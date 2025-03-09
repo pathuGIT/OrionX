@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export const subAdmin = (req, res, next) => {
+export const userRole = (req, res, next) => {
     if (!req.headers.authorization) {
         return res.status(401).json({ message: 'No token provided' }); // Ensure no `next()` call
     }
@@ -11,8 +11,12 @@ export const subAdmin = (req, res, next) => {
     //check user role is admin?
     const decoded = jwt.decode(token);
     const userRole = decoded?.role;
-    if(userRole !== 'sub_admin'){
-        return res.status(403).json({ message: 'You are not authorized bro..' });
+    if(userRole !== 'super_admin'){
+        return res.status(403).json({ message: 'You are not authorized..' });
+    }else if(userRole !== 'sub_admin'){
+        return res.status(403).json({ message: 'You are not authorized..' });
+    }else if(userRole !== 'employee'){
+        return res.status(403).json({ message: 'You are not authorized..' });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
