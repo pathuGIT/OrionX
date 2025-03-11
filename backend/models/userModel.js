@@ -9,8 +9,8 @@ export const registerSuperAdminSystemUserModel = async (pswd, employee_id) => {
     return result[0];
 }
 
-//register users 
-export const registerSystemUserModel = async (pswd, employee_id) => {
+//register emplyoee
+export const registerEmployeeModel = async (pswd, employee_id) => {
     const [result] = await pool.query(
         'INSERT INTO systemuser (password, role, status, employee_id) VALUES (?, ?, ?, ?)',
         [pswd, 'employee', 'active', employee_id]
@@ -18,18 +18,33 @@ export const registerSystemUserModel = async (pswd, employee_id) => {
     return result[0];
 }
 
-//get employees & system user by email or phone
-export const getUserByUserEmailORPswdModel = async (credintial) => {
-    const [result] = await pool.query(
-        'select s.user_id, s.password, s.role, s.status, e.email, e.employee_id, s.refresh_token from systemuser s inner join employee e on s.employee_id = e.employee_id where email = ? || phone = ?',
-        [credintial, credintial]
-    );
 
-    console.log(result[0].email)
-    return result[0];
-}
+//get employees & system user by email or phone
+// export const getUserByUserEmailORPswdModel = async (credintial) => {
+//     const [result] = await pool.query(
+//         'select s.user_id, s.password, s.role, s.status, e.email, e.employee_id, s.refresh_token from systemuser s inner join employee e on s.employee_id = e.employee_id where email = ? || phone = ?',
+//         [credintial, credintial]
+//     );
+
+//     console.log(result[0].email)
+//     return result[0];
+// }
 
 //get employee by email
+
+// Get employees & system users by email or phone
+export const getUserByUserEmailORPswdModel = async (credential) => {
+    const [result] = await pool.query(
+        'SELECT s.user_id, s.password, s.role, s.status, e.email, e.employee_id, s.refresh_token FROM systemuser s INNER JOIN employee e ON s.employee_id = e.employee_id WHERE e.email = ? OR e.phone = ?',
+        [credential, credential]
+    );
+
+    if (result.length === 0) return null; // Prevent accessing undefined index
+
+    console.log("User Found:", result[0].email);
+    return result[0];
+};
+
 export const getEmployeeByEmailModel = async (email) => {
     const [result] = await pool.query(
         'select * from employee where email = ?',
@@ -60,7 +75,7 @@ export const getSystemUserByEmpIdModel = async (empId) => {
 }
 
 //register employees
-export const registerEmployeeModel = async (name, phone, email, bod, salary) => {
+export const addEmployeeModel = async (name, phone, email, bod, salary) => {
     const hireDate = new Date().toISOString().split('T')[0];
     const [result] = await pool.query(
         'INSERT INTO employee (name,phone,email,bod,salary,hire_date) VALUES (?, ?, ?, ?, ?, ?)',

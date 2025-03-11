@@ -1,7 +1,11 @@
 import pool from '../config/db.js';
 
-export const saveRefreshTokenModel = async (token, userId) => {
+export const saveSystemuserRefreshTokenModel = async (token, userId) => {
     await pool.query('UPDATE systemuser SET refresh_token = ? WHERE user_id = ?', [token, userId]);
+}
+
+export const saveCustomerRefreshTokenModel = async (token, customer_id) => {
+    await pool.query('UPDATE customer SET refresh_token = ? WHERE customer_id = ?', [token, customer_id]);
 }
 
 export const isRefreshTokenValidModel = async (userId, token) => {

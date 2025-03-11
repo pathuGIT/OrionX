@@ -4,7 +4,7 @@ import { AuthContext } from '../context/Authcontext';
 import { loginUser } from '../services/AuthService';
 
 export const Login = () => {
-    const [user, setUser] = useState({ credintial: '', pswd: '' });
+    const [user, setUser] = useState({ credential: '', password: '' });
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ export const Login = () => {
             } else if (role === 'employee') {
                 navigate('/employee');
             } else if (role === 'customer') {
-                navigate('/customer');
+                navigate('/');
             }
 
         } catch (error) {
@@ -47,7 +47,7 @@ export const Login = () => {
                 <input
                     className=' block border'
                     type="text"
-                    name="credintial" // Added name attribute
+                    name="credential" // Added name attribute
                     placeholder="Username"
                     value={user.username}
                     onChange={handleChange} // Using generic handleChange function
@@ -55,7 +55,7 @@ export const Login = () => {
                 <input
                     className=' block border'
                     type="password"
-                    name="pswd" // Added name attribute
+                    name="password" // Added name attribute
                     placeholder="Password"
                     value={user.password}
                     onChange={handleChange} // Using generic handleChange function

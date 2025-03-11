@@ -19,11 +19,55 @@ export const getCustomerByPhoneModel = async (phone) => {
     return result[0];
 }
 
-export const registerCustomerModel = async (name, email, address, phone) => {
+//get employees & system user by email or phone
+// export const getCustomerByEmailORPswdModel = async (credintial) => {
+//     const [result] = await pool.query(
+//         'SELECT customer_id, email, role, phone, staus FROM customer WHERE staus = ? AND (email = ? OR phone = ?)',
+//         ['active',credintial, credintial]
+//     );
+
+//     console.log(result[0].email)
+//     return result[0];
+// }
+
+//get customers by customer id
+
+// Get customers by email or phone
+export const getCustomerByEmailORPswdModel = async (credential) => {
+    const [result] = await pool.query(
+        'SELECT customer_id, pasword as password, email, role, phone, staus, refresh_token FROM customer WHERE staus = ? AND (email = ? OR phone = ?)',
+        ['active', credential, credential]
+    );
+
+    if (result.length === 0) return null; // Prevent accessing undefined index
+
+    console.log("Customer Found:", result[0].email);
+    return result[0];
+};
+
+export const getCustomersByCusIdModel = async (empId) => {
+    const [result] = await pool.query(
+        'select * from customer where pasword IS NOT NULL and customer_id = ?',
+        [empId]
+    );
+    console.log(result[0])
+    return result[0];
+}
+
+export const addCustomerModel = async (name, email, address, phone) => {
     const create_date = new Date().toISOString().split('T')[0];
     const [result] = await pool.query(
         'INSERT INTO customer (name, email, role, address, phone, staus, create_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [name, email, 'customer', address, phone, 'active', create_date]
+    );
+    return result[0];
+}
+
+//register customer 
+export const registerCustomerModel = async (password, customer_id) => {
+    const [result] = await pool.query(
+        'UPDATE customer SET pasword = ? WHERE customer_id = ?',
+        [password, customer_id]
     );
     return result[0];
 }

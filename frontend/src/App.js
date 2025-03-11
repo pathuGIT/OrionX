@@ -9,6 +9,7 @@ import EmployeeDB from './pages/EmployeeDB';
 import CustomerDB from './pages/CustomerDB';
 import { AuthProvider } from './context/Authcontext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Profile from './pages/Profile';
 function App() {
   return (
     <AuthProvider>
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />

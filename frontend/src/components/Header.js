@@ -25,9 +25,10 @@ export const Header = () => {
   return (
     <header className=' mx-20 my-10 border border-black'>
       <nav className=' flex gap-2 relative '>
-        <Link to="/" className={`${dashboard == null ? 'visible': 'hidden'}`}>Home</Link>
-        <Link to={dashboard} className={`${user == null ? 'hidden': 'visible'}`} >Dashboard</Link>
-        <Link to="/login" className=' absolute right-2'>Login</Link>
+        <Link to="/" className={`${dashboard == null || sessionStorage.getItem('role') == 'customer' ? 'visible': 'hidden'}`}>Home</Link>
+        <Link to={dashboard} className={`${user != null && sessionStorage.getItem('role') != 'customer' ? 'visible': 'hidden'}`} >Dashboard</Link>
+        <Link to="/login" className={`${sessionStorage.getItem('role') == 'customer' || sessionStorage.getItem('role') != null ? 'hidden ' : 'visible absolute right-2'}`}>Login</Link>
+        <Link to="/profile" className={`${sessionStorage.getItem('role') == 'customer' ? 'visible absolute right-2' : 'hidden'}`}>Profile</Link>
       </nav>
     </header>
   )

@@ -24,7 +24,8 @@ CREATE TABLE Customer(
     phone VARCHAR(12) UNIQUE NOT NULL,
     staus ENUM('active','inactive'),
     create_date DATE,
-    pasword VARCHAR(255)
+    pasword VARCHAR(255),
+    refresh_token VARCHAR(255)
 );
 
 -- Create SystemUser table

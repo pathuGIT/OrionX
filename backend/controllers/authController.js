@@ -1,8 +1,13 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getUserByUserEmailORPswdModel, registerSuperAdminSystemUserModel, getSystemUserByEmpIdModel, registerSystemUserModel } from '../models/userModel.js';
-import { saveRefreshTokenModel, isRefreshTokenValidModel } from '../models/authModule.js';
-
+import {
+    getUserByUserEmailORPswdModel,
+    registerSuperAdminSystemUserModel,
+    getSystemUserByEmpIdModel,
+    registerEmployeeModel
+} from '../models/userModel.js';
+import { saveSystemuserRefreshTokenModel, isRefreshTokenValidModel, saveCustomerRefreshTokenModel } from '../models/authModule.js';
+import { getCustomersByCusIdModel, registerCustomerModel, getCustomerByEmailORPswdModel } from '../models/customerModel.js';
 
 //Register employee 
 export const registerEmp = async (req, res) => {
@@ -13,21 +18,22 @@ export const registerEmp = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(pswd, 10);
         //await registerSuperAdminSystemUserModel(hashedPassword, employee_id);
-        await registerSystemUserModel(hashedPassword, employee_id);
+        await registerEmployeeModel(hashedPassword, employee_id);
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         res.status(500).json({ msg: 'error register employees.', error });
     }
 }
+
 //Register customer 
 export const registerCus = async (req, res) => {
     const { password, customer_id } = req.body;
     try {
-        const userAlreadyExist = await getCustomersByCusIdModel(employee_id);
+        const userAlreadyExist = await getCustomersByCusIdModel(customer_id);
         if (userAlreadyExist) return res.status(400).json({ message: 'This User already exist...' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await registerSystemUserModel(hashedPassword, customer_id);
+        await registerCustomerModel(hashedPassword, customer_id);
         res.status(201).json({ message: 'Customer registered successfully' });
     } catch (error) {
         res.status(500).json({ msg: 'error register customer.', error });
@@ -36,29 +42,48 @@ export const registerCus = async (req, res) => {
 
 // For login
 export const login = async (req, res) => {
-    const { credintial, pswd } = req.body;
-    //const user = null;
+    const { credential, password } = req.body;
 
     try {
-        // Fetch user by email or contact no
-        const user = await getUserByUserEmailORPswdModel(credintial);
-        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+        // Try finding the user in customer model first
+        let user = await getCustomerByEmailORPswdModel(credential);
 
+        // If not found, try the system user model
+        if (!user) {
+            user = await getUserByUserEmailORPswdModel(credential);
+        }
+
+        // If still not found, return error
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        console.log("User found:", user);
         // Compare passwords
-        const isMatch = await bcrypt.compare(pswd, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Password not matched.' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Password not matched.' });
+        }
 
-        // Generate JWT
-        const token = jwt.sign({ useId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
-        const refreshToken = jwt.sign({ useId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '1h' });
-
-        console.log(user.user_id + user.role);
-        await saveRefreshTokenModel(refreshToken, user.user_id);
-        res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });
+        if (user.role == 'customer') {
+            const token = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
+            const refreshToken = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '1h' });
+            
+            await saveCustomerRefreshTokenModel(refreshToken, user.customer_id);
+            res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.customer_id, role: user.role, token, refreshToken });
+        } else {
+            const token = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
+            const refreshToken = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '1h' });
+    
+            await saveSystemuserRefreshTokenModel(refreshToken, user.user_id);
+            res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });    
+        }
+        
     } catch (error) {
-        res.status(500).json({ msg: 'error during login', error });
+        res.status(500).json({ msg: 'Error during login', error });
     }
-}
+};
+
+
 
 export const refresh = async (req, res) => {
     const refreshToken = req.body.refreshKey;
