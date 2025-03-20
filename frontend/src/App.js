@@ -9,6 +9,7 @@ import EmployeeDB from './pages/EmployeeDB';
 import CustomerDB from './pages/CustomerDB';
 import { AuthProvider } from './context/Authcontext';
 import ProtectedRoute from './components/ProtectedRoute';
+import EventForm from './components/EventForm';
 import Profile from './pages/Profile';
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
             <Route path="/customer" element={<ProtectedRoute name="customer"><CustomerDB /></ProtectedRoute>} />
+            <Route path="/customer/event" element={<EventForm/>} />
           </Routes>
         </main>
         <Footer />
