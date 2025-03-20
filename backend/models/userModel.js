@@ -101,3 +101,12 @@ export const checkUserIsActive = async (userId) => {
     );
     return result[0];
 }
+
+//get employees
+export const getEmployeeModel = async () => {
+    
+    const [result] = await pool.query(
+        'SELECT employee_id, name, phone, email, bod, hire_date FROM employee'
+    );
+    return result;
+}

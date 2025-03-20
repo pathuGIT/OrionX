@@ -10,12 +10,13 @@ import CustomerDB from './pages/CustomerDB';
 import { AuthProvider } from './context/Authcontext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Profile from './pages/Profile';
+import SuperAdminHome from './pages/superAdmin/SuperAdminHome';
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Header />
-        <main className=' px-20 py-10'>
+        <main className=' px-20'>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -23,7 +24,8 @@ function App() {
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
-            <Route path="/customer" element={<ProtectedRoute name="customer"><CustomerDB /></ProtectedRoute>} />
+            <Route path="/customr" element={<ProtectedRoute name="customer"><CustomerDB /></ProtectedRoute>} />
+            <Route path="/superAdminHome" element={<ProtectedRoute name="customer"> <SuperAdminHome /> </ProtectedRoute>} />
           </Routes>
         </main>
         <Footer />
