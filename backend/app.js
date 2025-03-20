@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRouter from './routes/userRouter.js';
 import mailRouter from './routes/mailRouter.js';
+import  eventRoutes from './routes/eventRoutes.js';
 
 const app = express();
 
@@ -14,6 +15,10 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRouter);
 app.use('/api/mail', mailRouter);
+
+
+//event routes
+app.use('/api/events', eventRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
