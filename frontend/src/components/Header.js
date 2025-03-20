@@ -23,7 +23,7 @@ export const Header = () => {
   },[user])
 
   return (
-    <header className=' mx-20 my-10 border border-black'>
+    <header className=' mx-20 mt-10 border border-black'>
       <nav className=' flex gap-2 relative '>
         <Link to="/" className={`${dashboard == null || sessionStorage.getItem('role') == 'customer' ? 'visible': 'hidden'}`}>Home</Link>
         <Link to={dashboard} className={`${user != null && sessionStorage.getItem('role') != 'customer' ? 'visible': 'hidden'}`} >Dashboard</Link>
