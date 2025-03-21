@@ -3,6 +3,7 @@ import {
     addEmployeeModel, 
     getEmployeeByEmailModel, 
     getEmployeeByPhoneModel,
+    getEmployeeModel,
     updateUserRoleModel,
     checkUserIsActive} from '../models/userModel.js';
 import { sendIdToUserMethod } from '../controllers/mailController.js';
@@ -68,4 +69,29 @@ export const changeUserRole = async (req, res) => {
     }catch(error){
         res.status(500).json({msg: 'Server error...', error })
     }
+}
+// update employee details
+export const updateEmployees = async (req, res) => {
+    const { employee_id, name, phone, email, salary } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(employee_id);
+        console.log(checkUserId);
+        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+
+        await updateEmployeesModel(employee_id, name, phone, email, salary);
+
+        res.status(200).json({ message: 'Employee updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+export const getEmployee = async (req, res) => {
+    try{
+        const result = await getEmployeeModel();
+        res.status(201).json({ employees: result });
+    }catch(error){
+        res.status(500).json({ msg: 'Server error...', error });
+    } 
 }
