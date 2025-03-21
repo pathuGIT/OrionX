@@ -94,7 +94,8 @@ export const refresh = async (req, res) => {
     const decodedRToken = jwt.decode(refreshToken);
     const userId = decodedRToken?.useId;
 
-    if (!userId || !(await isRefreshTokenValidModel(userId, refreshToken))) {
+    console.log(userId)
+    if (await isRefreshTokenValidModel(userId, refreshToken)) {
         console.error('Invalid refresh token');
         return res.sendStatus(403);
     }
