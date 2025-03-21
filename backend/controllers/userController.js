@@ -80,11 +80,3 @@ export const getEmployee = async (req, res) => {
     } 
 }
 
-export const getEmployee = async (req, res) => {
-    try{
-        const result = await getEmployeeModel();
-        res.status(201).json({ employees: result });
-    }catch(error){
-        res.status(500).json({ msg: 'Server error...', error });
-    } 
-}
