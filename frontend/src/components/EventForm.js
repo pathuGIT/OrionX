@@ -1,6 +1,7 @@
 // src/components/EventForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import './EventForm.css';
 
 const EventForm = () => {
     const [eventType, setEventType] = useState('');
@@ -42,10 +43,10 @@ const EventForm = () => {
     };
 
     return (
-        <div>
+        <div className="event-form">
             <h2>Create Event</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
+            {error && <p>{error}</p>}
+            {success && <p className="success">{success}</p>}
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Event Type:</label>
