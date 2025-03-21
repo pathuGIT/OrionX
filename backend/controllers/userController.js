@@ -4,8 +4,7 @@ import {
     getEmployeeByEmailModel, 
     getEmployeeByPhoneModel,
     updateUserRoleModel,
-    checkUserIsActive, 
-    getEmployeeModel} from '../models/userModel.js';
+    checkUserIsActive} from '../models/userModel.js';
 import { sendIdToUserMethod } from '../controllers/mailController.js';
 import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } from '../models/customerModel.js';
 
@@ -69,13 +68,4 @@ export const changeUserRole = async (req, res) => {
     }catch(error){
         res.status(500).json({msg: 'Server error...', error })
     }
-}
-
-export const getEmployee = async (req, res) => {
-    try{
-        const result = await getEmployeeModel();
-        res.status(201).json({ employees: result });
-    }catch(error){
-        res.status(500).json({ msg: 'Server error...', error });
-    } 
 }
