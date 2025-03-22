@@ -51,7 +51,7 @@ export const getEmployeeByEmailModel = async (email) => {
         [email]
     );
     console.log(result[0])
-    return result[0];
+    return result[0]
 }
 
 //get employees by phone
@@ -101,7 +101,6 @@ export const checkUserIsActive = async (userId) => {
     );
     return result[0];
 }
-
 //get employees
 export const getEmployeeModel = async () => {
     

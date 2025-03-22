@@ -3,7 +3,6 @@ import SuperAdminSideNav from '../components/SuperAdminSideNav';
 import { useNavigate } from 'react-router-dom';
 import SuperAdminHome from './superAdmin/SuperAdminHome';
 import AddEmployee from './superAdmin/AddEmployee';
-import GetEmployees from './superAdmin/GetEmployees';
 
 const SuperAdminDB = () => {
   const navigate = useNavigate();
@@ -14,8 +13,8 @@ const SuperAdminDB = () => {
         return <SuperAdminHome />
       case 'addEmployees':
         return <AddEmployee />
-      case 'getEmployees':
-        return <GetEmployees /> // Replace with your actual component
+      case 'Link1':
+        return <p>Content for Link 2</p>; // Replace with your actual component
       case 'Link2':
         return <p>Content for Link 2</p>; // Replace with your actual component
       case 'Link3':
