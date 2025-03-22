@@ -10,7 +10,7 @@ router.post('/addEmployee',superAdmin,  addEmployee);
 router.post('/addCustomer', superAdmin, addCustomer);
 router.post('/changeUserRole', superAdmin, changeUserRole);
 router.get('/getEmployees', superAdmin, getEmployee);
-router.post('/updateEmployee',updateEmployees);
+router.post('/updateEmployee',superAdmin,updateEmployees);
 //sub admins
 
 //employee

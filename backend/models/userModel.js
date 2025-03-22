@@ -109,3 +109,23 @@ export const getEmployeeModel = async () => {
     );
     return result;
 }
+
+//get epmloyee by id
+export const getEmployeeByuserIdModel = async (employee_id) => {
+    const [result] = await pool.query(
+        'SELECT * FROM employee WHERE employee_id = ?',
+        [employee_id]
+    );
+    //console.log(result[0]);
+    return result[0];
+};
+
+//update employees
+export const updateEmployeesModel = async (employee_id, name, phone, email, bod, salary, hire_date) => {
+    const [result] = await pool.query(
+        'UPDATE employee SET name = ?, phone = ?, email = ?, bod = ?, salary = ?, hire_date =?  WHERE employee_id = ?',  
+        [name, phone, email, bod, salary, hire_date, employee_id]
+    );
+    return result[0];
+};
+
