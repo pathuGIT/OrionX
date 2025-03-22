@@ -39,61 +39,6 @@ CREATE TABLE SystemUser (
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE CASCADE
 );
 
--- Trigger to format employee_id
-DELIMITER //
-
-CREATE TRIGGER before_employee_insert
-BEFORE INSERT ON Employee
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(employee_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Employee;
-    SET new_id = CONCAT('EMP', LPAD(max_id, 3, '0'));
-    SET NEW.employee_id = new_id;
-END //
-
--- Trigger to format customer_id
-DELIMITER //
-
-CREATE TRIGGER before_customer_insert
-BEFORE INSERT ON Customer
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(customer_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Customer;
-    SET new_id = CONCAT('CUS', LPAD(max_id, 3, '0'));
-    SET NEW.customer_id = new_id;
-END //
-
--- Trigger to format user_id
-CREATE TRIGGER before_user_insert
-BEFORE INSERT ON SystemUser
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(user_id, 3) AS UNSIGNED)), 0) + 1 INTO max_id FROM SystemUser;
-    SET new_id = CONCAT('SU', LPAD(max_id, 3, '0'));
-    SET NEW.user_id = new_id;
-END //
-
-DELIMITER ;
-
-
-
-
--- Insert sample data
-INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
-INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
-INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());
-
-
-
 ---catering system tables---
 
 --Menu table
@@ -195,5 +140,64 @@ CREATE TABLE OrderSummary (
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE
 );
+
+
+
+
+
+-- Trigger to format employee_id
+DELIMITER //
+
+CREATE TRIGGER before_employee_insert
+BEFORE INSERT ON Employee
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(employee_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Employee;
+    SET new_id = CONCAT('EMP', LPAD(max_id, 3, '0'));
+    SET NEW.employee_id = new_id;
+END //
+
+-- Trigger to format customer_id
+DELIMITER //
+
+CREATE TRIGGER before_customer_insert
+BEFORE INSERT ON Customer
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(customer_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Customer;
+    SET new_id = CONCAT('CUS', LPAD(max_id, 3, '0'));
+    SET NEW.customer_id = new_id;
+END //
+
+-- Trigger to format user_id
+CREATE TRIGGER before_user_insert
+BEFORE INSERT ON SystemUser
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(user_id, 3) AS UNSIGNED)), 0) + 1 INTO max_id FROM SystemUser;
+    SET new_id = CONCAT('SU', LPAD(max_id, 3, '0'));
+    SET NEW.user_id = new_id;
+END //
+
+DELIMITER ;
+
+
+
+
+-- Insert sample data
+INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
+INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
+INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());
+
+
 
 
