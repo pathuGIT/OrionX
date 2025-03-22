@@ -137,3 +137,12 @@ export const deleteEmployeesModel = async (employee_id) => {
     );
     return result[0];
 };
+
+//update employee(systemuser) status
+export const updateEmployeesStatusModel = async (employee_id, status) => {
+    const [result] = await pool.query(
+        'UPDATE systemuser SET status = ? WHERE employee_id = ?',
+        [status, employee_id]
+    );
+    return result[0];
+};
