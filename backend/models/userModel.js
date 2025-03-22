@@ -129,3 +129,11 @@ export const updateEmployeesModel = async (employee_id, name, phone, email, bod,
     return result[0];
 };
 
+//delete employees
+export const deleteEmployeesModel = async (employee_id) => {
+    const [result] = await pool.query(
+        'DELETE FROM employee WHERE employee_id = ?',
+        [employee_id]
+    );
+    return result[0];
+};
