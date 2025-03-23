@@ -63,7 +63,7 @@ CREATE TABLE Category_Menu_Type (
     category_menu_type_Id VARCHAR(10) PRIMARY KEY,
     menu_type_id VARCHAR(10),
     category_id VARCHAR(10),
-    limit INT DEFAULT NULL, 
+    item_limit  INT DEFAULT NULL, 
     FOREIGN KEY (menu_type_id) REFERENCES Menu_Type(menu_type_id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES Category(category_id) ON DELETE CASCADE
 );
