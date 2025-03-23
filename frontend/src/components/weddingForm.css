@@ -5,16 +5,33 @@
     border-radius: 10px;
     background: #f8f9fa;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .wedding-form h2 {
     text-align: center;
 }
 
+.form-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction:row;
+    justify-content:space-between;
+    gap: 20px; /* Adjust this value to increase or decrease spacing */
+    align-items: center;
+}
+
 .wedding-form label {
     display: block;
     margin-top: 10px;
     font-weight: bold;
+    width: 100%;
+    text-align: left;
 }
 
 .wedding-form input {
