@@ -7,7 +7,12 @@ export const loginUser = async (credentials) => {
   return response.data; // Returns user emailOrPhone, id, role, token, refresh token
 };
 
-export const registerUser = async (userData) => {
-  const response = await api.post('/auth/register', userData);
+export const registerEmployee = async (employeeData) => {
+  const response = await api.post('/auth/register-employee', employeeData);
+  return response.data; // Returns success message
+};
+
+export const registerCustomer = async (customerData) => {
+  const response = await api.post('/auth/register-customer', customerData);
   return response.data; // Returns success message
 };
