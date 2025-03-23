@@ -41,105 +41,53 @@ CREATE TABLE SystemUser (
 
 ---catering system tables---
 
---Menu table
-CREATE TABLE Menu (
-    menu_id INT PRIMARY KEY AUTO_INCREMENT,
-    menu_name VARCHAR(255) NOT NULL,
-    eventType_id INT NOT NULL,
-    menuType_id INT NOT NULL,
-    description TEXT,
+CREATE TABLE Menu_List_Type (
+    menu_list_type_id VARCHAR(10) PRIMARY KEY,
+    menu_list_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Menu_Type (
+    menu_type_id VARCHAR(10) PRIMARY KEY,
+    menu_type_name VARCHAR(255) NOT NULL,
+    menu_list_type_id VARCHAR(10),
     price DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (eventType_id) REFERENCES EventType(eventType_id) ON DELETE CASCADE, 
-    FOREIGN KEY (menuType_id) REFERENCES MenuType(menuType_id) ON DELETE CASCADE --If an eventType_id from EventType is deleted, all menus linked to that eventType_id in the Menu table will be automatically deleted.
+    FOREIGN KEY (menu_list_type_id) REFERENCES Menu_List_Type(menu_list_type_id) ON DELETE CASCADE
 );
 
-
---MenuType Table
-CREATE TABLE MenuType (
-    menuType_id INT PRIMARY KEY AUTO_INCREMENT,
-    menu_id INT,
-    menuType_name VARCHAR(100) UNIQUE NOT NULL
-    FOREIGN KEY (menu_id) REFERENCES Menu(menu_id) ON DELETE CASCADE
-);
-
-
---Category Table
 CREATE TABLE Category (
-    category_id INT PRIMARY KEY AUTO_INCREMENT,
-    category_name VARCHAR(100) NOT NULL,
-    menuType_id INT,
-    FOREIGN KEY (menuType_id) REFERENCES MenuType(menuType_id) ON DELETE CASCADE
-    FOREIGN KEY (menu_id) REFERENCES Menu(menu_id) ON DELETE CASCADE
+    category_id VARCHAR(10) PRIMARY KEY,
+    category_name VARCHAR(255) NOT NULL
 );
 
---Item Table
-CREATE TABLE Item (
-    item_id INT PRIMARY KEY AUTO_INCREMENT,
-    item_name VARCHAR(255) NOT NULL,
-    category_id INT,
+CREATE TABLE Category_Menu_Type (
+    category_menu_type_Id VARCHAR(10) PRIMARY KEY,
+    menu_type_id VARCHAR(10),
+    category_id VARCHAR(10),
+    limit INT DEFAULT NULL, 
+    FOREIGN KEY (menu_type_id) REFERENCES Menu_Type(menu_type_id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES Category(category_id) ON DELETE CASCADE
 );
 
---CustomerSelection Table
-CREATE TABLE CustomerSelection (
-    selection_id INT PRIMARY KEY AUTO_INCREMENT,
-    customer_id INT,
-    menuType_id INT,
-    category_id INT,
-    item_id INT,
-    quantity INT DEFAULT 1,
-    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE,
-    FOREIGN KEY (menuType_id) REFERENCES MenuType(menuType_id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES Category(category_id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES MenuItem(item_id) ON DELETE CASCADE
+CREATE TABLE Item (
+    item_id VARCHAR(10) PRIMARY KEY,
+    item_name VARCHAR(255) NOT NULL
 );
 
---Bites Table
-CREATE TABLE Bites (
-    bite_id INT PRIMARY KEY AUTO_INCREMENT,
-    bite_name VARCHAR(100) NOT NULL,
-    selection_id  INT,
-    weight DECIMAL(5,2) NOT NULL, -- Weight in grams or kg
-    price DECIMAL(10,2) NOT NULL
-    FOREIGN KEY (selection_id) REFERENCES CustomerSelection(selection_id) ON DELETE CASCADE
+CREATE TABLE Item_Category_Menu_Type (
+    ICMT_Id VARCHAR(10) PRIMARY KEY,
+    category_menu_type_id VARCHAR(10),
+    item_id VARCHAR(10),
+    FOREIGN KEY (category_menu_type_id) REFERENCES Category_Menu_Type(category_menu_type_Id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES Item(item_id) ON DELETE CASCADE
 );
 
-
---Beverages Table
-CREATE TABLE Beverages (
-    beverage_id INT PRIMARY KEY AUTO_INCREMENT,
-    beverage_name VARCHAR(100) NOT NULL,
-    selection_id  INT,
-    price DECIMAL(10,2) NOT NULL
-    FOREIGN KEY (selection_id) REFERENCES CustomerSelection(selection_id) ON DELETE CASCADE
+CREATE TABLE Customer_Menu_Item_Selection (
+    customer_id VARCHAR(10) NOT NULL,
+    ICMT_Id VARCHAR(10),
+    PRIMARY KEY (customer_id, ICMT_Id),
+    FOREIGN KEY (ICMT_Id) REFERENCES Item_Category_Menu_Type(ICMT_Id) ON DELETE CASCADE
 );
 
---order table
-CREATE TABLE Orders (
-    order_id INT PRIMARY KEY AUTO_INCREMENT,
-    customer_id INT,
-    total_price DECIMAL(10,2),
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    bite_id INT,                -- Foreign key to Bites table (if the order contains a bite)
-    beverage_id INT,            -- Foreign key to Beverages table 
-    menu_item_id INT,           -- Foreign key to MenuItem table 
-    quantity INT DEFAULT 1,     -- Quantity of the selected items
-    price DECIMAL(10,2),        -- Price for the selected items
-    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE,
-    FOREIGN KEY (bite_id) REFERENCES Bites(bite_id) ON DELETE CASCADE,
-    FOREIGN KEY (beverage_id) REFERENCES Beverages(beverage_id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_item_id) REFERENCES Item(item_id) ON DELETE CASCADE
-);
-
-
---OrderSummary Table
-CREATE TABLE OrderSummary (
-    order_id INT PRIMARY KEY AUTO_INCREMENT,
-    customer_id INT,
-    total_price DECIMAL(10,2),
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE
-);
 
 
 
