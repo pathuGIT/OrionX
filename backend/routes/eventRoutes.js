@@ -1,10 +1,11 @@
-// routes/eventRoutes.js
 import express from 'express';
-import { createEvent } from '../controllers/eventController.js'; // Named import
-import { validateEvent } from '../middleware/validateEvent.js'; // Named import
+import { createEvents } from '../controllers/eventController.js';
+import { validateEvent } from '../middleware/validateEvent.js';
+import { createWedding } from '../controllers/weddingController.js';
 
-const router = express.Router();
+// Create separate routers for events and weddings
+export const eventRoute = express.Router();
+eventRoute.post('/', validateEvent, createEvents);
 
-router.post('/', validateEvent, createEvent);
-
-export default router;
+export const weddingRoutes = express.Router();
+weddingRoutes.post('/', createWedding);
