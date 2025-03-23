@@ -15,6 +15,7 @@ const EventForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        alert('Event created successfully!');
         setError('');
         setSuccess('');
 
@@ -30,6 +31,7 @@ const EventForm = () => {
         try {
             const response = await axios.post('http://localhost:8000/api/events', eventData);
             setSuccess(response.data.message);
+            
             // Reset form fields
             setEventType('');
             setEventDate('');
