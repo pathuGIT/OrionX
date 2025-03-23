@@ -1,7 +1,7 @@
 // controllers/eventController.js
 import Event from '../models/eventModel.js'; // Default import
 
-export const createEvent = (req, res) => {
+export const createEvents = (req, res) => {
     const eventData = req.body;
 
     Event.create(eventData, (err, eventId) => {
@@ -12,3 +12,6 @@ export const createEvent = (req, res) => {
         res.status(201).json({ message: 'Event created successfully!', eventId });
     });
 };
+
+
+
