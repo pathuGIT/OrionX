@@ -5,6 +5,10 @@ import {
     getEmployeeByPhoneModel,
     getEmployeeModel,
     updateUserRoleModel,
+    updateEmployeesModel,
+    getEmployeeByuserIdModel,
+    deleteEmployeesModel,
+    updateEmployeesStatusModel,
     checkUserIsActive} from '../models/userModel.js';
 import { sendIdToUserMethod, } from '../controllers/mailController.js';
 import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } from '../models/customerModel.js';
@@ -70,23 +74,8 @@ export const changeUserRole = async (req, res) => {
         res.status(500).json({msg: 'Server error...', error })
     }
 }
-// update employee details
-export const updateEmployees = async (req, res) => {
-    const { employee_id, name, phone, email, salary } = req.body;
-    try {
-        const checkUserId = await getEmployeeByuserIdModel(employee_id);
-        console.log(checkUserId);
-        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
 
-
-        await updateEmployeesModel(employee_id, name, phone, email, salary);
-
-        res.status(200).json({ message: 'Employee updated successfully' });
-    } catch (error) {
-        res.status(500).json({ msg: 'Server error...', error });
-    }
-};
-
+// get employees data
 export const getEmployee = async (req, res) => {
     try{
         const result = await getEmployeeModel();
@@ -95,3 +84,48 @@ export const getEmployee = async (req, res) => {
         res.status(500).json({ msg: 'Server error...', error });
     } 
 }
+
+// update employee details
+export const updateEmployees = async (req, res) => {
+    const { employee_id, name, phone, email, bod, salary, hire_date} = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(employee_id);
+        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await updateEmployeesModel(employee_id, name, phone, email, bod, salary, hire_date);
+
+        res.status(200).json({ message: 'Employee updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// delete employee
+export const deleteEmployees = async (req, res) => {
+    const { employee_id } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(employee_id);
+        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await deleteEmployeesModel(employee_id);
+
+        res.status(200).json({ message: 'Employee deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// update employee(systemuser) status
+export const updateEmployeesStatus = async (req, res) => {
+    const { employee_id, status } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(employee_id);
+        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await updateEmployeesStatusModel(employee_id, status);
+
+        res.status(200).json({ message: 'Employee status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
