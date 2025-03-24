@@ -4,6 +4,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRouter from './routes/userRouter.js';
 import mailRouter from './routes/mailRouter.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
+import menuTypeRoutes from "./routes/menuTypeRoutes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRouter);
 app.use('/api/mail', mailRouter);
 app.use('/menus', menuListTypeRoutes);
+app.use('/menutypes', menuTypeRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
