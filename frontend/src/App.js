@@ -13,6 +13,9 @@ import EventForm from './components/EventForm';
 import WeddingForm from './components/weddingForm';
 import Profile from './pages/Profile';
 import SuperAdminHome from './pages/superAdmin/SuperAdminHome';
+import EmployeeRegistration from './pages/EmployeeRegistration';
+import CustomerRegistration from './pages/CustomerRegistration';
+
 function App() {
   return (
     <AuthProvider>
@@ -30,6 +33,8 @@ function App() {
             <Route path="/customer/event" element={<EventForm/>} />
             <Route path="/customer/wedding" element={<WeddingForm/>} />
             <Route path="/superAdminHome" element={<ProtectedRoute name="customer"> <SuperAdminHome /> </ProtectedRoute>} />
+            <Route path="/registration/register-employee" element={<EmployeeRegistration />}/>
+            <Route path="/registration/register-customer" element={<CustomerRegistration />}/>
           </Routes>
         </main>
         <Footer />

@@ -21,7 +21,7 @@ export const registerEmp = async (req, res) => {
         await registerEmployeeModel(hashedPassword, employee_id);
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        res.status(500).json({ msg: 'error register employees.', error });
+        res.status(500).json({ message: 'error register employees.', error });
     }
 }
 
@@ -36,7 +36,7 @@ export const registerCus = async (req, res) => {
         await registerCustomerModel(hashedPassword, customer_id);
         res.status(201).json({ message: 'Customer registered successfully' });
     } catch (error) {
-        res.status(500).json({ msg: 'error register customer.', error });
+        res.status(500).json({ message: 'error register customer.', error });
     }
 }
 

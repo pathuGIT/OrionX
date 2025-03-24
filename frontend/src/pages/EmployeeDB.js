@@ -4,7 +4,7 @@ import { Logout } from '../components/Logout'
 const EmployeeDB = () => {
   return (
     <div>
-      <p>Welcome Sub Admin: {sessionStorage.getItem('credential')}</p>
+      <p>Welcome Employee: {sessionStorage.getItem('credential')}</p>
       <Logout />
     </div>
   )
