@@ -1,7 +1,12 @@
 import api from './Api';
 
-export const getEmploees = async () => {
+export const getEmployees = async () => {
     const response = await api.get('/user/getEmployees');
-    console.log(response.data);
     return response.data; 
+}; 
+
+//updateEmployee_link
+export const updateEmployees = async (employeeId, data) => {
+    const response = await api.put(`/employees/${employeeId}`, data);
+    return response.data;
 };

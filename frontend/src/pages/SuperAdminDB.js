@@ -3,20 +3,22 @@ import SuperAdminSideNav from '../components/SuperAdminSideNav';
 import { useNavigate } from 'react-router-dom';
 import SuperAdminHome from './superAdmin/SuperAdminHome';
 import AddEmployee from './superAdmin/AddEmployee';
+import GetEmployees from './superAdmin/GetEmployee';
+import UpdateEmployees from './superAdmin/UpdateEmployees';
 
 const SuperAdminDB = () => {
   const navigate = useNavigate();
   const [display, setDisplay] = useState('superAdminHome');
   const renderContent = () => {
-    switch (display) {
+    switch (display) {    
       case 'superAdminHome':
         return <SuperAdminHome />
       case 'addEmployees':
         return <AddEmployee />
-      case 'Link1':
-        return <p>Content for Link 2</p>; // Replace with your actual component
-      case 'Link2':
-        return <p>Content for Link 2</p>; // Replace with your actual component
+      case 'getEmployees':
+        return <GetEmployees />
+      case 'updateEmployeesById':
+        return <UpdateEmployees/> 
       case 'Link3':
         return <p>Content for Link 3</p>; // Replace with your actual component
       default:
