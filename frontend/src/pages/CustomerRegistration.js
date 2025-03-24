@@ -1,33 +1,20 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/Authcontext';
-import { loginUser } from '../services/AuthService';
+import { registerCustomer } from '../services/AuthService';
 
-export const Login = () => {
-    const [user, setUser] = useState({ credential: '', password: '' });
-    const { login } = useContext(AuthContext);
+const CustomerRegistration = () => {
+    const [user, setUser] = useState({ password: '', customer_id: '' });
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { userEmail, id, role, token, refreshToken } = await loginUser(user);
-            login(userEmail, id, role, token, refreshToken);
-            
-            if (role === 'super_admin') {
-                navigate('/superAdmin');
-            } else if (role === 'sub_admin') {
-                navigate('/subAdmin');
-            } else if (role === 'employee') {
-                console.log("asasasasasasasasasasasasasasa")
-                navigate('/employee');
-            } else if (role === 'customer') {
-                navigate('/');
-            }
-
+            const { message } = await registerCustomer(user);
+            console.log(message);
+            navigate('/login');
         } catch (error) {
             console.error('Login error:', error); // Log the error
-            const errorMessage = error?.response?.data?.message || 'Login failed';
+            const errorMessage = 'customer registration failed';
             alert(errorMessage);
         }
     };
@@ -42,15 +29,15 @@ export const Login = () => {
 
     return (
         <div>
-            <h1 className=' text-xl mb-7'>Login</h1>
+            <h1 className=' text-xl mb-7'>Employee Registration</h1>
 
             <form onSubmit={handleSubmit} className='mt-2'>
                 <input
                     className=' block border'
                     type="text"
-                    name="credential" // Added name attribute
-                    placeholder="Username"
-                    value={user.username}
+                    name="customer_id" // Added name attribute
+                    placeholder="customer id"
+                    value={user.customer_id}
                     onChange={handleChange} // Using generic handleChange function
                 />
                 <input
@@ -61,8 +48,10 @@ export const Login = () => {
                     value={user.password}
                     onChange={handleChange} // Using generic handleChange function
                 />
-                <button type="submit" className=' block border p-2 mt-2'>Login</button>
+                <button type="submit" className=' block border p-2 mt-2'>Register</button>
             </form>
         </div>
     )
 }
+
+export default CustomerRegistration

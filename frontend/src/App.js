@@ -11,6 +11,9 @@ import { AuthProvider } from './context/Authcontext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Profile from './pages/Profile';
 import SuperAdminHome from './pages/superAdmin/SuperAdminHome';
+import EmployeeRegistration from './pages/EmployeeRegistration';
+import CustomerRegistration from './pages/CustomerRegistration';
+
 function App() {
   return (
     <AuthProvider>
@@ -26,6 +29,8 @@ function App() {
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
             <Route path="/customr" element={<ProtectedRoute name="customer"><CustomerDB /></ProtectedRoute>} />
             <Route path="/superAdminHome" element={<ProtectedRoute name="customer"> <SuperAdminHome /> </ProtectedRoute>} />
+            <Route path="/registration/register-employee" element={<EmployeeRegistration />}/>
+            <Route path="/registration/register-customer" element={<CustomerRegistration />}/>
           </Routes>
         </main>
         <Footer />

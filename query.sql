@@ -11,8 +11,8 @@ CREATE TABLE Employee (
     email VARCHAR(255) UNIQUE,
     bod DATE,
     salary DECIMAL(10,2),
-    hire_date DATE,
-    active_token VARCHAR(15)
+    service_charge_precentage DECIMAL(3.2),
+    hire_date DATE
 );
 
 CREATE TABLE Customer(
@@ -200,6 +200,38 @@ DELIMITER ;
 
 
 
+CREATE TABLE Booking (
+    booking_id VARCHAR(10) PRIMARY KEY,
+    time_slot ENUM('day','night'),
+    status ENUM('pending','confirmed','cancelled'),
+    booking_date DATE,
+    total_price DECIMAL(10,2),
+    created_at DATE,
+    updated_at DATE,
+    venue_id VARCHAR(10),
+    FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE CASCADE
+);
+
+CREATE TABLE venue (
+    venue_id VARCHAR(10) PRIMARY KEY,
+    venue_name VARCHAR(200),
+    time_slot ENUM('day','night'),
+    Location ENUM('indoor','outdoor','both'),
+    capacity INT,
+    price DECIMAL(10,2),
+    created_at DATE,
+    updated_at DATE
+);
+
+CREATE TABLE bookig_history (
+    history_id VARCHAR(10),
+    action_date DATE,
+    employee_id VARCHAR(10),
+    booking_id VARCHAR(10),
+    FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
+    FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+);
+
 -- Trigger to format employee_id
 DELIMITER //
 
@@ -230,6 +262,7 @@ BEGIN
     SET NEW.customer_id = new_id;
 END //
 
+DELIMITER //
 -- Trigger to format user_id
 CREATE TRIGGER before_user_insert
 BEFORE INSERT ON SystemUser
@@ -243,16 +276,54 @@ BEGIN
     SET NEW.user_id = new_id;
 END //
 
+DELIMITER //
+-- Trigger to format venue_id
+CREATE TRIGGER before_venue_insert
+BEFORE INSERT ON venue
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(venue_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM venue;
+    SET new_id = CONCAT('VNU', LPAD(max_id, 3, '0'));
+    SET NEW.venue_id = new_id;
+END //
+
+DELIMITER //
+-- Trigger to format booking_id
+CREATE TRIGGER before_booking_insert
+BEFORE INSERT ON booking
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(booking_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM booking;
+    SET new_id = CONCAT('BID', LPAD(max_id, 3, '0'));
+    SET NEW.booking_id = new_id;
+END //
+
+DELIMITER //
+CREATE TRIGGER before_bookig_history_insert
+BEFORE INSERT ON bookig_history
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(history_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM bookig_history;
+    SET new_id = CONCAT('BHID', LPAD(max_id, 3, '0'));
+    SET NEW.history_id = new_id;
+END //
+
 DELIMITER ;
 
 
 
 
 -- Insert sample data
-INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
+-- hard code super admin data
+INSERT INTO Employee (name, phone, email, bod, salary, service_charge_precentage, hire_date) VALUES ('shan', '0771988848 ', 'shan@gmail.com', '0000-00-00', 0, 0,  CURDATE());
 INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
 INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());
-
-
-
-
