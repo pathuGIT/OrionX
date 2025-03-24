@@ -38,10 +38,10 @@ CREATE TABLE Event (
     Function_durationTo TIME,
     Tea_table_Time TIME,
     Dress_Time TIME,
-    Booking_ID INT,
-    BarRequirementID VARCHAR,
-    FOREIGN KEY (Booking_ID) REFERENCES Booking(BookingID),
-    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
+    booking_id VARCHAR(10),
+    BarRequirementID VARCHAR(10),
+    FOREIGN KEY (booking_id) REFERENCES Booking(booking_id) ON DELETE CASCADE,
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID) ON DELETE CASCADE
 );
 
 -- Create Bar table
@@ -49,17 +49,16 @@ CREATE TABLE Bar (
     BarRequirementID VARCHAR(10) PRIMARY KEY,
     LiquorTimeFrom TIME,
     LiquorTimeTo TIME,
-    BarPax INT,
+    BarPax INT
 );
 
 -- Create Bite table
 
 CREATE TABLE Bite (
     Bite_ID VARCHAR(10) PRIMARY KEY,
-    Event_ID INT,
     Quantity INT,
     Type VARCHAR(50),
-    BarRequirementID VARCHAR,
+    BarRequirementID VARCHAR(10),
     FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
@@ -68,22 +67,22 @@ CREATE TABLE Bite (
 CREATE TABLE BiteByGuest (
     Bite_Name VARCHAR(100),
     Quantity INT,
-    BarRequirementID VARCHAR,
+    BarRequirementID VARCHAR(10),
     FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
--- Create Coordinator table
+-- Create Cordinator table
 
-CREATE TABLE Coordinator (
+CREATE TABLE Cordinator (
     Cordinator_Name VARCHAR(100) PRIMARY KEY,
-    Contact_no VARCHAR(15),
+    Contact_no VARCHAR(15)
 );
 
 -- Create Event_Service table
 
 CREATE TABLE Event_Service (
     Event_Service_ID VARCHAR(10) PRIMARY KEY,
-    Event_Service_Name VARCHAR(100),
+    Event_Service_Name VARCHAR(100)
 );
 
 -- Create Vendor table
@@ -149,7 +148,7 @@ CREATE TABLE Table_Chair_Arrangement (
     Table_Cloth_Color VARCHAR(50),
     Bow_Color VARCHAR(50),
     Chair_Cover_Color VARCHAR(50),
-    Table_Reserve_ID VARCHAR,
+    Table_Reserve_ID VARCHAR(10),
     FOREIGN KEY (Table_Reserve_ID) REFERENCES Table_Reserve(Table_Reserve_ID)
 );
 
@@ -158,7 +157,7 @@ CREATE TABLE Table_Chair_Arrangement (
 CREATE TABLE Table_Reserve (
     Table_Reserve_ID VARCHAR(10) PRIMARY KEY,
     Table_Number INT,
-    Reserve_Name VARCHAR(100),
+    Reserve_Name VARCHAR(100)
 );
 
 --many to many tables 
@@ -166,7 +165,7 @@ CREATE TABLE Table_Reserve (
 CREATE TABLE Event_Event_Service (
     Event_ID VARCHAR(10) NOT NULL,
     event_service_id VARCHAR(10) NOT NULL,
-    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
     FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE
 );
 
@@ -174,28 +173,28 @@ CREATE TABLE Event_Service_Vendor (
     event_service_id VARCHAR(10) NOT NULL,
     vendor_id VARCHAR(10) NOT NULL,
     FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
-    FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id) ON DELETE CASCADE
+    FOREIGN KEY (vendor_id) REFERENCES Vendor(vendor_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Event_Assigned_Employee (
     Event_ID VARCHAR(10) NOT NULL,
-    employee_assign_id VARCHAR(10) NOT NULL,
-    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
-    FOREIGN KEY (employee_assign_id) REFERENCES Employees(employee_assign_id) ON DELETE CASCADE
+    Employee_Assign_ID VARCHAR(10) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Employee_Assign_ID) REFERENCES Assigned_Employee(Employee_Assign_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE Event_Table_Chair (
     Event_ID VARCHAR(10) NOT NULL,
     Arrangement_Id VARCHAR(10) NOT NULL,
-    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
-    FOREIGN KEY (Arrangement_Id) REFERENCES Arrangements(Arrangement_Id) ON DELETE CASCADE
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Arrangement_Id) REFERENCES Table_Chair_Arrangement(Arrangement_Id) ON DELETE CASCADE
 );
 
-CREATE TABLE Event_Coordinator (
+CREATE TABLE Event_Cordinator (
     Event_ID VARCHAR(10) NOT NULL,
-    Coordinator_Name VARCHAR(100) NOT NULL,
-    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
-    FOREIGN KEY (Coordinator_Name) REFERENCES Coordinator(Coordinator_Name) ON DELETE CASCADE
+    Cordinator_Name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Cordinator_Name) REFERENCES Cordinator(Cordinator_Name) ON DELETE CASCADE
 );
 
 
@@ -243,7 +242,7 @@ BEGIN
     DECLARE new_id VARCHAR(10);
 
     SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
-    SET new_id = CONCAT('TCA', LPAD(max_id, 3, '0'));
+    SET new_id = CONCAT('EMP', LPAD(max_id, 3, '0'));
     SET NEW.Employee_Assign_ID = new_id;
 END //
 
