@@ -30,7 +30,7 @@ CREATE TABLE Customer(
 
 -- Create Event table
 CREATE TABLE Event (
-    Event_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
+    Event_ID VARCHAR(10) PRIMARY KEY,
     Buffet_TimeFrom TIME,
     Buffet_TimeTo TIME,
     Additional_Time TIME,
@@ -38,7 +38,6 @@ CREATE TABLE Event (
     Function_durationTo TIME,
     Tea_table_Time TIME,
     Dress_Time TIME,
-    Menu_ID INT,
     Booking_ID INT,
     BarRequirementID VARCHAR,
     FOREIGN KEY (Booking_ID) REFERENCES Booking(BookingID),
@@ -47,7 +46,7 @@ CREATE TABLE Event (
 
 -- Create Bar table
 CREATE TABLE Bar (
-    BarRequirementID VARCHAR AUTO_INCREMENT PRIMARY KEY,
+    BarRequirementID VARCHAR(10) PRIMARY KEY,
     LiquorTimeFrom TIME,
     LiquorTimeTo TIME,
     BarPax INT,
@@ -56,7 +55,7 @@ CREATE TABLE Bar (
 -- Create Bite table
 
 CREATE TABLE Bite (
-    Bite_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
+    Bite_ID VARCHAR(10) PRIMARY KEY,
     Event_ID INT,
     Quantity INT,
     Type VARCHAR(50),
@@ -83,14 +82,14 @@ CREATE TABLE Coordinator (
 -- Create Event_Service table
 
 CREATE TABLE Event_Service (
-    Event_Service_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
+    Event_Service_ID VARCHAR(10) PRIMARY KEY,
     Event_Service_Name VARCHAR(100),
 );
 
 -- Create Vendor table
 
 CREATE TABLE Vendor (
-    Vendor_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
+    Vendor_ID VARCHAR(10) PRIMARY KEY,
     Contact_no VARCHAR(15),
     Email VARCHAR(100),
     Address VARCHAR(255)
@@ -99,8 +98,8 @@ CREATE TABLE Vendor (
 -- Create Assigned_Employee table
 
 CREATE TABLE Assigned_Employee (
-    Employee_Assign_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
-    Employee_ID VARCHAR,
+    Employee_Assign_ID VARCHAR(10) PRIMARY KEY,
+    Employee_ID VARCHAR(10),
     User_Role VARCHAR(50),
     FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID)
 );
@@ -109,33 +108,33 @@ CREATE TABLE Assigned_Employee (
 
 CREATE TABLE Soft_Drink (
     Beverage_Name VARCHAR(100),
-    ForBar BOOLEAN,
-    ForTable BOOLEAN,
-    Event_ID VARCHAR,
+    ForBar INT,
+    ForTable INT,
+    Event_ID VARCHAR(10),
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
 );
 
 -- Create Wedding table
 
 CREATE TABLE Wedding (
-    Event_ID VARCHAR,
+    Event_ID VARCHAR(10),
     Groom_Name VARCHAR(100),
     Bride_Name VARCHAR(100),
     Groom_Contact_no VARCHAR(15),
     Bride_Contact_no VARCHAR(15),
-    Fountain BOOLEAN,
-    ProsperityTable BOOLEAN,
+    Fountain VARCHAR(10),
+    ProsperityTable VARCHAR(10),
     Groom_Address VARCHAR(255),
     Bride_Address VARCHAR(255),
     Poruwa_CeremonyFrom TIME,
     Poruwa_CeremonyTo TIME,
-    Registration_Time DATETIME,
+    Registration_Time TIME,
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
 );
 
 -- Create CustomEvent table
 CREATE TABLE CustomEvent (
-    Event_ID INT,
+    Event_ID VARCHAR(10),
     ContactPersonName VARCHAR(100),
     ContactPersonNumber VARCHAR(15),
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
@@ -143,61 +142,191 @@ CREATE TABLE CustomEvent (
 
 -- Create Table_Chair table
 
-CREATE TABLE Table_Chair (
-    Arrangement_ID INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Table_Chair_Arrangement (
+    Arrangement_ID VARCHAR(10)  PRIMARY KEY,
     Head_Table_Pax INT,
     Top_Cloth_Color VARCHAR(50),
     Table_Cloth_Color VARCHAR(50),
     Bow_Color VARCHAR(50),
-    Chair_Cover_Color VARCHAR(50)
+    Chair_Cover_Color VARCHAR(50),
+    Table_Reserve_ID VARCHAR,
+    FOREIGN KEY (Table_Reserve_ID) REFERENCES Table_Reserve(Table_Reserve_ID)
 );
 
 -- Create Table_Reserve table
 
 CREATE TABLE Table_Reserve (
-    Table_Reserve_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Table_Reserve_ID VARCHAR(10) PRIMARY KEY,
     Table_Number INT,
     Reserve_Name VARCHAR(100),
-    Arrangement_ID INT,
-    FOREIGN KEY (Arrangement_ID) REFERENCES Table_Chair(Arrangement_ID)
 );
 
 --many to many tables 
 
 CREATE TABLE Event_Event_Service (
-    Event_ID INT NOT NULL,
-    event_service_id INT NOT NULL,
+    Event_ID VARCHAR(10) NOT NULL,
+    event_service_id VARCHAR(10) NOT NULL,
     FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
     FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Event_Service_Vendor (
-    event_service_id INT NOT NULL,
-    vendor_id INT NOT NULL,
+    event_service_id VARCHAR(10) NOT NULL,
+    vendor_id VARCHAR(10) NOT NULL,
     FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
     FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Event_Assigned_Employee (
-    Event_ID INT NOT NULL,
-    employee_assign_id INT NOT NULL,
+    Event_ID VARCHAR(10) NOT NULL,
+    employee_assign_id VARCHAR(10) NOT NULL,
     FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
     FOREIGN KEY (employee_assign_id) REFERENCES Employees(employee_assign_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Event_Table_Chair (
-    Event_ID INT NOT NULL,
-    Arrangement_Id INT NOT NULL,
+    Event_ID VARCHAR(10) NOT NULL,
+    Arrangement_Id VARCHAR(10) NOT NULL,
     FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
     FOREIGN KEY (Arrangement_Id) REFERENCES Arrangements(Arrangement_Id) ON DELETE CASCADE
 );
 
 CREATE TABLE Event_Coordinator (
-    Event_ID INT NOT NULL,
-    Coordinator_Name VARCHAR(255) NOT NULL,
+    Event_ID VARCHAR(10) NOT NULL,
+    Coordinator_Name VARCHAR(100) NOT NULL,
     FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
     FOREIGN KEY (Coordinator_Name) REFERENCES Coordinator(Coordinator_Name) ON DELETE CASCADE
 );
+
+
+
+-- Trigger to format Table_Reserve_ID
+DELIMITER //
+
+CREATE TRIGGER before_Table_Reserve
+BEFORE INSERT ON Table_Reserve
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Table_Reserve_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Table_Reserve;
+    SET new_id = CONCAT('TAB', LPAD(max_id, 3, '0'));
+    SET NEW.Table_Reserve_ID = new_id;
+END //
+
+
+-- Trigger to format Arrangement_ID
+DELIMITER //
+
+CREATE TRIGGER before_Table_Chair_Arrangement
+BEFORE INSERT ON Table_Chair_Arrangement
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Arrangement_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Table_Chair_Arrangement;
+    SET new_id = CONCAT('TCA', LPAD(max_id, 3, '0'));
+    SET NEW.Arrangement_ID = new_id;
+END //
+
+
+-- Trigger to format Employee_Assign_ID
+DELIMITER //
+
+CREATE TRIGGER before_Assigned_Employee
+BEFORE INSERT ON Assigned_Employee
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
+    SET new_id = CONCAT('TCA', LPAD(max_id, 3, '0'));
+    SET NEW.Employee_Assign_ID = new_id;
+END //
+
+
+-- Trigger to format Vendor_ID
+DELIMITER //
+
+CREATE TRIGGER before_Vendor
+BEFORE INSERT ON Vendor
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Vendor_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Vendor;
+    SET new_id = CONCAT('VEN', LPAD(max_id, 3, '0'));
+    SET NEW.Vendor_ID = new_id;
+END //
+
+
+-- Trigger to format Event_Service_ID
+DELIMITER //
+
+CREATE TRIGGER before_Event_Service
+BEFORE INSERT ON Event_Service
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Event_Service_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Event_Service;
+    SET new_id = CONCAT('ES', LPAD(max_id, 2, '0'));
+    SET NEW.Event_Service_ID = new_id;
+END //
+
+
+-- Trigger to format Bite_ID
+DELIMITER //
+
+CREATE TRIGGER before_Bite
+BEFORE INSERT ON Bite
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Bite_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Bite;
+    SET new_id = CONCAT('BITE', LPAD(max_id, 4, '0'));
+    SET NEW.Bite_ID = new_id;
+END //
+
+-- Trigger to format BarRequirementID
+DELIMITER //
+
+CREATE TRIGGER before_Bar
+BEFORE INSERT ON Bar
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(BarRequirementID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Bar;
+    SET new_id = CONCAT('BAR', LPAD(max_id, 3, '0'));
+    SET NEW.BarRequirementID = new_id;
+END //
+
+-- Trigger to format Event_ID
+DELIMITER //
+
+CREATE TRIGGER before_Event_ID
+BEFORE INSERT ON Event
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Event_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Event;
+    SET new_id = CONCAT('EVN', LPAD(max_id, 3, '0'));
+    SET NEW.Event_ID = new_id;
+END //
+
+
+
 
 
 -- Create SystemUser table
