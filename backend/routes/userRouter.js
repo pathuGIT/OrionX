@@ -13,6 +13,8 @@ router.get('/getEmployees', superAdmin,  getEmployee);
 router.post('/updateEmployee',superAdmin,updateEmployees);
 router.delete('/deleteEmployee',superAdmin,deleteEmployees);
 router.post('/updateStatus',superAdmin,updateEmployeesStatus);
+router.get('/getEmployees', superAdmin, getEmployee);
+router.post('/updateEmployee',updateEmployees);
 
 //sub admins
 

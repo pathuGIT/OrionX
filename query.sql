@@ -183,38 +183,6 @@ CREATE TABLE SystemUser (
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE CASCADE
 );
 
-CREATE TABLE Booking (
-    booking_id VARCHAR(10) PRIMARY KEY,
-    time_slot ENUM('day','night'),
-    status ENUM('pending','confirmed','cancelled'),
-    booking_date DATE,
-    total_price DECIMAL(10,2),
-    created_at DATE,
-    updated_at DATE,
-    venue_id VARCHAR(10),
-    FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE CASCADE
-);
-
-CREATE TABLE venue (
-    venue_id VARCHAR(10) PRIMARY KEY,
-    venue_name VARCHAR(200),
-    time_slot ENUM('day','night'),
-    Location ENUM('indoor','outdoor','both'),
-    capacity INT,
-    price DECIMAL(10,2),
-    created_at DATE,
-    updated_at DATE
-);
-
-CREATE TABLE bookig_history (
-    history_id VARCHAR(10),
-    action_date DATE,
-    employee_id VARCHAR(10),
-    booking_id VARCHAR(10),
-    FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
-    FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
-);
-
 -- Trigger to format employee_id
 DELIMITER //
 
@@ -304,5 +272,8 @@ DELIMITER ;
 
 
 
--- hard code super admin data
-INSERT INTO Employee (name, phone, email, bod, salary, service_charge_precentage, hire_date) VALUES ('shan', '0771988848 ', 'shan@gmail.com', '0000-00-00', 0, 0,  CURDATE());
+
+-- Insert sample data
+INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
+INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
+INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());
