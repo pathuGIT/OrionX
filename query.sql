@@ -30,7 +30,7 @@ CREATE TABLE Customer(
 
 -- Create Event table
 CREATE TABLE Event (
-    Event_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Event_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
     Buffet_TimeFrom TIME,
     Buffet_TimeTo TIME,
     Additional_Time TIME,
@@ -40,62 +40,57 @@ CREATE TABLE Event (
     Dress_Time TIME,
     Menu_ID INT,
     Booking_ID INT,
-    FOREIGN KEY (Booking_ID) REFERENCES Booking(BookingID)
+    BarRequirementID VARCHAR,
+    FOREIGN KEY (Booking_ID) REFERENCES Booking(BookingID),
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
 -- Create Bar table
 CREATE TABLE Bar (
-    BarRequirementID INT AUTO_INCREMENT PRIMARY KEY,
+    BarRequirementID VARCHAR AUTO_INCREMENT PRIMARY KEY,
     LiquorTimeFrom TIME,
     LiquorTimeTo TIME,
     BarPax INT,
-    Event_ID INT,
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
 );
 
 -- Create Bite table
 
 CREATE TABLE Bite (
-    Bite_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Bite_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
     Event_ID INT,
     Quantity INT,
     Type VARCHAR(50),
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+    BarRequirementID VARCHAR,
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
 -- Create BiteByGuest table
 
 CREATE TABLE BiteByGuest (
-    Event_ID INT,
-    Name VARCHAR(100),
+    Bite_Name VARCHAR(100),
     Quantity INT,
-    PRIMARY KEY (Event_ID, Name),
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+    BarRequirementID VARCHAR,
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
 -- Create Coordinator table
 
 CREATE TABLE Coordinator (
-    CoordinatorID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100),
+    Cordinator_Name VARCHAR(100) PRIMARY KEY,
     Contact_no VARCHAR(15),
-    Event_ID INT,
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
 );
 
 -- Create Event_Service table
 
 CREATE TABLE Event_Service (
-    Event_Service_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Event_Service_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
     Event_Service_Name VARCHAR(100),
-    Vendor_ID INT,
-    FOREIGN KEY (Vendor_ID) REFERENCES Vendor(Vendor_ID)
 );
 
 -- Create Vendor table
 
 CREATE TABLE Vendor (
-    Vendor_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Vendor_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
     Contact_no VARCHAR(15),
     Email VARCHAR(100),
     Address VARCHAR(255)
@@ -104,29 +99,26 @@ CREATE TABLE Vendor (
 -- Create Assigned_Employee table
 
 CREATE TABLE Assigned_Employee (
-    Employee_Assign_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Event_ID INT,
-    Employee_ID INT,
+    Employee_Assign_ID VARCHAR AUTO_INCREMENT PRIMARY KEY,
+    Employee_ID VARCHAR,
     User_Role VARCHAR(50),
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID)
 );
 
 -- Create Soft_Drink table
 
 CREATE TABLE Soft_Drink (
     Beverage_Name VARCHAR(100),
-    Event_ID INT,
-    Beverage_ID INT,
     ForBar BOOLEAN,
     ForTable BOOLEAN,
-    PRIMARY KEY (Beverage_ID, Event_ID),
+    Event_ID VARCHAR,
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
 );
 
 -- Create Wedding table
 
 CREATE TABLE Wedding (
-    Event_ID INT,
+    Event_ID VARCHAR,
     Groom_Name VARCHAR(100),
     Bride_Name VARCHAR(100),
     Groom_Contact_no VARCHAR(15),
@@ -170,6 +162,42 @@ CREATE TABLE Table_Reserve (
     FOREIGN KEY (Arrangement_ID) REFERENCES Table_Chair(Arrangement_ID)
 );
 
+--many to many tables 
+
+CREATE TABLE Event_Event_Service (
+    Event_ID INT NOT NULL,
+    event_service_id INT NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Service_Vendor (
+    event_service_id INT NOT NULL,
+    vendor_id INT NOT NULL,
+    FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
+    FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Assigned_Employee (
+    Event_ID INT NOT NULL,
+    employee_assign_id INT NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (employee_assign_id) REFERENCES Employees(employee_assign_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Table_Chair (
+    Event_ID INT NOT NULL,
+    Arrangement_Id INT NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Arrangement_Id) REFERENCES Arrangements(Arrangement_Id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Coordinator (
+    Event_ID INT NOT NULL,
+    Coordinator_Name VARCHAR(255) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Events(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Coordinator_Name) REFERENCES Coordinator(Coordinator_Name) ON DELETE CASCADE
+);
 
 
 -- Create SystemUser table
