@@ -16,3 +16,8 @@ export const getEmployeeById = async (employeeId) => {
     const response = await api.get(`/user/getEmployeeById/${employeeId}`);
     return response.data;
 };
+
+export const addEmployees = async (employeeData) => {
+    const response = await api.post(`user/addEmployee/`, employeeData);
+    return response.data;
+};
