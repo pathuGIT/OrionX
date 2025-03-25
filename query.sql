@@ -133,12 +133,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the maximum numerical value of category_id (excluding the 'CAT' prefix)
     SELECT COALESCE(MAX(CAST(SUBSTRING(category_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Category;
+
+    -- Generate new category_id with the 'C' prefix
     SET new_id = CONCAT('C', LPAD(max_id, 3, '0'));
+
+    -- Set the new category_id
     SET NEW.category_id = new_id;
 END //
 
 DELIMITER ;
+
 
 --trigger to format category_menu_type
 DELIMITER //
