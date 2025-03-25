@@ -10,7 +10,7 @@ import {
     deleteEmployeesModel,
     updateEmployeesStatusModel,
     checkUserIsActive} from '../models/userModel.js';
-import { sendIdToUserMethod } from '../controllers/mailController.js';
+import { sendIdToUserMethod, } from '../controllers/mailController.js';
 import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } from '../models/customerModel.js';
 
 //add employees (employees add to system by admin)
@@ -26,7 +26,7 @@ export const addEmployee = async (req, res) => {
         await addEmployeeModel(name, phone, email, bod, salary);
 
         const user = await getEmployeeByEmailModel(email);
-        await sendIdToUserMethod(name, "Deandra Registration", email, user.employee_id, 'http://localhost:8000/api/auth/register-employee');
+        await sendIdToUserMethod(name, "Deandra Registration", email, user.employee_id, 'http://localhost:3000/registration/register-employee');
 
         res.status(201).json({ message: `User registered successfully and User ID sent to email: ${email}` });
 
@@ -49,7 +49,7 @@ export const addCustomer = async (req, res) => {
         await addCustomerModel(name, email, address, phone);
 
         const user = await getCustomerByEmailModel(email);
-        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:8000/api/auth/register-customer');
+        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
 
         res.status(201).json({ message: `User registered successfully and User ID sent to email: ${email}` });
 
