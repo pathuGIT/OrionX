@@ -114,46 +114,6 @@ const AddEmployee = () => {
             />
           </div>
         </div>
-        {/* <input
-          className=' block border'
-          type="text"
-          name="name"
-          placeholder="name"
-          value={user.name}
-          onChange={handleChange}
-        />
-        <input
-          className=' block border'
-          type="text"
-          name="phone"
-          placeholder="phone"
-          value={user.phone}
-          onChange={handleChange}
-        />
-        <input
-          className=' block border'
-          type="text"
-          name="email"
-          placeholder="email"
-          value={user.email}
-          onChange={handleChange}
-        />
-        <input
-          className=' block border'
-          type="date" // Changed to date input
-          name="bod"
-          placeholder="bod"
-          value={user.bod}
-          onChange={handleChange} // Using generic handleChange function
-        />
-        <input
-          className=' block border'
-          type="text"
-          name="salary"
-          placeholder="salary"
-          value={user.salary}
-          onChange={handleChange}
-        /> */}
         <button type="submit" className=' block border p-2 mt-2'>Add Employee</button>
       </form>
     </div>
