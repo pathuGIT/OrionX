@@ -7,6 +7,8 @@ import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import categoryMenuTypeRoutes from "./routes/categoryMenuTypeRoutes.js";
+import itemRoutes from "./routes/itemRoutes.js";
+import icmtRoutes from "./routes/icmtRoutes.js";
 
 const app = express();
 
@@ -22,6 +24,8 @@ app.use('/menus', menuListTypeRoutes);
 app.use('/menutypes', menuTypeRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/categoryMenuTypes', categoryMenuTypeRoutes);
+app.use('/items', itemRoutes);
+app.use('/icmt', icmtRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
