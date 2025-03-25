@@ -86,19 +86,19 @@ export const getEmployee = async (req, res) => {
 }
 
 // update employee details
-export const updateEmployees = async (req, res) => {
-    const { employee_id, name, phone, email, bod, salary, hire_date} = req.body;
-    try {
-        const checkUserId = await getEmployeeByuserIdModel(employee_id);
-        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+// export const updateEmployees = async (req, res) => {
+//     const { employee_id, name, phone, email, bod, salary, hire_date} = req.body;
+//     try {
+//         const checkUserId = await getEmployeeByuserIdModel(employee_id);
+//         if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
 
-        await updateEmployeesModel(employee_id, name, phone, email, bod, salary, hire_date);
+//         await updateEmployeesModel(employee_id, name, phone, email, bod, salary, hire_date);
 
-        res.status(200).json({ message: 'Employee updated successfully' });
-    } catch (error) {
-        res.status(500).json({ msg: 'Server error...', error });
-    }
-};
+//         res.status(200).json({ message: 'Employee updated successfully' });
+//     } catch (error) {
+//         res.status(500).json({ msg: 'Server error...', error });
+//     }
+// };
 
 // delete employee
 export const deleteEmployees = async (req, res) => {
@@ -125,6 +125,34 @@ export const updateEmployeesStatus = async (req, res) => {
         await updateEmployeesStatusModel(employee_id, status);
 
         res.status(200).json({ message: 'Employee status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// Get employee by ID
+export const getEmployeeById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const employee = await getEmployeeByuserIdModel(id);
+        if (!employee) return res.status(404).json({ message: 'Employee not found' });
+        res.status(200).json(employee);
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+ // update employee details
+export const updateEmployees = async (req, res) => {
+    const { id } = req.params;
+    const { name, phone, email, bod, salary, hire_date } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(id);
+        if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await updateEmployeesModel(id, name, phone, email, bod, salary, hire_date);
+
+        res.status(200).json({ message: 'Employee updated successfully' });
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
     }
