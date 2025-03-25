@@ -120,14 +120,11 @@ export const sendIdToUserMethod = async (name, subject, email, message, url, res
                             <div class="content">
                                 <p>Hello <strong>${name}</strong>,</p>
                                 <p>Your requested ID is: <strong>${message}</strong></p>
-                                <p>Use the following API:</p>
-                                <a href="${url}" class="btn">Access API</a>
+                                <p>Use the following Link to register & use this id${message}:</p>
+                                <a href="${url}" class="btn">link</a>
                             </div>
                             <div class="footer">
                                 Best regards,<br>Deandra Team
-                            </div>
-                            <div class="unsubscribe">
-                                If you no longer wish to receive emails, <a href="https://yourdomain.com/unsubscribe?email=${email}">unsubscribe here</a>.
                             </div>
                         </div>
                     </body>
