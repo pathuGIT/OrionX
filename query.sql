@@ -89,6 +89,107 @@ CREATE TABLE Customer_Menu_Item_Selection (
 );
 
 
+--trigger to format menu_list_type
+DELIMITER //
+
+CREATE TRIGGER before_menu_list_type_insert
+BEFORE INSERT ON Menu_List_Type
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(menu_list_type_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Menu_List_Type;
+    SET new_id = CONCAT('MLT', LPAD(max_id, 3, '0'));
+    SET NEW.menu_list_type_id = new_id;
+END //
+
+DELIMITER ;
+
+--trigger to format menu_type
+DELIMITER //
+
+CREATE TRIGGER before_menu_type_insert
+BEFORE INSERT ON Menu_Type
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(menu_type_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Menu_Type;
+    SET new_id = CONCAT('MT', LPAD(max_id, 3, '0'));
+    SET NEW.menu_type_id = new_id;
+END //
+
+DELIMITER ;
+
+--trigger to format category
+DELIMITER //
+
+CREATE TRIGGER before_category_insert
+BEFORE INSERT ON Category
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(category_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Category;
+    SET new_id = CONCAT('C', LPAD(max_id, 3, '0'));
+    SET NEW.category_id = new_id;
+END //
+
+DELIMITER ;
+
+--trigger to format category_menu_type
+DELIMITER //
+
+CREATE TRIGGER before_category_menu_type_insert
+BEFORE INSERT ON Category_Menu_Type
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(category_menu_type_Id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Category_Menu_Type;
+    SET new_id = CONCAT('CMT', LPAD(max_id, 3, '0'));
+    SET NEW.category_menu_type_Id = new_id;
+END //
+
+DELIMITER ;
+
+--trigger to format item
+DELIMITER //
+
+CREATE TRIGGER before_item_insert
+BEFORE INSERT ON Item
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(item_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Item;
+    SET new_id = CONCAT('I', LPAD(max_id, 3, '0'));
+    SET NEW.item_id = new_id;
+END //
+
+DELIMITER ;
+
+--trigger to format item_category_menu_type
+DELIMITER //
+
+CREATE TRIGGER before_item_category_menu_type_insert
+BEFORE INSERT ON Item_Category_Menu_Type
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(ICMT_Id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Item_Category_Menu_Type;
+    SET new_id = CONCAT('ICMT', LPAD(max_id, 3, '0'));
+    SET NEW.ICMT_Id = new_id;
+END //
+
+DELIMITER ;
 
 
 
