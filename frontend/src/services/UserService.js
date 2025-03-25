@@ -6,7 +6,13 @@ export const getEmployees = async () => {
 }; 
 
 //updateEmployee_link
-export const updateEmployees = async (employeeId, data) => {
-    const response = await api.put(`/employees/${employeeId}`, data);
+export const updateEmployee = async (employeeId, data) => {
+    const response = await api.put(`/user/updateEmployee/${employeeId}`, data);
+    return response.data;
+};
+
+// Get employee by ID
+export const getEmployeeById = async (employeeId) => {
+    const response = await api.get(`/user/getEmployeeById/${employeeId}`);
     return response.data;
 };
