@@ -15,7 +15,7 @@ import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } fr
 
 //add employees (employees add to system by admin)
 export const addEmployee = async (req, res) => {
-    const { name, phone, email, bod, salary } = req.body;
+    const { name, phone, email, bod, serviceCharge, salary } = req.body;
     try {
         const checkPhone = await getEmployeeByPhoneModel(phone);
         if (checkPhone) return res.status(400).json({ message: 'Phone already exist...' });
@@ -23,7 +23,8 @@ export const addEmployee = async (req, res) => {
         const checkEmail = await getEmployeeByEmailModel(email);
         if (checkEmail) return res.status(400).json({ message: 'Email already exist...' });
 
-        await addEmployeeModel(name, phone, email, bod, salary);
+        if(serviceCharge == null) serviceCharge = 0;
+        await addEmployeeModel(name, phone, email, bod, serviceCharge, salary);
 
         const user = await getEmployeeByEmailModel(email);
         await sendIdToUserMethod(name, "Deandra Registration", email, user.employee_id, 'http://localhost:3000/registration/register-employee');

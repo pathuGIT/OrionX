@@ -75,11 +75,11 @@ export const getSystemUserByEmpIdModel = async (empId) => {
 }
 
 //register employees
-export const addEmployeeModel = async (name, phone, email, bod, salary) => {
+export const addEmployeeModel = async (name, phone, email, bod, serviceCharge, salary) => {
     const hireDate = new Date().toISOString().split('T')[0];
     const [result] = await pool.query(
-        'INSERT INTO employee (name,phone,email,bod,salary,hire_date) VALUES (?, ?, ?, ?, ?, ?)',
-        [name, phone, email, bod, salary, hireDate]
+        'INSERT INTO employee (name,phone,email,bod,salary,service_charge_precentage,hire_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [name, phone, email, bod, salary, serviceCharge, hireDate]
     );
     return result[0];
 }
