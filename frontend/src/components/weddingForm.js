@@ -9,8 +9,8 @@ const WeddingForm = () => {
         brideName: "",
         groomContact: "",
         brideContact: "",
-        fountain: false,
-        prosperityTable: false,
+        fountain: "",
+        prosperityTable: "",
         groomAddress: "",
         brideAddress: "",
         ceremonyFrom: "",
@@ -40,7 +40,7 @@ const WeddingForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        alert("Wedding created successfully!");
+        //alert("Wedding created successfully!");
         setMessage("");
         setError("");
 
@@ -53,8 +53,8 @@ const WeddingForm = () => {
                 brideName: "",
                 groomContact: "",
                 brideContact: "",
-                fountain: false,
-                prosperityTable: false,
+                fountain: "",
+                prosperityTable: "",
                 groomAddress: "",
                 brideAddress: "",
                 ceremonyFrom: "",
@@ -78,7 +78,7 @@ const WeddingForm = () => {
                     <div className="form-section">
                         <h3>Groom Details</h3>
                         <label>Event ID:</label>
-                        <input type="number" name="eventId" value={formData.eventId} onChange={handleChange} required />
+                        <input type="text" name="eventId" value={formData.eventId} onChange={handleChange} required />
 
                         <label>Groom Name:</label>
                         <input type="text" name="groomName" value={formData.groomName} onChange={handleChange} required />
