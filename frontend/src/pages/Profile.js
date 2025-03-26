@@ -16,7 +16,7 @@ const Profile = () => {
       case 'createWedding':
         return <WeddingForm />;
       default:
-        return <p>Page not found</p>;
+        return <p></p>;
     }
   };
 
