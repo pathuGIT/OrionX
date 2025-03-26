@@ -146,12 +146,12 @@ export const getEmployeeById = async (req, res) => {
  // update employee details
 export const updateEmployees = async (req, res) => {
     const { id } = req.params;
-    const { name, phone, email, bod, salary, hire_date } = req.body;
+    const { name, phone, email, bod, salary, service_charge_precentage, hire_date } = req.body;
     try {
         const checkUserId = await getEmployeeByuserIdModel(id);
         if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
 
-        await updateEmployeesModel(id, name, phone, email, bod, salary, hire_date);
+        await updateEmployeesModel(id, name, phone, email, bod, salary, service_charge_precentage, hire_date);
 
         res.status(200).json({ message: 'Employee updated successfully' });
     } catch (error) {
