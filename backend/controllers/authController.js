@@ -66,13 +66,13 @@ export const login = async (req, res) => {
 
         if (user.role == 'customer') {
             const token = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
-            const refreshToken = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '1h' });
+            const refreshToken = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '2h' });
             
             await saveCustomerRefreshTokenModel(refreshToken, user.customer_id);
             res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.customer_id, role: user.role, token, refreshToken });
         } else {
             const token = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
-            const refreshToken = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '1h' });
+            const refreshToken = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '2h' });
     
             await saveSystemuserRefreshTokenModel(refreshToken, user.user_id);
             res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });    
