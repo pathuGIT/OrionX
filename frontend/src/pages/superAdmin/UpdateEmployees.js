@@ -43,10 +43,10 @@ function UpdateEmployees() {
                 name: response.name,
                 phone: response.phone,
                 email: response.email,
-                bod: response.bod ? new Date(response.bod).toISOString().split('T')[0] : '',
+                bod: response.bod ,
                 salary: response.salary,
                 service_charge_precentage: response.service_charge_precentage,
-                hire_date: response.hire_date ? new Date(response.hire_date).toISOString().split('T')[0] : ''
+                hire_date: response.hire_date
             });
             setShowPopup(true);
         } catch (error) {
@@ -106,10 +106,10 @@ function UpdateEmployees() {
                             <td className="py-1 px-2">{employee.name}</td>
                             <td className="py-1 px-2">{employee.phone}</td>
                             <td className="py-1 px-2">{employee.email}</td>
-                            <td className="py-1 px-2">{employee.bod}</td>
+                            <td className="py-1 px-2">{new Date(employee.bod).toISOString().split('T')[0]}</td>
                             <td className="py-1 px-2">{employee.salary}</td>
                             <td className="py-1 px-2">{employee.service_charge_precentage}</td>
-                            <td className="py-1 px-2">{employee.hire_date}</td>
+                            <td className="py-1 px-2">{new Date(employee.hire_date).toISOString().split('T')[0]}</td>
                             <td className="py-1 px-2">
                                 <button onClick={() => handleActionClick(employee.employee_id)} className="bg-blue-500 text-white px-2 py-1 rounded">Actions</button>
                             </td>
@@ -188,7 +188,7 @@ function UpdateEmployees() {
                                     placeholder="Date of Birth"
                                     value={formData.bod}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border border-gray-300 rounded"
+                                    className="w-full p-2 border border-gray-400 rounded"
                                 />
                             </div>
                             <div>
