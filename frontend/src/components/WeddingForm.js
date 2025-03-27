@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { createWedding } from "../services/EventService"; // Import API function
 
 const WeddingForm = () => {
     const [formData, setFormData] = useState({
-       // eventId: "",
         groomName: "",
         brideName: "",
         groomContact: "",
@@ -19,7 +18,7 @@ const WeddingForm = () => {
 
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-    const [step, setStep] = useState(1); // Step tracker (1=Groom, 2=Bride, 3=Event)
+    const [step, setStep] = useState(1);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -38,10 +37,9 @@ const WeddingForm = () => {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8000/api/weddings", formData);
-            setMessage(response.data.message);
+            const response = await createWedding(formData);
+            setMessage(response.message);
             setFormData({
-               // eventId: "",
                 groomName: "",
                 brideName: "",
                 groomContact: "",
@@ -70,22 +68,16 @@ const WeddingForm = () => {
                 {step === 1 && (
                     <div className="flex flex-col items-center">
                         <h3 className="text-xl font-semibold mb-2">Groom Details</h3>
-                       
-
                         <label className="w-full text-left">Groom Name:</label>
-                        <input type="text" name="groomName" value={formData.groomName} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
-
+                        <input type="text" name="groomName" value={formData.groomName} onChange={handleChange} required className="w-full p-2 border rounded" />
+                        
                         <label className="w-full text-left">Groom Contact No:</label>
-                        <input type="text" name="groomContact" value={formData.groomContact} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="text" name="groomContact" value={formData.groomContact} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <label className="w-full text-left">Groom Address:</label>
-                        <input type="text" name="groomAddress" value={formData.groomAddress} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="text" name="groomAddress" value={formData.groomAddress} onChange={handleChange} required className="w-full p-2 border rounded" />
 
-                        <button type="button" onClick={handleNext} 
-                                className="w-full bg-green-500 text-white py-2 rounded mt-3 hover:bg-green-600">Next</button>
+                        <button type="button" onClick={handleNext} className="w-full bg-green-500 text-white py-2 rounded mt-3 hover:bg-green-600">Next</button>
                     </div>
                 )}
 
@@ -93,22 +85,17 @@ const WeddingForm = () => {
                     <div className="flex flex-col items-center">
                         <h3 className="text-xl font-semibold mb-2">Bride Details</h3>
                         <label className="w-full text-left">Bride Name:</label>
-                        <input type="text" name="brideName" value={formData.brideName} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="text" name="brideName" value={formData.brideName} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <label className="w-full text-left">Bride Contact No:</label>
-                        <input type="text" name="brideContact" value={formData.brideContact} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="text" name="brideContact" value={formData.brideContact} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <label className="w-full text-left">Bride Address:</label>
-                        <input type="text" name="brideAddress" value={formData.brideAddress} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="text" name="brideAddress" value={formData.brideAddress} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <div className="flex justify-between w-full mt-3">
-                            <button type="button" onClick={handleBack} 
-                                    className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
-                            <button type="button" onClick={handleNext} 
-                                    className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Next</button>
+                            <button type="button" onClick={handleBack} className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
+                            <button type="button" onClick={handleNext} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Next</button>
                         </div>
                     </div>
                 )}
@@ -119,45 +106,22 @@ const WeddingForm = () => {
 
                         <label className="w-full text-left">Fountain:</label>
                         <div className="flex space-x-4">
-                            <label>
-                                <input type="radio" name="fountain" value="yes" checked={formData.fountain === "yes"} onChange={handleChange} />
-                                Yes
-                            </label>
-                            <label>
-                                <input type="radio" name="fountain" value="no" checked={formData.fountain === "no"} onChange={handleChange} />
-                                No
-                            </label>
-                        </div>
-
-                        <label className="w-full text-left">Prosperity Table:</label>
-                        <div className="flex space-x-4">
-                            <label>
-                                <input type="radio" name="prosperityTable" value="yes" checked={formData.prosperityTable === "yes"} onChange={handleChange} />
-                                Yes
-                            </label>
-                            <label>
-                                <input type="radio" name="prosperityTable" value="no" checked={formData.prosperityTable === "no"} onChange={handleChange} />
-                                No
-                            </label>
+                            <label><input type="radio" name="fountain" value="yes" checked={formData.fountain === "yes"} onChange={handleChange} /> Yes</label>
+                            <label><input type="radio" name="fountain" value="no" checked={formData.fountain === "no"} onChange={handleChange} /> No</label>
                         </div>
 
                         <label className="w-full text-left">Poruwa Ceremony From:</label>
-                        <input type="time" name="ceremonyFrom" value={formData.ceremonyFrom} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="time" name="ceremonyFrom" value={formData.ceremonyFrom} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <label className="w-full text-left">Poruwa Ceremony To:</label>
-                        <input type="time" name="ceremonyTo" value={formData.ceremonyTo} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="time" name="ceremonyTo" value={formData.ceremonyTo} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <label className="w-full text-left">Registration Time:</label>
-                        <input type="time" name="registrationTime" value={formData.registrationTime} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                        <input type="time" name="registrationTime" value={formData.registrationTime} onChange={handleChange} required className="w-full p-2 border rounded" />
 
                         <div className="flex justify-between w-full mt-3">
-                            <button type="button" onClick={handleBack} 
-                                    className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
-                            <button type="submit" 
-                                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Submit</button>
+                            <button type="button" onClick={handleBack} className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
+                            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Submit</button>
                         </div>
                     </div>
                 )}
@@ -167,4 +131,3 @@ const WeddingForm = () => {
 };
 
 export default WeddingForm;
-//test

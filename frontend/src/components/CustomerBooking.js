@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../context/Authcontext"; // Import AuthContext
+import { AuthContext } from "../context/Authcontext";
+import { getCustomerBookings } from "../services/EventService";
 
 const CustomerBookings = () => {
-    const { user } = useContext(AuthContext); // Get user from AuthContext
+    const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        let customerID = sessionStorage.getItem("id"); // Fetch from sessionStorage
-        
+        let customerID = sessionStorage.getItem("id");
+
         if (!customerID && user) {
-            customerID = user.id; // If not found in sessionStorage, get from AuthContext
+            customerID = user.id;
         }
 
         if (!customerID) {
@@ -21,47 +21,55 @@ const CustomerBookings = () => {
             return;
         }
 
-        // Fetch customer bookings from backend
-        axios.get(`http://localhost:8000/api/customer/${customerID}`)
-            .then(response => {
-                setBookings(response.data.data);
+        // Fetch customer bookings using the API function
+        getCustomerBookings(customerID)
+            .then(data => {
+                setBookings(data);
                 setLoading(false);
             })
             .catch(error => {
-                console.error("Error fetching bookings:", error);
                 setError("Failed to load bookings.");
                 setLoading(false);
             });
 
     }, [user]);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
+    // Function to format date
+    const formatDate = (isoDate) => {
+        const date = new Date(isoDate);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    if (loading) return <p className="text-center text-xl">Loading...</p>;
+    if (error) return <p className="text-center text-red-600">{error}</p>;
 
     return (
-        <div>
-            <h2>My Bookings</h2>
+        <div className="container mx-auto px-4 py-8">
+            <h2 className="text-3xl font-bold text-center mb-6">My Bookings</h2>
             {bookings.length === 0 ? (
-                <p>No bookings found.</p>
+                <p className="text-center">No bookings found.</p>
             ) : (
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Booking ID</th>
-                            <th>Customer ID</th>
-                            <th>Booking Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {bookings.map((booking) => (
-                            <tr key={booking.booking_id}>
-                                <td>{booking.booking_id}</td>
-                                <td>{booking.customer_id}</td>
-                                <td>{booking.booking_date}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {bookings.map((booking) => (
+                        <div key={booking.booking_id} className="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+                            <div className="p-6">
+                                <h3 className="text-2xl font-semibold text-blue-500">Booking ID: {booking.booking_id}</h3>
+                                <p className="text-lg text-gray-600 mt-2">Customer ID: {booking.customer_id}</p>
+                                <p className="text-lg text-gray-600 mt-2">Booking Date: {formatDate(booking.booking_date)}</p>
+                            </div>
+                            <div className="p-4 bg-gray-100 text-center">
+                                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300">
+                                    Plan Your Event
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );
