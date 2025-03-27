@@ -134,6 +134,7 @@ CREATE TABLE Wedding (
 -- Create CustomEvent table
 CREATE TABLE CustomEvent (
     Event_ID VARCHAR(10),
+    Event_Name VARCHAR(100),
     ContactPersonName VARCHAR(100),
     ContactPersonNumber VARCHAR(15),
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
