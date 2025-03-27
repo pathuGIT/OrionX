@@ -3,7 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRouter from './routes/userRouter.js';
 import mailRouter from './routes/mailRouter.js';
-import { eventRoute, weddingRoutes } from './routes/eventRoutes.js';
+import { eventRoute, weddingRoutes,cusBookingRoutes } from './routes/eventRoutes.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -29,11 +29,13 @@ app.use('/items', itemRoutes);
 app.use('/icmt', icmtRoutes);
 
 
+
 //event routes
 app.use('/api/events', eventRoute);
-//app.use('/api/events1', eventRoutes1);
 app.use('/api/weddings', weddingRoutes);
-//app.use('/api/customs', customRoutes);
+app.use('/api/customer', cusBookingRoutes);
+
+
 
 // Global error handler
 app.use((err, req, res, next) => {
