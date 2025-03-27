@@ -1,7 +1,9 @@
 // Customer profile page
 import React, { useState } from 'react';
 import CustomerSideNav from '../components/ProfileSideNav.js';
-import CustomerEventPlanning from './customer/CustomerEventPlanning.js';
+import CustomerEventPlanning from '../pages/customer/CustomerEventPlanning.js';
+import CustomerBookings from '../components/CustomerBooking.js';
+
 
 
 
@@ -12,8 +14,8 @@ const Profile = () => {
     switch (display) {
       case 'customerEvent':
         return <CustomerEventPlanning />;
-      case '':
-        return <p></p>;
+      case 'PlanYourEvent':
+        return <CustomerBookings />;
       default:
         return <p></p>;
     }

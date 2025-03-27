@@ -43,10 +43,10 @@ function UpdateEmployees() {
                 name: response.name,
                 phone: response.phone,
                 email: response.email,
-                bod: response.bod ,
+                bod: response.bod ? new Date(response.bod).toISOString().split('T')[0] : '',
                 salary: response.salary,
                 service_charge_precentage: response.service_charge_precentage,
-                hire_date: response.hire_date
+                hire_date: response.hire_date ? new Date(response.hire_date).toISOString().split('T')[0] : ''
             });
             setShowPopup(true);
         } catch (error) {
@@ -83,33 +83,33 @@ function UpdateEmployees() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 bg-white shadow-md rounded-lg">
+        <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg">
             <p className="text-xl font-semibold mb-4">Update Employees</p>
-            <table className="min-w-full bg-white">
+                       <table className="min-w-full bg-white border border-gray-300">
                 <thead>
-                    <tr>
-                        <th className="py-1 px-2 w-20">Employee ID</th>
-                        <th className="py-1 px-2 w-32">Name</th>
-                        <th className="py-1 px-2 w-32">Phone</th>
-                        <th className="py-1 px-2 w-40">Email</th>
-                        <th className="py-1 px-2 w-32">Date of Birth</th>
-                        <th className="py-1 px-2 w-24">Salary</th>
-                        <th className="py-1 px-2 w-32">Service Charge (%)</th>
-                        <th className="py-1 px-2 w-32">Hire Date</th>
-                        <th className="py-1 px-2 w-24">Actions</th>
+                    <tr className="border border-gray-300">
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Employee ID</th>
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Name</th>
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Phone</th>
+                        <th className="py-1 px-2 border-r border-gray-300  text-left">Email</th>
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Date of Birth</th>
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Salary</th>
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Service Charge (%)</th>
+                        <th className="py-1 px-2 border-r border-gray-300 text-left">Hire Date</th>
+                        <th className="py-1 px-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {employees.map((employee) => (
-                        <tr key={employee.employee_id}>
-                            <td className="py-1 px-2">{employee.employee_id}</td>
-                            <td className="py-1 px-2">{employee.name}</td>
-                            <td className="py-1 px-2">{employee.phone}</td>
-                            <td className="py-1 px-2">{employee.email}</td>
-                            <td className="py-1 px-2">{new Date(employee.bod).toISOString().split('T')[0]}</td>
-                            <td className="py-1 px-2">{employee.salary}</td>
-                            <td className="py-1 px-2">{employee.service_charge_precentage}</td>
-                            <td className="py-1 px-2">{new Date(employee.hire_date).toISOString().split('T')[0]}</td>
+                        <tr key={employee.employee_id} className='border border-gray-300'>
+                            <td className="py-1 px-3 border-r border-gray-300">{employee.employee_id}</td>
+                            <td className="py-0 px-3 border-r border-gray-300">{employee.name}</td>
+                            <td className="py-1 px-2 border-r border-gray-300">{employee.phone}</td>
+                            <td className="py-1 px-2 border-r border-gray-300">{employee.email}</td>
+                            <td className="py-1 px-2 border-r border-gray-300">{new Date(employee.bod).toISOString().split('T')[0]}</td>
+                            <td className="py-1 px-2 border-r border-gray-300">{employee.salary}</td>
+                            <td className="py-1 px-2 border-r border-gray-300">{employee.service_charge_precentage}</td>
+                            <td className="py-1 px-2 border-r border-gray-300">{new Date(employee.hire_date).toISOString().split('T')[0]}</td>
                             <td className="py-1 px-2">
                                 <button onClick={() => handleActionClick(employee.employee_id)} className="bg-blue-500 text-white px-2 py-1 rounded">Actions</button>
                             </td>
@@ -146,7 +146,7 @@ function UpdateEmployees() {
                                 {errorMessage}
                             </div>
                         )}
-                        <div className="space-y-4">
+                        <div className="space-y-4 w-96">
                             <div>
                                 <label className="block text-sm font-medium">Employee name</label>
                                 <input

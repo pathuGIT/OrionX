@@ -459,6 +459,27 @@ DELIMITER ;
 
 
 -- Insert sample data
-INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
+INSERT INTO Employee (name, phone, email, bod, salary, service_charge_precentage, hire_date) VALUES ('shan', '07712345678', 'shan@gmail.com', '1970-02-09', 0, 0, CURDATE());
 INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
 INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());
+
+DELIMITER //
+
+CREATE TRIGGER Before_Insert_Menu_Type 
+BEFORE INSERT ON Menu_Type 
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    -- Extract the numeric part from menu_type_id and find the max value
+    SELECT COALESCE(MAX(CAST(SUBSTRING(menu_type_id, 3) AS UNSIGNED)), 0) + 1 INTO max_id FROM Menu_Type;
+    
+    -- Format the new ID as 'MT' followed by a zero-padded number
+    SET new_id = CONCAT('MT', LPAD(max_id, 3, '0'));
+    
+    -- Assign the new ID to the inserted row
+    SET NEW.menu_type_id = new_id;
+END //
+
+DELIMITER ;
