@@ -5,7 +5,7 @@ import { createWedding } from '../controllers/weddingController.js';
 
 // Create separate routers for events and weddings
 export const eventRoute = express.Router();
-eventRoute.post('/', validateEvent, createEvents);
+eventRoute.post('/', createEvents);
 
 export const weddingRoutes = express.Router();
 weddingRoutes.post('/', createWedding);
