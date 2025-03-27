@@ -14,6 +14,40 @@ CREATE TABLE Employee (
     service_charge_precentage DECIMAL(3.2),
     hire_date DATE
 );
+CREATE TABLE Booking (
+    booking_id VARCHAR(10) PRIMARY KEY,
+    time_slot ENUM('day','night'),
+    status ENUM('pending','confirmed','cancelled'),
+    booking_date DATE,
+    event_type ENUM('custome','wedding'), -- New column added after booking_date
+    event_name VARCHAR(200), -- New column added after event_type
+    total_price DECIMAL(10,2),
+    created_at DATE,
+    updated_at DATE,
+    venue_id VARCHAR(10),
+    FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE venue (
+    venue_id VARCHAR(10) PRIMARY KEY,
+    venue_name VARCHAR(200),
+    time_slot ENUM('day','night'),
+    Location ENUM('indoor','outdoor','both'),
+    capacity INT,
+    price DECIMAL(10,2),
+    created_at DATE,
+    updated_at DATE
+);
+
+CREATE TABLE bookig_history (
+    history_id VARCHAR(10),
+    action_date DATE,
+    employee_id VARCHAR(10),
+    booking_id VARCHAR(10),
+    FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
+    FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+);
 
 CREATE TABLE Customer(
     customer_id VARCHAR(10) PRIMARY KEY,
@@ -199,6 +233,7 @@ CREATE TABLE Event_Cordinator (
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
     FOREIGN KEY (Cordinator_Name) REFERENCES Cordinator(Cordinator_Name) ON DELETE CASCADE
 );
+
 
 
 
