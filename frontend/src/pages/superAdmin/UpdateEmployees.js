@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getEmployees, getEmployeeById, updateEmployee, deleteEmployees } from '../../services/UserService';
+import { getEmployees, getEmployeeById, updateEmployee, deleteEmployees,updateEmployeesStatus } from '../../services/UserService';
 
 function UpdateEmployees() {
     const [employees, setEmployees] = useState([]);
@@ -16,7 +16,9 @@ function UpdateEmployees() {
     const [errorMessage, setErrorMessage] = useState('');
     const [showPopup, setShowPopup] = useState(false);
     const [showActionPopup, setShowActionPopup] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState('Active');  //update status
 
+    
     useEffect(() => {
         fetchEmployees();
     }, []);
@@ -66,14 +68,15 @@ function UpdateEmployees() {
         }
     };
 
-    const handleDelete = async (employeeId) => {
+    const handlupdateEmployeesStatus = async () => {  //update status
         try {
-            await deleteEmployees(employeeId);
-            alert('Employee deleted successfully');
+            await updateEmployeesStatus(selectedEmployee, selectedStatus);
+            alert('Employee status updated successfully');
+            setShowActionPopup(false);
             fetchEmployees();
         } catch (error) {
-            console.error('Error deleting employee:', error);
-            setErrorMessage('An unexpected error occurred.');
+            console.error('Error updating employee status:', error);
+            alert('An unexpected error occurred.');
         }
     };
 
@@ -101,7 +104,12 @@ function UpdateEmployees() {
                 </thead>
                 <tbody>
                     {employees.map((employee) => (
-                        <tr key={employee.employee_id} className='border border-gray-300'>
+                        <tr
+                         key={employee.employee_id} 
+                         className='border border-gray-300'
+                         >
+
+
                             <td className="py-1 px-3 border-r border-gray-300">{employee.employee_id}</td>
                             <td className="py-0 px-3 border-r border-gray-300">{employee.name}</td>
                             <td className="py-1 px-2 border-r border-gray-300">{employee.phone}</td>
@@ -123,13 +131,18 @@ function UpdateEmployees() {
                     <div className="bg-white p-4 rounded-lg shadow-lg">
                         <h2 className="text-xl font-semibold mb-4">Employee Actions</h2>
                         <div className="space-y-4">
-                            <button onClick={() => handleEdit(selectedEmployee)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            <button onClick={() => handleEdit(selectedEmployee)} 
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                                 Edit
                             </button>
-                            <button onClick={() => handleDelete(selectedEmployee)} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                                Delete
+                            <button
+                                onClick={() => handlupdateEmployeesStatus(selectedEmployee)}
+                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                            >
+                                Status 
                             </button>
-                            <button onClick={() => setShowActionPopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                            <button onClick={() => setShowActionPopup(false)} 
+                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                                 Cancel
                             </button>
                         </div>
