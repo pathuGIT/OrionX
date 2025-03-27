@@ -75,11 +75,11 @@ export const getSystemUserByEmpIdModel = async (empId) => {
 }
 
 //register employees
-export const addEmployeeModel = async (name, phone, email, bod, salary) => {
+export const addEmployeeModel = async (name, phone, email, bod, serviceCharge, salary) => {
     const hireDate = new Date().toISOString().split('T')[0];
     const [result] = await pool.query(
-        'INSERT INTO employee (name,phone,email,bod,salary,hire_date) VALUES (?, ?, ?, ?, ?, ?)',
-        [name, phone, email, bod, salary, hireDate]
+        'INSERT INTO employee (name,phone,email,bod,salary,service_charge_precentage,hire_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [name, phone, email, bod, salary, serviceCharge, hireDate]
     );
     return result[0];
 }
@@ -109,3 +109,40 @@ export const getEmployeeModel = async () => {
     );
     return result;
 }
+
+//get epmloyee by id
+export const getEmployeeByuserIdModel = async (employee_id) => {
+    const [result] = await pool.query(
+        'SELECT * FROM employee WHERE employee_id = ?',
+        [employee_id]
+    );
+    //console.log(result[0]);
+    return result[0];
+};
+
+//update employees
+export const updateEmployeesModel = async (employee_id, name, phone, email, bod, salary, service_charge_precentage, hire_date) => {
+    const [result] = await pool.query(
+        'UPDATE employee SET name = ?, phone = ?, email = ?, bod = ?, salary = ?, service_charge_precentage = ?, hire_date =?  WHERE employee_id = ?',  
+        [name, phone, email, bod, salary, service_charge_precentage, hire_date, employee_id]
+    );
+    return result[0];
+};
+
+//delete employees
+export const deleteEmployeesModel = async (employee_id) => {
+    const [result] = await pool.query(
+        'DELETE FROM employee WHERE employee_id = ?',
+        [employee_id]
+    );
+    return result[0];
+};
+
+//update employee(systemuser) status
+export const updateEmployeesStatusModel = async (employee_id, status) => {
+    const [result] = await pool.query(
+        'UPDATE systemuser SET status = ? WHERE employee_id = ?',
+        [status, employee_id]
+    );
+    return result[0];
+};

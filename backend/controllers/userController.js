@@ -5,13 +5,17 @@ import {
     getEmployeeByPhoneModel,
     getEmployeeModel,
     updateUserRoleModel,
+    updateEmployeesModel,
+    getEmployeeByuserIdModel,
+    deleteEmployeesModel,
+    updateEmployeesStatusModel,
     checkUserIsActive} from '../models/userModel.js';
 import { sendIdToUserMethod, } from '../controllers/mailController.js';
 import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } from '../models/customerModel.js';
 
 //add employees (employees add to system by admin)
 export const addEmployee = async (req, res) => {
-    const { name, phone, email, bod, salary } = req.body;
+    const { name, phone, email, bod, serviceCharge, salary } = req.body;
     try {
         const checkPhone = await getEmployeeByPhoneModel(phone);
         if (checkPhone) return res.status(400).json({ message: 'Phone already exist...' });
@@ -19,7 +23,8 @@ export const addEmployee = async (req, res) => {
         const checkEmail = await getEmployeeByEmailModel(email);
         if (checkEmail) return res.status(400).json({ message: 'Email already exist...' });
 
-        await addEmployeeModel(name, phone, email, bod, salary);
+        if(serviceCharge == null) serviceCharge = 0;
+        await addEmployeeModel(name, phone, email, bod, serviceCharge, salary);
 
         const user = await getEmployeeByEmailModel(email);
         await sendIdToUserMethod(name, "Deandra Registration", email, user.employee_id, 'http://localhost:3000/registration/register-employee');
@@ -70,23 +75,8 @@ export const changeUserRole = async (req, res) => {
         res.status(500).json({msg: 'Server error...', error })
     }
 }
-// update employee details
-export const updateEmployees = async (req, res) => {
-    const { employee_id, name, phone, email, salary } = req.body;
-    try {
-        const checkUserId = await getEmployeeByuserIdModel(employee_id);
-        console.log(checkUserId);
-        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
 
-
-        await updateEmployeesModel(employee_id, name, phone, email, salary);
-
-        res.status(200).json({ message: 'Employee updated successfully' });
-    } catch (error) {
-        res.status(500).json({ msg: 'Server error...', error });
-    }
-};
-
+// get employees data
 export const getEmployee = async (req, res) => {
     try{
         const result = await getEmployeeModel();
@@ -95,3 +85,76 @@ export const getEmployee = async (req, res) => {
         res.status(500).json({ msg: 'Server error...', error });
     } 
 }
+
+// update employee details
+// export const updateEmployees = async (req, res) => {
+//     const { employee_id, name, phone, email, bod, salary, hire_date} = req.body;
+//     try {
+//         const checkUserId = await getEmployeeByuserIdModel(employee_id);
+//         if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+//         await updateEmployeesModel(employee_id, name, phone, email, bod, salary, hire_date);
+
+//         res.status(200).json({ message: 'Employee updated successfully' });
+//     } catch (error) {
+//         res.status(500).json({ msg: 'Server error...', error });
+//     }
+// };
+
+// delete employee
+export const deleteEmployees = async (req, res) => {
+    const { employee_id } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(employee_id);
+        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await deleteEmployeesModel(employee_id);
+
+        res.status(200).json({ message: 'Employee deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// update employee(systemuser) status
+export const updateEmployeesStatus = async (req, res) => {
+    const { employee_id, status } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(employee_id);
+        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await updateEmployeesStatusModel(employee_id, status);
+
+        res.status(200).json({ message: 'Employee status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// Get employee by ID
+export const getEmployeeById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const employee = await getEmployeeByuserIdModel(id);
+        if (!employee) return res.status(404).json({ message: 'Employee not found' });
+        res.status(200).json(employee);
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+ // update employee details
+export const updateEmployees = async (req, res) => {
+    const { id } = req.params;
+    const { name, phone, email, bod, salary, service_charge_precentage, hire_date } = req.body;
+    try {
+        const checkUserId = await getEmployeeByuserIdModel(id);
+        if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
+
+        await updateEmployeesModel(id, name, phone, email, bod, salary, service_charge_precentage, hire_date);
+
+        res.status(200).json({ message: 'Employee updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};

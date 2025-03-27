@@ -28,6 +28,306 @@ CREATE TABLE Customer(
     refresh_token VARCHAR(255)
 );
 
+-- Create Event table
+CREATE TABLE Event (
+    Event_ID VARCHAR(10) PRIMARY KEY,
+    Buffet_TimeFrom TIME,
+    Buffet_TimeTo TIME,
+    Additional_Time TIME,
+    Function_durationFrom TIME,
+    Function_durationTo TIME,
+    Tea_table_Time TIME,
+    Dress_Time TIME,
+    booking_id VARCHAR(10),
+    BarRequirementID VARCHAR(10),
+    FOREIGN KEY (booking_id) REFERENCES Booking(booking_id) ON DELETE CASCADE,
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID) ON DELETE CASCADE
+);
+
+-- Create Bar table
+CREATE TABLE Bar (
+    BarRequirementID VARCHAR(10) PRIMARY KEY,
+    LiquorTimeFrom TIME,
+    LiquorTimeTo TIME,
+    BarPax INT
+);
+
+-- Create Bite table
+
+CREATE TABLE Bite (
+    Bite_ID VARCHAR(10) PRIMARY KEY,
+    Quantity INT,
+    Type VARCHAR(50),
+    BarRequirementID VARCHAR(10),
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
+);
+
+-- Create BiteByGuest table
+
+CREATE TABLE BiteByGuest (
+    Bite_Name VARCHAR(100),
+    Quantity INT,
+    BarRequirementID VARCHAR(10),
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
+);
+
+-- Create Cordinator table
+
+CREATE TABLE Cordinator (
+    Cordinator_Name VARCHAR(100) PRIMARY KEY,
+    Contact_no VARCHAR(15)
+);
+
+-- Create Event_Service table
+
+CREATE TABLE Event_Service (
+    Event_Service_ID VARCHAR(10) PRIMARY KEY,
+    Event_Service_Name VARCHAR(100)
+);
+
+-- Create Vendor table
+
+CREATE TABLE Vendor (
+    Vendor_ID VARCHAR(10) PRIMARY KEY,
+    Contact_no VARCHAR(15),
+    Email VARCHAR(100),
+    Address VARCHAR(255)
+);
+
+-- Create Assigned_Employee table
+
+CREATE TABLE Assigned_Employee (
+    Employee_Assign_ID VARCHAR(10) PRIMARY KEY,
+    Employee_ID VARCHAR(10),
+    User_Role VARCHAR(50),
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID)
+);
+
+-- Create Soft_Drink table
+
+CREATE TABLE Soft_Drink (
+    Beverage_Name VARCHAR(100),
+    ForBar INT,
+    ForTable INT,
+    Event_ID VARCHAR(10),
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+);
+
+-- Create Wedding table
+
+CREATE TABLE Wedding (
+    Event_ID VARCHAR(10),
+    Groom_Name VARCHAR(100),
+    Bride_Name VARCHAR(100),
+    Groom_Contact_no VARCHAR(15),
+    Bride_Contact_no VARCHAR(15),
+    Fountain VARCHAR(10),
+    ProsperityTable VARCHAR(10),
+    Groom_Address VARCHAR(255),
+    Bride_Address VARCHAR(255),
+    Poruwa_CeremonyFrom TIME,
+    Poruwa_CeremonyTo TIME,
+    Registration_Time TIME,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+);
+
+-- Create CustomEvent table
+CREATE TABLE CustomEvent (
+    Event_ID VARCHAR(10),
+    ContactPersonName VARCHAR(100),
+    ContactPersonNumber VARCHAR(15),
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+);
+
+-- Create Table_Chair table
+
+CREATE TABLE Table_Chair_Arrangement (
+    Arrangement_ID VARCHAR(10)  PRIMARY KEY,
+    Head_Table_Pax INT,
+    Top_Cloth_Color VARCHAR(50),
+    Table_Cloth_Color VARCHAR(50),
+    Bow_Color VARCHAR(50),
+    Chair_Cover_Color VARCHAR(50),
+    Table_Reserve_ID VARCHAR(10),
+    FOREIGN KEY (Table_Reserve_ID) REFERENCES Table_Reserve(Table_Reserve_ID)
+);
+
+-- Create Table_Reserve table
+
+CREATE TABLE Table_Reserve (
+    Table_Reserve_ID VARCHAR(10) PRIMARY KEY,
+    Table_Number INT,
+    Reserve_Name VARCHAR(100)
+);
+
+--many to many tables 
+
+CREATE TABLE Event_Event_Service (
+    Event_ID VARCHAR(10) NOT NULL,
+    event_service_id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Service_Vendor (
+    event_service_id VARCHAR(10) NOT NULL,
+    vendor_id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
+    FOREIGN KEY (vendor_id) REFERENCES Vendor(vendor_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Assigned_Employee (
+    Event_ID VARCHAR(10) NOT NULL,
+    Employee_Assign_ID VARCHAR(10) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Employee_Assign_ID) REFERENCES Assigned_Employee(Employee_Assign_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Table_Chair (
+    Event_ID VARCHAR(10) NOT NULL,
+    Arrangement_Id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Arrangement_Id) REFERENCES Table_Chair_Arrangement(Arrangement_Id) ON DELETE CASCADE
+);
+
+CREATE TABLE Event_Cordinator (
+    Event_ID VARCHAR(10) NOT NULL,
+    Cordinator_Name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Cordinator_Name) REFERENCES Cordinator(Cordinator_Name) ON DELETE CASCADE
+);
+
+
+
+-- Trigger to format Table_Reserve_ID
+DELIMITER //
+
+CREATE TRIGGER before_Table_Reserve
+BEFORE INSERT ON Table_Reserve
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Table_Reserve_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Table_Reserve;
+    SET new_id = CONCAT('TAB', LPAD(max_id, 3, '0'));
+    SET NEW.Table_Reserve_ID = new_id;
+END //
+
+
+-- Trigger to format Arrangement_ID
+DELIMITER //
+
+CREATE TRIGGER before_Table_Chair_Arrangement
+BEFORE INSERT ON Table_Chair_Arrangement
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Arrangement_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Table_Chair_Arrangement;
+    SET new_id = CONCAT('TCA', LPAD(max_id, 3, '0'));
+    SET NEW.Arrangement_ID = new_id;
+END //
+
+
+-- Trigger to format Employee_Assign_ID
+DELIMITER //
+
+CREATE TRIGGER before_Assigned_Employee
+BEFORE INSERT ON Assigned_Employee
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
+    SET new_id = CONCAT('EMP', LPAD(max_id, 3, '0'));
+    SET NEW.Employee_Assign_ID = new_id;
+END //
+
+
+-- Trigger to format Vendor_ID
+DELIMITER //
+
+CREATE TRIGGER before_Vendor
+BEFORE INSERT ON Vendor
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Vendor_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Vendor;
+    SET new_id = CONCAT('VEN', LPAD(max_id, 3, '0'));
+    SET NEW.Vendor_ID = new_id;
+END //
+
+
+-- Trigger to format Event_Service_ID
+DELIMITER //
+
+CREATE TRIGGER before_Event_Service
+BEFORE INSERT ON Event_Service
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Event_Service_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Event_Service;
+    SET new_id = CONCAT('ES', LPAD(max_id, 2, '0'));
+    SET NEW.Event_Service_ID = new_id;
+END //
+
+
+-- Trigger to format Bite_ID
+DELIMITER //
+
+CREATE TRIGGER before_Bite
+BEFORE INSERT ON Bite
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Bite_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Bite;
+    SET new_id = CONCAT('BITE', LPAD(max_id, 4, '0'));
+    SET NEW.Bite_ID = new_id;
+END //
+
+-- Trigger to format BarRequirementID
+DELIMITER //
+
+CREATE TRIGGER before_Bar
+BEFORE INSERT ON Bar
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(BarRequirementID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Bar;
+    SET new_id = CONCAT('BAR', LPAD(max_id, 3, '0'));
+    SET NEW.BarRequirementID = new_id;
+END //
+
+-- Trigger to format Event_ID
+DELIMITER //
+
+CREATE TRIGGER before_Event_ID
+BEFORE INSERT ON Event
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(Event_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Event;
+    SET new_id = CONCAT('EVN', LPAD(max_id, 3, '0'));
+    SET NEW.Event_ID = new_id;
+END //
+
+
+
+
+
 -- Create SystemUser table
 CREATE TABLE SystemUser (
     user_id VARCHAR(10) PRIMARY KEY,
@@ -37,199 +337,6 @@ CREATE TABLE SystemUser (
     employee_id VARCHAR(10),
     refresh_token VARCHAR(250),
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE CASCADE
-);
-
----catering system tables---
-
-CREATE TABLE Menu_List_Type (
-    menu_list_type_id VARCHAR(10) PRIMARY KEY,
-    menu_list_name VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Menu_Type (
-    menu_type_id VARCHAR(10) PRIMARY KEY,
-    menu_type_name VARCHAR(255) NOT NULL,
-    menu_list_type_id VARCHAR(10),
-    price DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (menu_list_type_id) REFERENCES Menu_List_Type(menu_list_type_id) ON DELETE CASCADE
-);
-
-CREATE TABLE Category (
-    category_id VARCHAR(10) PRIMARY KEY,
-    category_name VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Category_Menu_Type (
-    category_menu_type_Id VARCHAR(10) PRIMARY KEY,
-    menu_type_id VARCHAR(10),
-    category_id VARCHAR(10),
-    item_limit  INT DEFAULT NULL, 
-    FOREIGN KEY (menu_type_id) REFERENCES Menu_Type(menu_type_id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES Category(category_id) ON DELETE CASCADE
-);
-
-CREATE TABLE Item (
-    item_id VARCHAR(10) PRIMARY KEY,
-    item_name VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Item_Category_Menu_Type (
-    ICMT_Id VARCHAR(10) PRIMARY KEY,
-    category_menu_type_id VARCHAR(10),
-    item_id VARCHAR(10),
-    FOREIGN KEY (category_menu_type_id) REFERENCES Category_Menu_Type(category_menu_type_Id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES Item(item_id) ON DELETE CASCADE
-);
-
-CREATE TABLE Customer_Menu_Item_Selection (
-    customer_id VARCHAR(10) NOT NULL,
-    ICMT_Id VARCHAR(10),
-    PRIMARY KEY (customer_id, ICMT_Id),
-    FOREIGN KEY (ICMT_Id) REFERENCES Item_Category_Menu_Type(ICMT_Id) ON DELETE CASCADE
-);
-
-
---trigger to format menu_list_type
-DELIMITER //
-
-CREATE TRIGGER before_menu_list_type_insert
-BEFORE INSERT ON Menu_List_Type
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(menu_list_type_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Menu_List_Type;
-    SET new_id = CONCAT('MLT', LPAD(max_id, 3, '0'));
-    SET NEW.menu_list_type_id = new_id;
-END //
-
-DELIMITER ;
-
---trigger to format menu_type
-DELIMITER //
-
-CREATE TRIGGER before_menu_type_insert
-BEFORE INSERT ON Menu_Type
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(menu_type_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Menu_Type;
-    SET new_id = CONCAT('MT', LPAD(max_id, 3, '0'));
-    SET NEW.menu_type_id = new_id;
-END //
-
-DELIMITER ;
-
---trigger to format category
-DELIMITER //
-
-CREATE TRIGGER before_category_insert
-BEFORE INSERT ON Category
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    -- Find the maximum numerical value of category_id (excluding the 'CAT' prefix)
-    SELECT COALESCE(MAX(CAST(SUBSTRING(category_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Category;
-
-    -- Generate new category_id with the 'C' prefix
-    SET new_id = CONCAT('C', LPAD(max_id, 3, '0'));
-
-    -- Set the new category_id
-    SET NEW.category_id = new_id;
-END //
-
-DELIMITER ;
-
-
---trigger to format category_menu_type
-DELIMITER //
-
-CREATE TRIGGER before_category_menu_type_insert
-BEFORE INSERT ON Category_Menu_Type
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(category_menu_type_Id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Category_Menu_Type;
-    SET new_id = CONCAT('CMT', LPAD(max_id, 3, '0'));
-    SET NEW.category_menu_type_Id = new_id;
-END //
-
-DELIMITER ;
-
---trigger to format item
-DELIMITER //
-
-CREATE TRIGGER before_item_insert
-BEFORE INSERT ON Item
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(item_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Item;
-    SET new_id = CONCAT('I', LPAD(max_id, 3, '0'));
-    SET NEW.item_id = new_id;
-END //
-
-DELIMITER ;
-
---trigger to format item_category_menu_type
-DELIMITER //
-
-CREATE TRIGGER before_item_category_menu_type_insert
-BEFORE INSERT ON Item_Category_Menu_Type
-FOR EACH ROW
-BEGIN
-    DECLARE max_id INT;
-    DECLARE new_id VARCHAR(10);
-
-    SELECT COALESCE(MAX(CAST(SUBSTRING(ICMT_Id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Item_Category_Menu_Type;
-    SET new_id = CONCAT('ICMT', LPAD(max_id, 3, '0'));
-    SET NEW.ICMT_Id = new_id;
-END //
-
-DELIMITER ;
-
-
-
-
-CREATE TABLE Booking (
-    booking_id VARCHAR(10) PRIMARY KEY,
-    time_slot ENUM('day','night'),
-    status ENUM('pending','confirmed','cancelled'),
-    booking_date DATE,
-    total_price DECIMAL(10,2),
-    created_at DATE,
-    updated_at DATE,
-    venue_id VARCHAR(10),
-    FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE CASCADE
-);
-
-CREATE TABLE venue (
-    venue_id VARCHAR(10) PRIMARY KEY,
-    venue_name VARCHAR(200),
-    time_slot ENUM('day','night'),
-    Location ENUM('indoor','outdoor','both'),
-    capacity INT,
-    price DECIMAL(10,2),
-    created_at DATE,
-    updated_at DATE
-);
-
-CREATE TABLE bookig_history (
-    history_id VARCHAR(10),
-    action_date DATE,
-    employee_id VARCHAR(10),
-    booking_id VARCHAR(10),
-    FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
-    FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
 );
 
 -- Trigger to format employee_id
@@ -323,7 +430,6 @@ DELIMITER ;
 
 
 -- Insert sample data
--- hard code super admin data
-INSERT INTO Employee (name, phone, email, bod, salary, service_charge_precentage, hire_date) VALUES ('shan', '0771988848 ', 'shan@gmail.com', '0000-00-00', 0, 0,  CURDATE());
+INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
 INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
 INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());

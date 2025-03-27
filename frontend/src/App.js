@@ -6,7 +6,6 @@ import { Login } from './pages/Login';
 import SuperAdminDB from './pages/SuperAdminDB';
 import { SubAdminDB } from './pages/SubAdminDB';
 import EmployeeDB from './pages/EmployeeDB';
-import CustomerDB from './pages/CustomerDB';
 import { AuthProvider } from './context/Authcontext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Profile from './pages/Profile';
@@ -27,7 +26,6 @@ function App() {
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
-            <Route path="/customr" element={<ProtectedRoute name="customer"><CustomerDB /></ProtectedRoute>} />
             <Route path="/superAdminHome" element={<ProtectedRoute name="customer"> <SuperAdminHome /> </ProtectedRoute>} />
             <Route path="/registration/register-employee" element={<EmployeeRegistration />}/>
             <Route path="/registration/register-customer" element={<CustomerRegistration />}/>
