@@ -1,8 +1,7 @@
 // Customer profile page
 import React, { useState } from 'react';
 import CustomerSideNav from '../components/ProfileSideNav.js';
-import EventForm from '../components/EventForm.js';
-import WeddingForm from '../components/weddingForm.js';
+import CustomerEventPlanning from './customer/CustomerEventPlanning.js';
 
 
 
@@ -11,10 +10,10 @@ const Profile = () => {
 
   const renderContent = () => {
     switch (display) {
-      case 'createEvent':
-        return <EventForm/>;
-      case 'createWedding':
-        return <WeddingForm />;
+      case 'customerEvent':
+        return <CustomerEventPlanning />;
+      case '':
+        return <p></p>;
       default:
         return <p></p>;
     }
