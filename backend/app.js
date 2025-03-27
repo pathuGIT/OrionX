@@ -9,7 +9,7 @@ import menuTypeRoutes from "./routes/menuTypeRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import categoryMenuTypeRoutes from "./routes/categoryMenuTypeRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
-import icmtRoutes from "./routes/icmtRoutes.js";
+import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
 
 const app = express();
 
@@ -21,12 +21,12 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRouter);
 app.use('/api/mail', mailRouter);
-app.use('/menus', menuListTypeRoutes);
-app.use('/menutypes', menuTypeRoutes);
-app.use('/categories', categoryRoutes);
-app.use('/categoryMenuTypes', categoryMenuTypeRoutes);
-app.use('/items', itemRoutes);
-app.use('/icmt', icmtRoutes);
+app.use('/api/menus', menuListTypeRoutes);
+app.use('/api/menutypes', menuTypeRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
+app.use('/api/items', itemRoutes);
+app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 
 
 
