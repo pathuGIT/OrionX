@@ -1,6 +1,6 @@
 import MenuListType from "../models/menuListTypeModel.js";
 
-// Get all menus
+//Get all menus
 export const getMenus = async (req, res) => {
   try {
     const menus = await MenuListType.getAllMenus();
