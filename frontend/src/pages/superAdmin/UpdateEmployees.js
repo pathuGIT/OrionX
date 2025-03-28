@@ -155,6 +155,7 @@ function UpdateEmployees() {
                             </td>
                             <td className="py-1 px-2 border-r border-gray-300">
                                 {new Date(employee.bod).toISOString().split("T")[0]}
+                               
                             </td>
                             <td className="py-1 px-2 border-r border-gray-300">
                                 {employee.salary}

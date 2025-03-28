@@ -105,19 +105,19 @@ export const checkUserIsActive = async (userId) => {
 export const getEmployeeModel = async () => {
     
     const [result] = await pool.query(
-        'SELECT employee_id, name, phone, email, bod, salary, service_charge_precentage, hire_date FROM employee'
+        'SELECT employee_id, name, phone, email, DATE_FORMAT(bod, "%Y-%m-%d") AS bod, salary, service_charge_precentage, DATE_FORMAT(hire_date, "%Y-%m-%d") AS hire_date FROM employee'
     );
     return result;
 }
 
-//get epmloyee by id
+ //get employee by id
 export const getEmployeeByuserIdModel = async (employee_id) => {
-    console.log("aaaaaaaa"+employee_id)
+
     const [result] = await pool.query(
         'SELECT * FROM employee WHERE employee_id = ?',
         [employee_id]
     );
-    //console.log(result[0]);
+    
     return result[0];
 };
 
