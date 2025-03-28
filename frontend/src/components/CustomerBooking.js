@@ -11,6 +11,7 @@ const CustomerBookings = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+
     useEffect(() => {
         let customerID = sessionStorage.getItem("id");
 
@@ -69,7 +70,7 @@ const CustomerBookings = () => {
                                 <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
                                 onClick={() =>{
                                 const encryptedId = encryptBookingId(booking.booking_id);
-                                navigate(`/profile/$${encryptedId}`)}}>
+                                navigate(`/profile/${encryptedId}`)}}>
                                 Plan your Event</button>
                             </div>
                         </div>

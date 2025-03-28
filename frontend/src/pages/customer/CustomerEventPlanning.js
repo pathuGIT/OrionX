@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import WeddingForm from "../../components/WeddingForm.js";
 import EventForm from "../../components/CustomEventForm.js";
+import { useParams } from "react-router-dom";
+import { decryptBookingId } from "../../utills/encryptionUtils.js";
 
 const CustomerEventPlanning = () => {
+    
     const [eventType, setEventType] = useState("");
 
     const handleEventChange = (e) => {
@@ -30,10 +33,25 @@ const CustomerEventPlanning = () => {
 };
 
 const CustomEventForm = () => {
+    const { bookingId } = useParams();
+    let decryptedBookingId = null;
+    try {
+        decryptedBookingId = decryptBookingId(bookingId); // Attempt to decrypt the bookingId
+    } catch (error) {
+        console.error("Failed to decrypt booking ID:", error);
+    }
+    if (!decryptedBookingId) {
+        return (
+            <div className="p-4 bg-white rounded shadow-md mt-4">
+                <h3 className="text-xl font-semibold mb-2 text-red-600">Invalid Booking ID</h3>
+                <p>Please check the URL or contact support for assistance.</p>
+            </div>
+        );
+    }
     return (
         <div className="p-4 bg-white rounded shadow-md mt-4">
             <h3 className="text-xl font-semibold mb-2">Custom Event Planning</h3>
-            <EventForm />
+            <EventForm bookingId={decryptedBookingId} />
         </div>
     );
 };

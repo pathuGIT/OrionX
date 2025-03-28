@@ -4,6 +4,11 @@ export const encryptBookingId = (bookingId) => {
 };
 
 export const decryptBookingId = (encryptedId) => {
-    // Decode the Base64 string
-    return atob(encryptedId);
+    try {
+        // Decode the Base64 string
+        return atob(encryptedId);
+    } catch (error) {
+        console.error("Failed to decrypt booking ID:", error);
+        return null; // Return null if decryption fails
+    }
 };

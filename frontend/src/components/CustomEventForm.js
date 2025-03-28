@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { createEvents } from "../services/EventService"; // Import API function
 
-const EventForm = () => {
+
+const EventForm = ({ bookingId }) => {
+
+    console.log("Booking ID:", bookingId); // Log the bookingId for debugging
     const [formData, setFormData] = useState({
         eventName: "",
         buffetTimeFrom: "",
@@ -11,7 +14,7 @@ const EventForm = () => {
         functionDurationTo: "",
         teaTableTime: "",
         dressTime: "",
-        bookingID: "",
+        bookingID: bookingId || "",
         contactPersonName: "",
         contactPersonNumber: "",
     });
@@ -68,15 +71,6 @@ const EventForm = () => {
                         <label className="w-full text-left">Event Name:</label>
                         <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} required
                             className="w-full p-2 border rounded" />
-                        <label className="w-full text-left">Booking ID:</label>
-                        <input
-                            type="text"
-                            name="bookingID"
-                            value={formData.bookingID}
-                            onChange={handleChange}
-                            required
-                            className="w-full p-2 border rounded"
-                        />
                         <label className="w-full text-left">Contact Person Name:</label>
                         <input
                             type="text"
