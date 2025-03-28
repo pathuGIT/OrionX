@@ -3,14 +3,14 @@ import { createWedding } from "../services/EventService"; // Import API function
 
 const WeddingForm = () => {
     const [formData, setFormData] = useState({
-        groomName: "",
-        brideName: "",
-        groomContact: "",
-        brideContact: "",
-        fountain: "",
-        prosperityTable: "",
-        groomAddress: "",
-        brideAddress: "",
+        groomName: "kamal",
+        brideName: "kamala",
+        groomContact: "0779754633",
+        brideContact: "0779854633",
+        fountain: "no",
+        prosperityTable: "no",
+        groomAddress: "kalutara",
+        brideAddress: "colombo",
         ceremonyFrom: "",
         ceremonyTo: "",
         registrationTime: "",
@@ -53,6 +53,7 @@ const WeddingForm = () => {
                 registrationTime: "",
             });
             setStep(1);
+            //console.log(formData.brideName);
         } catch (err) {
             setError(err.response?.data?.error || "An error occurred while creating the wedding.");
         }
@@ -109,7 +110,11 @@ const WeddingForm = () => {
                             <label><input type="radio" name="fountain" value="yes" checked={formData.fountain === "yes"} onChange={handleChange} /> Yes</label>
                             <label><input type="radio" name="fountain" value="no" checked={formData.fountain === "no"} onChange={handleChange} /> No</label>
                         </div>
-
+                        <label className="w-full text-left">Prosperity Table:</label>
+                        <div className="flex space-x-4">
+                            <label><input type="radio" name="prosperityTable" value="yes" checked={formData.prosperityTable === "yes"} onChange={handleChange} /> Yes</label>
+                            <label><input type="radio" name="prosperityTable" value="no" checked={formData.prosperityTable === "no"} onChange={handleChange} /> No</label>
+                        </div>
                         <label className="w-full text-left">Poruwa Ceremony From:</label>
                         <input type="time" name="ceremonyFrom" value={formData.ceremonyFrom} onChange={handleChange} required className="w-full p-2 border rounded" />
 

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { createEvents } from "../services/EventService"; // Import API function
 
 const EventForm = () => {
