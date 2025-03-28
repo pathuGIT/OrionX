@@ -2,7 +2,7 @@ import express from 'express';
 import { createEvents } from '../controllers/eventController.js';
 //import { validateEvent } from '../middleware/validateEvent.js';
 import { createWedding } from '../controllers/weddingController.js';
-import { customerBookingController } from '../controllers/customerBookingController.js';
+import { getCustomerBookings } from '../controllers/customerBookingController.js';
 import { customer } from '../middleware/Customer.js';
 
 // Create separate routers for events and weddings
@@ -12,8 +12,8 @@ const cusBookingRoutes = express.Router();
 
 
 
-eventRoute.post('/',customer, createEvents);
-weddingRoutes.post('/',customer, createWedding);
-cusBookingRoutes.get('/:customerID',customer, customerBookingController);
+eventRoute.post('/createCustomEvents',customer, createEvents);
+weddingRoutes.post('/createWedding',customer, createWedding);
+cusBookingRoutes.get('/:customerID',customer,getCustomerBookings);
 
 export { eventRoute, weddingRoutes, cusBookingRoutes };

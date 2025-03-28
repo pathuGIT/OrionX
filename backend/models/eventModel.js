@@ -1,8 +1,9 @@
 import db from '../config/db.js';
 
-class Event {
-    static async create(eventData) {
+class EventModel {
+    static async createEvents(eventData) {
         try {
+
             // Insert into Event table
             const [result] = await db.query(
                 `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, Additional_Time, 
@@ -15,7 +16,6 @@ class Event {
                 ]
             );
 
-            // Fetch the Event_ID from the Event table based on booking_id
             const [eventResult] = await db.query(
                 `SELECT Event_ID FROM Event WHERE booking_id = ?`, [eventData.bookingID]
             );
@@ -36,7 +36,6 @@ class Event {
                 return eventID;  // Returning the Event_ID
             }
 
-            // Insert into CustomEvent table using the fetched Event_ID
             const [customResult] = await db.query(
                 `INSERT INTO CustomEvent (Event_ID, Event_Name, ContactPersonName, ContactPersonNumber) 
                 VALUES (?, ?, ?, ?)`,
@@ -54,4 +53,4 @@ class Event {
     }
 }
 
-export default Event;
+export default EventModel;
