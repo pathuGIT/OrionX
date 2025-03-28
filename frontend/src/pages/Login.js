@@ -19,7 +19,7 @@ export const Login = () => {
             } else if (role === 'sub_admin') {
                 navigate('/subAdmin');
             } else if (role === 'employee') {
-                console.log("asasasasasasasasasasasasasasa")
+                 
                 navigate('/employee');
             } else if (role === 'customer') {
                 navigate('/');
