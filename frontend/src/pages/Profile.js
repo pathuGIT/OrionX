@@ -8,7 +8,7 @@ import CustomerBookings from '../components/CustomerBooking.js';
 
 
 const Profile = () => {
-  const [display, setDisplay] = useState();
+  const [display, setDisplay] = useState('PlanYourEvent');
 
   const renderContent = () => {
     switch (display) {
