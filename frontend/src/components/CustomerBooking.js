@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/Authcontext";
 import { getCustomerBookings } from "../services/EventService";
 import { useNavigate } from "react-router-dom";
+import { encryptBookingId } from "../utills/encryptionUtils";    
 
 const CustomerBookings = () => {
     const { user } = useContext(AuthContext);
@@ -66,7 +67,9 @@ const CustomerBookings = () => {
                             </div>
                             <div className="p-4 bg-gray-100 text-center">
                                 <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
-                                onClick={() => navigate(`/profile/${booking.booking_id}`)}>
+                                onClick={() =>{
+                                const encryptedId = encryptBookingId(booking.booking_id);
+                                navigate(`/profile/$${encryptedId}`)}}>
                                 Plan your Event</button>
                             </div>
                         </div>
