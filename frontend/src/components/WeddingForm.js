@@ -8,6 +8,14 @@ const WeddingForm = () => {
         groomContact: "0779754633",
         brideContact: "0779854633",
         fountain: "no",
+        buffetTimeFrom: "",
+        buffetTimeTo: "",
+        additionalTime: "",
+        functionDurationFrom: "",
+        functionDurationTo: "",
+        teaTableTime: "",
+        dressTime: "",
+        bookingID: "",
         prosperityTable: "no",
         groomAddress: "kalutara",
         brideAddress: "colombo",
@@ -19,6 +27,7 @@ const WeddingForm = () => {
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [step, setStep] = useState(1);
+
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -45,6 +54,14 @@ const WeddingForm = () => {
                 groomContact: "",
                 brideContact: "",
                 fountain: "",
+                buffetTimeFrom: "",
+                buffetTimeTo: "",
+                additionalTime: "",
+                functionDurationFrom: "",
+                functionDurationTo: "",
+                teaTableTime: "",
+                dressTime: "",
+                bookingID: "",
                 prosperityTable: "",
                 groomAddress: "",
                 brideAddress: "",
@@ -53,7 +70,6 @@ const WeddingForm = () => {
                 registrationTime: "",
             });
             setStep(1);
-            //console.log(formData.brideName);
         } catch (err) {
             setError(err.response?.data?.error || "An error occurred while creating the wedding.");
         }

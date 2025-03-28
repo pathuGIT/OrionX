@@ -1,8 +1,9 @@
 import db from '../config/db.js';
 
 class EventModel {
-    static async create(eventData) {
+    static async createEvents(eventData) {
         try {
+
             // Insert into Event table
             const [result] = await db.query(
                 `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, Additional_Time, 

@@ -2,13 +2,13 @@ import api from './Api';
 
 // Create a wedding event
 export const createWedding = async (formData) => {
-    const response = await api.post('/createWedding', formData);
+    const response = await api.post('/wedding/createWedding', formData);
     return response.data;
 };
 
 // Create an event
 export const createEvents = async (formData) => {
-    const response = await api.post('/createCustomEvents', formData);
+    const response = await api.post('/event/createCustomEvents', formData);
     return response.data;
 };
 

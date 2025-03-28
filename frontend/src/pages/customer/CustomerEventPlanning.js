@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import WeddingForm from "../../components/WeddingForm.js";
-import EventForm from "../../components/EventForm.js";
+import EventForm from "../../components/CustomEventForm.js";
 
 const CustomerEventPlanning = () => {
     const [eventType, setEventType] = useState("");

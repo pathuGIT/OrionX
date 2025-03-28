@@ -38,7 +38,7 @@ const EventForm = () => {
 
         try {
             const response = await createEvents(formData); // Assuming createEvents is the API function
-            setMessage(response.data.message);
+            setMessage(response.message);
             setFormData({
                 eventName: "",
                 buffetTimeFrom: "",

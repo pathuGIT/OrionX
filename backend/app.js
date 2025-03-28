@@ -31,8 +31,8 @@ app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 
 
 //event routes
-app.use('/api/', eventRoute);
-app.use('/api/createWedding', weddingRoutes);
+app.use('/api/event', eventRoute);
+app.use('/api/wedding', weddingRoutes);
 app.use('/api/customer', cusBookingRoutes);
 
 
