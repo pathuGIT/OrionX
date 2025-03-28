@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import categoryMenuTypeRoutes from "./routes/categoryMenuTypeRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
 import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
+import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
+app.use('/api/customerMenuSelection', customerSelectionRoutes);
 
 
 //event routes
