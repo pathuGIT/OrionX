@@ -27,7 +27,12 @@ export const deleteEmployees = async (employeeId) => {
     return response.data;
 };
 
-export const updateEmployeesStatus = async (employeeId, status) => {
-    const response = await api.post(`user/updateStatus/`, { employeeId, status });
+export const updateEmployeesStatus = async (employee_Id, status) => {
+    const data = { employee_Id, status };
+
+    console.log(employee_Id, status);
+    const response = await api.put("/user/updateStatus/",data);
+    //fault
+    console.log(response.data);
     return response.data;
-}
+};

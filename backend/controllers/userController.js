@@ -118,18 +118,23 @@ export const deleteEmployees = async (req, res) => {
 
 // update employee(systemuser) status
 export const updateEmployeesStatus = async (req, res) => {
-    const { employee_id, status } = req.body;
+    const { employee_Id, status } = req.body;
+    console.log(employee_Id, status)
+   
     try {
-        const checkUserId = await getEmployeeByuserIdModel(employee_id);
-        if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
-
-        await updateEmployeesStatusModel(employee_id, status);
+        const checkUserId = await getEmployeeByuserIdModel(employee_Id);
+        if (!checkUserId) {
+            return res.status(400).json({ message: 'User ID does not exist' });
+        }
+    
+        await updateEmployeesStatusModel(employee_Id, status);
 
         res.status(200).json({ message: 'Employee status updated successfully' });
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
     }
 };
+
 
 // Get employee by ID
 export const getEmployeeById = async (req, res) => {
