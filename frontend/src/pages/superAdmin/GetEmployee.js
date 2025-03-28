@@ -15,7 +15,7 @@ const CallGetEmployees = async () => {
 }
 
   return (
-    <div>
+    <div className=' mt-5'>
       <p>Get Employee</p>
       {employees.map((emp) => (
         <ul className='border p-2 my-2' key={emp.employee_id}>

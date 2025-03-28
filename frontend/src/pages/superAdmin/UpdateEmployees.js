@@ -83,7 +83,7 @@ function UpdateEmployees() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg">
+        <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg border border-red-500 mt-5">
             <p className="text-xl font-semibold mb-4">Update Employees</p>
                        <table className="min-w-full bg-white border border-gray-300">
                 <thead>

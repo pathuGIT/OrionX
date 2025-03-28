@@ -1,11 +1,9 @@
 import React from 'react'
-import { Logout } from '../../components/Logout'
 
 const superAdminHome = () => {
     return (
-        <div>
+        <div className=' mt-5'>
             <p>Welcome Super Admin: {sessionStorage.getItem('credential')}</p>
-            <Logout />
         </div>
     )
 }
