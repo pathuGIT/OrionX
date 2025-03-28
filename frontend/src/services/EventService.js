@@ -8,7 +8,7 @@ export const createWedding = async (formData) => {
 
 // Create an event
 export const createEvents = async (formData) => {
-    const response = await api.post('/events', formData);
+    const response = await api.post('/createCustomEvents', formData);
     return response.data;
 };
 
