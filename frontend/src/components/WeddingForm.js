@@ -3,14 +3,22 @@ import { createWedding } from "../services/EventService"; // Import API function
 
 const WeddingForm = () => {
     const [formData, setFormData] = useState({
-        groomName: "",
-        brideName: "",
-        groomContact: "",
-        brideContact: "",
-        fountain: "",
-        prosperityTable: "",
-        groomAddress: "",
-        brideAddress: "",
+        groomName: "kamal",
+        brideName: "kamala",
+        groomContact: "0779754633",
+        brideContact: "0779854633",
+        fountain: "no",
+        buffetTimeFrom: "",
+        buffetTimeTo: "",
+        additionalTime: "",
+        functionDurationFrom: "",
+        functionDurationTo: "",
+        teaTableTime: "",
+        dressTime: "",
+        bookingID: "",
+        prosperityTable: "no",
+        groomAddress: "kalutara",
+        brideAddress: "colombo",
         ceremonyFrom: "",
         ceremonyTo: "",
         registrationTime: "",
@@ -19,6 +27,7 @@ const WeddingForm = () => {
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [step, setStep] = useState(1);
+
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -45,6 +54,14 @@ const WeddingForm = () => {
                 groomContact: "",
                 brideContact: "",
                 fountain: "",
+                buffetTimeFrom: "",
+                buffetTimeTo: "",
+                additionalTime: "",
+                functionDurationFrom: "",
+                functionDurationTo: "",
+                teaTableTime: "",
+                dressTime: "",
+                bookingID: "",
                 prosperityTable: "",
                 groomAddress: "",
                 brideAddress: "",
@@ -109,7 +126,11 @@ const WeddingForm = () => {
                             <label><input type="radio" name="fountain" value="yes" checked={formData.fountain === "yes"} onChange={handleChange} /> Yes</label>
                             <label><input type="radio" name="fountain" value="no" checked={formData.fountain === "no"} onChange={handleChange} /> No</label>
                         </div>
-
+                        <label className="w-full text-left">Prosperity Table:</label>
+                        <div className="flex space-x-4">
+                            <label><input type="radio" name="prosperityTable" value="yes" checked={formData.prosperityTable === "yes"} onChange={handleChange} /> Yes</label>
+                            <label><input type="radio" name="prosperityTable" value="no" checked={formData.prosperityTable === "no"} onChange={handleChange} /> No</label>
+                        </div>
                         <label className="w-full text-left">Poruwa Ceremony From:</label>
                         <input type="time" name="ceremonyFrom" value={formData.ceremonyFrom} onChange={handleChange} required className="w-full p-2 border rounded" />
 

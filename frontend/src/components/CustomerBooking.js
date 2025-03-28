@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/Authcontext";
 import { getCustomerBookings } from "../services/EventService";
+import { useNavigate } from "react-router-dom";
+import { encryptBookingId } from "../utills/encryptionUtils";    
 
 const CustomerBookings = () => {
     const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -63,9 +66,11 @@ const CustomerBookings = () => {
                                 <p className="text-lg text-gray-600 mt-2">Booking Date: {formatDate(booking.booking_date)}</p>
                             </div>
                             <div className="p-4 bg-gray-100 text-center">
-                                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300">
-                                    Plan Your Event
-                                </button>
+                                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
+                                onClick={() =>{
+                                const encryptedId = encryptBookingId(booking.booking_id);
+                                navigate(`/profile/$${encryptedId}`)}}>
+                                Plan your Event</button>
                             </div>
                         </div>
                     ))}

@@ -2,13 +2,13 @@ import api from './Api';
 
 // Create a wedding event
 export const createWedding = async (formData) => {
-    const response = await api.post('/weddings', formData);
+    const response = await api.post('/wedding/createWedding', formData);
     return response.data;
 };
 
 // Create an event
 export const createEvents = async (formData) => {
-    const response = await api.post('/events', formData);
+    const response = await api.post('/event/createCustomEvents', formData);
     return response.data;
 };
 
@@ -18,7 +18,7 @@ export const getCustomerBookings = async (customerID) => {
         const response = await api.get(`/customer/${customerID}`);
         return response.data.data;
     } catch (error) {
-        console.error("Error fetching customer bookings:", error);
+        console.error("You Have No Bookings:", error);
         throw error;
     }
 };

@@ -12,7 +12,7 @@ const cusBookingRoutes = express.Router();
 
 
 
-eventRoute.post('/createEvent',customer, createEvents);
+eventRoute.post('/createCustomEvents',customer, createEvents);
 weddingRoutes.post('/createWedding',customer, createWedding);
 cusBookingRoutes.get('/:customerID',customer,getCustomerBookings);
 
