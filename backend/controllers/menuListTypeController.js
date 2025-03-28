@@ -28,13 +28,13 @@ export const getMenuById = async (req, res) => {
 
 // Create a new menu
 export const createMenu = async (req, res) => {
-  const { menu_list_type_id, menu_list_name } = req.body;
+  const { menu_list_name } = req.body;
   try {
-    if (!menu_list_type_id || !menu_list_name) {
+    if ( !menu_list_name) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    await MenuListType.createMenu(menu_list_type_id, menu_list_name);
+    await MenuListType.createMenu( menu_list_name);
     res.status(201).json({ message: "Menu created successfully" });
   } catch (error) {
     res.status(500).json({ error: "Error inserting menu" });

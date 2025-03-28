@@ -7,7 +7,7 @@ const SuperAdminSideNav = ({ setDisplay }) => {
             <li><button onClick={() => setDisplay('addEmployees')}>Add Employees</button></li>
             <li><button onClick={() => setDisplay('getEmployees')}>GetEmployees</button></li>
             <li><button onClick={() => setDisplay('updateEmployeesById')}>updateEmployee</button></li>
-            <li>Link</li>
+            <li><button onClick={() => setDisplay('getMenus')}>Get Menus</button> </li>
         </div>
     )
 }

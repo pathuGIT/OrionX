@@ -5,6 +5,7 @@ import SuperAdminHome from './superAdmin/SuperAdminHome';
 import AddEmployee from './superAdmin/AddEmployee';
 import GetEmployees from './superAdmin/GetEmployee';
 import UpdateEmployees from './superAdmin/UpdateEmployees';
+import GetMenus from './superAdmin/GetMenus';
 
 const SuperAdminDB = () => {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ const SuperAdminDB = () => {
         return <GetEmployees />
       case 'updateEmployeesById':
         return <UpdateEmployees/> 
-      case 'Link3':
-        return <p>Content for Link 3</p>; // Replace with your actual component
+      case 'getMenus':
+        return <GetMenus/> // Replace with your actual component
       default:
         return <p>Page not found</p>;
     }
