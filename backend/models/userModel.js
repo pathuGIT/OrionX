@@ -34,14 +34,17 @@ export const registerEmployeeModel = async (pswd, employee_id) => {
 
 // Get employees & system users by email or phone
 export const getUserByUserEmailORPswdModel = async (credential) => {
+    console.log(typeof(credential))
     const [result] = await pool.query(
         'SELECT s.user_id, s.password, s.role, s.status, e.email, e.employee_id, s.refresh_token FROM systemuser s INNER JOIN employee e ON s.employee_id = e.employee_id WHERE e.email = ? OR e.phone = ?',
-        [credential, credential]
+        [credential, parseInt(credential, 10)|| 0]
+        //[credential, credential]
     );
 
+    console.log("User Found:", result[0]);
     if (result.length === 0) return null; // Prevent accessing undefined index
 
-    console.log("User Found:", result[0].email);
+    
     return result[0];
 };
 

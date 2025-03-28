@@ -1,5 +1,5 @@
 // backend/controllers/weddingController.js
-import Wedding from '../models/wedding.js'; // Default import
+import Wedding from '../models/weddingModel.js'; // Default import
 
 export const createWedding = (req, res) => {
   try {

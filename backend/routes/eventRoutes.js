@@ -1,11 +1,19 @@
 import express from 'express';
 import { createEvents } from '../controllers/eventController.js';
-import { validateEvent } from '../middleware/validateEvent.js';
+//import { validateEvent } from '../middleware/validateEvent.js';
 import { createWedding } from '../controllers/weddingController.js';
+import { customerBookingController } from '../controllers/customerBookingController.js';
+import { customer } from '../middleware/Customer.js';
 
 // Create separate routers for events and weddings
-export const eventRoute = express.Router();
-eventRoute.post('/', validateEvent, createEvents);
+const eventRoute = express.Router();
+const weddingRoutes = express.Router();
+const cusBookingRoutes = express.Router();
 
-export const weddingRoutes = express.Router();
-weddingRoutes.post('/', createWedding);
+
+
+eventRoute.post('/',customer, createEvents);
+weddingRoutes.post('/',customer, createWedding);
+cusBookingRoutes.get('/:customerID',customer, customerBookingController);
+
+export { eventRoute, weddingRoutes, cusBookingRoutes };

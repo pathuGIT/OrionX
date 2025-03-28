@@ -52,12 +52,12 @@ export const login = async (req, res) => {
         if (!user) {
             user = await getUserByUserEmailORPswdModel(credential);
         }
+        console.log("User found:", user);
 
         // If still not found, return error
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
-        console.log("User found:", user);
         // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {

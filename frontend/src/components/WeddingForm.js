@@ -3,7 +3,7 @@ import axios from "axios";
 
 const WeddingForm = () => {
     const [formData, setFormData] = useState({
-        eventId: "",
+       // eventId: "",
         groomName: "",
         brideName: "",
         groomContact: "",
@@ -41,7 +41,7 @@ const WeddingForm = () => {
             const response = await axios.post("http://localhost:8000/api/weddings", formData);
             setMessage(response.data.message);
             setFormData({
-                eventId: "",
+               // eventId: "",
                 groomName: "",
                 brideName: "",
                 groomContact: "",
@@ -70,9 +70,7 @@ const WeddingForm = () => {
                 {step === 1 && (
                     <div className="flex flex-col items-center">
                         <h3 className="text-xl font-semibold mb-2">Groom Details</h3>
-                        <label className="w-full text-left">Event ID:</label>
-                        <input type="text" name="eventId" value={formData.eventId} onChange={handleChange} required 
-                               className="w-full p-2 border rounded" />
+                       
 
                         <label className="w-full text-left">Groom Name:</label>
                         <input type="text" name="groomName" value={formData.groomName} onChange={handleChange} required 
@@ -169,3 +167,4 @@ const WeddingForm = () => {
 };
 
 export default WeddingForm;
+//test
