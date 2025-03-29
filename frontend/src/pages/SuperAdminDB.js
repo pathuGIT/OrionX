@@ -5,8 +5,7 @@ import SuperAdminHome from './superAdmin/SuperAdminHome';
 import AddEmployee from './superAdmin/AddEmployee';
 import GetEmployees from './superAdmin/GetEmployee';
 import UpdateEmployees from './superAdmin/UpdateEmployees';
-import GetMenus from './superAdmin/GetMenus';
-import CreateMenu from './superAdmin/CreateMenu';
+import CreateMenuListType from './superAdmin/CreateMenuListType';
 
 const SuperAdminDB = () => {
   const navigate = useNavigate();
@@ -21,10 +20,8 @@ const SuperAdminDB = () => {
         return <GetEmployees />
       case 'updateEmployeesById':
         return <UpdateEmployees/> 
-      case 'getMenus':
-        return <GetMenus/> 
       case 'createMenu':
-        return <CreateMenu/>
+        return <CreateMenuListType/>
 
       default:
         return <p>Page not found</p>;

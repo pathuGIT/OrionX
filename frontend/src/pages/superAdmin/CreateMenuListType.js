@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addMenuListType, getMenus } from '../../services/MenuService';
 
-function CreateMenu() {
+function CreateMenuListType() {
   const [menu, setMenu] = useState({ menu_list_type_id: '', menu_list_name: '' });
   const [menus, setMenus] = useState([]);
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ function CreateMenu() {
     try {
       await addMenuListType(menu);
       alert('Menu added successfully!');
-      setMenu({ menu_list_type_id: '', menu_list_name: '' });
+      setMenu({menu_list_name: '' });
       
       // Refresh menu list after adding
       const updatedMenus = await getMenus();
@@ -48,16 +48,7 @@ function CreateMenu() {
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-black mb-5">Create Menu</h2>
         <form onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-900">Menu List Type ID</label>
-            <input
-              type="text"
-              name="menu_list_type_id"
-              value={menu.menu_list_type_id}
-              readOnly
-              className="block w-full rounded-md bg-gray-200 px-3 py-2 text-gray-900"
-            />
-          </div>
+          
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu List Name</label>
             <input
@@ -100,4 +91,4 @@ function CreateMenu() {
   );
 }
 
-export default CreateMenu;
+export default CreateMenuListType;

@@ -22,7 +22,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRouter);
 app.use('/api/mail', mailRouter);
-app.use('/api/menus', menuListTypeRoutes);
+app.use('/api/menuListType', menuListTypeRoutes);
 app.use('/api/menutypes', menuTypeRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
