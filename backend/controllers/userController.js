@@ -7,6 +7,7 @@ import {
     updateUserRoleModel,
     updateEmployeesModel,
     getEmployeeByuserIdModel,
+    getEmployeesByStatusModel,
     deleteEmployeesModel,
     updateEmployeesStatusModel,
     checkUserIsActive} from '../models/userModel.js';
@@ -121,7 +122,7 @@ export const deleteEmployees = async (req, res) => {
 // update employee(systemuser) status
 export const updateEmployeesStatus = async (req, res) => {
     const { employee_Id, status } = req.body;
-    console.log(employee_Id, status)
+   
    
     try {
         const checkUserId = await getEmployeeByuserIdModel(employee_Id);
@@ -161,6 +162,18 @@ export const updateEmployees = async (req, res) => {
         await updateEmployeesModel(id, name, phone, email, bod, salary, service_charge_precentage, hire_date);
 
         res.status(200).json({ message: 'Employee updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// Get employees by status
+export const getEmployeesByStatus = async (req, res) => {
+    const { status } = req.body; 
+    try {
+        const employees = await getEmployeesByStatusModel(status);
+        res.status(200).json({ employees });
+        console.log(employees);
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
     }

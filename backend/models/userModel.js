@@ -151,3 +151,14 @@ export const updateEmployeesStatusModel = async (employee_id, status) => {
 
     ); return result[0]; 
 };
+
+//get employees by status
+export const getEmployeesByStatusModel = async (status) => {
+    const [result] = await pool.query(
+        
+        'SELECT e.* FROM employee e JOIN systemuser su ON e.employee_id = su.employee_id WHERE su.status = ?',
+        [status]
+    );
+    console.log(result[0]);
+    return result[0];
+};

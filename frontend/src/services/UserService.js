@@ -32,7 +32,11 @@ export const updateEmployeesStatus = async (employee_Id, status) => {
 
     console.log(employee_Id, status);
     const response = await api.put("/user/updateStatus/",data);
-    //fault
     console.log(response.data);
+    return response.data;
+};
+
+export const getEmployeesByStatus = async (status) => {
+    const response = await api.get(`/user/getEmployeesByStatus?status=${status}`);
     return response.data;
 };
