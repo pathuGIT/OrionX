@@ -22,15 +22,16 @@ function UpdateEmployees() {
     const [errorMessage, setErrorMessage] = useState("");
     const [showPopup, setShowPopup] = useState(false);
     const [showActionPopup, setShowActionPopup] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState("active"); //update status
+    const [selectedStatus, setSelectedStatus] = useState("active"); // update status
+    const [filterStatus, setFilterStatus] = useState("Active"); // Filter for active/inactive
 
     useEffect(() => {
-        fetchEmployees();
-    }, []);
+        fetchEmployees(filterStatus);
+    }, [filterStatus]);
 
-    const fetchEmployees = async () => {
+    const fetchEmployees = async (status) => {
         try {
-            const response = await getEmployees();
+            const response = await getEmployees(status); // Pass the status to the API
             setEmployees(response.employees);
         } catch (error) {
             console.error("Error fetching employees:", error);
@@ -70,7 +71,7 @@ function UpdateEmployees() {
             await updateEmployee(selectedEmployee.employee_id, formData);
             alert("Employee updated successfully");
             setShowPopup(false);
-            fetchEmployees();
+            fetchEmployees(filterStatus);
         } catch (error) {
             console.error("Error updating employee:", error);
             setErrorMessage("An unexpected error occurred.");
@@ -83,18 +84,17 @@ function UpdateEmployees() {
                 alert("Please select an employee and a status.");
                 return;
             }
-          
+
             await updateEmployeesStatus(selectedEmployee, selectedStatus);
             alert("Employee status updated successfully");
-            
+
             setShowActionPopup(false);
-            fetchEmployees(); // Refresh the employee list
+            fetchEmployees(filterStatus); // Refresh the employee list
         } catch (error) {
             console.error("Error updating employee status:", error);
             alert("An unexpected error occurred.");
         }
     };
-    
 
     const handleActionClick = (employee) => {
         setSelectedEmployee(employee);
@@ -104,6 +104,31 @@ function UpdateEmployees() {
     return (
         <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg">
             <p className="text-xl font-semibold mb-4">Update Employees</p>
+
+            {/* Filter Buttons */}
+            <div className="mb-4 flex space-x-4">
+                <button
+                    onClick={() => setFilterStatus("Active")}
+                    className={`px-4 py-2 rounded ${
+                        filterStatus === "Active"
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-300 text-black"
+                    }`}
+                >
+                    Active
+                </button>
+                <button
+                    onClick={() => setFilterStatus("Inactive")}
+                    className={`px-4 py-2 rounded ${
+                        filterStatus === "Inactive"
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-300 text-black"
+                    }`}
+                >
+                    Inactive
+                </button>
+            </div>
+
             <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                     <tr className="border border-gray-300">
@@ -136,11 +161,10 @@ function UpdateEmployees() {
                 </thead>
                 <tbody>
                     {employees.map((employee) => (
-                        <tr 
+                        <tr
                             key={employee.employee_id}
-                             className="border border-gray-300"
-                            >
-
+                            className="border border-gray-300"
+                        >
                             <td className="py-1 px-3 border-r border-gray-300">
                                 {employee.employee_id}
                             </td>
@@ -155,7 +179,6 @@ function UpdateEmployees() {
                             </td>
                             <td className="py-1 px-2 border-r border-gray-300">
                                 {new Date(employee.bod).toISOString().split("T")[0]}
-                               
                             </td>
                             <td className="py-1 px-2 border-r border-gray-300">
                                 {employee.salary}
@@ -179,6 +202,7 @@ function UpdateEmployees() {
                 </tbody>
             </table>
 
+            {/* Action Popup */}
             {showActionPopup && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-4 rounded-lg shadow-lg">
@@ -218,6 +242,7 @@ function UpdateEmployees() {
                 </div>
             )}
 
+            {/* Edit Popup */}
             {showPopup && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-4 rounded-lg shadow-lg">
@@ -226,6 +251,7 @@ function UpdateEmployees() {
                             <div className="text-red-500 mb-4">{errorMessage}</div>
                         )}
                         <div className="space-y-4 w-96">
+                            {/* Form Fields */}
                             <div>
                                 <label className="block text-sm font-medium">
                                     Employee name
@@ -315,6 +341,7 @@ function UpdateEmployees() {
                                     className="w-full p-2 border border-gray-300 rounded"
                                 />
                             </div>
+                            {/* Other fields */}
                             <div className="flex justify-between">
                                 <button
                                     onClick={handleUpdate}
