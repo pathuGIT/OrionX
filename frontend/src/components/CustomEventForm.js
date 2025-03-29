@@ -4,7 +4,7 @@ import { createEvents } from "../services/EventService"; // Import API function
 
 const EventForm = ({ bookingId }) => {
 
-    console.log("Booking ID:", bookingId); // Log the bookingId for debugging
+     // Log the bookingId for debugging
     const [formData, setFormData] = useState({
         eventName: "",
         buffetTimeFrom: "",
