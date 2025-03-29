@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import SuperAdminHome from './pages/superAdmin/SuperAdminHome';
 import EmployeeRegistration from './pages/EmployeeRegistration';
 import CustomerRegistration from './pages/CustomerRegistration';
+import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
+            <Route path="/profile/:bookingId" element={<ProtectedRoute name="customer"><CustomerEventPlanning /></ProtectedRoute>} />
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />

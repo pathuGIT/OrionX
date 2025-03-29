@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { createEvents } from "../services/EventService"; // Import API function
 
 const EventForm = () => {
     const [formData, setFormData] = useState({
@@ -37,8 +37,8 @@ const EventForm = () => {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8000/api/events", formData);
-            setMessage(response.data.message);
+            const response = await createEvents(formData); // Assuming createEvents is the API function
+            setMessage(response.message);
             setFormData({
                 eventName: "",
                 buffetTimeFrom: "",
