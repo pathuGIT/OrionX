@@ -12,7 +12,7 @@ export const customer = (req, res, next) => {
     const decoded = jwt.decode(token);
     const userRole = decoded?.role;
     if(userRole !== 'customer'){
-        return res.status(403).json({ message: 'You are not authorized bro..' });
+        return res.status(403).json({ message: 'You are not authorized customer' });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {

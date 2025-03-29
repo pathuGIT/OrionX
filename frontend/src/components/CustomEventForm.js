@@ -9,7 +9,7 @@ const EventForm = ({ bookingId }) => {
         eventName: "",
         buffetTimeFrom: "",
         buffetTimeTo: "",
-        additionalTime: "",
+      //  additionalTime: "",
         functionDurationFrom: "",
         functionDurationTo: "",
         teaTableTime: "",
@@ -46,7 +46,7 @@ const EventForm = ({ bookingId }) => {
                 eventName: "",
                 buffetTimeFrom: "",
                 buffetTimeTo: "",
-                additionalTime: "",
+               // additionalTime: "",
                 functionDurationFrom: "",
                 functionDurationTo: "",
                 teaTableTime: "",
@@ -127,10 +127,10 @@ const EventForm = ({ bookingId }) => {
                         <label className="w-full text-left">Function Duration To:</label>
                         <input type="time" name="functionDurationTo" value={formData.functionDurationTo} onChange={handleChange}
                             className="w-full p-2 border rounded" />
-
+{/* 
                         <label className="w-full text-left">Additional Time(if):</label>
                         <input type="time" name="additionalTime" value={formData.additionalTime} onChange={handleChange}
-                            className="w-full p-2 border rounded" />
+                            className="w-full p-2 border rounded" /> */}
 
                         <div className="flex justify-between w-full mt-3">
                             <button type="button" onClick={handleBack}

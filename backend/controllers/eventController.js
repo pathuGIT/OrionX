@@ -1,6 +1,6 @@
 // controllers/eventController.js
-
 import Event from '../models/eventModel.js'; // Import the Event model
+
 
 export const createEvents = async (req, res) => {
     try {

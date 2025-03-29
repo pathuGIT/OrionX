@@ -6,11 +6,11 @@ class EventModel {
 
             // Insert into Event table
             const [result] = await db.query(
-                `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, Additional_Time, 
+                `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, 
                 Function_durationFrom, Function_durationTo, Tea_table_Time, Dress_Time, booking_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    eventData.buffetTimeFrom, eventData.buffetTimeTo, eventData.additionalTime, 
+                    eventData.buffetTimeFrom, eventData.buffetTimeTo, 
                     eventData.functionDurationFrom, eventData.functionDurationTo, eventData.teaTableTime, 
                     eventData.dressTime, eventData.bookingID
                 ]
