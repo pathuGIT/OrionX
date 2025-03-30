@@ -7,6 +7,7 @@ import {
     updateUserRoleModel,
     updateEmployeesModel,
     getEmployeeByuserIdModel,
+    getEmployeesByStatusModel,
     deleteEmployeesModel,
     updateEmployeesStatusModel,
     checkUserIsActive} from '../models/userModel.js';
@@ -121,7 +122,7 @@ export const deleteEmployees = async (req, res) => {
 // update employee(systemuser) status
 export const updateEmployeesStatus = async (req, res) => {
     const { employee_Id, status } = req.body;
-    console.log(employee_Id, status)
+   
    
     try {
         const checkUserId = await getEmployeeByuserIdModel(employee_Id);
@@ -140,7 +141,9 @@ export const updateEmployeesStatus = async (req, res) => {
 
 // Get employee by ID
 export const getEmployeeById = async (req, res) => {
-    const { id } = req.params;
+    const {id}  = req.params;
+     console.log(id);
+
     try {
         const employee = await getEmployeeByuserIdModel(id);
         if (!employee) return res.status(404).json({ message: 'Employee not found' });
@@ -152,15 +155,27 @@ export const getEmployeeById = async (req, res) => {
 
  // update employee details
 export const updateEmployees = async (req, res) => {
-    const { id } = req.params;
-    const { name, phone, email, bod, salary, service_charge_precentage, hire_date } = req.body;
+    const { id, name, phone, email, bod, salary, service_charge_precentage, hire_date } = req.body;
     try {
-        const checkUserId = await getEmployeeByuserIdModel(id);
-        if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
-
+        //const checkUserId = await getEmployeeByuserIdModel(id);
+        //if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
+        console.log(id, name, phone, email, bod, salary, service_charge_precentage, hire_date)
         await updateEmployeesModel(id, name, phone, email, bod, salary, service_charge_precentage, hire_date);
 
         res.status(200).json({ message: 'Employee updated successfully' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+
+// Get employees by status
+export const getEmployeesByStatus = async (req, res) => {
+    const { status } = req.params;
+    console.log(status)
+    try {
+        const employees = await getEmployeesByStatusModel(status);
+        res.status(200).json({ employees });
+    
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
     }

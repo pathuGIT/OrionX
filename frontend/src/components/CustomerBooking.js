@@ -4,6 +4,7 @@ import { getCustomerBookings } from "../services/EventService";
 import { useNavigate } from "react-router-dom";
 import { encryptBookingId } from "../utills/encryptionUtils";    
 
+
 const CustomerBookings = () => {
     const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
@@ -11,7 +12,7 @@ const CustomerBookings = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-
+//take this part
     useEffect(() => {
         let customerID = sessionStorage.getItem("id");
 
@@ -37,6 +38,16 @@ const CustomerBookings = () => {
             });
 
     }, [user]);
+//here 
+
+// {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
+// onClick={() =>{
+// const encryptedId = encryptBookingId(booking.booking_id);
+// navigate(`/profile/${encryptedId}`)}}>
+// Plan your Event</button> */}
+
+//under construction
+
 
     // Function to format date
     const formatDate = (isoDate) => {
@@ -68,9 +79,11 @@ const CustomerBookings = () => {
                             </div>
                             <div className="p-4 bg-gray-100 text-center">
                                 <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
-                                onClick={() =>{
-                                const encryptedId = encryptBookingId(booking.booking_id);
-                                navigate(`/profile/${encryptedId}`)}}>
+                                onClick={() => {
+                                    const encryptedId = encryptBookingId(booking.booking_id);
+                                    navigate(`/eventHome/${encryptedId}`)
+                                    
+                                }}>
                                 Plan your Event</button>
                             </div>
                         </div>

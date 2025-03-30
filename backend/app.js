@@ -36,6 +36,7 @@ app.use('/api/customerMenuSelection', customerSelectionRoutes);
 app.use('/api/event', eventRoute);
 app.use('/api/wedding', weddingRoutes);
 app.use('/api/customer', cusBookingRoutes);
+app.use('/api/', showEvents);
 
 
 

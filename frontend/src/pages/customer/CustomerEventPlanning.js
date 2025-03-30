@@ -5,8 +5,27 @@ import { useParams } from "react-router-dom";
 import { decryptBookingId } from "../../utills/encryptionUtils.js";
 
 const CustomerEventPlanning = () => {
-    
+   
+    const { bookingId } = useParams();
+    let decryptedBookingId = null;
+
+    try {
+        decryptedBookingId = decryptBookingId(bookingId); // Attempt to decrypt the bookingId
+    } catch (error) {
+        console.error("Failed to decrypt booking ID:", error);
+    }
+        console.log(decryptedBookingId);
+    // ✅ Move useState above the conditional return
     const [eventType, setEventType] = useState("");
+
+    if (!decryptedBookingId) {
+        return (
+            <div className="p-4 bg-white rounded shadow-md mt-4">
+                <h3 className="text-xl font-semibold mb-2 text-red-600">Invalid Booking ID</h3>
+                <p>Please check the URL or contact support for assistance.</p>
+            </div>
+        );
+    }
 
     const handleEventChange = (e) => {
         setEventType(e.target.value);
@@ -25,7 +44,7 @@ const CustomerEventPlanning = () => {
 
             {/* Render the corresponding form based on selection */}
             <div className="mt-4">
-                {eventType === "wedding" && <WeddingForm />}
+                {eventType === "wedding" && <WeddingForm bookingId={decryptedBookingId} />}
                 {eventType === "custom" && <CustomEventForm />}
             </div>
         </div>
@@ -35,11 +54,13 @@ const CustomerEventPlanning = () => {
 const CustomEventForm = () => {
     const { bookingId } = useParams();
     let decryptedBookingId = null;
+
     try {
         decryptedBookingId = decryptBookingId(bookingId); // Attempt to decrypt the bookingId
     } catch (error) {
         console.error("Failed to decrypt booking ID:", error);
     }
+
     if (!decryptedBookingId) {
         return (
             <div className="p-4 bg-white rounded shadow-md mt-4">
@@ -48,6 +69,8 @@ const CustomEventForm = () => {
             </div>
         );
     }
+
+
     return (
         <div className="p-4 bg-white rounded shadow-md mt-4">
             <h3 className="text-xl font-semibold mb-2">Custom Event Planning</h3>
@@ -55,6 +78,5 @@ const CustomEventForm = () => {
         </div>
     );
 };
-
 
 export default CustomerEventPlanning;
