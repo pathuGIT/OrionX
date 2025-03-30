@@ -85,4 +85,25 @@ export const addItem = async (item) => {
   }
 };
 
+// to display all category menu types and add new category menu types through form
+export const getCategoryMenuTypes = async () => {
+  try {
+    const response = await api.get('/categoryMenuTypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category menu types:", error);
+    throw error;
+  }
+};
+
+export const addCategoryMenuType = async (categoryMenu) => {
+  try {
+    const response = await api.post('/categoryMenuTypes/add', categoryMenu);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding category menu type:", error);
+    throw error;
+  }
+};
+
 

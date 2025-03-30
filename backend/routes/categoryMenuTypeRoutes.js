@@ -4,18 +4,18 @@ import CategoryMenuTypeController from "../controllers/categoryMenuTypeControlle
 const router = express.Router();
 
 // Get all category menu types
-router.get("/", CategoryMenuTypeController.getAllCategoryMenuTypes);
+router.get("/getAll", CategoryMenuTypeController.getAllCategoryMenuTypes);
 
 // Get a single category menu type by ID
-router.get("/:id", CategoryMenuTypeController.getCategoryMenuTypeById);
+router.get("/get/:id", CategoryMenuTypeController.getCategoryMenuTypeById);
 
 // Create a new category menu type
-router.post("/", CategoryMenuTypeController.createCategoryMenuType);
+router.post("/add/", CategoryMenuTypeController.createCategoryMenuType);
 
 // Update an existing category menu type
-router.put("/:id", CategoryMenuTypeController.updateCategoryMenuType);
+router.put("/update/:id", CategoryMenuTypeController.updateCategoryMenuType);
 
 // Delete a category menu type
-router.delete("/:id", CategoryMenuTypeController.deleteCategoryMenuType);
+router.delete("/delete/:id", CategoryMenuTypeController.deleteCategoryMenuType);
 
 export default router;
