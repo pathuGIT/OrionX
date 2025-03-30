@@ -10,7 +10,7 @@ export const getMenuTypeById = async (menu_type_id) => {
         "SELECT * FROM Menu_Type WHERE menu_type_id = ?",
         [menu_type_id]
     );
-    return rows[0];
+    return rows[0];z
 };
 
 export const createMenuType = async (menu_type_name, menu_list_type_id, price) => {

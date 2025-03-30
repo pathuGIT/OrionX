@@ -14,7 +14,6 @@ export const getMenuListType = async (req, res) => {
 export const getMenuById = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("menu_list_type_id", id);
     const menu = await MenuListType.getMenuById(id);
 
     if (!menu) {
@@ -63,9 +62,9 @@ export const updateMenuById = async (req, res) => {
 // Delete a menu
 export const deleteMenu = async (req, res) => {
   try {
-    const { menu_list_type_id } = req.params;
+    const { id } = req.params;
 
-    const deletedRows = await MenuListType.deleteMenu(menu_list_type_id);
+    const deletedRows = await MenuListType.deleteMenu(id);
 
     if (deletedRows === 0) {
       return res.status(404).json({ error: "Menu not found" });
