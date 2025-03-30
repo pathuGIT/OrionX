@@ -17,6 +17,14 @@ const EventHome = () => {
               Plan Your Event
             </button>
           </li>
+          <li className="mb-2">
+            <button
+              className="block p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+              onClick={() => navigate(`/display-events`)}
+            >
+              Plan Your Event
+            </button>
+          </li>
         </ul>
       </div>
 

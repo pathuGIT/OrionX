@@ -22,3 +22,14 @@ export const getCustomerBookings = async (customerID) => {
         throw error;
     }
 };
+
+
+export const getPlannedEvent = async (customerID) => {
+    try {
+        const response = await api.get(`/displayEvents/${customerID}`);
+        return response.data.data;
+    } catch (error) {
+        console.error("You Have No Planned Events:", error);
+        throw error;
+    }
+};

@@ -12,3 +12,19 @@ export const decryptBookingId = (encryptedId) => {
         return null; // Return null if decryption fails
     }
 };
+
+
+export const encryptCustId = (custId) => {
+    // Simple Base64 encoding (not secure for sensitive data)
+    return btoa(custId);
+}
+
+export const decryptCustId = (encryptedId) => {
+    try {
+        // Decode the Base64 string
+        return atob(encryptedId);
+    } catch (error) {
+        console.error("Failed to decrypt customer ID:", error);
+        return null; // Return null if decryption fails
+    }
+};
