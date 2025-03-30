@@ -13,10 +13,11 @@ export const getMenuById = async (menu_list_type_id) => {
     return rows[0];
 };
 
-export const createMenu = async (menu_list_type_id, menu_list_name) => {
+export const createMenu = async ( menu_list_name) => {
+    console.log("menu_list_name",menu_list_name);
     const [result] = await db.query(
-        "INSERT INTO Menu_List_Type (menu_list_type_id, menu_list_name) VALUES (?, ?)",
-        [menu_list_type_id, menu_list_name]
+        "INSERT INTO Menu_List_Type ( menu_list_name) VALUES (?)",
+        [menu_list_name]
     );
     return result.insertId;
 };

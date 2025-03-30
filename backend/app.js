@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import categoryMenuTypeRoutes from "./routes/categoryMenuTypeRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
 import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
+import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
 
 const app = express();
 
@@ -21,12 +22,13 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRouter);
 app.use('/api/mail', mailRouter);
-app.use('/api/menus', menuListTypeRoutes);
+app.use('/api/menuListType', menuListTypeRoutes);
 app.use('/api/menutypes', menuTypeRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
+app.use('/api/customerMenuSelection', customerSelectionRoutes);
 
 
 
