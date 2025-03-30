@@ -11,15 +11,19 @@ export const getAllCategories = async (req, res) => {
 
 export const getCategoryById = async (req, res) => {
     try {
-        const category = await CategoryModel.getCategoryById(req.params.id);
-        if (!category) {
-            return res.status(404).json({ message: "Category not found" });
-        }
-        res.json(category);
+      const { id } = req.params;
+      const category = await CategoryModel.getCategoryById(id);
+  
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+  
+      res.json(category);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: "Database error" });
     }
-};
+  };
+  
 
 export const createCategory = async (req, res) => {
     try {

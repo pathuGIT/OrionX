@@ -11,6 +11,18 @@ export const getMenus = async () => {
   }
 };
 
+//get menu list type py id
+export const getMenuListTypeById = async (id) => {
+  try {
+    const response = await api.get(`/menuListType/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding menu:", error);
+    throw error;
+  }
+}; 
+
+//add new menu list type
 export const addMenuListType = async (menu) => {
   try {
     const response = await api.post('/menuListType/add', menu);
@@ -20,6 +32,32 @@ export const addMenuListType = async (menu) => {
     throw error;
   }
 };  
+
+//delete new menu list type by id
+export const deleteMenuListType = async (id) => {
+  try {
+    const response = await api.delete(`/menuListType/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding menu:", error);
+    throw error;
+  }
+}; 
+
+// update menu list type by id
+export const updateMenuListTypeById = async (id, data) => {
+  console.log(id,data);
+  const name = {menu_list_name:data}
+  try {
+    const response = await api.put(`/menuListType/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding menu:", error);
+    throw error;
+  }
+}; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 //to display all menytypes and add new menu types through form
@@ -43,5 +81,68 @@ export const addMenuType = async (menuType) => {
   }
 };
 
+//to display all categories and add new categories through form
+export const getCategories = async () => {
+  try {
+    const response = await api.get('/categories/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+export const addCategory = async (category) => {
+  try {
+    const response = await api.post('/categories/add', category);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding category:", error);
+    throw error;
+  }
+};
+
+//to display all items and add new items through form
+export const getItems = async () => {
+  try {
+    const response = await api.get('/items/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    throw error;
+  }
+};
+
+export const addItem = async (item) => {
+  try {
+    const response = await api.post('/items/add', item);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding item:", error);
+    throw error;
+  }
+};
+
+// to display all category menu types and add new category menu types through form
+export const getCategoryMenuTypes = async () => {
+  try {
+    const response = await api.get('/categoryMenuTypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category menu types:", error);
+    throw error;
+  }
+};
+
+export const addCategoryMenuType = async (categoryMenu) => {
+  try {
+    const response = await api.post('/categoryMenuTypes/add', categoryMenu);
+    console.log("Category Menu Type added successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding category menu type:", error);
+    throw error;
+  }
+};
 
 
