@@ -13,10 +13,10 @@ export const getItemCategoryMenuTypeById  = async (ICMT_Id) => {
 };
 
 // Create a new record in Item_Category_Menu_Type
-export const createItemCategoryMenuType = async (ICMT_Id, category_menu_type_id, item_id) => {
+export const createItemCategoryMenuType = async (category_menu_type_id, item_id) => {
     const [result] = await db.query(
-        "INSERT INTO Item_Category_Menu_Type (ICMT_Id, category_menu_type_id, item_id) VALUES (?, ?, ?)",
-        [ICMT_Id, category_menu_type_id, item_id]
+        "INSERT INTO Item_Category_Menu_Type (category_menu_type_id, item_id) VALUES (?, ?)",
+        [category_menu_type_id, item_id]
     );
     return result.insertId;
 };

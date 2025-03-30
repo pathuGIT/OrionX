@@ -11,20 +11,25 @@ export const getAllMenuTypes = async (req, res) => {
 
 export const getMenuTypeById = async (req, res) => {
     try {
-        const menuType = await MenuTypeModel.getMenuTypeById(req.params.id);
+        const { id } = req.params;
+        console.log("menu_type_id", id);
+        const menuType = await MenuTypeModel.getMenuTypeById(id);
+
         if (!menuType) {
-            return res.status(404).json({ message: "Menu Type not found" });
+            return res.status(404).json({ error: "Menu Type not found" });
         }
+
         res.json(menuType);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Database error" });
     }
 };
 
+
 export const createMenuType = async (req, res) => {
     try {
-        const { menu_type_id, menu_type_name, menu_list_type_id, price } = req.body;
-        await MenuTypeModel.createMenuType(menu_type_id, menu_type_name, menu_list_type_id, price);
+        const {menu_type_name, menu_list_type_id, price } = req.body;
+        await MenuTypeModel.createMenuType(menu_type_name, menu_list_type_id, price);
         res.status(201).json({ message: "Menu Type created successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
