@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { decryptBookingId } from "../../utills/encryptionUtils.js";
 
 const CustomerEventPlanning = () => {
+   
     const { bookingId } = useParams();
     let decryptedBookingId = null;
 
@@ -13,7 +14,7 @@ const CustomerEventPlanning = () => {
     } catch (error) {
         console.error("Failed to decrypt booking ID:", error);
     }
-
+        console.log(decryptedBookingId);
     // ✅ Move useState above the conditional return
     const [eventType, setEventType] = useState("");
 
@@ -68,6 +69,7 @@ const CustomEventForm = () => {
             </div>
         );
     }
+
 
     return (
         <div className="p-4 bg-white rounded shadow-md mt-4">
