@@ -64,5 +64,25 @@ export const addCategory = async (category) => {
   }
 };
 
+//to display all items and add new items through form
+export const getItems = async () => {
+  try {
+    const response = await api.get('/items/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    throw error;
+  }
+};
+
+export const addItem = async (item) => {
+  try {
+    const response = await api.post('/items/add', item);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding item:", error);
+    throw error;
+  }
+};
 
 
