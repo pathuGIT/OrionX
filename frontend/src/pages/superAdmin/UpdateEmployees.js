@@ -11,7 +11,7 @@ import {
 function UpdateEmployees() {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  console.log("huuuu", selectedEmployee);
+  console.log("Selected Employee aa:", selectedEmployee);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -54,6 +54,7 @@ function UpdateEmployees() {
   const handleEdit = async (employeeId) => {
     try {
       const response = await getEmployeeById(employeeId);
+      console.log("Fetched employee:", response);
       setSelectedEmployee(response);
       setFormData({
         name: response.name,
@@ -88,14 +89,17 @@ function UpdateEmployees() {
       setErrorMessage("An unexpected error occurred.");
     }
   };
-
+  
   const handleUpdateEmployeesStatus = async () => {
+    
     try {
       if (!selectedEmployee || !selectedStatus) {
+       
+       
         alert("Please select an employee and a status.");
         return;
       }
-
+      console.log("aa",selectedStatus);
       await updateEmployeesStatus(selectedEmployee, selectedStatus);
       alert("Employee status updated successfully");
 
@@ -108,7 +112,8 @@ function UpdateEmployees() {
   };
 
   const handleActionClick = (employee) => {
-    setSelectedEmployee(employee);
+    setSelectedEmployee(employee.employee_id);
+    console.log("Selected Employeeddddddd:", employee);
     setShowActionPopup(true);
   };
 
