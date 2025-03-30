@@ -23,8 +23,8 @@ export const getCategoryById = async (req, res) => {
 
 export const createCategory = async (req, res) => {
     try {
-        const { category_id, category_name } = req.body;
-        await CategoryModel.createCategory(category_id, category_name);
+        const {category_name } = req.body;
+        await CategoryModel.createCategory(category_name);
         res.status(201).json({ message: "Category created successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });

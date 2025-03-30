@@ -23,8 +23,8 @@ export const getCategoryMenuTypeById = async (req, res) => {
 
 export const createCategoryMenuType = async (req, res) => {
     try {
-        const { category_menu_type_Id, menu_type_id, category_id, item_limit } = req.body;
-        await CategoryMenuTypeModel.createCategoryMenuType(category_menu_type_Id, menu_type_id, category_id, item_limit);
+        const {menu_type_id, category_id, item_limit } = req.body;
+        await CategoryMenuTypeModel.createCategoryMenuType(menu_type_id, category_id, item_limit);
         res.status(201).json({ message: "Category Menu Type created successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
