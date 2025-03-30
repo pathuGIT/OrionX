@@ -10,6 +10,7 @@ const SuperAdminSideNav = ({ setDisplay }) => {
             {/* <li><button onClick={() => setDisplay('getMenus')}>Get Menus</button> </li> */}
             <li><button onClick={() => setDisplay('createMenu')}>Create Menu list type</button></li>  
             <li><button onClick={() => setDisplay('createMenuType')}>Create Menu Type</button></li>
+            <li><button onClick={() => setDisplay('createCategories')}>Create Categories</button></li>
         </div>
     )
 }

@@ -43,5 +43,26 @@ export const addMenuType = async (menuType) => {
   }
 };
 
+//to display all categories and add new categories through form
+export const getCategories = async () => {
+  try {
+    const response = await api.get('/categories/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+export const addCategory = async (category) => {
+  try {
+    const response = await api.post('/categories/add', category);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding category:", error);
+    throw error;
+  }
+};
+
 
 
