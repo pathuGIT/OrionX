@@ -78,7 +78,6 @@ function UpdateEmployees() {
   };
 
   const handleUpdate = async () => {
-    console.log("sdaasasa");
     try {
       await updateEmployee(selectedEmployee.employee_id, formData);
       alert("Employee updated successfully");
@@ -91,8 +90,8 @@ function UpdateEmployees() {
   };
   
   const handleUpdateEmployeesStatus = async () => {
-    
     try {
+      
       if (!selectedEmployee || !selectedStatus) {
        
        
@@ -100,7 +99,7 @@ function UpdateEmployees() {
         return;
       }
       console.log("aa",selectedStatus);
-      await updateEmployeesStatus(selectedEmployee, selectedStatus);
+      await updateEmployeesStatus(selectedEmployee.employee_id, selectedStatus);
       alert("Employee status updated successfully");
 
       setShowActionPopup(false);
@@ -112,8 +111,7 @@ function UpdateEmployees() {
   };
 
   const handleActionClick = (employee) => {
-    setSelectedEmployee(employee.employee_id);
-    console.log("Selected Employeeddddddd:", employee);
+    setSelectedEmployee(employee);
     setShowActionPopup(true);
   };
 
