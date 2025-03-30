@@ -14,6 +14,40 @@ CREATE TABLE Employee (
     service_charge_precentage DECIMAL(3.2),
     hire_date DATE
 );
+CREATE TABLE Booking (
+    booking_id VARCHAR(10) PRIMARY KEY,
+    time_slot ENUM('day','night'),
+    status ENUM('pending','confirmed','cancelled'),
+    booking_date DATE,
+    event_type ENUM('custome','wedding'), -- New column added after booking_date
+    event_name VARCHAR(200), -- New column added after event_type
+    total_price DECIMAL(10,2),
+    created_at DATE,
+    updated_at DATE,
+    venue_id VARCHAR(10),
+    FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE venue (
+    venue_id VARCHAR(10) PRIMARY KEY,
+    venue_name VARCHAR(200),
+    time_slot ENUM('day','night'),
+    Location ENUM('indoor','outdoor','both'),
+    capacity INT,
+    price DECIMAL(10,2),
+    created_at DATE,
+    updated_at DATE
+);
+
+CREATE TABLE bookig_history (
+    history_id VARCHAR(10),
+    action_date DATE,
+    employee_id VARCHAR(10),
+    booking_id VARCHAR(10),
+    FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
+    FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+);
 
 CREATE TABLE Customer(
     customer_id VARCHAR(10) PRIMARY KEY,
@@ -134,9 +168,19 @@ CREATE TABLE Wedding (
 -- Create CustomEvent table
 CREATE TABLE CustomEvent (
     Event_ID VARCHAR(10),
+    Event_Name VARCHAR(100),
     ContactPersonName VARCHAR(100),
     ContactPersonNumber VARCHAR(15),
     FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+);
+
+
+-- Create Table_Reserve table
+
+CREATE TABLE Table_Reserve (
+    Table_Reserve_ID VARCHAR(10) PRIMARY KEY,
+    Table_Number INT,
+    Reserve_Name VARCHAR(100)
 );
 
 -- Create Table_Chair table
@@ -152,13 +196,6 @@ CREATE TABLE Table_Chair_Arrangement (
     FOREIGN KEY (Table_Reserve_ID) REFERENCES Table_Reserve(Table_Reserve_ID)
 );
 
--- Create Table_Reserve table
-
-CREATE TABLE Table_Reserve (
-    Table_Reserve_ID VARCHAR(10) PRIMARY KEY,
-    Table_Number INT,
-    Reserve_Name VARCHAR(100)
-);
 
 --many to many tables 
 
@@ -199,9 +236,9 @@ CREATE TABLE Event_Cordinator (
 
 
 
+
 -- Trigger to format Table_Reserve_ID
 DELIMITER //
-
 CREATE TRIGGER before_Table_Reserve
 BEFORE INSERT ON Table_Reserve
 FOR EACH ROW
@@ -209,15 +246,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Table_Reserve_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Table_Reserve_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Table_Reserve;
-    SET new_id = CONCAT('TAB', LPAD(max_id, 3, '0'));
+    
+    -- Format the new ID as 'TAB' followed by a zero-padded number (3 digits)
+    SET new_id = CONCAT('TAB', LPAD(max_id, 6, '0'));
     SET NEW.Table_Reserve_ID = new_id;
 END //
+DELIMITER ;
 
 
 -- Trigger to format Arrangement_ID
 DELIMITER //
-
 CREATE TRIGGER before_Table_Chair_Arrangement
 BEFORE INSERT ON Table_Chair_Arrangement
 FOR EACH ROW
@@ -225,15 +265,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Arrangement_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Arrangement_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Table_Chair_Arrangement;
-    SET new_id = CONCAT('TCA', LPAD(max_id, 3, '0'));
+    
+    -- Format the new ID as 'TCA' followed by a zero-padded number (3 digits)
+    SET new_id = CONCAT('TCA', LPAD(max_id, 6, '0'));
     SET NEW.Arrangement_ID = new_id;
 END //
+DELIMITER ;
 
 
 -- Trigger to format Employee_Assign_ID
 DELIMITER //
-
 CREATE TRIGGER before_Assigned_Employee
 BEFORE INSERT ON Assigned_Employee
 FOR EACH ROW
@@ -241,15 +284,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Employee_Assign_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
-    SET new_id = CONCAT('EMP', LPAD(max_id, 3, '0'));
+    
+    -- Format the new ID as 'EMP' followed by a zero-padded number (3 digits)
+    SET new_id = CONCAT('EMP', LPAD(max_id, 6, '0'));
     SET NEW.Employee_Assign_ID = new_id;
 END //
+DELIMITER ;
 
 
 -- Trigger to format Vendor_ID
 DELIMITER //
-
 CREATE TRIGGER before_Vendor
 BEFORE INSERT ON Vendor
 FOR EACH ROW
@@ -257,15 +303,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Vendor_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Vendor_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Vendor;
-    SET new_id = CONCAT('VEN', LPAD(max_id, 3, '0'));
+    
+    -- Format the new ID as 'VEN' followed by a zero-padded number (3 digits)
+    SET new_id = CONCAT('VEN', LPAD(max_id, 6, '0'));
     SET NEW.Vendor_ID = new_id;
 END //
+DELIMITER ;
 
 
 -- Trigger to format Event_Service_ID
 DELIMITER //
-
 CREATE TRIGGER before_Event_Service
 BEFORE INSERT ON Event_Service
 FOR EACH ROW
@@ -273,15 +322,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Event_Service_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Event_Service_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Event_Service;
-    SET new_id = CONCAT('ES', LPAD(max_id, 2, '0'));
+    
+    -- Format the new ID as 'ES' followed by a zero-padded number (2 digits)
+    SET new_id = CONCAT('ES', LPAD(max_id, 6, '0'));
     SET NEW.Event_Service_ID = new_id;
 END //
+DELIMITER ;
 
 
 -- Trigger to format Bite_ID
 DELIMITER //
-
 CREATE TRIGGER before_Bite
 BEFORE INSERT ON Bite
 FOR EACH ROW
@@ -289,14 +341,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Bite_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Bite_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Bite;
-    SET new_id = CONCAT('BITE', LPAD(max_id, 4, '0'));
+    
+    -- Format the new ID as 'BITE' followed by a zero-padded number (4 digits)
+    SET new_id = CONCAT('BITE', LPAD(max_id, 6, '0'));
     SET NEW.Bite_ID = new_id;
 END //
+DELIMITER ;
+
 
 -- Trigger to format BarRequirementID
 DELIMITER //
-
 CREATE TRIGGER before_Bar
 BEFORE INSERT ON Bar
 FOR EACH ROW
@@ -304,14 +360,18 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max BarRequirementID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(BarRequirementID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Bar;
-    SET new_id = CONCAT('BAR', LPAD(max_id, 3, '0'));
+    
+    -- Format the new ID as 'BAR' followed by a zero-padded number (3 digits)
+    SET new_id = CONCAT('BAR', LPAD(max_id, 6, '0'));
     SET NEW.BarRequirementID = new_id;
 END //
+DELIMITER ;
+
 
 -- Trigger to format Event_ID
 DELIMITER //
-
 CREATE TRIGGER before_Event_ID
 BEFORE INSERT ON Event
 FOR EACH ROW
@@ -319,10 +379,14 @@ BEGIN
     DECLARE max_id INT;
     DECLARE new_id VARCHAR(10);
 
+    -- Find the max Event_ID by extracting numeric part
     SELECT COALESCE(MAX(CAST(SUBSTRING(Event_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Event;
-    SET new_id = CONCAT('EVN', LPAD(max_id, 3, '0'));
+    
+    -- Format the new ID as 'EVN' followed by a zero-padded number (3 digits)
+    SET new_id = CONCAT('EVN', LPAD(max_id, 6, '0'));
     SET NEW.Event_ID = new_id;
 END //
+DELIMITER ;
 
 
 
@@ -430,6 +494,27 @@ DELIMITER ;
 
 
 -- Insert sample data
-INSERT INTO Employee (name, phone, email, bod, salary, hire_date, active_token) VALUES ('saman', '07712345678', 'ksl@gmail.com', '2001-02-09', 5000, CURDATE(), 'OPT123');
+INSERT INTO Employee (name, phone, email, bod, salary, service_charge_precentage, hire_date) VALUES ('shan', '07712345678', 'shan@gmail.com', '1970-02-09', 0, 0, CURDATE());
 INSERT INTO SystemUser (password, role, status, employee_id, refresh_token) VALUES ('password123', 'super_admin', 'active', 'emp001', 'refresh_token_example');
 INSERT INTO Customer (name, email, address, phone, staus, create_date) VALUES ("Gamini", 'gamini@gmail.com','Galle SA Road','0778564596', 'active', CURDATE());
+
+DELIMITER //
+
+CREATE TRIGGER Before_Insert_Menu_Type 
+BEFORE INSERT ON Menu_Type 
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    -- Extract the numeric part from menu_type_id and find the max value
+    SELECT COALESCE(MAX(CAST(SUBSTRING(menu_type_id, 3) AS UNSIGNED)), 0) + 1 INTO max_id FROM Menu_Type;
+    
+    -- Format the new ID as 'MT' followed by a zero-padded number
+    SET new_id = CONCAT('MT', LPAD(max_id, 3, '0'));
+    
+    -- Assign the new ID to the inserted row
+    SET NEW.menu_type_id = new_id;
+END //
+
+DELIMITER ;

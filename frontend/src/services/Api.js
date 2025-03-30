@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { useContext } from 'react';
+import { AuthContext } from '../context/Authcontext';
 
 const Api = axios.create({
     baseURL: 'http://localhost:8000/api', // Backend base URL
@@ -43,7 +45,10 @@ Api.interceptors.response.use(
             } catch (refreshError) {
                 console.error('Refresh token expired or invalid');
                 // Redirect to login page or handle logout
-                //window.location.href = '/';
+                // const { logout } = useContext(AuthContext);
+                // await logout();
+                sessionStorage.clear();
+                window.location.href = '/login';
             }
         }
 

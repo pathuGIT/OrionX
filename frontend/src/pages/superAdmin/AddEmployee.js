@@ -33,7 +33,7 @@ const AddEmployee = () => {
   };
 
   return (
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm  mt-5">
       <h1 className=' text-xl mb-7'>Add New Employee to the System</h1>
 
       <form onSubmit={handleSubmit} className='mt-2'>
