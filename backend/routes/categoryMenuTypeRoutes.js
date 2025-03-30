@@ -10,7 +10,7 @@ router.get("/getAll", CategoryMenuTypeController.getAllCategoryMenuTypes);
 router.get("/get/:id", CategoryMenuTypeController.getCategoryMenuTypeById);
 
 // Create a new category menu type
-router.post("/add/", CategoryMenuTypeController.createCategoryMenuType);
+router.post("/add", CategoryMenuTypeController.createCategoryMenuType);
 
 // Update an existing category menu type
 router.put("/update/:id", CategoryMenuTypeController.updateCategoryMenuType);

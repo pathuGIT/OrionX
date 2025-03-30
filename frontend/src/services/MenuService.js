@@ -99,6 +99,7 @@ export const getCategoryMenuTypes = async () => {
 export const addCategoryMenuType = async (categoryMenu) => {
   try {
     const response = await api.post('/categoryMenuTypes/add', categoryMenu);
+    console.log("Category Menu Type added successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error adding category menu type:", error);

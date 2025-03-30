@@ -3,7 +3,6 @@ import { getCategoryMenuTypes, addCategoryMenuType } from '../../services/MenuSe
 
 function CreateCategoryMenuType() {
   const [categoryMenu, setCategoryMenu] = useState({
-    category_menu_type_id: '',
     menu_type_id: '',
     category_id: '',
     item_limit: '',
@@ -16,10 +15,6 @@ function CreateCategoryMenuType() {
       try {
         const fetchedCategories = await getCategoryMenuTypes();
         setCategories(fetchedCategories);
-        const nextId = fetchedCategories.length
-          ? `CMT${(fetchedCategories.length + 1).toString().padStart(6, '0')}`
-          : 'CMT000001';
-        setCategoryMenu((prev) => ({ ...prev, category_menu_type_id: nextId }));
       } catch (error) {
         console.error('Error fetching category menu types:', error);
       }
@@ -30,16 +25,17 @@ function CreateCategoryMenuType() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("Submitting:", categoryMenu);
       await addCategoryMenuType(categoryMenu);
       alert('Category Menu Type added successfully!');
-      setCategoryMenu({ category_menu_type_id: '', menu_type_id: '', category_id: '', item_limit: '' });
+      setCategoryMenu({ menu_type_id: '', category_id: '', item_limit: '' });
 
       // Refresh categories after adding
       const updatedCategories = await getCategoryMenuTypes();
       setCategories(updatedCategories);
     } catch (error) {
-      console.error('Adding Error:', error);
       alert('An error occurred while adding the category menu type.');
+      console.error(error);
     }
   };
 
@@ -52,7 +48,7 @@ function CreateCategoryMenuType() {
     <div className="flex justify-between items-start mt-10 px-10">
       {/* Left Side - Form */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-black mb-5">Create Category Menu Type</h2>
+        <h2 className="text-xl font-semibold text-black mb-5">Category Menu Type</h2>
         <form onSubmit={handleSubmit}>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu Type ID</label>
