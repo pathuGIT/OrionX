@@ -12,5 +12,5 @@ export const Logout = () => {
       navigate('/');
     };
   
-    return <button onClick={handleLogout} className=' border ' >Logout</button>;
+    return <button onClick={handleLogout} className=' border py-1 px-2' >Logout</button>;
 }
