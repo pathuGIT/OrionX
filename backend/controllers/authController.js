@@ -112,14 +112,15 @@ export const refresh = async (req, res) => {
 }
 
 export const checkEmail = async (req, res) => {
-    const { mail } = req.body;
+    const { email } = req.query;
     try {
-        const response = await checkEmailModel(mail);
+        const response = await checkEmailModel(email);
         if (!response) {
             return res.status(404).json({ message: 'Email not found' });
         }
+
         res.status(200).json({ message: 'Email validated', email: response.email, source_table: response.source_table });
     } catch (error) {
         res.status(500).json({ message: 'Error validating email', error });
     }
-}
+};

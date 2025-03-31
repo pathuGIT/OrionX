@@ -16,3 +16,13 @@ export const registerCustomer = async (customerData) => {
   const response = await api.post('/auth/register-customer', customerData);
   return response.data; // Returns success message
 };
+
+export const validateEmail = async (email) => {
+  try {
+    const response = await api.get(`/auth/check-email?email=${email}`);
+    console.log(response.data)
+    return response.data; // Returns success message
+  } catch (error) {
+    return error.response?.data || { message: "An error occurred" };
+  }
+};
