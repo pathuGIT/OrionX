@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getMenuTypes, addMenuType, getMenus } from '../../services/MenuService'; // Added getMenus
+import { getMenuTypes, addMenuType, getMenus, deleteMenuType, updateMenuTypeById, getMenuTypeById } from '../../services/MenuService';
 
 function CreateMenuType() {
   const [menuType, setMenuType] = useState({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
   const [menuTypes, setMenuTypes] = useState([]);
-  const [menuListTypes, setMenuListTypes] = useState([]); // State for menu list types
+  const [menuListTypes, setMenuListTypes] = useState([]);
+  const [btnname, setBtnname] = useState('Add Menu Type');
 
   useEffect(() => {
     const fetchMenuTypes = async () => {
@@ -20,7 +21,7 @@ function CreateMenuType() {
 
     const fetchMenuListTypes = async () => {
       try {
-        const fetchedMenuListTypes = await getMenus(); // Fetch menu list types
+        const fetchedMenuListTypes = await getMenus();
         setMenuListTypes(fetchedMenuListTypes);
       } catch (error) {
         console.error('Error fetching menu list types:', error);
@@ -34,16 +35,22 @@ function CreateMenuType() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addMenuType(menuType);
-      alert('Menu Type added successfully!');
-      setMenuType({ menu_type_name: '', price: '', menu_list_type_id: '' });
+      if (btnname === 'Add Menu Type') {
+        await addMenuType(menuType);
+        alert('Menu Type added successfully!');
+        setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
+      } else if (btnname === 'Update') {
+        await updateMenuTypeById(menuType.menu_type_id, menuType.menu_type_name, menuType.price, menuType.menu_list_type_id);
+        alert('Menu Type updated successfully!');
+        setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
+        setBtnname('Add Menu Type');
+      }
 
-      // Refresh menu types after adding
       const updatedMenuTypes = await getMenuTypes();
       setMenuTypes(updatedMenuTypes);
     } catch (error) {
-      console.error('Adding Error:', error);
-      alert('An error occurred while adding the menu type.');
+      console.error('Error:', error);
+      alert('An error occurred while processing the menu type.');
     }
   };
 
@@ -52,76 +59,85 @@ function CreateMenuType() {
     setMenuType((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleEdit = async (id) => {
+    try {
+      const menuTypeData = await getMenuTypeById(id);
+      if (!menuTypeData) {
+        alert('Menu type not found.');
+        return;
+      }
+      setMenuType({
+        menu_type_id: id,
+        menu_type_name: menuTypeData.menu_type_name,
+        price: menuTypeData.price,
+        menu_list_type_id: menuTypeData.menu_list_type_id,
+      });
+      setBtnname('Update');
+    } catch (error) {
+      console.error('Error fetching menu type by ID:', error);
+      alert('An error occurred while fetching the menu type.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await deleteMenuType(id);
+      if (response) {
+        alert(response.message);
+        const updatedMenuTypes = await getMenuTypes();
+        setMenuTypes(updatedMenuTypes);
+      }
+    } catch (error) {
+      console.error('Error deleting menu type:', error);
+      alert('An error occurred while deleting the menu type.');
+    }
+  };
+
   return (
-    <div className="flex justify-between items-start mt-10 px-10">
-      {/* Left Side - Form */}
+    <div className="flex justify-between items-start mt-10 px-10 gap-2">
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-black mb-5">Create Menu Type</h2>
+        <h2 className="text-sm font-semibold text-black mb-5">Create Menu Type</h2>
         <form onSubmit={handleSubmit}>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu Type Name</label>
-            <input
-              type="text"
-              name="menu_type_name"
-              required
-              placeholder="Enter menu type name"
-              value={menuType.menu_type_name}
-              onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
+            <input type="text" name="menu_type_name" required value={menuType.menu_type_name} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Price</label>
-            <input
-              type="number"
-              name="price"
-              required
-              placeholder="Enter price"
-              value={menuType.price}
-              onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
+            <input type="number" name="price" required value={menuType.price} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Select Menu List Type</label>
-            <select
-              name="menu_list_type_id"
-              required
-              value={menuType.menu_list_type_id}
-              onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            >
+            <select name="menu_list_type_id" required value={menuType.menu_list_type_id} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none">
               <option value="" disabled>Select a menu list type</option>
               {menuListTypes.map((menuListType) => (
-                <option key={menuListType.menu_list_type_id} value={menuListType.menu_list_type_id}>
-                  {menuListType.menu_list_name}
-                </option>
+                <option key={menuListType.menu_list_type_id} value={menuListType.menu_list_type_id}>{menuListType.menu_list_name}</option>
               ))}
             </select>
           </div>
-          <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">
-            Add Menu Type
-          </button>
+          <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">{btnname}</button>
         </form>
       </div>
 
-      {/* Right Side - Table */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-black mb-5">Menu Types</h2>
+        <h2 className="text-sm font-semibold text-black mb-5">Menu Types</h2>
         <table className="min-w-full border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-4 py-2">ID</th>
               <th className="border px-4 py-2">Name</th>
               <th className="border px-4 py-2">Price</th>
+              <th colSpan={2}>Action</th>
             </tr>
           </thead>
           <tbody>
-            {menuTypes.map((type, index) => (
+            {menuTypes.map((menuType, index) => (
               <tr key={index} className="border">
-                <td className="border px-4 py-2">{type.menu_type_id}</td>
-                <td className="border px-4 py-2">{type.menu_type_name}</td>
-                <td className="border px-4 py-2">${type.price}</td>
+                <td className="border px-4 py-2">{menuType.menu_type_id}</td>
+                <td className="border px-4 py-2">{menuType.menu_type_name}</td>
+                <td className="border px-4 py-2">${menuType.price}</td>
+                <td><button className="border px-3 py-1 bg-blue-500 text-sm" onClick={() => handleEdit(menuType.menu_type_id)}>Edit</button></td>
+                <td><button className="border px-3 py-1 bg-red-500 text-sm" onClick={() => handleDelete(menuType.menu_type_id)}>Delete</button></td>
               </tr>
             ))}
           </tbody>

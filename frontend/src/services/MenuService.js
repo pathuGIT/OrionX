@@ -71,6 +71,17 @@ export const getMenuTypes = async () => {
   }
 };
 
+export const getMenuTypeById = async (id) => {
+  try {
+    const response = await api.get(`/menutypes/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding menu:", error);
+    throw error;
+  }
+}; 
+
+
 export const addMenuType = async (menuType) => {
   try {
     const response = await api.post('/menutypes/add', menuType);
@@ -80,6 +91,32 @@ export const addMenuType = async (menuType) => {
     throw error;
   }
 };
+
+//delete menu type by id
+export const deleteMenuType = async (id) => {
+  try {
+    const response = await api.delete(`/menutypes/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting menu type:", error);
+    throw error;
+  }
+}
+
+// update menu type by id
+export const updateMenuTypeById = async (id, data) => {
+  console.log(id,data);
+  const name = {menu_type_name:data}
+  try {
+    const response = await api.put(`/menutypes/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating menu type:", error);
+    throw error;
+  }
+};
+
+//////////////////////////////////////////////////////////////////////////////////
 
 //to display all categories and add new categories through form
 export const getCategories = async () => {

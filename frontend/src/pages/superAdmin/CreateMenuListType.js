@@ -132,7 +132,7 @@ function CreateMenuListType() {
           </thead>
           <tbody>
             {menus.map((menuItem, index) => (
-              <tr key={index} className="border">
+              <tr key={index} className="border"> 
                 <td className="border px-4 py-2 text-sm">{menuItem.menu_list_type_id}</td>
                 <td className="border px-4 py-2 text-sm">{menuItem.menu_list_name}</td>
                 <td><button className=' border px-3 py-1 bg-blue-500  text-sm ' onClick={() => handleEdit(menuItem.menu_list_type_id)}>Edit</button></td>
