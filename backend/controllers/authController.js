@@ -6,7 +6,7 @@ import {
     getSystemUserByEmpIdModel,
     registerEmployeeModel
 } from '../models/userModel.js';
-import { saveSystemuserRefreshTokenModel, isRefreshTokenValidModel, saveCustomerRefreshTokenModel } from '../models/authModule.js';
+import { saveSystemuserRefreshTokenModel, isRefreshTokenValidModel, saveCustomerRefreshTokenModel, checkEmailModel } from '../models/authModule.js';
 import { getCustomersByCusIdModel, registerCustomerModel, getCustomerByEmailORPswdModel } from '../models/customerModel.js';
 
 //Register employee 
@@ -67,23 +67,21 @@ export const login = async (req, res) => {
         if (user.role == 'customer') {
             const token = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
             const refreshToken = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '2h' });
-            
+
             await saveCustomerRefreshTokenModel(refreshToken, user.customer_id);
             res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.customer_id, role: user.role, token, refreshToken });
         } else {
             const token = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
             const refreshToken = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '2h' });
-    
+
             await saveSystemuserRefreshTokenModel(refreshToken, user.user_id);
-            res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });    
+            res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });
         }
-        
+
     } catch (error) {
         res.status(500).json({ msg: 'Error during login', error });
     }
 };
-
-
 
 export const refresh = async (req, res) => {
     const refreshToken = req.body.refreshKey;
@@ -111,4 +109,17 @@ export const refresh = async (req, res) => {
         res.status(200).json({ message: 'Token refreshed', userEmail: user.email, id: user.id, role: user.roles, token });
     });
 
+}
+
+export const checkEmail = async (req, res) => {
+    const { mail } = req.body;
+    try {
+        const response = await checkEmailModel(mail);
+        if (!response) {
+            return res.status(404).json({ message: 'Email not found' });
+        }
+        res.status(200).json({ message: 'Email validated', email: response.email, source_table: response.source_table });
+    } catch (error) {
+        res.status(500).json({ message: 'Error validating email', error });
+    }
 }
