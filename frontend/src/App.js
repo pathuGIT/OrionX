@@ -27,9 +27,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
-            <Route path="/eventHome/:bookingId" element={<ProtectedRoute name="customer"><EventHome /></ProtectedRoute>} />
+            <Route path="/eventHome/:bookingId" element={<ProtectedRoute name="customer"><EventHome/></ProtectedRoute>} />
             <Route path="/event-planning/:bookingId" element={<ProtectedRoute name="customer"><CustomerEventPlanning /></ProtectedRoute>} />
-            <Route path="/display-events" element={<ProtectedRoute name="customer"><DisplayEvents /></ProtectedRoute>} />
+            <Route path="/display-Events/:customerID" element={<ProtectedRoute name="customer"><DisplayEvents /></ProtectedRoute>} />
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />

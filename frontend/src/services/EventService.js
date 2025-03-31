@@ -24,7 +24,7 @@ export const getCustomerBookings = async (customerID) => {
 };
 
 
-export const getPlannedEvent = async (customerID) => {
+export const getPlannedEvents = async (customerID) => {
     try {
         const response = await api.get(`/displayEvents/${customerID}`);
         return response.data.data;

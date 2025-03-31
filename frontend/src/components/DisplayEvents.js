@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/Authcontext";
-import { useNavigate } from "react-router-dom";
 //import { encryptCustId } from "../utills/encryptionUtils";
-import { getPlannedEvent } from "../services/EventService";
+import { getPlannedEvents } from "../services/EventService";
 
 const DisplayEvents = () => {
     const { user } = useContext(AuthContext);
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
+   
 
     useEffect(() => {
         let customerID = sessionStorage.getItem("id");
@@ -20,7 +19,7 @@ const DisplayEvents = () => {
             return;
         }
 
-        getPlannedEvent(customerID)
+        getPlannedEvents(customerID)
             .then(data => {
                 setEvents(data);
                 setLoading(false);
@@ -89,14 +88,7 @@ const DisplayEvents = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="p-4 bg-gray-100 text-center">
-                                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
-                                    onClick={() => {
-                                        
-                                        navigate(`/display-events`);
-                                    }}>
-                                    View Event Details
-                                </button>
+                            <div className="p-4 bg-gray-100 text-center"> 
                             </div>
                         </div>
                     ))}

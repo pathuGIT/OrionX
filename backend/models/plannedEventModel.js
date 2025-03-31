@@ -1,9 +1,7 @@
 import db from "../config/db.js";
 
 class plannedEvent {
-    static async getPlannedEvent(req, res) {
-        const { customerID } = req.params;
-
+    static async getPlannedEvent(customerID) {
         try {
             const [results] = await db.query(
                 `SELECT 
@@ -35,14 +33,10 @@ class plannedEvent {
                 [customerID]
             );
 
-            if (results.length === 0) {
-                return res.status(404).json({ message: "No events found for this customer." });
-            }
-
-            res.json(results);
+            return results;  // ✅ Return results instead of using res.json()
         } catch (error) {
             console.error("Database Error:", error);
-            res.status(500).json({ message: "Failed to fetch event details." });
+            throw new Error("Failed to fetch event details.");  // ✅ Throw an error instead of res.status()
         }
     }
 }

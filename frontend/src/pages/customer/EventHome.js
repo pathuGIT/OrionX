@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 const EventHome = () => {
   const { bookingId } = useParams(); // Get the booking ID from URL
+  const { customerID } = useParams(); // Get the customer ID from URL
   const navigate = useNavigate();
 
   return (
@@ -20,9 +21,9 @@ const EventHome = () => {
           <li className="mb-2">
             <button
               className="block p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-              onClick={() => navigate(`/display-events`)}
+              onClick={() => navigate(`/display-Events/${customerID}`)}
             >
-              Plan Your Event
+              See Your Event
             </button>
           </li>
         </ul>
