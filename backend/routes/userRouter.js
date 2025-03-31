@@ -14,12 +14,12 @@ router.post('/addCustomer', superAdmin, addCustomer);
 router.post('/changeUserRole', superAdmin, changeUserRole);
 router.delete('/deleteEmployee',superAdmin,deleteEmployees);
 router.put('/updateStatus', updateEmployeesStatus);
-router.get('/getEmployeeById/:id', getEmployeeById); // New route to get employee by ID
+router.get('/getEmployeeById/:id', superAdmin,getEmployeeById); // New route to get employee by ID
 //router.put("/updateEmployee/:id", updateEmployees); // same
-router.get('/getEmployees', getEmployee);
-router.put('/updateEmployee',updateEmployees);// same
-router.get('/getEmployeesByStatus', getEmployeesByStatus);
-router.get('/getEmployeesByStatus/:status', getEmployeesByStatus);
+router.get('/getEmployees', superAdmin,getEmployee);
+router.put('/updateEmployee',superAdmin,updateEmployees);// same
+router.get('/getEmployeesByStatus', superAdmin,getEmployeesByStatus);
+router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
 
 //sub admins
 
