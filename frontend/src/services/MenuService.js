@@ -11,7 +11,7 @@ export const getMenus = async () => {
   }
 };
 
-//get menu list type py id
+//get menu list type by id
 export const getMenuListTypeById = async (id) => {
   try {
     const response = await api.get(`/menuListType/get/${id}`);
@@ -71,6 +71,7 @@ export const getMenuTypes = async () => {
   }
 };
 
+//to get one menutype by id
 export const getMenuTypeById = async (id) => {
   try {
     const response = await api.get(`/menutypes/get/${id}`);
@@ -81,7 +82,7 @@ export const getMenuTypeById = async (id) => {
   }
 }; 
 
-
+//to insert a menutype 
 export const addMenuType = async (menuType) => {
   try {
     const response = await api.post('/menutypes/add', menuType);
@@ -129,6 +130,8 @@ export const getCategories = async () => {
   }
 };
 
+
+//to insert a category
 export const addCategory = async (category) => {
   try {
     const response = await api.post('/categories/add', category);
@@ -150,6 +153,7 @@ export const getItems = async () => {
   }
 };
 
+//to insert an item
 export const addItem = async (item) => {
   try {
     const response = await api.post('/items/add', item);
@@ -171,6 +175,8 @@ export const getCategoryMenuTypes = async () => {
   }
 };
 
+
+//to insert a category menu type
 export const addCategoryMenuType = async (categoryMenu) => {
   try {
     const response = await api.post('/categoryMenuTypes/add', categoryMenu);
