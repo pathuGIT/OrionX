@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getCategories, addCategory } from '../../services/MenuService';
+import { getCategories, addCategory ,getCategoryById , deleteCategory , updateCategoryById } from '../../services/MenuService';
+import { useNavigate } from 'react-router-dom';
+
 
 function CreateCategory() {
   const [category, setCategory] = useState({ category_id: '', category_name: '' });
   const [categories, setCategories] = useState([]);
+  const [btnname, setBtnname] = useState('Add Category')
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -22,6 +26,7 @@ function CreateCategory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (btnname === 'Update') {
       await addCategory(category);
       alert('Category added successfully!');
       setCategory({ category_name: '' });
@@ -29,7 +34,17 @@ function CreateCategory() {
       // Refresh categories after adding
       const updatedCategories = await getCategories();
       setCategories(updatedCategories);
-    } catch (error) {
+    }else if (btnname === 'Update') {
+      await updateCategoryById(category.category_id, category.category_name);
+      setCategory({ category_name: '' });
+      alert('Category Updated successfully!');
+
+      const updatedCategories = await getCategories();
+      setCategories(updatedCategories);
+      setBtnname('Add Category');
+    }
+
+   } catch (error) {
       console.error('Adding Error:', error);
       alert('An error occurred while adding the category.');
     }
@@ -39,6 +54,42 @@ function CreateCategory() {
     const { name, value } = e.target;
     setCategory((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleEdit = async (id) => {
+    console.log(id);
+    try {
+      const fetchedCategory = await getCategoryById(id);
+
+      if (!fetchedCategory) {
+        console.error('Category not found');
+        return;
+      }
+      setCategory({
+        category_id: fetchedCategory.category_id,
+        category_name: fetchedCategory.category_name,
+      });
+
+      setBtnname('Update');
+    } catch (error) {
+      console.error('Error fetching category by id:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    console.log(id);
+    try{
+      const deletedCategory = await deleteCategory(id);
+      if(deletedCategory){
+        alert(deletedCategory.message);
+
+        const updatedCategories = await getCategories();
+        setCategories(updatedCategories);
+      }
+    }catch(error){
+      console.error('Error deleting category:', error);
+    }
+  };
+
 
   return (
     <div className="flex justify-between items-start mt-10 px-10">
@@ -59,7 +110,7 @@ function CreateCategory() {
             />
           </div>
           <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">
-            Add Category
+            {btnname}
           </button>
         </form>
       </div>
@@ -72,6 +123,7 @@ function CreateCategory() {
             <tr className="bg-gray-100">
               <th className="border px-4 py-2">ID</th>
               <th className="border px-4 py-2">Name</th>
+               <th colSpan={2}>Action </th>
             </tr>
           </thead>
           <tbody>
@@ -79,6 +131,8 @@ function CreateCategory() {
               <tr key={index} className="border">
                 <td className="border px-4 py-2">{cat.category_id}</td>
                 <td className="border px-4 py-2">{cat.category_name}</td>
+                <td><button className='border px-3 py-1 bg-blue-500  text-sm ' onClick={() => handleEdit(cat.category_id)}>Edit</button></td>
+                <td><button className=' border px-3 py-1 bg-red-500  text-sm ' onClick={() => handleDelete(cat.category_id)}>Delete</button></td>
               </tr>
             ))}
           </tbody>
