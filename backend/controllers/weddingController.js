@@ -1,5 +1,6 @@
 import Wedding from '../models/weddingModel.js'; // Import the Wedding model
 
+
 export const createWedding = async (req, res) => {
     try {
         const weddingData = req.body;
