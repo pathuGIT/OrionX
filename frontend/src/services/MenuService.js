@@ -17,7 +17,7 @@ export const getMenuListTypeById = async (id) => {
     const response = await api.get(`/menuListType/get/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error getting menu:", error);
+    console.error("Error getting menu list type:", error);
     throw error;
   }
 }; 
@@ -28,7 +28,7 @@ export const addMenuListType = async (menu) => {
     const response = await api.post('/menuListType/add', menu);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error adding menu list type:", error);
     throw error;
   }
 };  
@@ -39,7 +39,7 @@ export const deleteMenuListType = async (id) => {
     const response = await api.delete(`/menuListType/delete/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error deleting menu list type:", error);
     throw error;
   }
 }; 
@@ -52,7 +52,7 @@ export const updateMenuListTypeById = async (id, data) => {
     const response = await api.put(`/menuListType/update/${id}`, name);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error updating menu list type:", error);
     throw error;
   }
 }; 
@@ -197,6 +197,42 @@ export const addItem = async (item) => {
     throw error;
   }
 };
+
+export const getItemById = async (id) => {
+  try {
+    const response = await api.get(`/items/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting item:", error);
+    throw error;
+  }
+}; 
+
+
+
+export const deleteItem = async (id) => {
+  try {
+    const response = await api.delete(`/items/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    throw error;
+  }
+}; 
+
+
+export const updateItem = async (id, data) => {
+  console.log(id,data);
+  const name = {item:data}
+  try {
+    const response = await api.put(`/items/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating item:", error);
+    throw error;
+  }
+}; 
+
 
 //////////////////////////////////////////////////////////////////////////////////
 
