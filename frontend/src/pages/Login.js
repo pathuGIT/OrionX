@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/Authcontext';
 import { loginUser } from '../services/AuthService';
 
@@ -60,7 +60,8 @@ export const Login = () => {
                         <div class="flex items-center justify-between">
                             <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
                             <div class="text-sm">
-                                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                                <Link to="/forgot-password" class="font-semibold text-indigo-600 hover:text-indigo-500"  >Forgot password</Link>
+                                {/* <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500" >Forgot password?</a> */}
                             </div>
                         </div>
                         <div class="mt-2">

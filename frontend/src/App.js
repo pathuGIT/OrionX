@@ -16,6 +16,7 @@ import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import EventHome from './pages/customer/EventHome';
 import DisplayEvents from './components/DisplayEvents';
 
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/superAdminHome" element={<ProtectedRoute name="customer"> <SuperAdminHome /> </ProtectedRoute>} />
             <Route path="/registration/register-employee" element={<EmployeeRegistration />}/>
             <Route path="/registration/register-customer" element={<CustomerRegistration />}/>
+            <Route path="/forgot-password" element={<ResetPassword />}/>
           </Routes>
         </main>
         <Footer />
