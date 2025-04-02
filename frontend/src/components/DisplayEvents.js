@@ -32,18 +32,40 @@ const DisplayEvents = () => {
     }, [user]);
 
     // Function to format date and time
-    const formatDateTime = (isoString) => {
-        if (!isoString) return "N/A";
-        const date = new Date(isoString);
+    const formatDateTime = (dateTimeString) => {
+        if (!dateTimeString) return "N/A";
+    
+        // Check if the string contains only time (e.g., "08:27:00")
+        if (/^\d{2}:\d{2}:\d{2}$/.test(dateTimeString)) {
+            // Convert time-only values to a proper Date object (using today's date)
+            const today = new Date();
+            const [hours, minutes, seconds] = dateTimeString.split(":");
+            today.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), 0);
+            
+            return today.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
+    
+        // If it's a full date-time string, format it normally
+        const date = new Date(dateTimeString);
+        if (isNaN(date.getTime())) return "Invalid Date"; // Handle invalid dates
+    
         return date.toLocaleString('en-US', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
         });
     };
+    
 
     if (loading) return <p className="text-center text-xl">Loading...</p>;
     if (error) return <p className="text-center text-red-600">{error}</p>;
