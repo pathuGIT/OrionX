@@ -13,7 +13,7 @@ import SuperAdminHome from './pages/superAdmin/SuperAdminHome';
 import EmployeeRegistration from './pages/EmployeeRegistration';
 import CustomerRegistration from './pages/CustomerRegistration';
 import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
-import ResetPassword from './pages/ResetPassword';
+import ResetPassword from './pages/VerifyOtp';
 import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
 import UpdatePassword from './pages/UpdatePassword';
 
