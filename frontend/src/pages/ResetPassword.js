@@ -24,7 +24,7 @@ const ResetPassword = () => {
         setButtonText("Send OTP");
         if(buttonText === "Send OTP"){
           // send otp to email serive call
-
+          
           
         }
       }
