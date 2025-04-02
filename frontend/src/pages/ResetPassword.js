@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { validateEmail } from "../services/AuthService";
+import { sendOtp, validateEmail, validateOtp } from "../services/AuthService";
+import { useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [buttonText, setButtonText] = useState("Check your email");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [response, setResponse]  = useState();
 
   const handleCheckEmail = async () => {
     if (!email.trim()) {
@@ -12,28 +16,78 @@ const ResetPassword = () => {
       return;
     }
 
-    setButtonText("Validating...");
-    setErrorMessage(null);
-
-    try {
-      const response = await validateEmail(email); // Pass email as a string
-      if (response.message === "Email not found") {
-        setErrorMessage("Email not found. Please try again.");
-      } else {
-        alert(`Email found in: ${response.source_table}`);
-        setButtonText("Send OTP");
-        if(buttonText === "Send OTP"){
-          // send otp to email serive call
-          
-          
+    if (buttonText === "Check your email") {
+      setButtonText("Validating...");
+      setErrorMessage(null);
+      try {
+        const value = await validateEmail(email);
+        setResponse(value);
+        if (value.message === "Email not found") {
+          setErrorMessage("Email not found. Please try again.");
+          setButtonText("Check your email");
+        } else {
+          setErrorMessage(`Email is verified as a ${value.source_table}.`);
+          setButtonText("Send OTP");
         }
+      } catch (error) {
+        setErrorMessage("Error validating email. Try again later.");
+        setButtonText("Check your email");
       }
-    } catch (error) {
-      setErrorMessage("Error validating email. Try again later.");
-    } finally {
-      //setButtonText("Check your email");
+    }
+
+    if (buttonText === "Send OTP") {
+      setButtonText("Sending..")
+      try {
+        const sendOtpResponse = await sendOtp({ email });
+        sessionStorage.setItem('otp-token', sendOtpResponse.token);
+        console.log("sssssss::",sessionStorage.getItem('otp-token'))
+
+        console.log(sendOtpResponse);
+
+        let countdown = 180; // 3 minutes in seconds
+        const formatTime = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        };
+
+        setButtonText(`Wait, ${formatTime(countdown)}`);
+        const interval = setInterval(() => {
+          countdown -= 1;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            setButtonText("Send OTP");
+          } else {
+            setButtonText(`Wait, ${formatTime(countdown)}`);
+          }
+        }, 1000);
+        setButtonText("Send OTP");
+      } catch (error) {
+        setErrorMessage("Error sending OTP. Try again later.");
+        setButtonText("Send OTP")
+      } 
     }
   };
+
+  const handleValidateOtp = async () => {
+    //const mm = sessionStorage.getItem('otp-token');
+    const data = {token:sessionStorage.getItem('otp-token'), otp:otp}
+
+    try{
+      const otpResponse = await validateOtp(data);
+      setErrorMessage(otpResponse.message);
+      sessionStorage.removeItem('otp-token');
+
+      setButtonText("Check your email");
+
+      setTimeout(() => {
+        navigate('/forgot-password/update', { state: { email, sourceTable: response.source_table } });
+      }, 3000); // Wait for 5 seconds before navigating
+    } catch (error) {
+      setErrorMessage("OTP is not valid!!");
+    }
+
+  }
 
   return (
     <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
@@ -55,10 +109,10 @@ const ResetPassword = () => {
 
       {/* OTP Section */}
       <div className="mt-4">
-        <input type="text" placeholder="OTP" className="w-full p-2 border rounded mb-2" />
+        <input type="text" placeholder="OTP" value={otp} onChange={(e) => setOtp(e.target.value)} className="w-full p-2 border rounded mb-2" />
         <button
           className="w-full bg-green-500 text-white p-2 rounded"
-          onClick={() => alert("OTP Verified!")}
+          onClick={handleValidateOtp}
         >
           Verify OTP
         </button>

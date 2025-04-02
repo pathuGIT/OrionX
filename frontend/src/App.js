@@ -14,6 +14,8 @@ import EmployeeRegistration from './pages/EmployeeRegistration';
 import CustomerRegistration from './pages/CustomerRegistration';
 import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import ResetPassword from './pages/ResetPassword';
+import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
+import UpdatePassword from './pages/UpdatePassword';
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
             <Route path="/registration/register-employee" element={<EmployeeRegistration />}/>
             <Route path="/registration/register-customer" element={<CustomerRegistration />}/>
             <Route path="/forgot-password" element={<ResetPassword />}/>
+            <Route path="/forgot-password/success" element={<ForgotPswdSuccess />}/>
+            <Route path="/forgot-password/update" element={<UpdatePassword />}/>
           </Routes>
         </main>
         <Footer />

@@ -26,3 +26,20 @@ export const validateEmail = async (email) => {
     return error.response?.data || { message: "An error occurred" };
   }
 };
+
+export const sendOtp = async (email) => {
+  console.log(email)
+  const response = await api.post('/auth/forgot-password', email);
+  return response.data; // Returns success message
+};
+
+export const validateOtp = async (data) => {
+  console.log(data.otp)
+  const response = await api.post('/auth/validate-otp', data);
+  return response.data; // Returns success message
+};
+
+export const updateUserPassword = async (data) => {
+  const response = await api.put('/auth/update-password', data);
+  return response.data; // Returns success message
+}
