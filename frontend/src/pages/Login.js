@@ -6,10 +6,12 @@ import { loginUser } from '../services/AuthService';
 export const Login = () => {
     const [user, setUser] = useState({ credential: '', password: '' });
     const [loading, setLoading] = useState(false); // Add loading state
+    const [error, setError] = useState("")
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
+        setError()
         e.preventDefault();
         setLoading(true); // Set loading to true
         try {
@@ -28,7 +30,8 @@ export const Login = () => {
         } catch (error) {
             console.error('Login error:', error);
             const errorMessage = error?.response?.data?.message || 'Login failed';
-            alert(errorMessage);
+            //alert(errorMessage);
+            setError(errorMessage);
         } finally {
             setLoading(false); // Set loading to false
         }
@@ -47,6 +50,7 @@ export const Login = () => {
             <div class="sm:mx-auto sm:w-full sm:max-w-sm">
                 <img class="mx-auto h-10 w-auto" src="15.svg" alt="Your Company" />
                 <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+                <p className='text-center mt-5 text-red-500'>{error}</p>
             </div>
 
             <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
