@@ -16,7 +16,6 @@ import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import EventHome from './pages/customer/EventHome';
 import DisplayEvents from './components/DisplayEvents';
 //import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
-import EventHome from './pages/customer/EventHome';
 // import DisplayEvents from './components/DisplayEvents';
 
 import ResetPassword from './pages/VerifyOtp';
