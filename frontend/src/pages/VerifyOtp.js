@@ -7,12 +7,12 @@ const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [buttonText, setButtonText] = useState("Check your email");
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState({msg:'', color:''});
   const [response, setResponse] = useState();
 
   const handleCheckEmail = async () => {
     if (!email.trim()) {
-      setErrorMessage("Please enter an email");
+      setErrorMessage({msg:"Please enter an email", color:"text-red-500"});
       return;
     }
 
@@ -23,14 +23,14 @@ const ResetPassword = () => {
         const value = await validateEmail(email);
         setResponse(value);
         if (value.message === "Email not found") {
-          setErrorMessage("Email not found. Please try again.");
+          setErrorMessage({msg:"Email not found. Please try again.", color:"text-red-500"});
           setButtonText("Check your email");
         } else {
-          setErrorMessage(`Email is verified as a ${value.source_table}.`);
+          setErrorMessage({msg:`Email is verified.`, color:"text-green-500"});
           setButtonText("Send OTP");
         }
       } catch (error) {
-        setErrorMessage("Error validating email. Try again later.");
+        setErrorMessage({msg:"Error validating email. Try again later.", color:"text-red-500"});
         setButtonText("Check your email");
       }
     }
@@ -63,7 +63,7 @@ const ResetPassword = () => {
         }, 1000);
         setButtonText("Send OTP");
       } catch (error) {
-        setErrorMessage("Error sending OTP. Try again later.");
+        setErrorMessage({msg:"Error sending OTP. Try again later.", color:"text-red-500"});
         setButtonText("Send OTP")
       }
     }
@@ -75,7 +75,7 @@ const ResetPassword = () => {
 
     try {
       const otpResponse = await validateOtp(data);
-      setErrorMessage(otpResponse.message);
+      setErrorMessage({msg:otpResponse.message, color:"text-green-500"});
       sessionStorage.removeItem('otp-token');
 
       setButtonText("Check your email");
@@ -84,7 +84,7 @@ const ResetPassword = () => {
         navigate('/forgot-password/update', { state: { email, sourceTable: response.source_table } });
       }, 3000); // Wait for 5 seconds before navigating
     } catch (error) {
-      setErrorMessage("OTP is not valid!!");
+      setErrorMessage({msg:"OTP is not valid!!", color:"text-red-500"});
     }
 
   }
@@ -101,7 +101,7 @@ const ResetPassword = () => {
             <h2 class="mb-1 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
             Verify your email
             </h2>
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            {errorMessage && <p className={errorMessage.color}>{errorMessage.msg}</p>}
             <div class="mt-4 space-y-4 lg:mt-5 md:space-y-5">
               <div>
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
