@@ -3,10 +3,13 @@ import db from '../config/db.js';
 class Wedding {
     static async createWedding(weddingData) {
         try {
-            const [newEvent] = await db.query(
-                `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, 
-                Function_durationFrom, Function_durationTo, Tea_table_Time, Dress_Time, booking_id) 
+            // Insert into Event table and retrieve Event_ID
+            const [eventResult] = await db.query(
+                `INSERT INTO Event 
+                (Buffet_TimeFrom, Buffet_TimeTo, Function_durationFrom, Function_durationTo, 
+                Tea_table_Time, Dress_Time, booking_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+
                 [
                     weddingData.buffetTimeFrom, 
                     weddingData.buffetTimeTo, 
@@ -17,30 +20,22 @@ class Wedding {
                     weddingData.bookingID
                 ]
             );
-            console.log("New Event inserted with ID:", weddingData.buffetTimeFrom);
-            // Check if an event already exists for the booking
-            const [eventResult1] = await db.query(
-                `SELECT Event_ID FROM Event WHERE booking_id = ?`, 
+
+             const [NewEventID] = await db.query(
+                `SELECT Event_ID FROM Event WHERE booking_id = ?`,
                 [weddingData.bookingID]
             );
+            let newEventID = NewEventID[0].Event_ID;
 
-            
-            if (eventResult1.length === 0) {
-                console.log("No existing Event_ID found, inserting new Event...");
-    
-            } 
-              const  eventID = eventResult1[0].Event_ID;
-            
-
-            console.log("Event ID to be used:", eventID);
-
-            // Insert Wedding details
-            const [weddingResult] = await db.query(
+            // Insert into Wedding table using the correct Event_ID
+            await db.query(
                 `INSERT INTO Wedding 
-                (Event_ID, Groom_Name, Bride_Name, Groom_Contact_no, Bride_Contact_no, Fountain, ProsperityTable, Groom_Address, Bride_Address, Poruwa_CeremonyFrom, Poruwa_CeremonyTo, Registration_Time) 
+                (Event_ID, Groom_Name, Bride_Name, Groom_Contact_no, Bride_Contact_no, Fountain, ProsperityTable, 
+                Groom_Address, Bride_Address, Poruwa_CeremonyFrom, Poruwa_CeremonyTo, Registration_Time) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+
                 [
-                    eventID,
+                    newEventID,
                     weddingData.groomName, 
                     weddingData.brideName, 
                     weddingData.groomContact, 
@@ -54,12 +49,12 @@ class Wedding {
                     weddingData.registrationTime
                 ]
             );
-            console.log("New Event inserted with ID:", weddingData.groomName);
-            console.log("Wedding inserted successfully, ID:", weddingResult.insertId);
-            return weddingResult.insertId;
+
+            console.log("Wedding inserted successfully with Event_ID:", newEventID);
+            return newEventID;
         } catch (error) {
-            console.error("Database Error (createWedding):", error);
-            throw new Error("Failed to create wedding event.");
+            console.error("Database Error (createWedding):", error.message || error);
+            throw new Error(error.message || "Failed to create wedding event.");
         }
     }
 }

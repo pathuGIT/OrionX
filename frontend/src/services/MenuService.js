@@ -11,13 +11,13 @@ export const getMenus = async () => {
   }
 };
 
-//get menu list type py id
+//get menu list type by id
 export const getMenuListTypeById = async (id) => {
   try {
     const response = await api.get(`/menuListType/get/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error getting menu list type:", error);
     throw error;
   }
 }; 
@@ -28,7 +28,7 @@ export const addMenuListType = async (menu) => {
     const response = await api.post('/menuListType/add', menu);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error adding menu list type:", error);
     throw error;
   }
 };  
@@ -39,7 +39,7 @@ export const deleteMenuListType = async (id) => {
     const response = await api.delete(`/menuListType/delete/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error deleting menu list type:", error);
     throw error;
   }
 }; 
@@ -52,7 +52,7 @@ export const updateMenuListTypeById = async (id, data) => {
     const response = await api.put(`/menuListType/update/${id}`, name);
     return response.data;
   } catch (error) {
-    console.error("Error adding menu:", error);
+    console.error("Error updating menu list type:", error);
     throw error;
   }
 }; 
@@ -71,6 +71,18 @@ export const getMenuTypes = async () => {
   }
 };
 
+//to get one menutype by id
+export const getMenuTypeById = async (id) => {
+  try {
+    const response = await api.get(`/menutypes/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding menutype:", error);
+    throw error;
+  }
+}; 
+
+//to insert a menutype 
 export const addMenuType = async (menuType) => {
   try {
     const response = await api.post('/menutypes/add', menuType);
@@ -80,6 +92,31 @@ export const addMenuType = async (menuType) => {
     throw error;
   }
 };
+
+//delete menu type by id
+export const deleteMenuType = async (id) => {
+  try {
+    const response = await api.delete(`/menutypes/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting menu type:", error);
+    throw error;
+  }
+}
+
+// update menu type by id
+export const updateMenuTypeById = async (data) => {
+  console.log(data);
+  try {
+    const response = await api.put(`/menutypes/update/${data.menu_type_id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating menu type:", error);
+    throw error;
+  }
+};
+
+//////////////////////////////////////////////////////////////////////////////////
 
 //to display all categories and add new categories through form
 export const getCategories = async () => {
@@ -92,6 +129,8 @@ export const getCategories = async () => {
   }
 };
 
+
+//to insert a category
 export const addCategory = async (category) => {
   try {
     const response = await api.post('/categories/add', category);
@@ -101,6 +140,40 @@ export const addCategory = async (category) => {
     throw error;
   }
 };
+
+export const getCategoryById = async (id) => {
+  try {
+    const response = await api.get(`/categories/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting category:", error);
+    throw error;
+  }
+}; 
+
+export const deleteCategory = async (id) => {
+  try {
+    const response = await api.delete(`/categories/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw error;
+  }
+}; 
+
+export const updateCategoryById = async (id, data) => {
+  console.log(id,data);
+  const name = {category_name:data}
+  try {
+    const response = await api.put(`/categories/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
+}; 
+
+//////////////////////////////////////////////////////////////////////
 
 //to display all items and add new items through form
 export const getItems = async () => {
@@ -113,6 +186,7 @@ export const getItems = async () => {
   }
 };
 
+//to insert an item
 export const addItem = async (item) => {
   try {
     const response = await api.post('/items/add', item);
@@ -122,6 +196,45 @@ export const addItem = async (item) => {
     throw error;
   }
 };
+
+export const getItemById = async (id) => {
+  try {
+    const response = await api.get(`/items/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting item:", error);
+    throw error;
+  }
+}; 
+
+
+
+export const deleteItem = async (id) => {
+  try {
+    const response = await api.delete(`/items/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    throw error;
+  }
+}; 
+
+
+export const updateItem = async (id, data) => {
+  console.log(id, data);
+  const name = { item_name: data }; 
+  try {
+    const response = await api.put(`/items/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating item:", error);
+    throw error;
+  }
+};
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
 
 // to display all category menu types and add new category menu types through form
 export const getCategoryMenuTypes = async () => {
@@ -134,6 +247,8 @@ export const getCategoryMenuTypes = async () => {
   }
 };
 
+
+//to insert a category menu type
 export const addCategoryMenuType = async (categoryMenu) => {
   try {
     const response = await api.post('/categoryMenuTypes/add', categoryMenu);
@@ -146,3 +261,34 @@ export const addCategoryMenuType = async (categoryMenu) => {
 };
 
 
+export const getCategoryMenuTypeById = async (id) => {
+  try {
+    const response = await api.get(`/categoryMenuTypes/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting category menu type:", error);
+    throw error;
+  }
+}; 
+
+export const deleteCategoryMenuType = async (id) => {
+  try {
+    const response = await api.delete(`/categoryMenuTypes/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting category menu type:", error);
+    throw error;
+  }
+}; 
+
+export const updateCategoryMenuTypeById = async (id, data) => {
+  console.log(id,data);
+  const name = {categoryMenuType_name:data}
+  try {
+    const response = await api.put(`/categoryMenuTypes/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category menu type:", error);
+    throw error;
+  }
+}; 

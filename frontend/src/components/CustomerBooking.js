@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/Authcontext";
 import { getCustomerBookings } from "../services/EventService";
 import { useNavigate } from "react-router-dom";
-import { encryptBookingId } from "../utills/encryptionUtils";    
+import { encryptBookingId,encryptCustId } from "../utills/encryptionUtils";    
 
 
 const CustomerBookings = () => {
@@ -60,6 +60,7 @@ const CustomerBookings = () => {
         });
     };
 
+
     if (loading) return <p className="text-center text-xl">Loading...</p>;
     if (error) return <p className="text-center text-red-600">{error}</p>;
 
@@ -81,7 +82,8 @@ const CustomerBookings = () => {
                                 <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
                                 onClick={() => {
                                     const encryptedId = encryptBookingId(booking.booking_id);
-                                    navigate(`/eventHome/${encryptedId}`)
+                                    const encryptedCustomerId = encryptCustId(booking.customer_id);
+                                    navigate(`/eventHome/${encryptedId}/${encryptedCustomerId}`);
                                     
                                 }}>
                                 Plan your Event</button>

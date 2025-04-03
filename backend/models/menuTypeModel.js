@@ -22,6 +22,7 @@ export const createMenuType = async (menu_type_name, menu_list_type_id, price) =
 };
 
 export const updateMenuType = async (menu_type_id, menu_type_name, menu_list_type_id, price) => {
+    console.log(menu_type_id, menu_type_name, menu_list_type_id, price)
     const [result] = await db.query(
         "UPDATE Menu_Type SET menu_type_name = ?, menu_list_type_id = ?, price = ? WHERE menu_type_id = ?",
         [menu_type_name, menu_list_type_id, price, menu_type_id]

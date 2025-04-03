@@ -3,52 +3,40 @@ import db from '../config/db.js';
 class EventModel {
     static async createEvents(eventData) {
         try {
-
             // Insert into Event table
             const [result] = await db.query(
                 `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, 
                 Function_durationFrom, Function_durationTo, Tea_table_Time, Dress_Time, booking_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    eventData.buffetTimeFrom, eventData.buffetTimeTo, 
-                    eventData.functionDurationFrom, eventData.functionDurationTo, eventData.teaTableTime, 
-                    eventData.dressTime, eventData.bookingID
+                    eventData.buffetTimeFrom, 
+                    eventData.buffetTimeTo, 
+                    eventData.functionDurationFrom, 
+                    eventData.functionDurationTo, 
+                    eventData.teaTableTime, 
+                    eventData.dressTime, 
+                    eventData.bookingID
                 ]
             );
 
-            const [eventResult] = await db.query(
-                `SELECT Event_ID FROM Event WHERE booking_id = ?`, [eventData.bookingID]
+            const [NewEventID] = await db.query(
+                `SELECT Event_ID FROM Event WHERE booking_id = ?`,
+                [eventData.bookingID]
             );
+            let newEventID = NewEventID[0].Event_ID;
 
-            // Check if Event_ID was found
-            if (eventResult.length === 0) {
-                throw new Error("Event_ID not found for the given booking_id.");
-            }
-
-            const eventID = eventResult[0].Event_ID;  // Extract the Event_ID
-
-            // Log the Event_ID (optional for debugging)
-            console.log("Event inserted with ID:", eventID);
-
-            // If no event name is provided, skip inserting into CustomEvent
-            if (!eventData.eventName) {
-                console.warn("No event name provided, skipping CustomEvent insert.");
-                return eventID;  // Returning the Event_ID
-            }
-
-            const [customResult] = await db.query(
+            await db.query(
                 `INSERT INTO CustomEvent (Event_ID, Event_Name, ContactPersonName, ContactPersonNumber) 
                 VALUES (?, ?, ?, ?)`,
-                [eventID, eventData.eventName, eventData.contactPersonName, eventData.contactPersonNumber]
+                [newEventID, eventData.eventName, eventData.contactPersonName, eventData.contactPersonNumber]
             );
 
-            console.log("CustomEvent inserted with Event_ID:", eventID);
-
-            return customResult.insertId; // Return the inserted CustomEvent's ID (optional)
+            console.log("CustomEvent inserted with Event_ID:", newEventID);
+            return newEventID; 
 
         } catch (error) {
-            console.error("Database Error (createEvent):", error);
-            throw new Error("Failed to create event.");
+            console.error("Database Error (createEvents):", error.message || error);
+            throw new Error(error.message || "Failed to create event.");
         }
     }
 }

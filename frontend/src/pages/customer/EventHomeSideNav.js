@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Logout } from '../components/Logout';
+import { Logout } from '../../components/Logout';
 
-const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
+const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
   const [openMenu, setOpenMenu] = useState(null);
 
   const toggleMenu = (menu) => {
@@ -11,7 +11,7 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
   return (
     <aside className="w-64 bg-gray-800 h-full fixed left-0 top-0 md:relative md:translate-x-0 transform transition-transform duration-300 ease-in-out">
       <div className="flex items-center justify-between h-16 px-4 bg-gray-900">
-        <span className="text-white text-lg font-bold">Profile</span>
+        <span className="text-white text-lg font-bold">Event Management</span>
       </div>
       <nav className="mt-5 overflow-y-auto h-[calc(100vh-4rem)]">
         <button
@@ -45,16 +45,16 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                Plan Your Event
+                Plan New Event
               </button>
               <button
                 onClick={() => {
-                  setActivePage('my-events');
+                  setActivePage('view-events');
                   closeSidebar();
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                My Events
+                View My Events
               </button>
             </div>
           )}
@@ -72,4 +72,4 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
   );
 };
 
-export default ProfileSideNav;
+export default EventHomeSideNav;
