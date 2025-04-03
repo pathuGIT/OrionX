@@ -5,7 +5,7 @@ import { addMenuListType, deleteMenuListType, getMenuListTypeById, getMenus, upd
 function CreateMenuListType() {
   const [menu, setMenu] = useState({ menu_list_type_id: '', menu_list_name: '' });
   const [menus, setMenus] = useState([]);
-  const [btnname, setBtnname] = useState('Add Menu')
+  const [btnname, setBtnname] = useState('Add Menu');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,31 +22,46 @@ function CreateMenuListType() {
     fetchMenus();
   }, []);
 
+  const handleValidation = () => {
+    return menus.some((item) => item.menu_list_name.toLowerCase() === menu.menu_list_name.toLowerCase());
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if the menu_list_name is empty or contains only spaces
+    if (!menu.menu_list_name.trim()) {
+      alert('Menu name cannot be empty or just spaces!');
+      return;
+    }
+
+    if (handleValidation()) {
+      alert('This menu name already exists! Please enter a unique name.');
+      return;
+    }
+
     try {
-      if(btnname == 'Add Menu'){
+      if (btnname === 'Add Menu') {
         await addMenuListType(menu);
         alert('Menu added successfully!');
         setMenu({ menu_list_name: '' });
-  
-        // Refresh menu list after adding
-        const updatedMenus = await getMenus();
-        setMenus(updatedMenus);
-      }else if(btnname == 'Update'){
-        await updateMenuListTypeById(menu.menu_list_type_id, menu.menu_list_name);
-        setMenu({ menu_list_name: '' });
-        alert('Menu Updated successfully!');
 
         // Refresh menu list after adding
         const updatedMenus = await getMenus();
         setMenus(updatedMenus);
+      } else if (btnname === 'Update') {
+        await updateMenuListTypeById(menu.menu_list_type_id, menu.menu_list_name);
+        setMenu({ menu_list_name: '' });
+        alert('Menu updated successfully!');
+
+        // Refresh menu list after updating
+        const updatedMenus = await getMenus();
+        setMenus(updatedMenus);
         setBtnname('Add Menu');
       }
-      
     } catch (error) {
-      console.error('Adding Error:', error);
-      alert('An error occurred while adding the menu list type.');
+      console.error('Error:', error);
+      alert('An error occurred while processing the menu.');
     }
   };
 
@@ -55,35 +70,30 @@ function CreateMenuListType() {
     setMenu((prevMenu) => ({ ...prevMenu, [name]: value }));
   };
 
-
   const handleEdit = async (id) => {
-    console.log(id);
     try {
-      const getMeuListNameById = await getMenuListTypeById(id);
-
-      if (!getMeuListNameById) {
-        alert("Not found this id.");
+      const menuById = await getMenuListTypeById(id);
+      if (!menuById) {
+        alert('Menu ID not found.');
         return;
       }
 
-      // Update the menu state with the fetched data
       setMenu({
         menu_list_type_id: id,
-        menu_list_name: getMeuListNameById.menu_list_name,
+        menu_list_name: menuById.menu_list_name,
       });
 
       setBtnname('Update');
     } catch (error) {
-      console.error('Error fetching menu list type by id:', error);
+      console.error('Error fetching menu list type by ID:', error);
     }
   };
 
   const handleDelete = async (id) => {
-    console.log(id);
     try {
-      const deleteMenuList = await deleteMenuListType(id);
-      if (deleteMenuList) {
-        alert(deleteMenuList.message);
+      const deleteResponse = await deleteMenuListType(id);
+      if (deleteResponse) {
+        alert(deleteResponse.message);
 
         // Refresh menu list after deletion
         const updatedMenus = await getMenus();
@@ -100,7 +110,6 @@ function CreateMenuListType() {
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Create Menu</h2>
         <form onSubmit={handleSubmit}>
-
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu List Name</label>
             <input
@@ -132,11 +141,19 @@ function CreateMenuListType() {
           </thead>
           <tbody>
             {menus.map((menuItem, index) => (
-              <tr key={index} className="border"> 
+              <tr key={index} className="border">
                 <td className="border px-4 py-2 text-sm">{menuItem.menu_list_type_id}</td>
                 <td className="border px-4 py-2 text-sm">{menuItem.menu_list_name}</td>
-                <td><button className=' border px-3 py-1 bg-blue-500  text-sm ' onClick={() => handleEdit(menuItem.menu_list_type_id)}>Edit</button></td>
-                <td><button className=' border px-3 py-1 bg-red-500  text-sm ' onClick={() => handleDelete(menuItem.menu_list_type_id)}>Delete</button></td>
+                <td>
+                  <button className="border px-3 py-1 bg-blue-500 text-sm" onClick={() => handleEdit(menuItem.menu_list_type_id)}>
+                    Edit
+                  </button>
+                </td>
+                <td>
+                  <button className="border px-3 py-1 bg-red-500 text-sm" onClick={() => handleDelete(menuItem.menu_list_type_id)}>
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -34,18 +34,37 @@ function CreateMenuType() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Trim name to remove extra spaces
+    const trimmedName = menuType.menu_type_name.trim();
+    
+    if (!trimmedName || !menuType.price || !menuType.menu_list_type_id) {
+      alert("All fields are required!");
+      return;
+    }
+
+    if (isNaN(menuType.price) || Number(menuType.price) <= 0) {
+      alert("Price must be a positive number!");
+      return;
+    }
+
+    const isDuplicate = menuTypes.some(mt => mt.menu_type_name.toLowerCase() === trimmedName.toLowerCase());
+    if (isDuplicate && btnname === "Add Menu Type") {
+      alert("Menu type name already exists!");
+      return;
+    }
+
     try {
       if (btnname === 'Add Menu Type') {
-        await addMenuType(menuType);
+        await addMenuType({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type added successfully!');
-        setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
       } else if (btnname === 'Update') {
-        await updateMenuTypeById(menuType.menu_type_id, menuType.menu_type_name, menuType.price, menuType.menu_list_type_id);
+        await updateMenuTypeById(menuType.menu_type_id, trimmedName, menuType.price, menuType.menu_list_type_id);
         alert('Menu Type updated successfully!');
-        setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
         setBtnname('Add Menu Type');
       }
 
+      setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
       const updatedMenuTypes = await getMenuTypes();
       setMenuTypes(updatedMenuTypes);
     } catch (error) {
@@ -56,6 +75,11 @@ function CreateMenuType() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "price" && value !== "" && !/^\d+(\.\d{0,2})?$/.test(value)) {
+      return; // Prevents non-numeric input in price field
+    }
+
     setMenuType((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -104,7 +128,7 @@ function CreateMenuType() {
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Price</label>
-            <input type="number" name="price" required value={menuType.price} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
+            <input type="text" name="price" required value={menuType.price} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Select Menu List Type</label>
@@ -136,8 +160,8 @@ function CreateMenuType() {
                 <td className="border px-4 py-2">{menuType.menu_type_id}</td>
                 <td className="border px-4 py-2">{menuType.menu_type_name}</td>
                 <td className="border px-4 py-2">${menuType.price}</td>
-                <td><button className="border px-3 py-1 bg-blue-500 text-sm" onClick={() => handleEdit(menuType.menu_type_id)}>Edit</button></td>
-                <td><button className="border px-3 py-1 bg-red-500 text-sm" onClick={() => handleDelete(menuType.menu_type_id)}>Delete</button></td>
+                <td><button className="border px-3 py-1 bg-blue-500 text-sm text-white" onClick={() => handleEdit(menuType.menu_type_id)}>Edit</button></td>
+                <td><button className="border px-3 py-1 bg-red-500 text-sm text-white" onClick={() => handleDelete(menuType.menu_type_id)}>Delete</button></td>
               </tr>
             ))}
           </tbody>
