@@ -37,8 +37,9 @@ function CreateMenuType() {
     
     // Trim name to remove extra spaces
     const trimmedName = menuType.menu_type_name.trim();
+    setMenuType({menu_type_name:trimmedName})
     
-    if (!trimmedName || !menuType.price || !menuType.menu_list_type_id) {
+    if (!menuType.menu_type_name || !menuType.price || !menuType.menu_list_type_id) {
       alert("All fields are required!");
       return;
     }
@@ -48,7 +49,7 @@ function CreateMenuType() {
       return;
     }
 
-    const isDuplicate = menuTypes.some(mt => mt.menu_type_name.toLowerCase() === trimmedName.toLowerCase());
+    const isDuplicate = menuTypes.some(mt => mt.menu_type_name.toLowerCase() === menuType.menu_type_name.toLowerCase());
     if (isDuplicate && btnname === "Add Menu Type") {
       alert("Menu type name already exists!");
       return;
@@ -56,10 +57,11 @@ function CreateMenuType() {
 
     try {
       if (btnname === 'Add Menu Type') {
-        await addMenuType({ ...menuType, menu_type_name: trimmedName });
+        await addMenuType({ ...menuType, menu_type_name: menuType.menu_type_name });
         alert('Menu Type added successfully!');
+        
       } else if (btnname === 'Update') {
-        await updateMenuTypeById(menuType.menu_type_id, trimmedName, menuType.price, menuType.menu_list_type_id);
+        await updateMenuTypeById(menuType);
         alert('Menu Type updated successfully!');
         setBtnname('Add Menu Type');
       }
@@ -118,6 +120,7 @@ function CreateMenuType() {
   };
 
   return (
+    // create menu types
     <div className="flex justify-between items-start mt-10 px-10 gap-2">
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Create Menu Type</h2>
@@ -142,7 +145,8 @@ function CreateMenuType() {
           <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">{btnname}</button>
         </form>
       </div>
-
+      
+    {/* display menu types */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Menu Types</h2>
         <table className="min-w-full border border-gray-300">

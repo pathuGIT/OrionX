@@ -105,11 +105,10 @@ export const deleteMenuType = async (id) => {
 }
 
 // update menu type by id
-export const updateMenuTypeById = async (id, data) => {
-  console.log(id,data);
-  const name = {menu_type_name:data}
+export const updateMenuTypeById = async (data) => {
+  console.log(data);
   try {
-    const response = await api.put(`/menutypes/update/${id}`, name);
+    const response = await api.put(`/menutypes/update/${data.menu_type_id}`, data);
     return response.data;
   } catch (error) {
     console.error("Error updating menu type:", error);
