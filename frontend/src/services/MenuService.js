@@ -221,8 +221,8 @@ export const deleteItem = async (id) => {
 
 
 export const updateItem = async (id, data) => {
-  console.log(id,data);
-  const name = {item:data}
+  console.log(id, data);
+  const name = { item_name: data }; 
   try {
     const response = await api.put(`/items/update/${id}`, name);
     return response.data;
@@ -230,7 +230,8 @@ export const updateItem = async (id, data) => {
     console.error("Error updating item:", error);
     throw error;
   }
-}; 
+};
+
 
 
 //////////////////////////////////////////////////////////////////////////////////
