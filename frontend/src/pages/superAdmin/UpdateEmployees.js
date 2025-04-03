@@ -26,6 +26,7 @@ function UpdateEmployees() {
   const [showActionPopup, setShowActionPopup] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [filterStatus, setFilterStatus] = useState();
+  const [previousFilterStatus, setPreviousFilterStatus] = useState(null); // Track the previous filter status
 
   useEffect(() => {
     fetchEmployees();
@@ -49,6 +50,9 @@ function UpdateEmployees() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+
+
   };
 
   const handleEdit = async (employeeId) => {
@@ -114,6 +118,16 @@ function UpdateEmployees() {
     setSelectedEmployee(employee);
     setShowActionPopup(true);
   };
+  const handleFilterChange = (status) => {
+    setPreviousFilterStatus(filterStatus); // Save the current filter status before changing it
+    setFilterStatus(status);
+  };
+
+  const handleBack = () => {
+    setFilterStatus(previousFilterStatus); // Restore the previous filter status
+    setPreviousFilterStatus(null);
+    
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg border border-red-500 mt-5">
@@ -124,8 +138,8 @@ function UpdateEmployees() {
         <button
           onClick={() => setFilterStatus("active")}
           className={`px-4 py-2 rounded ${
-            filterStatus === "Active"
-              ? "bg-blue-500 text-white"
+            filterStatus === "active"
+              ? "bg-green-500 text-white"
               : "bg-gray-300 text-black"
           }`}
         >
@@ -135,13 +149,21 @@ function UpdateEmployees() {
         <button
           onClick={() => setFilterStatus("inactive")}
           className={`px-4 py-2 rounded ${
-            filterStatus === "Inactive"
-              ? "bg-blue-500 text-white"
+            filterStatus === "inactive"
+              ? "bg-green-500 text-white"
               : "bg-gray-300 text-black"
           }`}
         >
           Inactive
         </button>
+        {  (
+          <button
+            onClick={handleBack}
+            className="px-4 py-2 rounded bg-blue-500 text-white"
+          >
+            Back
+          </button>
+        )}
       </div>
 
       <table className="min-w-full bg-white border border-gray-300">
@@ -163,10 +185,10 @@ function UpdateEmployees() {
               Date of Birth
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
-              Salary
+              Basic Salary
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
-              Service Charge (%)
+              Service Charge
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
               Hire Date
@@ -200,10 +222,10 @@ function UpdateEmployees() {
                       : "N/A"}
                   </td>
                   <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.salary}
+                    {"Rs "+employee.salary}
                   </td>
                   <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.service_charge_precentage}
+                    {employee.service_charge_precentage+"%"}
                   </td>
                   <td className="py-1 px-2 border-r border-gray-300">
                     {employee.hire_date &&
