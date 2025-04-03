@@ -34,12 +34,16 @@ function CreateMenuType() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Trim name to remove extra spaces
+
+    // Trim name to remove leading/trailing spaces
     const trimmedName = menuType.menu_type_name.trim();
-    setMenuType({menu_type_name:trimmedName})
-    
-    if (!menuType.menu_type_name || !menuType.price || !menuType.menu_list_type_id) {
+
+    if (!trimmedName) {
+      alert("Menu Type Name cannot be empty or contain only spaces!");
+      return;
+    }
+
+    if (!menuType.price || !menuType.menu_list_type_id) {
       alert("All fields are required!");
       return;
     }
@@ -49,7 +53,8 @@ function CreateMenuType() {
       return;
     }
 
-    const isDuplicate = menuTypes.some(mt => mt.menu_type_name.toLowerCase() === menuType.menu_type_name.toLowerCase());
+    // Check for duplicate menu type names (case-insensitive)
+    const isDuplicate = menuTypes.some(mt => mt.menu_type_name.toLowerCase() === trimmedName.toLowerCase());
     if (isDuplicate && btnname === "Add Menu Type") {
       alert("Menu type name already exists!");
       return;
@@ -57,16 +62,18 @@ function CreateMenuType() {
 
     try {
       if (btnname === 'Add Menu Type') {
-        await addMenuType({ ...menuType, menu_type_name: menuType.menu_type_name });
+        await addMenuType({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type added successfully!');
-        
       } else if (btnname === 'Update') {
-        await updateMenuTypeById(menuType);
+        await updateMenuTypeById({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type updated successfully!');
         setBtnname('Add Menu Type');
       }
 
+      // Reset the form
       setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
+
+      // Refresh the menu type list
       const updatedMenuTypes = await getMenuTypes();
       setMenuTypes(updatedMenuTypes);
     } catch (error) {
@@ -120,8 +127,8 @@ function CreateMenuType() {
   };
 
   return (
-    // create menu types
     <div className="flex justify-between items-start mt-10 px-10 gap-2">
+      {/* Create Menu Type Form */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Create Menu Type</h2>
         <form onSubmit={handleSubmit}>
@@ -146,7 +153,7 @@ function CreateMenuType() {
         </form>
       </div>
       
-    {/* display menu types */}
+      {/* Display Menu Types */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Menu Types</h2>
         <table className="min-w-full border border-gray-300">
@@ -163,7 +170,7 @@ function CreateMenuType() {
               <tr key={index} className="border">
                 <td className="border px-4 py-2">{menuType.menu_type_id}</td>
                 <td className="border px-4 py-2">{menuType.menu_type_name}</td>
-                <td className="border px-4 py-2">${menuType.price}</td>
+                <td className="border px-4 py-2">Rs.{menuType.price}</td>
                 <td><button className="border px-3 py-1 bg-blue-500 text-sm text-white" onClick={() => handleEdit(menuType.menu_type_id)}>Edit</button></td>
                 <td><button className="border px-3 py-1 bg-red-500 text-sm text-white" onClick={() => handleDelete(menuType.menu_type_id)}>Delete</button></td>
               </tr>
