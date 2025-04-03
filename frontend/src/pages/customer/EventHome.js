@@ -1,37 +1,99 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import EventHomeSideNav from './EventHomeSideNav';
+import EventPlan from './CustomerEventPlanning';
+import DisplayEvents from '../../components/DisplayEvents';
+// import ProfileNavbar from '../components/ProfileNavbar';
 
 const EventHome = () => {
-  const { bookingId } = useParams(); // Get the booking ID from URL
-  const { customerID } = useParams(); // Get the customer ID from URL
-  const navigate = useNavigate();
+  const { bookingId, customerID } = useParams();
+  const [activePage, setActivePage] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const closeSidebar = () => {
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const renderContent = () => {
+    switch (activePage) {
+      case 'plan-event':
+        return <EventPlan bookingId={bookingId} />;
+      case 'view-events':
+        return <DisplayEvents customerID={customerID} />;
+      case 'dashboard':
+      default:
+        return (
+          <div>
+            <h1 className="text-2xl font-bold mb-6">Event Dashboard</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="flex items-center">
+                  <i className="fas fa-calendar-check text-blue-500 text-2xl mr-4"></i>
+                  <div>
+                    <p className="text-gray-500">Active Bookings</p>
+                    <h3 className="text-xl font-bold ">2</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="flex items-center">
+                  <i className="fas fa-clock text-yellow-500 text-2xl mr-4"></i>
+                  <div>
+                    <p className="text-gray-500">Pending Events</p>
+                    <h3 className="text-xl font-bold">1</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+    }
+  };
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/4 bg-gray-100 p-4 shadow-lg">
-        <h2 className="text-lg font-bold mb-4">Navigation</h2>
-        <ul>
-          <li className="mb-2">
-            <button
-              className="block p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-              onClick={() => navigate(`/event-planning/${bookingId}`)}
-            >
-              Plan Your Event
-            </button>
-          </li>
-          <li className="mb-2">
-            <button
-              className="block p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-              onClick={() => navigate(`/display-Events/${customerID}`)}
-            >
-              See Your Event
-            </button>
-          </li>
-        </ul>
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      {/* <ProfileNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} /> */}
 
-      {/* Display event planning content */}
-      <div className="w-3/4 p-6">
-        <Outlet /> {/* Will render event planning components based on route */}
+      <div className="flex">
+        {/* Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+        )}
+
+        <EventHomeSideNav
+          setActivePage={setActivePage}
+          closeSidebar={closeSidebar}
+          className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            } md:translate-x-0`}
+        />
+
+        <main
+          className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarOpen ? 'md:ml-3' : 'ml-0'
+            }`}
+        >
+          <div className="bg-white shadow-md rounded-lg p-6">
+            {renderContent()}
+          </div>
+        </main>
       </div>
     </div>
   );
