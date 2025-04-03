@@ -6,6 +6,8 @@ import EventManagementSAN from '../components/superAdminSideNavs/EventManagement
 import MenuManagementSAN from '../components/superAdminSideNavs/MenuManagementSAN';
 import DefaultSAN from '../components/superAdminSideNavs/DefaultSAN';
 import PayrollManagementSAN from '../components/superAdminSideNavs/PayrollManagementSAN';
+import BookingManagementSAN from '../components/superAdminSideNavs/BookingManagementSAN';
+import CustomersManagementSAN from '../components/superAdminSideNavs/CustomersManagementSAN';
 
 const SuperAdminDB = () => {
   const [topNav, setTopNav] = useState();
@@ -22,6 +24,10 @@ const SuperAdminDB = () => {
         return <MenuManagementSAN setRenderContent={setRenderContent} />;
       case 'B':
         return <PayrollManagementSAN setRenderContent={setRenderContent} />;
+      case 'E':
+        return <BookingManagementSAN setRenderContent={setRenderContent} />;
+      case 'F':
+        return <CustomersManagementSAN setRenderContent={setRenderContent} />;
       default:
         return <DefaultSAN setRenderContent={setRenderContent} />;
     }
@@ -38,22 +44,32 @@ const SuperAdminDB = () => {
           <ul className="flex-col md:flex-row flex md:space-x-8 mt-4 md:mt-0 md:text-sm md:font-medium">
             <li>
               <button type="button" onClick={() => setTopNav('A')} className="text-gray-700 text-base hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
-                User Management
+                Employees
               </button>
             </li>
             <li>
               <button type="button" onClick={() => setTopNav('B')} className="text-gray-700 text-base hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
-                Payroll Management
+                Payroll
               </button>
             </li>
             <li>
               <button type="button" onClick={() => setTopNav('C')} className="text-gray-700 text-base hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
-                Event Management
+                Events
               </button>
             </li>
             <li>
               <button type="button"onClick={() => setTopNav('D')}className="text-gray-700 text-base hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
-                Menu Management
+                Menus
+              </button>
+            </li>
+            <li>
+              <button type="button"onClick={() => setTopNav('E')}className="text-gray-700 text-base hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+                Bookings
+              </button>
+            </li>
+            <li>
+              <button type="button"onClick={() => setTopNav('F')}className="text-gray-700 text-base hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+                Customers
               </button>
             </li>
           </ul>

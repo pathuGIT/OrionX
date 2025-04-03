@@ -4,23 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import { addEmployees } from '../../services/UserService';
 
 const AddEmployee = () => {
-  const [user, setUser] = useState({ name: '', phone: '', email: '', bod: '', serviceCharge:'', salary: '' });
+  const [user, setUser] = useState({ name: '', phone: '', email: '', bod: '', serviceCharge: '', salary: '' });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const { message } = await addEmployees(user);
-        console.log(message);
-        alert(message); // Display success message
-        setUser({ name: '', phone: '', email: '', bod: '', serviceCharge: '', salary: '' }); // Clear input fields
+      const { message } = await addEmployees(user);
+      console.log(message);
+      alert(message); // Display success message
+      setUser({ name: '', phone: '', email: '', bod: '', serviceCharge: '', salary: '' }); // Clear input fields
     } catch (error) {
-        console.error('Adding Error:', error); // Log the error
-        if (error.response && error.response.data && error.response.data.message) {
-            alert(error.response.data.message); // Display server error message
-        } else {
-            alert('An unexpected error occurred.'); // Fallback error message
-        }
+      console.error('Adding Error:', error); // Log the error
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message); // Display server error message
+      } else {
+        alert('An unexpected error occurred.'); // Fallback error message
+      }
     }
   };
 
@@ -114,7 +114,11 @@ const AddEmployee = () => {
             />
           </div>
         </div>
-        <button type="submit" className=' block border p-2 mt-2'>Add Employee</button>
+        <div className='mt-5'>
+          <button type="submit" class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2">
+            Add Employee
+          </button>
+        </div>
       </form>
     </div>
   )
