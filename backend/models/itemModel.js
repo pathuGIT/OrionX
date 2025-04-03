@@ -11,10 +11,10 @@ export const getItemById = async (item_id) => {
     return rows[0];
 };
 
-export const createItem = async (item_id, item_name) => {
+export const createItem = async (item_name) => {
     const [result] = await db.query(
-        "INSERT INTO Item (item_id, item_name) VALUES (?, ?)",
-        [item_id, item_name]
+        "INSERT INTO Item (item_name) VALUES (?)",
+        [item_name]
     );
     return result.insertId;
 };

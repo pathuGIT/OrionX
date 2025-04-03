@@ -1,13 +1,16 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+
 import {
     getUserByUserEmailORPswdModel,
     registerSuperAdminSystemUserModel,
     getSystemUserByEmpIdModel,
-    registerEmployeeModel
+    registerEmployeeModel,
+    updatePasswordByEmail
 } from '../models/userModel.js';
-import { saveSystemuserRefreshTokenModel, isRefreshTokenValidModel, saveCustomerRefreshTokenModel } from '../models/authModule.js';
+import { saveSystemuserRefreshTokenModel, isRefreshTokenValidModel, saveCustomerRefreshTokenModel, checkEmailModel } from '../models/authModule.js';
 import { getCustomersByCusIdModel, registerCustomerModel, getCustomerByEmailORPswdModel } from '../models/customerModel.js';
+import { sendOtpEmail } from './mailController.js';
 
 //Register employee 
 export const registerEmp = async (req, res) => {
@@ -67,23 +70,21 @@ export const login = async (req, res) => {
         if (user.role == 'customer') {
             const token = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
             const refreshToken = jwt.sign({ userId: user.customer_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '2h' });
-            
+
             await saveCustomerRefreshTokenModel(refreshToken, user.customer_id);
             res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.customer_id, role: user.role, token, refreshToken });
         } else {
             const token = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2m' });
             const refreshToken = jwt.sign({ userId: user.user_id, userEmail: user.email, role: user.role }, process.env.JWT_REFRESH, { expiresIn: '2h' });
-    
+
             await saveSystemuserRefreshTokenModel(refreshToken, user.user_id);
-            res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });    
+            res.status(200).json({ message: 'Login successful', userEmail: user.email, id: user.user_id, role: user.role, token, refreshToken });
         }
-        
+
     } catch (error) {
         res.status(500).json({ msg: 'Error during login', error });
     }
 };
-
-
 
 export const refresh = async (req, res) => {
     const refreshToken = req.body.refreshKey;
@@ -112,3 +113,59 @@ export const refresh = async (req, res) => {
     });
 
 }
+
+export const checkEmail = async (req, res) => {
+    const { email } = req.query;
+    try {
+        const response = await checkEmailModel(email);
+        if (!response) {
+            return res.status(404).json({ message: 'Email not found' });
+        }
+
+        res.status(200).json({ message: 'Email validated', email: response.email, source_table: response.source_table });
+    } catch (error) {
+        res.status(500).json({ message: 'Error validating email', error });
+    }
+};
+
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
+    console.log(otp);
+    const token = jwt.sign({ email, otp }, process.env.JWT_SECRET, { expiresIn: '3m' });
+
+    try {
+        await sendOtpEmail(email, otp);
+        res.status(200).json({ message: 'OTP sent successfully', token });
+    } catch (error) {
+        res.status(500).json({ message: 'Error sending OTP', error });
+    }
+};
+
+export const validateOtp = async (req, res) => {
+    const { token, otp } = req.body;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (decoded.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        res.status(200).json({ message: 'OTP validated successfully' });
+    } catch (error) {
+        res.status(400).json({ message: 'Invalid or expired token', error });
+    }
+};
+
+export const updateUserPassword = async (req, res) => {
+    const {password, email, table } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await updatePasswordByEmail(hashedPassword, email, table);
+        res.status(201).json({ message: 'User update successfully' });
+    } catch (error) {
+        res.status(400).json({ message: 'Invalid or expired token', error });
+    }
+};

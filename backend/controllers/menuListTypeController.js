@@ -1,7 +1,7 @@
 import MenuListType from "../models/menuListTypeModel.js";
 
-// Get all menus
-export const getMenus = async (req, res) => {
+//Get all menus
+export const getMenuListType = async (req, res) => {
   try {
     const menus = await MenuListType.getAllMenus();
     res.json(menus);
@@ -13,8 +13,8 @@ export const getMenus = async (req, res) => {
 // Get a menu by ID
 export const getMenuById = async (req, res) => {
   try {
-    const { menu_list_type_id } = req.params;
-    const menu = await MenuListType.getMenuById(menu_list_type_id);
+    const { id } = req.params;
+    const menu = await MenuListType.getMenuById(id);
 
     if (!menu) {
       return res.status(404).json({ error: "Menu not found" });
@@ -28,13 +28,13 @@ export const getMenuById = async (req, res) => {
 
 // Create a new menu
 export const createMenu = async (req, res) => {
-  const { menu_list_type_id, menu_list_name } = req.body;
+  const { menu_list_name } = req.body;
   try {
-    if (!menu_list_type_id || !menu_list_name) {
+    if ( !menu_list_name) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    await MenuListType.createMenu(menu_list_type_id, menu_list_name);
+    await MenuListType.createMenu( menu_list_name);
     res.status(201).json({ message: "Menu created successfully" });
   } catch (error) {
     res.status(500).json({ error: "Error inserting menu" });
@@ -42,12 +42,12 @@ export const createMenu = async (req, res) => {
 };
 
 // Update a menu
-export const updateMenu = async (req, res) => {
+export const updateMenuById = async (req, res) => {
   try {
-    const { menu_list_type_id } = req.params;
+    const { id } = req.params;
     const { menu_list_name } = req.body;
 
-    const updatedRows = await MenuListType.updateMenu(menu_list_type_id, menu_list_name);
+    const updatedRows = await MenuListType.updateMenu(id, menu_list_name);
 
     if (updatedRows === 0) {
       return res.status(404).json({ error: "Menu not found" });
@@ -62,9 +62,9 @@ export const updateMenu = async (req, res) => {
 // Delete a menu
 export const deleteMenu = async (req, res) => {
   try {
-    const { menu_list_type_id } = req.params;
+    const { id } = req.params;
 
-    const deletedRows = await MenuListType.deleteMenu(menu_list_type_id);
+    const deletedRows = await MenuListType.deleteMenu(id);
 
     if (deletedRows === 0) {
       return res.status(404).json({ error: "Menu not found" });
@@ -76,4 +76,4 @@ export const deleteMenu = async (req, res) => {
   }
 };
 
-export default { getMenus, getMenuById, createMenu, updateMenu, deleteMenu };
+export default { getMenuListType, getMenuById, createMenu, updateMenuById, deleteMenu };

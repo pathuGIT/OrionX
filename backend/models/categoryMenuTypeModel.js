@@ -13,10 +13,10 @@ export const getCategoryMenuTypeById = async (category_menu_type_Id) => {
     return rows[0];
 };
 
-export const createCategoryMenuType = async (category_menu_type_Id, menu_type_id, category_id, item_limit) => {
+export const createCategoryMenuType = async (menu_type_id, category_id, item_limit) => {
     const [result] = await db.query(
-        "INSERT INTO Category_Menu_Type (category_menu_type_Id, menu_type_id, category_id, item_limit) VALUES (?, ?, ?, ?)",
-        [category_menu_type_Id, menu_type_id, category_id, item_limit]
+        "INSERT INTO Category_Menu_Type (menu_type_id, category_id, item_limit) VALUES (?, ?, ?)",
+        [menu_type_id, category_id, item_limit]
     );
     return result.insertId;
 };

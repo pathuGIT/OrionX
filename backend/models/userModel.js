@@ -63,7 +63,7 @@ export const getEmployeeByPhoneModel = async (phone) => {
         'select * from employee where phone = ?',
         [phone]
     );
-    console.log(result[0])
+    
     return result[0];
 }
 
@@ -115,13 +115,11 @@ export const getEmployeeModel = async () => {
 
  //get employee by id
 export const getEmployeeByuserIdModel = async (employee_id) => {
-
     const [result] = await pool.query(
-        'SELECT * FROM employee WHERE employee_id = ?',
+        'SELECT employee_id, name, phone, email, DATE_FORMAT(bod, "%Y-%m-%d") AS bod, salary, service_charge_precentage, DATE_FORMAT(hire_date, "%Y-%m-%d") AS hire_date FROM employee WHERE employee_id = ?',
         [employee_id]
     );
-    
-    return result[0];
+    return result[0]; 
 };
 
 //update employees
@@ -130,7 +128,7 @@ export const updateEmployeesModel = async (employee_id, name, phone, email, bod,
         'UPDATE employee SET name = ?, phone = ?, email = ?, bod = ?, salary = ?, service_charge_precentage = ?, hire_date =?  WHERE employee_id = ?',  
         [name, phone, email, bod, salary, service_charge_precentage, hire_date, employee_id]
     );
-    return result[0];
+    return result[0]; 
 };
 
 //delete employees
@@ -150,4 +148,38 @@ export const updateEmployeesStatusModel = async (employee_id, status) => {
         [status, employee_id]
 
     ); return result[0]; 
+};
+
+//get employees by status
+export const getEmployeesByStatusModel = async (status) => {
+    console.log(status);
+    const [result] = await pool.query(
+        
+        'SELECT e.* FROM employee e JOIN systemuser su ON e.employee_id = su.employee_id WHERE su.status = ?',
+        [status]
+    );
+    //console.log(result[0]);
+    return result;
+};
+
+export const updatePasswordByEmail = async (newPassword, email, table) => {
+    console.log(newPassword, email, table);
+    let result;
+    if (table === 'employee') {
+        [result] = await pool.query(
+            `UPDATE systemuser s 
+             JOIN employee e ON e.employee_id = s.employee_id 
+             SET s.password = ? 
+             WHERE e.email = ?`,
+            [newPassword, email]
+        );
+    } else if (table === 'customer') {
+        [result] = await pool.query(
+            `UPDATE customer 
+             SET pasword = ? 
+             WHERE email = ?`,
+            [newPassword, email]
+        );
+    }
+    return result.affectedRows; // Returns the number of rows affected
 };
