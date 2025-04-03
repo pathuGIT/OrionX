@@ -261,3 +261,34 @@ export const addCategoryMenuType = async (categoryMenu) => {
 };
 
 
+export const getCategoryMenuTypeById = async (id) => {
+  try {
+    const response = await api.get(`/categoryMenuTypes/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting category menu type:", error);
+    throw error;
+  }
+}; 
+
+export const deleteCategoryMenuType = async (id) => {
+  try {
+    const response = await api.delete(`/categoryMenuTypes/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting category menu type:", error);
+    throw error;
+  }
+}; 
+
+export const updateCategoryMenuTypeById = async (id, data) => {
+  console.log(id,data);
+  const name = {categoryMenuType_name:data}
+  try {
+    const response = await api.put(`/categoryMenuTypes/update/${id}`, name);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category menu type:", error);
+    throw error;
+  }
+}; 
