@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCategoryMenuTypes, addCategoryMenuType } from '../../services/MenuService';
+import { getCategoryMenuTypes, addCategoryMenuType, getMenuTypes } from '../../services/MenuService';
 
 function CreateCategoryMenuType() {
   const [categoryMenu, setCategoryMenu] = useState({
@@ -9,17 +9,21 @@ function CreateCategoryMenuType() {
   });
 
   const [categories, setCategories] = useState([]);
+  const [menuTypes, setMenuTypes] = useState([]); // For storing the menu types
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchCategoriesAndMenuTypes = async () => {
       try {
+        // Fetch all categories and menu types
         const fetchedCategories = await getCategoryMenuTypes();
+        const fetchedMenuTypes = await getMenuTypes();
         setCategories(fetchedCategories);
+        setMenuTypes(fetchedMenuTypes);
       } catch (error) {
-        console.error('Error fetching category menu types:', error);
+        console.error('Error fetching categories and menu types:', error);
       }
     };
-    fetchCategories();
+    fetchCategoriesAndMenuTypes();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -51,29 +55,39 @@ function CreateCategoryMenuType() {
         <h2 className="text-xl font-semibold text-black mb-5">Category Menu Type</h2>
         <form onSubmit={handleSubmit}>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-900">Menu Type ID</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-900">Menu Type</label>
+            <select
               name="menu_type_id"
               required
-              placeholder="Enter Menu Type ID"
               value={categoryMenu.menu_type_id}
               onChange={handleChange}
               className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
+            >
+              <option value="">Select Menu Type</option>
+              {menuTypes.map((menuType) => (
+                <option key={menuType.menu_type_id} value={menuType.menu_type_id}>
+                  {menuType.menu_type_name} {/* Displaying the name of the menu type */}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-900">Category ID</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-900">Category</label>
+            <select
               name="category_id"
               required
-              placeholder="Enter Category ID"
               value={categoryMenu.category_id}
               onChange={handleChange}
               className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
+            >
+              <option value="">Select Category</option>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.category_name} {/* Displaying the name of the category */}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mt-4">
@@ -102,7 +116,7 @@ function CreateCategoryMenuType() {
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-4 py-2">Menu Type ID</th>
-              <th className="border px-4 py-2">Category ID</th>
+              <th className="border px-4 py-2">Category Name</th> {/* Change category_id to category_name */}
               <th className="border px-4 py-2">Item Limit</th>
             </tr>
           </thead>
@@ -110,7 +124,7 @@ function CreateCategoryMenuType() {
             {categories.map((category, index) => (
               <tr key={index} className="border">
                 <td className="border px-4 py-2">{category.menu_type_id}</td>
-                <td className="border px-4 py-2">{category.category_id}</td>
+                <td className="border px-4 py-2">{category.category_name}</td> {/* Displaying the category name */}
                 <td className="border px-4 py-2">{category.item_limit}</td>
               </tr>
             ))}
