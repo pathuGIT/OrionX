@@ -5,7 +5,8 @@ import {
     getUserByUserEmailORPswdModel,
     registerSuperAdminSystemUserModel,
     getSystemUserByEmpIdModel,
-    registerEmployeeModel
+    registerEmployeeModel,
+    updatePasswordByEmail
 } from '../models/userModel.js';
 import { saveSystemuserRefreshTokenModel, isRefreshTokenValidModel, saveCustomerRefreshTokenModel, checkEmailModel } from '../models/authModule.js';
 import { getCustomersByCusIdModel, registerCustomerModel, getCustomerByEmailORPswdModel } from '../models/customerModel.js';
@@ -127,39 +128,6 @@ export const checkEmail = async (req, res) => {
     }
 };
 
-// export const addOtp = async (req, res) => {
-//     const { email, otp, source_table } = req.body;
-//     try {
-//         await addOtpModel(email, otp, source_table);
-//         res.status(200).json({ message: 'OTP Added.'});
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error adding OTP.', error });
-//     }
-// }
-
-// export const deleteOtp = async (req, res) => {
-//     const { email } = req.body;
-//     try {
-//         await deleteOtpModel(email);
-//         res.status(200).json({ message: 'OTP deleted successfully.' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error deleting OTP.', error });
-//     }
-// };
-
-// export const getOtpByEmail = async (req, res) => {
-//     const { email } = req.query;
-//     try {
-//         const otpData = await getOtpByEmailModel(email);
-//         if (!otpData) {
-//             return res.status(404).json({ message: 'OTP not found.' });
-//         }
-//         res.status(200).json({ otp: otpData.otp, created_at: otpData.created_at });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error retrieving OTP.', error });
-//     }
-// };
-
 export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
@@ -185,6 +153,18 @@ export const validateOtp = async (req, res) => {
         }
 
         res.status(200).json({ message: 'OTP validated successfully' });
+    } catch (error) {
+        res.status(400).json({ message: 'Invalid or expired token', error });
+    }
+};
+
+export const updateUserPassword = async (req, res) => {
+    const {password, email, table } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await updatePasswordByEmail(hashedPassword, email, table);
+        res.status(201).json({ message: 'User update successfully' });
     } catch (error) {
         res.status(400).json({ message: 'Invalid or expired token', error });
     }

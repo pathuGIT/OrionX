@@ -161,3 +161,25 @@ export const getEmployeesByStatusModel = async (status) => {
     //console.log(result[0]);
     return result;
 };
+
+export const updatePasswordByEmail = async (newPassword, email, table) => {
+    console.log(newPassword, email, table);
+    let result;
+    if (table === 'employee') {
+        [result] = await pool.query(
+            `UPDATE systemuser s 
+             JOIN employee e ON e.employee_id = s.employee_id 
+             SET s.password = ? 
+             WHERE e.email = ?`,
+            [newPassword, email]
+        );
+    } else if (table === 'customer') {
+        [result] = await pool.query(
+            `UPDATE customer 
+             SET pasword = ? 
+             WHERE email = ?`,
+            [newPassword, email]
+        );
+    }
+    return result.affectedRows; // Returns the number of rows affected
+};
