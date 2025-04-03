@@ -77,7 +77,7 @@ export const changeUserRole = async (req, res) => {
     }
 }
 
-// get employees data
+//get employees data
 export const getEmployee = async (req, res) => {
     try{
         const result = await getEmployeeModel();
@@ -88,6 +88,8 @@ export const getEmployee = async (req, res) => {
         res.status(500).json({ msg: 'Server error...', error });
     } 
 }
+
+
 
 // update employee details
 // export const updateEmployees = async (req, res) => {

@@ -50,6 +50,9 @@ function UpdateEmployees() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+
+
   };
 
   const handleEdit = async (employeeId) => {
@@ -182,10 +185,10 @@ function UpdateEmployees() {
               Date of Birth
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
-              Salary
+              Basic Salary
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
-              Service Charge (%)
+              Service Charge
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
               Hire Date
@@ -219,10 +222,10 @@ function UpdateEmployees() {
                       : "N/A"}
                   </td>
                   <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.salary}
+                    {"Rs "+employee.salary}
                   </td>
                   <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.service_charge_precentage}
+                    {employee.service_charge_precentage+"%"}
                   </td>
                   <td className="py-1 px-2 border-r border-gray-300">
                     {employee.hire_date &&

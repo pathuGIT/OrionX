@@ -1,7 +1,7 @@
 import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
 import { addEmployee, changeUserRole, addCustomer ,
-    updateEmployees,getEmployee,deleteEmployees,updateEmployeesStatus,getEmployeesByStatus,
+    updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
     getEmployeeById
 } from '../controllers/userController.js';
 import { subAdmin } from '../middleware/Sub_admin.js';
@@ -16,7 +16,7 @@ router.delete('/deleteEmployee',superAdmin,deleteEmployees);
 router.put('/updateStatus', updateEmployeesStatus);
 router.get('/getEmployeeById/:id', superAdmin,getEmployeeById); // New route to get employee by ID
 //router.put("/updateEmployee/:id", updateEmployees); // same
-router.get('/getEmployees', superAdmin,getEmployee);
+router.get('/getEmployees', superAdmin,getEmployee);//chage get employees
 router.put('/updateEmployee',superAdmin,updateEmployees);// same
 router.get('/getEmployeesByStatus', superAdmin,getEmployeesByStatus);
 router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
