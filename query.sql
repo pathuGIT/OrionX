@@ -49,6 +49,14 @@ CREATE TABLE bookig_history (
     FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
 );
 
+CREATE TABLE otp_store (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    otp VARCHAR(10) NOT NULL,
+    created_at TIME,
+    source_table VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE Customer(
     customer_id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(250),
@@ -517,4 +525,12 @@ BEGIN
     SET NEW.menu_type_id = new_id;
 END //
 
+DELIMITER //
+
+CREATE EVENT auto_delete_otp
+ON SCHEDULE EVERY 1 MINUTE
+DO
+BEGIN
+    DELETE FROM otp_store WHERE created_at < NOW() - INTERVAL 3 MINUTE;
+END //
 DELIMITER ;

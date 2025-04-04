@@ -9,10 +9,10 @@ import {
 const router = express.Router();
 
 // Routes for Item Table
-router.get("/", getItems);
-router.get("/:id", getItem);
-router.post("/", createItem);
-router.put("/:id", updateItem);
-router.delete("/:id", deleteItem);
+router.get("/getAll", getItems);
+router.get("/get/:id", getItem);
+router.post("/add/", createItem);
+router.put("/update/:id", updateItem);
+router.delete("/delete/:id", deleteItem);
 
 export default router;

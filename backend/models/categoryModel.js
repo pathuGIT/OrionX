@@ -13,10 +13,10 @@ export const getCategoryById = async (category_id) => {
     return rows[0];
 };
 
-export const createCategory = async (category_id, category_name) => {
+export const createCategory = async (category_name) => {
     const [result] = await db.query(
-        "INSERT INTO Category (category_id, category_name) VALUES (?, ?)",
-        [category_id, category_name]
+        "INSERT INTO Category (category_name) VALUES (?)",
+        [category_name]
     );
     return result.insertId;
 };

@@ -27,9 +27,9 @@ export const getItemCategoryMenuTypeById = async (req, res) => {
 // Create a new record in Item_Category_Menu_Type
 export const createItemCategoryMenuType = async (req, res) => {
     try {
-        const { ICMT_Id, category_menu_type_id, item_id } = req.body;
-        const insertId = await ItemCategoryMenuTypeModel.createItemCategoryMenuType(ICMT_Id, category_menu_type_id, item_id);
-        res.status(201).json({ message: "ItemCategoryMenuType record added", insertId });
+        const {category_menu_type_id, item_id } = req.body;
+        const insertId = await ItemCategoryMenuTypeModel.createItemCategoryMenuType(category_menu_type_id, item_id);
+        res.status(201).json({ message: "ItemCategoryMenuType record added"});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

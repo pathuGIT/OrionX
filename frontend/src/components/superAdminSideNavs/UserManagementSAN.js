@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import superAdminHome from '../../pages/superAdmin/SuperAdminHome';
 import AddEmployee from '../../pages/superAdmin/AddEmployee';
-import GetEmployees from '../../pages/superAdmin/GetEmployee';
+//import GetEmployees from '../../pages/superAdmin/GetEmployee';
 import UpdateEmployees from '../../pages/superAdmin/UpdateEmployees';
 import { Logout } from '../../components/Logout'
 
@@ -16,9 +16,9 @@ const UserManagementSAN = ({ setRenderContent }) => {
       case 'addEmployees':
         setRenderContent(() => () => <AddEmployee />);
         break;
-      case 'getEmployees':
-        setRenderContent(() => () => <GetEmployees />);
-        break;
+      // case 'getEmployees':
+      //   setRenderContent(() => () => <GetEmployees />);
+      //   break;
       case 'updateEmployeesById':
         setRenderContent(() => () => <UpdateEmployees />);
         break;
@@ -37,12 +37,12 @@ const UserManagementSAN = ({ setRenderContent }) => {
             <span class="text-sm font-medium">Add Employees</span>
           </button>
         </li>
-        <li>
+        {/* <li>
           <button onClick={() => handleRenderContent('getEmployees')} class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-800">
             <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i class="bx bx-home"></i></span>
             <span class="text-sm font-medium">Get Employees</span>
           </button>
-        </li>
+        </li> */}
         <li>
           <button onClick={() => handleRenderContent('updateEmployeesById')} class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-800">
             <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i class="bx bx-home"></i></span>

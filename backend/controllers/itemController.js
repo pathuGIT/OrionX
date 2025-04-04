@@ -25,9 +25,9 @@ export const getItem = async (req, res) => {
 
 export const createItem = async (req, res) => {
     try {
-        const { item_id, item_name } = req.body;
-        const insertId = await ItemModel.createItem(item_id, item_name);
-        res.status(201).json({ message: "Item added", insertId });
+        const {item_name } = req.body;
+        const insertId = await ItemModel.createItem(item_name);
+        res.status(201).json({ message: "Item added"});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
