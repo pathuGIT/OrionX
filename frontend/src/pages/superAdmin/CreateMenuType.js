@@ -134,11 +134,25 @@ function CreateMenuType() {
         <form onSubmit={handleSubmit}>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu Type Name</label>
-            <input type="text" name="menu_type_name" required value={menuType.menu_type_name} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
+            <input 
+              type="text" 
+              name="menu_type_name" 
+              required 
+              placeholder="Enter Menu Type name"
+              value={menuType.menu_type_name} 
+              onChange={handleChange} 
+              className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Price</label>
-            <input type="text" name="price" required value={menuType.price} onChange={handleChange} className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
+            <input 
+            type="text" 
+            name="price" 
+            required 
+            placeholder="Enter Price"
+            value={menuType.price} 
+            onChange={handleChange} 
+            className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none" />
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Select Menu List Type</label>

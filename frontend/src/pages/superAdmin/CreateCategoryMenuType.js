@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCategoryMenuTypes, addCategoryMenuType, getMenuTypes } from '../../services/MenuService';
+import { getCategoryMenuTypes, addCategoryMenuType, getMenuTypes, getCategories } from '../../services/MenuService';
 
 function CreateCategoryMenuType() {
   const [categoryMenu, setCategoryMenu] = useState({
@@ -8,17 +8,21 @@ function CreateCategoryMenuType() {
     item_limit: '',
   });
 
-  const [categories, setCategories] = useState([]);
-  const [menuTypes, setMenuTypes] = useState([]); // For storing the menu types
+  const [categoryMenuTypes, setCategoryMenuTypes] = useState([]);
+  const [categories, setCategories] = useState([]); 
+  const [menuTypes, setMenuTypes] = useState([]); 
 
   useEffect(() => {
     const fetchCategoriesAndMenuTypes = async () => {
       try {
-        // Fetch all categories and menu types
-        const fetchedCategories = await getCategoryMenuTypes();
+        const fetchedCategoryMenuTypes = await getCategoryMenuTypes();
+        setCategoryMenuTypes(fetchedCategoryMenuTypes);
+
+        const fetchedCategories = await getCategories();
         const fetchedMenuTypes = await getMenuTypes();
         setCategories(fetchedCategories);
         setMenuTypes(fetchedMenuTypes);
+
       } catch (error) {
         console.error('Error fetching categories and menu types:', error);
       }
@@ -36,7 +40,7 @@ function CreateCategoryMenuType() {
 
       // Refresh categories after adding
       const updatedCategories = await getCategoryMenuTypes();
-      setCategories(updatedCategories);
+      setCategoryMenuTypes(updatedCategories);
     } catch (error) {
       alert('An error occurred while adding the category menu type.');
       console.error(error);
@@ -45,6 +49,12 @@ function CreateCategoryMenuType() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "item_limit") {
+      if (!/^\d*$/.test(value)) return; // Allow only digits
+      if (value !== "" && parseInt(value, 10) <= 0) return; // Prevent negative values or zero
+    }
+
     setCategoryMenu((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -66,7 +76,7 @@ function CreateCategoryMenuType() {
               <option value="">Select Menu Type</option>
               {menuTypes.map((menuType) => (
                 <option key={menuType.menu_type_id} value={menuType.menu_type_id}>
-                  {menuType.menu_type_name} {/* Displaying the name of the menu type */}
+                  {menuType.menu_type_name}
                 </option>
               ))}
             </select>
@@ -84,7 +94,7 @@ function CreateCategoryMenuType() {
               <option value="">Select Category</option>
               {categories.map((category) => (
                 <option key={category.category_id} value={category.category_id}>
-                  {category.category_name} {/* Displaying the name of the category */}
+                  {category.category_name}
                 </option>
               ))}
             </select>
@@ -99,6 +109,7 @@ function CreateCategoryMenuType() {
               placeholder="Enter Item Limit"
               value={categoryMenu.item_limit}
               onChange={handleChange}
+              min="1"
               className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
             />
           </div>
@@ -115,17 +126,17 @@ function CreateCategoryMenuType() {
         <table className="min-w-full border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border px-4 py-2">Menu Type ID</th>
-              <th className="border px-4 py-2">Category Name</th> {/* Change category_id to category_name */}
+              <th className="border px-4 py-2">Menu Type Name</th>
+              <th className="border px-4 py-2">Category Name</th>
               <th className="border px-4 py-2">Item Limit</th>
             </tr>
           </thead>
           <tbody>
-            {categories.map((category, index) => (
+            {categoryMenuTypes.map((cmt, index) => (
               <tr key={index} className="border">
-                <td className="border px-4 py-2">{category.menu_type_id}</td>
-                <td className="border px-4 py-2">{category.category_name}</td> {/* Displaying the category name */}
-                <td className="border px-4 py-2">{category.item_limit}</td>
+                <td className="border px-4 py-2">{cmt.menu_type_name}</td>
+                <td className="border px-4 py-2">{cmt.category_name}</td>
+                <td className="border px-4 py-2">{cmt.item_limit}</td>
               </tr>
             ))}
           </tbody>
