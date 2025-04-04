@@ -18,11 +18,11 @@ import {
 
 const WeddingForm = ({ bookingId }) => {
     const [formData, setFormData] = useState({
-        groomName: "kamal",
-        brideName: "kamala",
-        groomContact: "0779754633",
-        brideContact: "0779854633",
-        fountain: "no",
+        groomName: "",
+        brideName: "",
+        groomContact: "",
+        brideContact: "",
+        fountain: "",
         buffetTimeFrom: "",
         buffetTimeTo: "",
         functionDurationFrom: "",
@@ -30,9 +30,9 @@ const WeddingForm = ({ bookingId }) => {
         teaTableTime: "",
         dressTime: "",
         bookingID: bookingId || "",
-        prosperityTable: "no",
-        groomAddress: "kalutara",
-        brideAddress: "colombo",
+        prosperityTable: "",
+        groomAddress: "",
+        brideAddress: "",
         ceremonyFrom: "",
         ceremonyTo: "",
         registrationTime: "",
@@ -373,50 +373,10 @@ const WeddingForm = ({ bookingId }) => {
                     </div>
                 )}
 
-                {/* Step 4 - Buffet Timings */}
-                {step === 4 && (
-                    <div className="space-y-4">
-                        <div className="border-b pb-4 mb-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2 text-pink-600">
-                                <Utensils className="w-6 h-6" />
-                                Buffet Timings
-                            </h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                                <div className="relative">
-                                    <input
-                                        type="time"
-                                        name="buffetTimeFrom"
-                                        value={formData.buffetTimeFrom}
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                                    />
-                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                </div>
-                            </div>
-
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                                <div className="relative">
-                                    <input
-                                        type="time"
-                                        name="buffetTimeTo"
-                                        value={formData.buffetTimeTo}
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                                    />
-                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                
 
                 {/* Step 5 - Function Durations */}
-                {step === 5 && (
+                {step === 4 && (
                     <div className="space-y-4">
                         <div className="border-b pb-4 mb-4">
                             <h3 className="text-xl font-semibold flex items-center gap-2 text-pink-600">
@@ -447,6 +407,48 @@ const WeddingForm = ({ bookingId }) => {
                                         type="time"
                                         name="functionDurationTo"
                                         value={formData.functionDurationTo}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                                    />
+                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 4 - Buffet Timings */}
+                {step === 5 && (
+                    <div className="space-y-4">
+                        <div className="border-b pb-4 mb-4">
+                            <h3 className="text-xl font-semibold flex items-center gap-2 text-pink-600">
+                                <Utensils className="w-6 h-6" />
+                                Buffet Timings
+                            </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                                <div className="relative">
+                                    <input
+                                        type="time"
+                                        name="buffetTimeFrom"
+                                        value={formData.buffetTimeFrom}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                                    />
+                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                                <div className="relative">
+                                    <input
+                                        type="time"
+                                        name="buffetTimeTo"
+                                        value={formData.buffetTimeTo}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                                     />
