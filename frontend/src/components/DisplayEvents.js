@@ -185,13 +185,13 @@ const DisplayEvents = () => {
                                         <div>
                                             <p className="text-sm text-gray-500">Event Date</p>
                                             <p className="font-medium">
-                                                {formatDateTime(event.Event_Date)}
+                                                {formatDateTime(event.Function_durationFrom)}
                                             </p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Duration</p>
                                             <p className="font-medium">
-                                                {formatDateTime(event.Event_Duration)}
+                                                {formatDateTime(event.Function_durationTo)}
                                             </p>
                                         </div>
                                     </div>

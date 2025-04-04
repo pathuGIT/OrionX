@@ -54,7 +54,7 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                View My Events
+                View Events
               </button>
             </div>
           )}
