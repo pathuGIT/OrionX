@@ -85,7 +85,7 @@ const WeddingForm = ({ bookingId }) => {
             });
             setStep(1);
         } catch (err) {
-            setError(err.response?.data?.error || "An error occurred while creating the wedding.");
+            setError(err.response?.data?.error || "Wedding is Already Created!");
         }
     };
 
@@ -124,7 +124,17 @@ const WeddingForm = ({ bookingId }) => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form 
+                 onSubmit={(e) => {
+                    e.preventDefault();
+                    // Only submit if we're on the final step
+                    if (step === 6) {
+                        handleSubmit(e);
+                    }else{
+                        console.log("Form Submitted");
+                    }
+                }}
+            className="space-y-6">
                 {/* Step 1 - Groom Details */}
                 {step === 1 && (
                     <div className="space-y-4">
@@ -515,9 +525,10 @@ const WeddingForm = ({ bookingId }) => {
                     ) : (
                         <button
                             type="button"
-                            className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors"
+                            onClick={handleSubmit}
+                            className="px-6 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors"
                         >
-                            Submit Wedding Plan
+                            Submit
                         </button>
                     )}
                 </div>
