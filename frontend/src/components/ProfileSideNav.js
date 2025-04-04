@@ -32,7 +32,7 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
             className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
           >
             <div className="flex items-center">
-              <i className="fas fa-calendar mr-3"></i>Events
+              <i className="fas fa-calendar mr-3"></i>Event Planning
             </div>
             <i className={`fas ${openMenu === 'events' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
           </button>
@@ -45,7 +45,7 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                Plan Your Event
+                Plan Event
               </button>
               <button
                 onClick={() => {
