@@ -71,6 +71,12 @@ const MenuManagementSAN = ({ setRenderContent }) => {
           </button>
         </li>
         <li>
+          <button onClick={() => handleRenderContent('ItemCategoryMenuType')} className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-800">
+            <span className="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i className="bx bx-home"></i></span>
+            <span className={`text-sm font-medium ${selected === 'ItemCategoryMenuType' ? 'text-yellow-300' : ''}`}>Create Item Category Menu Type</span>
+          </button>
+        </li>
+        <li>
           <a href="#" className="text-white hover:text-gray-800">
             <span className="inline-flex items-center justify-center h-12 w-12 text-white"><i className="bx bx-log-out"></i></span>
             <span className="text-sm font-medium"><Logout /></span>
