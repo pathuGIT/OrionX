@@ -51,8 +51,6 @@ function UpdateEmployees() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-
-
   };
 
   const handleEdit = async (employeeId) => {
@@ -82,6 +80,38 @@ function UpdateEmployees() {
   };
 
   const handleUpdate = async () => {
+
+    //validation
+    if (!formData.name.trim()) {
+      setErrorMessage("Employee name is required.");
+      return;
+    }
+    
+    if (!formData.phone.trim() || !/^\d{10}$/.test(formData.phone)) {
+      setErrorMessage("Phone number must be 10 digits.");
+      return;
+    }
+    
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setErrorMessage("Enter a valid email address.");
+      return;
+    }
+    
+    if (!formData.salary || isNaN(formData.salary) || formData.salary <= 0) {
+      setErrorMessage("Basic salary must be a positive number.");
+      return;
+    }
+  
+    if (
+      formData.service_charge_precentage === "" ||
+      isNaN(formData.service_charge_precentage) ||
+      formData.service_charge_precentage < 0 ||
+      formData.service_charge_precentage > 100
+    ) {
+      setErrorMessage("Service charge percentage must be between 0 and 100.");
+      return;
+    }
+
     try {
       await updateEmployee(selectedEmployee.employee_id, formData);
       alert("Employee updated successfully");
@@ -91,6 +121,8 @@ function UpdateEmployees() {
       console.error("Error updating employee:", error);
       setErrorMessage("An unexpected error occurred.");
     }
+
+    setErrorMessage("");
   };
   
   const handleUpdateEmployeesStatus = async () => {
