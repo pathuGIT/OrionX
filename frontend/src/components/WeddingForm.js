@@ -464,8 +464,8 @@ const WeddingForm = ({ bookingId }) => {
                     <div className="space-y-4">
                         <div className="border-b pb-4 mb-4">
                             <h3 className="text-xl font-semibold flex items-center gap-2 text-pink-600">
-                                <Scissors className="w-6 h-6" />
-                                Final Details
+                                <Clock className="w-6 h-6" />
+                                Tea & Dress Timings
                             </h3>
                         </div>
 
