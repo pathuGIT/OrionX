@@ -64,7 +64,7 @@ const EventForm = ({ bookingId }) => {
             });
             setStep(1);
         } catch (err) {
-            setError(err.response?.data?.error || "An error occurred while creating the event.");
+            setError(err.response?.data?.error || "Your Event is already Created!");
         }
     };
 
