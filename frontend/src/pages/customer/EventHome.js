@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import EventHomeSideNav from './EventHomeSideNav';
+import EventPlan from './CustomerEventPlanning';
+import DisplayEvents from '../../components/DisplayEvents';
 // import ProfileNavbar from '../components/ProfileNavbar';
-import ProfileSideNav from '../components/ProfileSideNav';
-import CustomerBookings from '../components/CustomerBooking';
 
-const Profile = () => {
+const EventHome = () => {
+  const { bookingId, customerID } = useParams();
   const [activePage, setActivePage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -30,21 +33,30 @@ const Profile = () => {
   const renderContent = () => {
     switch (activePage) {
       case 'plan-event':
-        return <CustomerBookings />;
-      case 'my-events':
-        return <div className="bg-white p-6 rounded-lg shadow"><h2 className="text-2xl font-bold mb-4">My Events</h2></div>;
+        return <EventPlan bookingId={bookingId} />;
+      case 'view-events':
+        return <DisplayEvents customerID={customerID} />;
       case 'dashboard':
       default:
         return (
           <div>
-            <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+            <h1 className="text-2xl font-bold mb-6">Event Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-lg shadow">
                 <div className="flex items-center">
                   <i className="fas fa-calendar-check text-blue-500 text-2xl mr-4"></i>
                   <div>
-                    <p className="text-gray-500">Upcoming Events</p>
-                    <h3 className="text-xl font-bold">2</h3>
+                    <p className="text-gray-500">Active Bookings</p>
+                    <h3 className="text-xl font-bold ">2</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="flex items-center">
+                  <i className="fas fa-clock text-yellow-500 text-2xl mr-4"></i>
+                  <div>
+                    <p className="text-gray-500">Pending Events</p>
+                    <h3 className="text-xl font-bold">1</h3>
                   </div>
                 </div>
               </div>
@@ -67,7 +79,7 @@ const Profile = () => {
           ></div>
         )}
 
-        <ProfileSideNav
+        <EventHomeSideNav
           setActivePage={setActivePage}
           closeSidebar={closeSidebar}
           className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -87,4 +99,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default EventHome;

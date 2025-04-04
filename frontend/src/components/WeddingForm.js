@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createWedding } from "../services/EventService"; // Import API function
 
-const WeddingForm = () => {
+const WeddingForm = ({ bookingId }) => {
     const [formData, setFormData] = useState({
         groomName: "kamal",
         brideName: "kamala",
@@ -10,12 +10,12 @@ const WeddingForm = () => {
         fountain: "no",
         buffetTimeFrom: "",
         buffetTimeTo: "",
-        additionalTime: "",
+       // additionalTime: "",
         functionDurationFrom: "",
         functionDurationTo: "",
         teaTableTime: "",
         dressTime: "",
-        bookingID: "",
+        bookingID:  bookingId ||"",
         prosperityTable: "no",
         groomAddress: "kalutara",
         brideAddress: "colombo",
@@ -56,7 +56,7 @@ const WeddingForm = () => {
                 fountain: "",
                 buffetTimeFrom: "",
                 buffetTimeTo: "",
-                additionalTime: "",
+                //additionalTime: "",
                 functionDurationFrom: "",
                 functionDurationTo: "",
                 teaTableTime: "",
@@ -142,10 +142,84 @@ const WeddingForm = () => {
 
                         <div className="flex justify-between w-full mt-3">
                             <button type="button" onClick={handleBack} className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
-                            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Submit</button>
+                            <button type="button" onClick={handleNext}
+                                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Next</button>
                         </div>
                     </div>
                 )}
+
+                {step === 4 && (
+                    <div className="flex flex-col items-center">
+                        <h3 className="text-xl font-semibold mb-2">Buffet Timings</h3>
+                        <label className="w-full text-left">Buffet Time From:</label>
+                        <input type="time" name="buffetTimeFrom" value={formData.buffetTimeFrom} onChange={handleChange}
+                            className="w-full p-2 border rounded" />
+
+                        <label className="w-full text-left">Buffet Time To:</label>
+                        <input type="time" name="buffetTimeTo" value={formData.buffetTimeTo} onChange={handleChange}
+                            className="w-full p-2 border rounded" />
+
+                        <div className="flex justify-between w-full mt-3">
+                            <button type="button" onClick={handleBack}
+                                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
+                            <button type="button" onClick={handleNext}
+                                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Next</button>
+                        </div>
+                    </div>
+                )}
+
+                {step === 5 && (
+                    <div className="flex flex-col items-center">
+                        <h3 className="text-xl font-semibold mb-2">Function Durations</h3>
+
+
+                        <label className="w-full text-left">Function Duration From:</label>
+                        <input type="time" name="functionDurationFrom" value={formData.functionDurationFrom} onChange={handleChange}
+                            className="w-full p-2 border rounded" />
+
+                        <label className="w-full text-left">Function Duration To:</label>
+                        <input type="time" name="functionDurationTo" value={formData.functionDurationTo} onChange={handleChange}
+                            className="w-full p-2 border rounded" />
+{/* 
+                        <label className="w-full text-left">Additional Time(if):</label>
+                        <input type="time" name="additionalTime" value={formData.additionalTime} onChange={handleChange}
+                            className="w-full p-2 border rounded" /> */}
+
+                        <div className="flex justify-between w-full mt-3">
+                            <button type="button" onClick={handleBack}
+                                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back</button>
+                            <button type="button" onClick={handleNext}
+                                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Next</button>
+                        </div>
+                    </div>
+                )}
+
+                {step === 6 && (
+                    <div className="flex flex-col items-center">
+                        <h3 className="text-xl font-semibold mb-2">Tea & Dress Timings</h3>
+                        <label className="w-full text-left">Tea Table Time:</label>
+                        <input type="time" name="teaTableTime" value={formData.teaTableTime} onChange={handleChange}
+                            className="w-full p-2 border rounded" />
+
+                        <label className="w-full text-left">Dress Time:</label>
+                        <input type="time" name="dressTime" value={formData.dressTime} onChange={handleChange}
+                            className="w-full p-2 border rounded" />
+                        <div className="flex justify-between w-full mt-3">
+                            <button type="button" onClick={handleBack}
+                                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+                                Back
+                            </button>
+                            <button type="submit"
+                                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                                Submit
+                            </button>
+                        </div>
+
+                    </div>
+                )}
+
+
+
             </form>
         </div>
     );

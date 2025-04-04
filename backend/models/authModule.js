@@ -15,3 +15,27 @@ export const isRefreshTokenValidModel = async (userId, token) => {
     }
     return rows[0].refresh_token === token;
 };
+
+export const checkEmailModel = async (email) => {
+    const [rows] = await pool.query(
+        'SELECT email, "employee" AS source_table FROM employee WHERE email = ? UNION SELECT email, "customer" AS source_table FROM customer WHERE email = ?',
+        [email, email]
+    );
+    return rows[0];
+};
+
+// export const addOtpModel = async (email, otp, source_table) => {
+//     await pool.query(
+//         'INSERT INTO otp_store (email, otp, created_at, source_table) VALUES (?, ?, NOW(), ?)',
+//         [email, otp, source_table]
+//     );
+// };
+
+// export const deleteOtpModel = async (email) => {
+//     await pool.query('DELETE FROM otp_store WHERE email = ?', [email]);
+// };
+
+// export const getOtpByEmailModel = async (email) => {
+//     const [rows] = await pool.query('SELECT otp, created_at FROM otp_store WHERE email = ?', [email]);
+//     return rows.length > 0 ? rows[0] : null;
+// };

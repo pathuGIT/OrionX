@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import { createEvents } from "../services/EventService"; // Import API function
 
-const EventForm = () => {
+
+const EventForm = ({ bookingId }) => {
+
+     // Log the bookingId for debugging
     const [formData, setFormData] = useState({
         eventName: "",
         buffetTimeFrom: "",
         buffetTimeTo: "",
-        additionalTime: "",
+      //  additionalTime: "",
         functionDurationFrom: "",
         functionDurationTo: "",
         teaTableTime: "",
         dressTime: "",
-        bookingID: "",
+        bookingID: bookingId || "",
         contactPersonName: "",
         contactPersonNumber: "",
     });
@@ -43,7 +46,7 @@ const EventForm = () => {
                 eventName: "",
                 buffetTimeFrom: "",
                 buffetTimeTo: "",
-                additionalTime: "",
+               // additionalTime: "",
                 functionDurationFrom: "",
                 functionDurationTo: "",
                 teaTableTime: "",
@@ -68,15 +71,6 @@ const EventForm = () => {
                         <label className="w-full text-left">Event Name:</label>
                         <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} required
                             className="w-full p-2 border rounded" />
-                        <label className="w-full text-left">Booking ID:</label>
-                        <input
-                            type="text"
-                            name="bookingID"
-                            value={formData.bookingID}
-                            onChange={handleChange}
-                            required
-                            className="w-full p-2 border rounded"
-                        />
                         <label className="w-full text-left">Contact Person Name:</label>
                         <input
                             type="text"
@@ -133,10 +127,10 @@ const EventForm = () => {
                         <label className="w-full text-left">Function Duration To:</label>
                         <input type="time" name="functionDurationTo" value={formData.functionDurationTo} onChange={handleChange}
                             className="w-full p-2 border rounded" />
-
+{/* 
                         <label className="w-full text-left">Additional Time(if):</label>
                         <input type="time" name="additionalTime" value={formData.additionalTime} onChange={handleChange}
-                            className="w-full p-2 border rounded" />
+                            className="w-full p-2 border rounded" /> */}
 
                         <div className="flex justify-between w-full mt-3">
                             <button type="button" onClick={handleBack}
