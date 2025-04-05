@@ -141,6 +141,7 @@ export const addCategory = async (category) => {
   }
 };
 
+//to display a category by id
 export const getCategoryById = async (id) => {
   try {
     const response = await api.get(`/categories/get/${id}`);
@@ -151,6 +152,7 @@ export const getCategoryById = async (id) => {
   }
 }; 
 
+//to delete a category 
 export const deleteCategory = async (id) => {
   try {
     const response = await api.delete(`/categories/delete/${id}`);
@@ -161,6 +163,7 @@ export const deleteCategory = async (id) => {
   }
 }; 
 
+//to update a category
 export const updateCategoryById = async (id, data) => {
   console.log(id,data);
   const name = {category_name:data}
@@ -197,6 +200,7 @@ export const addItem = async (item) => {
   }
 };
 
+//to diplay an item by id
 export const getItemById = async (id) => {
   try {
     const response = await api.get(`/items/get/${id}`);
@@ -208,7 +212,7 @@ export const getItemById = async (id) => {
 }; 
 
 
-
+//to delete an item 
 export const deleteItem = async (id) => {
   try {
     const response = await api.delete(`/items/delete/${id}`);
@@ -219,7 +223,7 @@ export const deleteItem = async (id) => {
   }
 }; 
 
-
+//to update an item
 export const updateItem = async (id, data) => {
   console.log(id, data);
   const name = { item_name: data }; 
@@ -260,7 +264,7 @@ export const addCategoryMenuType = async (categoryMenu) => {
   }
 };
 
-
+//to display a category menu type by id
 export const getCategoryMenuTypeById = async (id) => {
   try {
     const response = await api.get(`/categoryMenuTypes/get/${id}`);
@@ -271,6 +275,7 @@ export const getCategoryMenuTypeById = async (id) => {
   }
 }; 
 
+//to delete a category menu type
 export const deleteCategoryMenuType = async (id) => {
   try {
     const response = await api.delete(`/categoryMenuTypes/delete/${id}`);
@@ -281,7 +286,8 @@ export const deleteCategoryMenuType = async (id) => {
   }
 }; 
 
-export const updateCategoryMenuTypeById = async (id, data) => {
+//to update a catedory menu type by id
+export const updateCategoryMenuType = async (id, data) => {
   console.log(id,data);
   const name = {categoryMenuType_name:data}
   try {
