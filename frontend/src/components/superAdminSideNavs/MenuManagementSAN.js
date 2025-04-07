@@ -6,6 +6,7 @@ import CreateMenuType from '../../pages/superAdmin/CreateMenuType';
 import CreateCategory from '../../pages/superAdmin/CreateCategories';
 import CreateItem from '../../pages/superAdmin/CreateItem';
 import CreateCategoryMenuType from '../../pages/superAdmin/CreateCategoryMenuType';
+import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategoryMenuType';
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [selected , setSelected] = useState('');
@@ -32,6 +33,9 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         break;
       case 'CreateCategoryMenuType':
         setRenderContent(() => () => <CreateCategoryMenuType />);
+        break;
+      case 'CreateItemCategoryMenuType':
+        setRenderContent(() => () => <CreateItemCategoryMenuType />);
         break;
       default:
         setRenderContent(() => () => <p>Page not found</p>);
@@ -70,12 +74,12 @@ const MenuManagementSAN = ({ setRenderContent }) => {
             <span className={`text-sm font-medium ${selected === 'CreateCategoryMenuType' ? 'text-yellow-300' : ''}`}>Create Category Menu Type</span>
           </button>
         </li>
-        {/* <li>
-          <button onClick={() => handleRenderContent('ItemCategoryMenuType')} className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-800">
+        <li>
+          <button onClick={() => handleRenderContent('CreateItemCategoryMenuType')} className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-800">
             <span className="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i className="bx bx-home"></i></span>
-            <span className={`text-sm font-medium ${selected === 'ItemCategoryMenuType' ? 'text-yellow-300' : ''}`}>Create Item Category Menu Type</span>
+            <span className={`text-sm font-medium ${selected === 'CreateItemCategoryMenuType' ? 'text-yellow-300' : ''}`}>Create Item Category Menu Type</span>
           </button>
-        </li> */}
+        </li>
         <li>
           <a href="#" className="text-white hover:text-gray-800">
             <span className="inline-flex items-center justify-center h-12 w-12 text-white"><i className="bx bx-log-out"></i></span>
