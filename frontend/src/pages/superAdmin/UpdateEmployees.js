@@ -27,6 +27,7 @@ function UpdateEmployees() {
   const [selectedStatus, setSelectedStatus] = useState("active");
   const [filterStatus, setFilterStatus] = useState();
   const [previousFilterStatus, setPreviousFilterStatus] = useState(null); // Track the previous filter status
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   useEffect(() => {
     fetchEmployees();
@@ -50,8 +51,17 @@ function UpdateEmployees() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
   };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredEmployees = employees.filter(
+    (employee) =>
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.employee_id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEdit = async (employeeId) => {
     try {
@@ -80,28 +90,27 @@ function UpdateEmployees() {
   };
 
   const handleUpdate = async () => {
-
     //validation
     if (!formData.name.trim()) {
       setErrorMessage("Employee name is required.");
       return;
     }
-    
+
     if (!formData.phone.trim() || !/^\d{10}$/.test(formData.phone)) {
       setErrorMessage("Phone number must be 10 digits.");
       return;
     }
-    
+
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setErrorMessage("Enter a valid email address.");
       return;
     }
-    
+
     if (!formData.salary || isNaN(formData.salary) || formData.salary <= 0) {
       setErrorMessage("Basic salary must be a positive number.");
       return;
     }
-  
+
     if (
       formData.service_charge_precentage === "" ||
       isNaN(formData.service_charge_precentage) ||
@@ -124,17 +133,14 @@ function UpdateEmployees() {
 
     setErrorMessage("");
   };
-  
+
   const handleUpdateEmployeesStatus = async () => {
     try {
-      
       if (!selectedEmployee || !selectedStatus) {
-       
-       
         alert("Please select an employee and a status.");
         return;
       }
-      console.log("aa",selectedStatus);
+      console.log("aa", selectedStatus);
       await updateEmployeesStatus(selectedEmployee.employee_id, selectedStatus);
       alert("Employee status updated successfully");
 
@@ -158,12 +164,22 @@ function UpdateEmployees() {
   const handleBack = () => {
     setFilterStatus(previousFilterStatus); // Restore the previous filter status
     setPreviousFilterStatus(null);
-    
   };
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg border border-red-500 mt-5">
       <p className="text-xl font-semibold mb-4">Update Employees</p>
+
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name or employee ID"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full h-7 p-2 border border-gray-300 rounded"
+        />
+      </div>
 
       {/* Filter Buttons */}
       <div className="mb-4 flex space-x-4">
@@ -188,7 +204,7 @@ function UpdateEmployees() {
         >
           Inactive
         </button>
-        {  (
+        {(
           <button
             onClick={handleBack}
             className="px-4 py-2 rounded bg-blue-500 text-white"
@@ -230,94 +246,47 @@ function UpdateEmployees() {
         </thead>
 
         <tbody>
-          {employees
-            ? employees.map((employee) => (
-                <tr
-                  key={employee.employee_id}
-                  className="border border-gray-300"
+          {filteredEmployees.map((employee) => (
+            <tr key={employee.employee_id} className="border border-gray-300">
+              <td className="py-1 px-3 border-r border-gray-300">
+                {employee.employee_id}
+              </td>
+              <td className="py-0 px-3 border-r border-gray-300">
+                {employee.name}
+              </td>
+              <td className="py-1 px-2 border-r border-gray-300">
+                {employee.phone}
+              </td>
+              <td className="py-1 px-2 border-r border-gray-300">
+                {employee.email}
+              </td>
+              <td className="py-1 px-2 border-r border-gray-300">
+                {employee.bod && !isNaN(new Date(employee.bod).getTime())
+                  ? new Date(employee.bod).toISOString().split("T")[0]
+                  : "N/A"}
+              </td>
+              <td className="py-1 px-2 border-r border-gray-300">
+                {"Rs " + employee.salary}
+              </td>
+              <td className="py-1 px-2 border-r border-gray-300">
+                {employee.service_charge_precentage + "%"}
+              </td>
+              <td className="py-1 px-2 border-r border-gray-300">
+                {employee.hire_date &&
+                !isNaN(new Date(employee.hire_date).getTime())
+                  ? new Date(employee.hire_date).toISOString().split("T")[0]
+                  : "N/A"}
+              </td>
+              <td className="py-1 px-2">
+                <button
+                  onClick={() => handleActionClick(employee)}
+                  className="bg-blue-500 text-white px-2 py-1 rounded"
                 >
-                  <td className="py-1 px-3 border-r border-gray-300">
-                    {employee.employee_id}
-                  </td>
-                  <td className="py-0 px-3 border-r border-gray-300">
-                    {employee.name}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.phone}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.email}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.bod && !isNaN(new Date(employee.bod).getTime())
-                      ? new Date(employee.bod).toISOString().split("T")[0]
-                      : "N/A"}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {"Rs "+employee.salary}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.service_charge_precentage+"%"}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employee.hire_date &&
-                    !isNaN(new Date(employee.hire_date).getTime())
-                      ? new Date(employee.hire_date).toISOString().split("T")[0]
-                      : "N/A"}
-                  </td>
-                  <td className="py-1 px-2">
-                    <button
-                      onClick={() => handleActionClick(employee)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded"
-                    >
-                      Actions
-                    </button>
-                  </td>
-                </tr>
-              ))
-            : employees && (
-                <tr className="border border-gray-300">
-                  <td className="py-1 px-3 border-r border-gray-300">
-                    {employees.employee_id}
-                  </td>
-                  <td className="py-0 px-3 border-r border-gray-300">
-                    {employees.name}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employees.phone}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employees.email}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employees.bod && !isNaN(new Date(employees.bod).getTime())
-                      ? new Date(employees.bod).toISOString().split("T")[0]
-                      : "N/A"}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employees.salary}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employees.service_charge_precentage}
-                  </td>
-                  <td className="py-1 px-2 border-r border-gray-300">
-                    {employees.hire_date &&
-                    !isNaN(new Date(employees.hire_date).getTime())
-                      ? new Date(employees.hire_date)
-                          .toISOString()
-                          .split("T")[0]
-                      : "N/A"}
-                  </td>
-                  <td className="py-1 px-2">
-                    <button
-                      onClick={() => handleActionClick(employees)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded"
-                    >
-                      Actions
-                    </button>
-                  </td>
-                </tr>
-              )}
+                  Actions
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
