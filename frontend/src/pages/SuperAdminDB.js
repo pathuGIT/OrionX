@@ -36,7 +36,8 @@ const SuperAdminDB = () => {
   // Top navigation bars
   return (
     <div className="flex bg-slate-100" style={{ minHeight: '85vh' }}>
-      <div className="flex flex-col rounded-r-3xl overflow-hidden w-1/5 bg-indigo-600" style={{ backgroundColor: '#4F39F6' }}>
+      {/* overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 */}
+      <div className="flex flex-col rounded-r-3xl overflow-hidden w-1/5 border-l border-gray-200 " style={{ backgroundColor: 'white' }}>
         {renderNavs()}
       </div>
       <div className="border py-2 px-2 bg-slate-100 w-full">

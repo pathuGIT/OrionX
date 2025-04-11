@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { getCategoryMenuTypes, addCategoryMenuType, getMenuTypes } from '../../services/MenuService';
+import { getCategoryMenuTypes, addCategoryMenuType, getMenuTypes, getCategories } from '../../services/MenuService';
 
 function CreateCategoryMenuType() {
   const [categoryMenu, setCategoryMenu] = useState({
@@ -8,17 +9,23 @@ function CreateCategoryMenuType() {
     item_limit: '',
   });
 
-  const [categories, setCategories] = useState([]);
+  const [categortMenuTypes, setCategoryMenuType] = useState([]);
+  const [categoris, setCategory] = useState([]); // For storing the menu types
   const [menuTypes, setMenuTypes] = useState([]); // For storing the menu types
 
   useEffect(() => {
     const fetchCategoriesAndMenuTypes = async () => {
       try {
         // Fetch all categories and menu types
-        const fetchedCategories = await getCategoryMenuTypes();
+        const fetchedCategoryMenuType = await getCategoryMenuTypes();
+        setCategoryMenuType(fetchedCategoryMenuType);
+
+        const fetchedCategories = await getCategories();
         const fetchedMenuTypes = await getMenuTypes();
-        setCategories(fetchedCategories);
+        setCategory(fetchedCategories);
         setMenuTypes(fetchedMenuTypes);
+
+        console.log(fetchedCategoryMenuType);
       } catch (error) {
         console.error('Error fetching categories and menu types:', error);
       }
@@ -36,7 +43,7 @@ function CreateCategoryMenuType() {
 
       // Refresh categories after adding
       const updatedCategories = await getCategoryMenuTypes();
-      setCategories(updatedCategories);
+      setCategoryMenuType(updatedCategories);
     } catch (error) {
       alert('An error occurred while adding the category menu type.');
       console.error(error);
@@ -66,7 +73,7 @@ function CreateCategoryMenuType() {
               <option value="">Select Menu Type</option>
               {menuTypes.map((menuType) => (
                 <option key={menuType.menu_type_id} value={menuType.menu_type_id}>
-                  {menuType.menu_type_name} {/* Displaying the name of the menu type */}
+                  {menuType.menu_type_name} {console.log(menuType.menu_type_id)}
                 </option>
               ))}
             </select>
@@ -82,7 +89,7 @@ function CreateCategoryMenuType() {
               className="block w-full rounded-md bg-white px-3 py-2 border border-gray-300 focus:border-gray-500 focus:outline-none"
             >
               <option value="">Select Category</option>
-              {categories.map((category) => (
+              {categoris.map((category) => (
                 <option key={category.category_id} value={category.category_id}>
                   {category.category_name} {/* Displaying the name of the category */}
                 </option>
@@ -121,11 +128,11 @@ function CreateCategoryMenuType() {
             </tr>
           </thead>
           <tbody>
-            {categories.map((category, index) => (
+            {categortMenuTypes.map((cmt, index) => (
               <tr key={index} className="border">
-                <td className="border px-4 py-2">{category.menu_type_id}</td>
-                <td className="border px-4 py-2">{category.category_name}</td> {/* Displaying the category name */}
-                <td className="border px-4 py-2">{category.item_limit}</td>
+                <td className="border px-4 py-2">{cmt.menu_type_name}</td>
+                <td className="border px-4 py-2">{cmt.category_name}</td> {/* Displaying the category name */}
+                <td className="border px-4 py-2">{cmt.item_limit}</td>
               </tr>
             ))}
           </tbody>
