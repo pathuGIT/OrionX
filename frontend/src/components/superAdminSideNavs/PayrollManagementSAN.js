@@ -11,7 +11,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
             //     setRenderContent(() => () => <AddEmployee />);
             //     break;
             default:
-                setRenderContent(() => () => <p>Page not found</p>);
+                setRenderContent(() => () => <p>Page </p>);
         }
     };
     return (
