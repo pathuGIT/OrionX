@@ -60,8 +60,9 @@ function UpdateEmployees() {
   const filteredEmployees = employees.filter(
     (employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.employee_id.toLowerCase().includes(searchTerm.toLowerCase())
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   const handleEdit = async (employeeId) => {
     try {
@@ -174,7 +175,7 @@ function UpdateEmployees() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by name or employee ID"
+          placeholder="Search by name or email"
           value={searchTerm}
           onChange={handleSearch}
           className="w-full h-7 p-2 border border-gray-300 rounded"
