@@ -32,11 +32,15 @@ const ServicesChargeCalc = () => {
     };
 
     return (
-        <div>
-            <h1>Services Charge Calculation</h1>
-            <div>
-                <label htmlFor="employeeSelect">Select Employee:</label>
-                <select id="employeeSelect" onChange={handleEmployeeSelect}>
+        <div className="p-6 bg-gray-100 min-h-screen">
+            <h1 className="text-2xl font-bold text-center mb-6">Services Charge Calculation</h1>
+            <div className="mb-6">
+                <label htmlFor="employeeSelect" className="block text-lg font-medium mb-2">Select Employee:</label>
+                <select 
+                    id="employeeSelect" 
+                    onChange={handleEmployeeSelect} 
+                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                     <option value="">-- Select --</option>
                     {employees.map(emp => (
                         <option key={emp.employee_id} value={emp.employee_id}>
@@ -47,12 +51,12 @@ const ServicesChargeCalc = () => {
             </div>
 
             {selectedEmployee && (
-                <div>
-                    <h2>Employee Information</h2>
-                    <p><strong>Name:</strong> {selectedEmployee.name}</p>
-                    <p><strong>Salary:</strong> Rs {selectedEmployee.salary}</p>
-                    <p><strong>Service Charge Percentage:</strong> {selectedEmployee.service_charge_precentage}%</p>
-                    <p><strong>Calculated Service Charge:</strong> Rs {serviceCharge}</p>
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4">Employee Information</h2>
+                    <p className="mb-2"><strong>Name:</strong> {selectedEmployee.name}</p>
+                    <p className="mb-2"><strong>Salary:</strong> Rs {selectedEmployee.salary}</p>
+                    <p className="mb-2"><strong>Service Charge Percentage:</strong> {selectedEmployee.service_charge_precentage}%</p>
+                    <p className="mb-2"><strong>Calculated Service Charge:</strong> Rs {serviceCharge}</p>
                 </div>
             )}
         </div>
