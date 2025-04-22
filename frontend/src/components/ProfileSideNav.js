@@ -10,9 +10,9 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
 
   return (
     <aside className="w-64 bg-gray-800 h-full fixed left-0 top-0 md:relative md:translate-x-0 transform transition-transform duration-300 ease-in-out">
-      <div className="flex items-center justify-between h-16 px-4 bg-gray-900">
+      {/* <div className="flex items-center justify-between h-16 px-4 bg-gray-900">
         <span className="text-white text-lg font-bold">Profile</span>
-      </div>
+      </div> */}
       <nav className="mt-5 overflow-y-auto h-[calc(100vh-4rem)]">
         <button
           onClick={() => {
