@@ -11,6 +11,7 @@ import categoryMenuTypeRoutes from "./routes/categoryMenuTypeRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
 import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
 import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
+import bookingRoutes from './routes/bookingRoutes.js';
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.use('/api/items', itemRoutes);
 app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 app.use('/api/customerMenuSelection', customerSelectionRoutes);
 
+//booking routes
+app.use('/api/booking', bookingRoutes);
 
 
 //event routes
