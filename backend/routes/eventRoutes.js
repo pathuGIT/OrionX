@@ -6,6 +6,7 @@ import { getCustomerBookings } from '../controllers/customerBookingController.js
 import { customer } from '../middleware/Customer.js';
 import { getPlannedEvents } from '../controllers/plannedEventController.js';
 import { getServiceVendors } from '../controllers/serviceVendorController.js';
+import { getEventServices } from '../controllers/eventServiceController.js';
 
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
@@ -13,6 +14,7 @@ const weddingRoutes = express.Router();
 const cusBookingRoutes = express.Router();
 const dispayEventsRoutes = express.Router();
 const serviceVendorRoutes = express.Router();
+const EventServiceRoutes = express.Router();
 
 
 //app.js routes -ashen(don't delete this line)
@@ -21,4 +23,5 @@ weddingRoutes.post('/createWedding',customer, createWedding);
 cusBookingRoutes.get('/:customerID',customer,getCustomerBookings);//controller -ashen(don't delete this line)
 dispayEventsRoutes.get('/:customerID',customer,getPlannedEvents);
 serviceVendorRoutes.get('/getServiceVendors',customer, getServiceVendors);
-export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes };
+EventServiceRoutes.get('/getEventService',customer, getEventServices);
+export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes };

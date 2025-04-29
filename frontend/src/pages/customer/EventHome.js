@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import EventHomeSideNav from './EventHomeSideNav';
 import EventPlan from './CustomerEventPlanning';
 import DisplayEvents from '../../components/DisplayEvents';
+import EventServicesSelector from './EventServicesSelector';
 // import ProfileNavbar from '../components/ProfileNavbar';
 
 const EventHome = () => {
@@ -36,6 +37,10 @@ const EventHome = () => {
         return <EventPlan bookingId={bookingId} />;
       case 'view-events':
         return <DisplayEvents customerID={customerID} />;
+      case 'Select-Services':
+        return <EventServicesSelector customerID={customerID} />;
+      case 'view-Vendors':
+        return ;
       case 'dashboard':
       default:
         return (

@@ -3,7 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRouter from './routes/userRouter.js';
 import mailRouter from './routes/mailRouter.js';
-import { eventRoute, weddingRoutes,cusBookingRoutes ,dispayEventsRoutes ,serviceVendorRoutes } from './routes/eventRoutes.js';
+import { eventRoute, weddingRoutes,cusBookingRoutes ,dispayEventsRoutes ,serviceVendorRoutes, EventServiceRoutes } from './routes/eventRoutes.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -38,6 +38,7 @@ app.use('/api/wedding', weddingRoutes);
 app.use('/api/customer', cusBookingRoutes);
 app.use('/api/displayEvents', dispayEventsRoutes);
 app.use('/api/VendorServices', serviceVendorRoutes);
+app.use('/api/EventService', EventServiceRoutes);
 
 
 
