@@ -74,10 +74,7 @@ const Profile = () => {
             } md:translate-x-0`}
         />
 
-        <main
-          className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarOpen ? 'md:ml-3' : 'ml-0'
-            }`}
-        >
+        <main className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarOpen ? 'md:ml-3' : 'ml-0'}`}>
           <div className="bg-white shadow-md rounded-lg p-6">
             {renderContent()}
           </div>
