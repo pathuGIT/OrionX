@@ -1,8 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Logout } from '../../components/Logout';
 
 const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
   const [openMenu, setOpenMenu] = useState(null);
+  const [isHoverSupported, setIsHoverSupported] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover)');
+    const updateHoverSupport = (e) => {
+      setIsHoverSupported(e.matches);
+    };
+    setIsHoverSupported(mediaQuery.matches);
+    mediaQuery.addEventListener('change', updateHoverSupport);
+    return () => {
+      mediaQuery.removeEventListener('change', updateHoverSupport);
+    };
+  }, []);
 
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
@@ -26,13 +39,17 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
 
         <div className="border-t border-gray-700 my-2"></div>
 
-        <div>
+        <div
+          className="relative"
+          onMouseEnter={isHoverSupported ? () => setOpenMenu('events') : undefined}
+          onMouseLeave={isHoverSupported ? () => setOpenMenu(null) : undefined}
+        >
           <button 
-            onClick={() => toggleMenu('events')}
+            onClick={!isHoverSupported ? () => toggleMenu('events') : undefined}
             className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
           >
             <div className="flex items-center">
-              <i className="fas fa-calendar mr-3"></i>Events
+              <i className="fas fa-calendar mr-3"></i>Plan Events
             </div>
             <i className={`fas ${openMenu === 'events' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
           </button>
@@ -54,7 +71,45 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                View Events
+                View Planned Events
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="border-t border-gray-700 my-2"></div>
+        <div
+          className="relative"
+          onMouseEnter={isHoverSupported ? () => setOpenMenu('EventServices') : undefined}
+          onMouseLeave={isHoverSupported ? () => setOpenMenu(null) : undefined}
+        >
+          <button 
+            onClick={!isHoverSupported ? () => toggleMenu('EventServices') : undefined}
+            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
+          >
+            <div className="flex items-center">
+              <i className="fas fa-calendar mr-3"></i>Event Services
+            </div>
+            <i className={`fas ${openMenu === 'EventServices' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+          </button>
+          {openMenu === 'EventServices' && (
+            <div className="bg-gray-700">
+              <button
+                onClick={() => {
+                  setActivePage('Select-Services');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Select Event Services
+              </button>
+              <button
+                onClick={() => {
+                  setActivePage('view-Vendors');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                See Vendors 
               </button>
             </div>
           )}
