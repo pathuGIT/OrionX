@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/Authcontext";
 import { getEventServices, saveSelectedServices } from "../../services/EventService";
-import { CheckCircle, XCircle, PartyPopper, Check, ShoppingCart } from "lucide-react";
+import { CheckCircle, XCircle, PartyPopper, Check } from "lucide-react";
 
 const EventServiceSelector = () => {
     const { user } = useContext(AuthContext);
@@ -22,14 +22,14 @@ const EventServiceSelector = () => {
 
         getEventServices()
             .then(data => {
-                // Validate and transform API response
                 if (!data || !Array.isArray(data)) {
                     throw new Error("Invalid services data format");
                 }
                 
                 const validatedServices = data.map(service => ({
                     id: service.Event_Service_ID,
-                    name: service.Event_Service_Name
+                    name: service.Event_Service_Name,
+                    image: service.Event_Service_Image
                 }));
 
                 setServices(validatedServices);
@@ -123,8 +123,24 @@ const EventServiceSelector = () => {
                                         </div>
                                     </div>
                                     
-                                    <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <ShoppingCart className="w-12 h-12 text-gray-400" />
+                                    <div className="h-48 bg-gray-100 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200">
+                                        {service.image ? (
+                                            <img 
+                                                src={service.image}
+                                                alt={service.name}
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                                onError={(e) => {
+                                                    e.target.onerror = null; 
+                                                    e.target.src = '/default-service-image.jpg';
+                                                }}
+                                                
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                <span className="text-gray-500">No Image Available</span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm">

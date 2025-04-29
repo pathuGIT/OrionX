@@ -40,7 +40,8 @@ export const getEventServices = async () => {
         console.log("API Response:", response.data); // Verify structure here
         return response.data.data.map(service => ({
             Event_Service_ID: service.id || service.serviceId,
-            Event_Service_Name: service.name || service.serviceName
+            Event_Service_Name: service.name || service.serviceName,
+            Event_Service_Image: service.imagePath || service.serviceImage
         }));
     } catch (error) {
         console.error("Error:", error);
@@ -52,7 +53,8 @@ export const saveSelectedServices = async (customerId, services) => {
     try {
         await api.post('/CustomerService/saveServices', {
             customerId,
-            serviceIds: services
+            serviceIds: services,
+            
         });
     } catch (error) {
         throw new Error("Service save failed");

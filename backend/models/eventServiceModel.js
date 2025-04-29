@@ -7,7 +7,8 @@ class EventServiceModel {
             const [results] = await db.query(`
                 SELECT 
                     Event_Service_ID AS id,
-                    Event_Service_Name AS name
+                    Event_Service_Name AS name,
+                    image_path AS imagePath
                 FROM event_service
                 ORDER BY Event_Service_Name
             `);
