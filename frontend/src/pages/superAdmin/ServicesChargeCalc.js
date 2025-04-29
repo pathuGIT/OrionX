@@ -6,6 +6,7 @@ const ServicesChargeCalc = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [serviceCharge, setServiceCharge] = useState(0);
     const [tableData, setTableData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     useEffect(() => {
         // Fetch employees on component mount
@@ -45,6 +46,12 @@ const ServicesChargeCalc = () => {
         }
     };
 
+    // Filter table data based on search query
+    const filteredTableData = tableData.filter(row =>
+        row.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        row.Employee_ID.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-2xl font-bold text-center mb-6">Services Charge Calculation</h1>
@@ -74,6 +81,18 @@ const ServicesChargeCalc = () => {
                 </div>
             )}
 
+            <div className="mb-6">
+                <label htmlFor="search" className="block text-lg font-medium mb-2">Search by Name or Employee ID:</label>
+                <input
+                    id="search"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Enter name or employee ID"
+                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-300">
                     <thead>
@@ -89,7 +108,7 @@ const ServicesChargeCalc = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {tableData.map((row, index) => (
+                        {filteredTableData.map((row, index) => (
                             <tr key={index} className="text-center">
                                 <td className="px-4 py-2 border-b">{row.services_charge_id}</td>
                                 <td className="px-4 py-2 border-b">{row.Employee_ID}</td>
