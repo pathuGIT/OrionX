@@ -38,7 +38,7 @@ const EventHome = () => {
       case 'view-events':
         return <DisplayEvents customerID={customerID} />;
       case 'Select-Services':
-        return <EventServicesSelector customerID={customerID} />;
+        return <EventServicesSelector customerID={customerID}  bookingId={bookingId}/>;
       case 'view-Vendors':
         return ;
       case 'dashboard':

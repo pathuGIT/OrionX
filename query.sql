@@ -243,6 +243,15 @@ CREATE TABLE Event_Cordinator (
 );
 
 
+create table Customer_Event_Service(
+customer_id VARCHAR(100) not null,
+event_service_id VARCHAR(100) not null,
+booking_id VARCHAR(255) NOT NULL,
+FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
+FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
+FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+);
+
 
 
 -- Trigger to format Table_Reserve_ID
