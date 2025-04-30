@@ -62,3 +62,13 @@ export const saveSelectedServices = async (customerId, bookingId, services) => {
         throw new Error(error.response?.data?.message || "Failed to save services");
     }
 };
+
+export const getServiceVendors = async (customerId, bookingId) => {
+    try {
+        const response = await api.get(`/VendorServices/getServiceVendors/${customerId}/${bookingId}`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching vendors:", error);
+        throw new Error(error.response?.data?.message || "Failed to load vendors");
+    }
+};

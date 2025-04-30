@@ -1,27 +1,22 @@
 import db from '../config/db.js';
 
-class ServiceVendorModel {
-    static async getServiceVendors() {
+class serviceVendorModel {
+    static async getVendorsByCustomerBooking(customerId, bookingId) {
         try {
             const [results] = await db.query(`
-                SELECT 
-                    es.Event_Service_ID AS serviceId,
-                    es.Event_Service_Name AS serviceName,
-                    v.Vendor_ID AS vendorId,
-                    v.Contact_no AS contact,
-                    v.Email AS email,
-                    v.Address AS address
-                FROM event_service es
-                JOIN event_service_vendor esv ON es.Event_Service_ID = esv.event_service_id
+                SELECT DISTINCT v.Vendor_ID, v.Contact_no, v.Email, v.Address
+                FROM Customer_Event_Service ces
+                JOIN event_service_vendor esv ON ces.event_service_id = esv.event_service_id
                 JOIN vendor v ON esv.vendor_id = v.Vendor_ID
-                ORDER BY es.Event_Service_Name, v.Vendor_ID
-            `);
+                WHERE ces.customer_id = ? AND ces.booking_id = ?
+            `, [customerId, bookingId]);
+
             return results;
         } catch (error) {
-            console.error("Database Error (getServiceVendors):", error.message || error);
-            throw new Error(error.message || "Failed to fetch service vendors");
+            console.error("Database Error (getVendorsByCustomerBooking):", error);
+            throw new Error("Failed to fetch vendors");
         }
     }
 }
 
-export default ServiceVendorModel;
+export default serviceVendorModel;
