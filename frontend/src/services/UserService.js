@@ -56,7 +56,7 @@ export const getEmployeesByStatus = async (status) => {
 // Get all service charge data
 export const getAllServiceChargeData = async () => {
     const response = await api.get("/user/getAllServiceChargeData");
-    console.log("adoooo");
-    console.log(response.data);
+    // console.log("adoooo");
+    // console.log(response.data);
     return response.data;
 };

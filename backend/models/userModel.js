@@ -207,5 +207,5 @@ JOIN
 JOIN
     event ev ON ea.event_id = ev.Event_ID;`
     );
-    return result[0];
+    return result;
 };
