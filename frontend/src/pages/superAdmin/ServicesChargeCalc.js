@@ -1,123 +1,105 @@
-import React, { useState, useEffect } from 'react';
-import { getEmployees } from '../../services/UserService'; // Assuming this service fetches employee data
+import React, { useEffect, useState } from 'react';
+import { getAllServiceChargeData } from '../../services/UserService';
 
-const ServicesChargeCalc = () => {
-    const [employees, setEmployees] = useState([]);
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
-    const [serviceCharge, setServiceCharge] = useState(0);
-    const [tableData, setTableData] = useState([]);
-    const [searchQuery, setSearchQuery] = useState(''); // State for search query
+const ServiceChargeTable = () => {
+    const [serviceChargeData, setServiceChargeData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedMonth, setSelectedMonth] = useState(''); // State for selected month
 
     useEffect(() => {
-        // Fetch employees on component mount
-        const fetchEmployees = async () => {
+        const fetchServiceChargeData = async () => {
             try {
-                const response = await getEmployees();
-                setEmployees(response.employees);
+                const response = await getAllServiceChargeData(); // Use the imported function
+                console.log('Fetched Data:', response); // Log the fetched data
+                const data = Array.isArray(response) ? response : [];
+                setServiceChargeData(data); // Set the full data
+                setFilteredData(data); // Initially, show all data
+                setLoading(false);
             } catch (error) {
-                console.error('Error fetching employees:', error);
+                console.error('Error fetching service charge data:', error);
+                setLoading(false);
             }
         };
-        fetchEmployees();
+
+        fetchServiceChargeData();
     }, []);
 
-    const handleEmployeeSelect = (e) => {
-        const employeeId = e.target.value;
-        const employee = employees.find(emp => emp.employee_id === employeeId);
-        setSelectedEmployee(employee);
-
-        // Calculate service charge
-        if (employee) {
-            const charge = (employee.salary * employee.service_charge_precentage) / 100;
-            setServiceCharge(charge);
-
-            // Add data to the table
-            const newRow = {
-                services_charge_id: `SC-${employee.employee_id}`,
-                Employee_ID: employee.employee_id,
-                Name: employee.name,
-                service_charge_precentage: employee.service_charge_precentage,
-                Hire_Date: employee.hire_date || 'N/A', // Replace with actual data if available
-                amount: charge,
-                Booking_Date: new Date().toISOString().split('T')[0], // Current date
-                Status: 'Pending', // Default status
-            };
-            setTableData(prevData => [...prevData, newRow]);
+    // Filter data based on the selected month
+    useEffect(() => {
+        if (selectedMonth === '') {
+            setFilteredData(serviceChargeData); // Show all data if no month is selected
+        } else {
+            const filtered = serviceChargeData.filter((row) => {
+                const eventDate = new Date(row.Date); // Convert the date string to a Date object
+                return eventDate.getMonth() + 1 === parseInt(selectedMonth); // Match the month (getMonth() is 0-based)
+            });
+            setFilteredData(filtered);
         }
-    };
+    }, [selectedMonth, serviceChargeData]);
 
-    // Filter table data based on search query
-    const filteredTableData = tableData.filter(row =>
-        row.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.Employee_ID.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (!Array.isArray(filteredData) || filteredData.length === 0) {
+        return <p>No data available</p>;
+    }
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-2xl font-bold text-center mb-6">Services Charge Calculation</h1>
+            <h1 className="text-2xl font-bold text-center mb-6">Service Charge Data</h1>
+
+            {/* Month Selector */}
             <div className="mb-6">
-                <label htmlFor="employeeSelect" className="block text-lg font-medium mb-2">Select Employee:</label>
-                <select 
-                    id="employeeSelect" 
-                    onChange={handleEmployeeSelect} 
+                <label htmlFor="monthSelect" className="block text-lg font-medium mb-2">
+                    Select Month:
+                </label>
+                <select
+                    id="monthSelect"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    <option value="">-- Select --</option>
-                    {employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                            {emp.name}
-                        </option>
-                    ))}
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
                 </select>
-            </div>
-
-            {selectedEmployee && (
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 className="text-xl font-semibold mb-4">Employee Information</h2>
-                    <p className="mb-2"><strong>Name:</strong> {selectedEmployee.name}</p>
-                    <p className="mb-2"><strong>Salary:</strong> Rs {selectedEmployee.salary}</p>
-                    <p className="mb-2"><strong>Service Charge Percentage:</strong> {selectedEmployee.service_charge_precentage}%</p>
-                    <p className="mb-2"><strong>Calculated Service Charge:</strong> Rs {serviceCharge}</p>
-                </div>
-            )}
-
-            <div className="mb-6">
-                <label htmlFor="search" className="block text-lg font-medium mb-2">Search by Name or Employee ID:</label>
-                <input
-                    id="search"
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Enter name or employee ID"
-                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
             </div>
 
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-300">
                     <thead>
                         <tr>
-                            <th className="px-4 py-2 border-b">Services Charge ID</th>
+                            <th className="px-4 py-2 border-b">Service Charge ID</th>
                             <th className="px-4 py-2 border-b">Employee ID</th>
-                            <th className="px-4 py-2 border-b">Name</th>
+                            <th className="px-4 py-2 border-b">Employee Name</th>
                             <th className="px-4 py-2 border-b">Service Charge %</th>
-                            <th className="px-4 py-2 border-b">Hire Date</th>
-                            <th className="px-4 py-2 border-b">Amount</th>
-                            <th className="px-4 py-2 border-b">Booking Date</th>
-                            <th className="px-4 py-2 border-b">Status</th>
+                            <th className="px-4 py-2 border-b">Base Amount</th>
+                            <th className="px-4 py-2 border-b">Service Charge Amount</th>
+                            <th className="px-4 py-2 border-b">Event Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredTableData.map((row, index) => (
+                        {filteredData.map((row, index) => (
                             <tr key={index} className="text-center">
                                 <td className="px-4 py-2 border-b">{row.services_charge_id}</td>
-                                <td className="px-4 py-2 border-b">{row.Employee_ID}</td>
-                                <td className="px-4 py-2 border-b">{row.Name}</td>
+                                <td className="px-4 py-2 border-b">{row.employee_id}</td>
+                                <td className="px-4 py-2 border-b">{row.name}</td>
                                 <td className="px-4 py-2 border-b">{row.service_charge_precentage}%</td>
-                                <td className="px-4 py-2 border-b">{row.Hire_Date}</td>
-                                <td className="px-4 py-2 border-b">Rs {row.amount}</td>
-                                <td className="px-4 py-2 border-b">{row.Booking_Date}</td>
-                                <td className="px-4 py-2 border-b">{row.Status}</td>
+                                <td className="px-4 py-2 border-b">Rs {row.base_amount}</td>
+                                <td className="px-4 py-2 border-b">Rs {row.service_charge_amount}</td>
+                                <td className="px-4 py-2 border-b">{row.Date}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -127,4 +109,4 @@ const ServicesChargeCalc = () => {
     );
 };
 
-export default ServicesChargeCalc;
+export default ServiceChargeTable;

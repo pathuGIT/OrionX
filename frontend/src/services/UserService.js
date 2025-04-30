@@ -52,3 +52,11 @@ export const getEmployeesByStatus = async (status) => {
     const response = await api.get(`/user/getEmployeesByStatus/${status}`);
     return response.data;
 };
+
+// Get all service charge data
+export const getAllServiceChargeData = async () => {
+    const response = await api.get("/user/getAllServiceChargeData");
+    // console.log("adoooo");
+    // console.log(response.data);
+    return response.data;
+};
