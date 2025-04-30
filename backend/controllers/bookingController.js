@@ -32,6 +32,7 @@ export const addVenue = async (req, res) => {
         await addNewVenue({ name, time, location, minCapacity, maxCapacity, price });
         res.status(201).json({ message: `Venue added successfully` });
     } catch (error) {
+        console.error(error); // <-- add this
         res.status(500).json({ msg: 'Server error...', error });
     }
 
@@ -77,7 +78,7 @@ export const getVenueById = async (req, res) => {
     try {
         const result = await getVenueByIdModel(id);
 
-        if (!result || result.length === 0) { 
+        if (!result || result.length === 0) {
             return res.status(404).json({ msg: "Venue not found." });
         }
 
@@ -121,7 +122,7 @@ export const updateVenueById = async (req, res) => {
     }
 
     try {
-        await updateNewVenueModel({id, name, time, location, minCapacity, maxCapacity, price });
+        await updateNewVenueModel({ id, name, time, location, minCapacity, maxCapacity, price });
         res.status(201).json({ message: `Venue updated successfully` });
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
