@@ -184,17 +184,16 @@ export const getEmployeesByStatus = async (req, res) => {
     }
 };
 
-//get  service charge data
-export const calculateServiceCharge = async (req, res) => {
-    const { employee_id } = req.body;
+
+
+// Get all service charge data
+export const getAllServiceChargeData = async (req, res) => {
     try {
-        const employee = await getAllServiceChargeDataModel(employee_id);
-        if (!employee) return res.status(404).json({ message: 'Employee not found' });
-        
-        const serviceCharge = (employee.salary * employee.service_charge_precentage) / 100;
-        res.status(200).json({ serviceCharge });
+        const data = await getAllServiceChargeDataModel();
+        res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ msg: 'Server error...', error });
+        console.error('Error fetching service charge data:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
     
