@@ -54,9 +54,26 @@ export const getEmployeesByStatus = async (status) => {
 };
 
 // Get all service charge data
+// export const getAllServiceChargeData = async () => {
+//     const response = await api.get("/user/getAllServiceChargeData");
+//     // console.log("adoooo");
+//     // console.log(response.data);
+//     return response.data;
+// };
+// Service Charge Calculation Logic
+// export const calculateServiceChargeDistribution = async () => {
+//     const response = await api.get("/user/getAllServiceChargeData");
+//     return response.data;
+// };
+
 export const getAllServiceChargeData = async () => {
     const response = await api.get("/user/getAllServiceChargeData");
-    // console.log("adoooo");
-    // console.log(response.data);
+    return response.data.historicalData || [];
+};
+
+export const calculateServiceChargeDistribution = async (totalCollected) => {
+    const response = await api.post("/user/getAllServiceChargeData", {
+        totalCollectedServiceCharge: totalCollected
+    });
     return response.data;
 };

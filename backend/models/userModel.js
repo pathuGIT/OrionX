@@ -202,77 +202,68 @@ export const updatePasswordByEmail = async (newPassword, email, table) => {
   return result.affectedRows; // Returns the number of rows affected
 };
 
-//get all service charge data
-export const getAllServiceChargeDataModel = async () => {
-  const [result] = await pool.query(
-    `SELECT
-    sc.services_charge_id,
-    ae.Employee_ID AS employee_id,
-    ea.event_id,
-    e.name,
-    e.service_charge_precentage,
-    sc.amount AS base_amount,
-    ROUND((sc.amount * e.service_charge_precentage / 100), 2) AS service_charge_amount,
-    DATE_FORMAT(ea.event_date, "%Y-%m-%d") AS Date
-FROM
-    assigned_employee ae
-JOIN
-    employee e ON ae.Employee_ID = e.employee_id
-JOIN
-    services_charge sc ON ae.Employee_Assign_ID = sc.employee_assign_id
-JOIN
-    event_assigned_employee ea ON ae.Employee_Assign_ID = ea.employee_assign_id
-JOIN
-    event ev ON ea.event_id = ev.Event_ID;`
-  );
-  return result;
-};
-// Service Charge Calculation Logic
-export const calculateServiceChargeDistributionModel = async (totalCollectedServiceCharge) => {
-    try {
-      // 1. Get active employees with their roles and weights
+export class ServiceChargeModel {
+    // Get historical service charge records
+    static async getAllRecords() {
+      const [results] = await pool.query(`
+        SELECT
+          sc.services_charge_id,
+          ae.Employee_ID AS employee_id,
+          ea.event_id,
+          e.name,
+          ae.User_Role,
+          e.service_charge_precentage,
+          sc.amount AS base_amount,
+          ROUND((sc.amount * e.service_charge_precentage / 100), 2) AS service_charge_amount,
+          DATE_FORMAT(ea.event_date, "%Y-%m-%d") AS date
+        FROM assigned_employee ae
+        JOIN employee e ON ae.Employee_ID = e.employee_id
+        JOIN services_charge sc ON ae.Employee_Assign_ID = sc.employee_assign_id
+        JOIN event_assigned_employee ea ON ae.Employee_Assign_ID = ea.employee_assign_id
+      `);
+      return results;
+    }
+  
+    // Calculate service charge distribution
+    static async calculateDistribution(totalCollected) {
       const [categories] = await pool.query(`
         SELECT 
           ae.User_Role AS role,
-          (e.service_charge_precentage / 100) AS category_weight,
+          (e.service_charge_precentage / 100) AS weight,
           COUNT(e.employee_id) AS employee_count
         FROM employee e
         INNER JOIN systemuser su ON e.employee_id = su.employee_id
         INNER JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
         WHERE su.status = 'active'
+          AND ae.Employee_Assign_ID IS NOT NULL
         GROUP BY ae.User_Role, e.service_charge_precentage
+        HAVING employee_count > 0
       `);
   
-      // 2. Calculate Total Weighted Employees
-      let totalWeightedEmployees = categories.reduce((sum, category) => {
-        return sum + (category.category_weight * category.employee_count);
-      }, 0);
-  
-      if (totalWeightedEmployees === 0) {
-        throw new Error("Cannot calculate - no active employees or invalid categories");
+      if (categories.length === 0) {
+        throw new Error("No eligible employees available for distribution");
       }
   
-      // 3. Calculate Base Rate
-      const baseRate = totalCollectedServiceCharge / totalWeightedEmployees;
+      const totalWeight = categories.reduce((sum, { weight, employee_count }) => 
+        sum + (weight * employee_count), 0);
   
-      // 4. Calculate distribution with proper field names
-      const distribution = categories.map(category => ({
-        role: category.role,
-        categoryWeight: category.category_weight,
-        numberOfEmployees: category.employee_count,
-        perEmployeeAmount: category.category_weight * baseRate,
-        totalForCategory: category.category_weight * baseRate * category.employee_count
+      const baseRate = totalCollected / totalWeight;
+      const distribution = categories.map(({ role, weight, employee_count }) => ({
+        role,
+        weight: +weight.toFixed(4),
+        employeeCount: employee_count,
+        perEmployee: +(weight * baseRate).toFixed(2),
+        totalForCategory: +(weight * baseRate * employee_count).toFixed(2)
       }));
   
       return {
-        totalCollectedServiceCharge,
-        totalWeightedEmployees: parseFloat(totalWeightedEmployees.toFixed(2)),
-        baseRate: parseFloat(baseRate.toFixed(2)),
+        totalCollected: +totalCollected.toFixed(2),
+        totalWeight: +totalWeight.toFixed(2),
+        baseRate: +baseRate.toFixed(2),
         distribution,
-        grandTotal: distribution.reduce((sum, item) => sum + item.totalForCategory, 0)
+        grandTotal: +distribution
+          .reduce((sum, { totalForCategory }) => sum + totalForCategory, 0)
+          .toFixed(2)
       };
-  
-    } catch (error) {
-      throw error;
     }
-  };
+  }

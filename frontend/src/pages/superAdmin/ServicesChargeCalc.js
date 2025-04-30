@@ -5,16 +5,22 @@ const ServiceChargeTable = () => {
     const [serviceChargeData, setServiceChargeData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedMonth, setSelectedMonth] = useState(''); // State for selected month
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const [totalDistributed, setTotalDistributed] = useState(0);
 
     useEffect(() => {
         const fetchServiceChargeData = async () => {
             try {
-                const response = await getAllServiceChargeData(); // Use the imported function
-                console.log('Fetched Data:', response); // Log the fetched data
+                const response = await getAllServiceChargeData();
                 const data = Array.isArray(response) ? response : [];
-                setServiceChargeData(data); // Set the full data
-                setFilteredData(data); // Initially, show all data
+                
+                // Calculate total distributed once on load
+                const total = data.reduce((sum, item) => 
+                    sum + parseFloat(item.service_charge_amount || 0), 0);
+                
+                setServiceChargeData(data);
+                setFilteredData(data);
+                setTotalDistributed(total);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching service charge data:', error);
@@ -25,81 +31,154 @@ const ServiceChargeTable = () => {
         fetchServiceChargeData();
     }, []);
 
-    // Filter data based on the selected month
     useEffect(() => {
-        if (selectedMonth === '') {
-            setFilteredData(serviceChargeData); // Show all data if no month is selected
-        } else {
-            const filtered = serviceChargeData.filter((row) => {
-                const eventDate = new Date(row.Date); // Convert the date string to a Date object
-                return eventDate.getMonth() + 1 === parseInt(selectedMonth); // Match the month (getMonth() is 0-based)
-            });
-            setFilteredData(filtered);
-        }
+        const filterData = () => {
+            if (selectedMonth === '') {
+                setFilteredData(serviceChargeData);
+                setTotalDistributed(
+                    serviceChargeData.reduce((sum, item) => 
+                        sum + parseFloat(item.service_charge_amount || 0), 0)
+                );
+            } else {
+                const filtered = serviceChargeData.filter((row) => {
+                    const eventDate = new Date(row.date);
+                    return eventDate.getMonth() + 1 === parseInt(selectedMonth);
+                });
+                
+                setFilteredData(filtered);
+                setTotalDistributed(
+                    filtered.reduce((sum, item) => 
+                        sum + parseFloat(item.service_charge_amount || 0), 0)
+                );
+            }
+        };
+
+        filterData();
     }, [selectedMonth, serviceChargeData]);
 
+    const formatCurrency = (value) => {
+        return parseFloat(value || 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
+
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <div className="p-6 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                <p className="mt-4 text-gray-600">Loading service charge data...</p>
+            </div>
+        );
     }
 
     if (!Array.isArray(filteredData) || filteredData.length === 0) {
-        return <p>No data available</p>;
+        return (
+            <div className="p-6 text-center">
+                <p className="text-gray-600">No service charge records found</p>
+                {serviceChargeData.length > 0 && (
+                    <button 
+                        onClick={() => setSelectedMonth('')}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                        Clear Filters
+                    </button>
+                )}
+            </div>
+        );
     }
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-2xl font-bold text-center mb-6">Service Charge Data</h1>
+            <h1 className="text-2xl font-bold text-center mb-6">Service Charge Distribution Report</h1>
 
-            {/* Month Selector */}
-            <div className="mb-6">
-                <label htmlFor="monthSelect" className="block text-lg font-medium mb-2">
-                    Select Month:
-                </label>
-                <select
-                    id="monthSelect"
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">All Months</option>
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
+            {/* Controls Section */}
+            <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <div className="w-full sm:w-64">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Filter by Month:
+                    </label>
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">All Months</option>
+                        {Array.from({length: 12}, (_, i) => (
+                            <option key={i+1} value={i+1}>
+                                {new Date(0, i).toLocaleString('default', {month: 'long'})}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Summary Cards */}
+                <div className="w-full sm:w-auto grid grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-lg shadow">
+                        <h3 className="text-sm font-medium text-gray-500">Total Distributed</h3>
+                        <p className="mt-1 text-xl font-semibold text-green-600">
+                            LKR {formatCurrency(totalDistributed)}
+                        </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow">
+                        <h3 className="text-sm font-medium text-gray-500">Total Records</h3>
+                        <p className="mt-1 text-xl font-semibold text-blue-600">
+                            {filteredData.length}
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-300">
-                    <thead>
+            {/* Data Table */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-4 py-2 border-b">Service Charge ID</th>
-                            <th className="px-4 py-2 border-b">Employee ID</th>
-                            <th className="px-4 py-2 border-b">Employee Name</th>
-                            <th className="px-4 py-2 border-b">Service Charge %</th>
-                            <th className="px-4 py-2 border-b">Base Amount</th>
-                            <th className="px-4 py-2 border-b">Service Charge Amount</th>
-                            <th className="px-4 py-2 border-b">Event Date</th>
+                            {[
+                                'SC ID', 'Employee ID', 'Event ID', 
+                                'Role', 'Charge %', 'Base Amount', 
+                                'Service Charge', 'Date'
+                            ].map((header, idx) => (
+                                <th 
+                                    key={idx}
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                >
+                                    {header}
+                                </th>
+                            ))}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-white divide-y divide-gray-200">
                         {filteredData.map((row, index) => (
-                            <tr key={index} className="text-center">
-                                <td className="px-4 py-2 border-b">{row.services_charge_id}</td>
-                                <td className="px-4 py-2 border-b">{row.employee_id}</td>
-                                <td className="px-4 py-2 border-b">{row.name}</td>
-                                <td className="px-4 py-2 border-b">{row.service_charge_precentage}%</td>
-                                <td className="px-4 py-2 border-b">Rs {row.base_amount}</td>
-                                <td className="px-4 py-2 border-b">Rs {row.service_charge_amount}</td>
-                                <td className="px-4 py-2 border-b">{row.Date}</td>
+                            <tr key={index} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {row.services_charge_id}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                                    {row.employee_id}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {row.event_id}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {row.User_Role}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {row.service_charge_precentage}%
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    LKR {formatCurrency(row.base_amount)}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                                    LKR {formatCurrency(row.service_charge_amount)}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {new Date(row.date).toLocaleDateString('en-GB', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric'
+                                    })}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
