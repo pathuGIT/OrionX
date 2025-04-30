@@ -4,6 +4,7 @@ import EventHomeSideNav from './EventHomeSideNav';
 import EventPlan from './CustomerEventPlanning';
 import DisplayEvents from '../../components/DisplayEvents';
 import EventServicesSelector from './EventServicesSelector';
+import ServiceVendor from './ServiceVendor';
 // import ProfileNavbar from '../components/ProfileNavbar';
 
 const EventHome = () => {
@@ -38,9 +39,9 @@ const EventHome = () => {
       case 'view-events':
         return <DisplayEvents customerID={customerID} />;
       case 'Select-Services':
-        return <EventServicesSelector customerID={customerID} />;
+        return <EventServicesSelector customerID={customerID}  bookingId={bookingId}/>;
       case 'view-Vendors':
-        return ;
+        return <ServiceVendor customerID={customerID}  bookingId={bookingId} />;
       case 'dashboard':
       default:
         return (

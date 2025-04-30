@@ -1,37 +1,28 @@
 import ServiceVendorModel from '../models/serviceVendorModel.js';
 
-export const getServiceVendors = async (req, res) => {
+export const getVendorsForCustomerBooking = async (req, res) => {
     try {
-        const results = await ServiceVendorModel.getServiceVendors();
+        const { customerId, bookingId } = req.params;
         
-        const groupedData = results.reduce((acc, row) => {
-            if (!acc[row.serviceId]) {
-                acc[row.serviceId] = {
-                    serviceId: row.serviceId,
-                    serviceName: row.serviceName,
-                    vendors: []
-                };
-            }
-            acc[row.serviceId].vendors.push({
-                vendorId: row.vendorId,
-                contact: row.contact,
-                email: row.email,
-                address: row.address
+        if (!customerId || !bookingId) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing customer ID or booking ID"
             });
-            return acc;
-        }, {});
+        }
 
-        res.status(200).json({ 
-            success: true, 
-            message: "Service vendors fetched successfully",
-            data: Object.values(groupedData) 
+        const vendors = await ServiceVendorModel.getVendorsByCustomerBooking(customerId, bookingId);
+        
+        res.status(200).json({
+            success: true,
+            data: vendors
         });
-
+        
     } catch (error) {
-        console.error("Error fetching service vendors:", error);
-        res.status(500).json({ 
-            success: false, 
-            message: error.message || "Internal Server Error" 
+        console.error("Error fetching vendors:", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal server error"
         });
     }
 };

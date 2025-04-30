@@ -49,14 +49,26 @@ export const getEventServices = async () => {
     }
 };
 
-export const saveSelectedServices = async (customerId, services) => {
+export const saveSelectedServices = async (customerId, bookingId, services) => {
     try {
-        await api.post('/CustomerService/saveServices', {
+        const response = await api.post('/CustomerService/saveServices', {
             customerId,
-            serviceIds: services,
-            
+            bookingId,
+            serviceIds: services
         });
+        return response.data;
     } catch (error) {
-        throw new Error("Service save failed");
+        console.error("Save error:", error);
+        throw new Error(error.response?.data?.message || "Failed to save services");
+    }
+};
+
+export const getServiceVendors = async (customerId, bookingId) => {
+    try {
+        const response = await api.get(`/VendorServices/getServiceVendors/${customerId}/${bookingId}`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching vendors:", error);
+        throw new Error(error.response?.data?.message || "Failed to load vendors");
     }
 };
