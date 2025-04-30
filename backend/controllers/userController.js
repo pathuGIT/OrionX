@@ -10,7 +10,8 @@ import {
     getEmployeesByStatusModel,
     deleteEmployeesModel,
     updateEmployeesStatusModel,
-    checkUserIsActive} from '../models/userModel.js';
+    checkUserIsActive,
+    getAllServiceChargeDataModel} from '../models/userModel.js';
 import { sendIdToUserMethod, } from '../controllers/mailController.js';
 import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } from '../models/customerModel.js';
 
@@ -182,3 +183,18 @@ export const getEmployeesByStatus = async (req, res) => {
         res.status(500).json({ msg: 'Server error...', error });
     }
 };
+
+//get  service charge data
+export const calculateServiceCharge = async (req, res) => {
+    const { employee_id } = req.body;
+    try {
+        const employee = await getAllServiceChargeDataModel(employee_id);
+        if (!employee) return res.status(404).json({ message: 'Employee not found' });
+        
+        const serviceCharge = (employee.salary * employee.service_charge_precentage) / 100;
+        res.status(200).json({ serviceCharge });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+};
+    

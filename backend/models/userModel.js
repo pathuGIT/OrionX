@@ -183,3 +183,29 @@ export const updatePasswordByEmail = async (newPassword, email, table) => {
     }
     return result.affectedRows; // Returns the number of rows affected
 };
+
+//get all service charge data
+export const getAllServiceChargeDataModel = async () => {
+    const [result] = await pool.query(
+`SELECT
+    sc.services_charge_id,
+    ae.Employee_ID AS employee_id,
+    ea.event_id,
+    e.name,
+    e.service_charge_precentage,
+    sc.amount AS base_amount,
+    ROUND((sc.amount * e.service_charge_precentage / 100), 2) AS service_charge_amount,
+    ea.event_date AS Date
+FROM
+    assigned_employee ae
+JOIN
+    employee e ON ae.Employee_ID = e.employee_id
+JOIN
+    services_charge sc ON ae.Employee_Assign_ID = sc.employee_assign_id
+JOIN
+    event_assigned_employee ea ON ae.Employee_Assign_ID = ea.employee_assign_id
+JOIN
+    event ev ON ea.event_id = ev.Event_ID;`
+    );
+    return result[0];
+};
