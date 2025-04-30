@@ -10,6 +10,7 @@ import {
     getEmployeesByStatusModel,
     deleteEmployeesModel,
     updateEmployeesStatusModel,
+    calculateServiceChargeDistributionModel,
     checkUserIsActive,
     getAllServiceChargeDataModel} from '../models/userModel.js';
 import { sendIdToUserMethod, } from '../controllers/mailController.js';
@@ -183,7 +184,7 @@ export const getEmployeesByStatus = async (req, res) => {
         res.status(500).json({ msg: 'Server error...', error });
     }
 };
-
+//////////////////////////////////////////////////////////////////////////////
 
 
 // Get all service charge data
@@ -194,6 +195,122 @@ export const getAllServiceChargeData = async (req, res) => {
     } catch (error) {
         console.error('Error fetching service charge data:', error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const calculateServiceChargeDistribution = async (req, res) => {
+    try {
+        // Validate input
+        const { totalCollectedServiceCharge } = req.body;
+        
+        if (!totalCollectedServiceCharge || isNaN(totalCollectedServiceCharge)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid service charge amount'
+            });
+        }
+
+        // Perform calculation
+        const result = await calculateServiceChargeDistributionModel(
+            parseFloat(totalCollectedServiceCharge)
+        );
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error) {
+        console.error('Service charge calculation error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to calculate service charge distribution'
+        });
+    }
+};
+
+// Get historical service charge calculations
+export const getServiceChargeHistory = async (req, res) => {
+    try {
+        const [history] = await pool.query(`
+            SELECT * FROM service_charge_calculations
+            ORDER BY calculation_date DESC
+            LIMIT 50
+        `);
+
+        res.status(200).json({
+            success: true,
+            data: history
+        });
+
+    } catch (error) {
+        console.error('Get history error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve service charge history'
+        });
+    }
+};
+
+// Save service charge calculation
+export const saveServiceChargeCalculation = async (req, res) => {
+    const connection = await pool.getConnection();
+    try {
+        const calculationData = req.body;
+        
+        await connection.beginTransaction();
+
+        // Save main calculation
+        const [result] = await connection.query(`
+            INSERT INTO service_charge_calculations (
+                total_collected,
+                total_weighted_employees,
+                base_rate,
+                grand_total,
+                calculation_date
+            ) VALUES (?, ?, ?, ?, NOW())
+        `, [
+            calculationData.totalCollectedServiceCharge,
+            calculationData.totalWeightedEmployees,
+            calculationData.baseRate,
+            calculationData.grandTotal
+        ]);
+
+        // Save distribution details
+        for (const category of calculationData.distribution) {
+            await connection.query(`
+                INSERT INTO service_charge_distribution (
+                    calculation_id,
+                    category,
+                    employee_count,
+                    per_employee_amount,
+                    total_for_category
+                ) VALUES (?, ?, ?, ?, ?)
+            `, [
+                result.insertId,
+                category.category,
+                category.numberOfEmployees,
+                category.perEmployeeAmount,
+                category.totalForCategory
+            ]);
+        }
+
+        await connection.commit();
+        
+        res.status(201).json({
+            success: true,
+            message: 'Calculation saved successfully'
+        });
+
+    } catch (error) {
+        await connection.rollback();
+        console.error('Save calculation error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to save service charge calculation'
+        });
+    } finally {
+        connection.release();
     }
 };
     
