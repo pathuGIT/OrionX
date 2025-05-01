@@ -61,6 +61,46 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
         </div>
 
         <div className="border-t border-gray-700 my-2"></div>
+        {/* sadli edit the below part*/}
+        <div>
+          <button 
+            onClick={() => toggleMenu('events')}
+            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
+          >
+            <div className="flex items-center">
+              <i className="fas fa-calendar mr-3"></i>Menu Planning
+            </div>
+            <i className={`fas ${openMenu === 'events' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+          </button>
+          {openMenu === 'events' && (
+            <div className="bg-gray-700">
+              <button
+                onClick={() => {
+                  setActivePage('plan-menu');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Select Menu
+              </button>
+              <button
+                onClick={() => {
+                  setActivePage('my-menu');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                View Menu
+              </button>
+            </div>
+          )}
+        </div>
+
+
+
+
+
+
 
         <div className="mt-auto">
           <div className="px-4 py-2 text-gray-100 hover:bg-gray-700 cursor-pointer">
