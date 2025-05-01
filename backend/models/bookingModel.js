@@ -12,10 +12,36 @@ export const addNewVenue = async ({ name, time, location, minCapacity, maxCapaci
 };
 
 // Get all venues
+// export const getAllVenuesModel = async () => {
+//     const [rows] = await pool.query(`SELECT * FROM venue`);
+//     return rows;
+// };
 export const getAllVenuesModel = async () => {
-    const [rows] = await pool.query(`SELECT * FROM venue`);
+    const [rows] = await pool.query(`
+        SELECT 
+            v.venue_id,
+            v.venue_name,
+            v.time_slot,
+            v.Location,
+            v.min_capacity,
+            v.max_capacity,
+            v.price,
+            v.created_at,
+            v.updated_at,
+            CASE 
+                WHEN COUNT(b.booking_id) > 0 THEN 'booked'
+                ELSE 'not'
+            END AS status
+        FROM 
+            venue v
+        LEFT JOIN 
+            booking b ON v.venue_id = b.venue_id
+        GROUP BY 
+            v.venue_id
+    `);
     return rows;
 };
+
 
 export const deleteVenueByIdModel = async (id) => {
     const [result] = await pool.query(`DELETE FROM venue WHERE venue_id = ?`, [id]);
@@ -51,4 +77,12 @@ export const updateNewVenueModel = async ({ id, name, time, location, minCapacit
          WHERE venue_id = ?`,
         [name, time, location, minCapacity, maxCapacity, price, today, id]
     );
+};
+
+export const checkBookingByVenueId = async (venueId) => {
+  const [rows] = await pool.query(
+    'SELECT 1 FROM booking WHERE venue_id = ? LIMIT 1',
+    [venueId]
+  );
+  return rows.length > 0;  // true if exists, false if not
 };

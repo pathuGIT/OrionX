@@ -1,4 +1,4 @@
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -49,7 +49,8 @@ export const getAllVenue = async (req, res) => {
 }
 
 export const deleteVenueById = async (req, res) => {
-    const { id } = req.query;
+    const { id } = req.params;
+
 
     if (!id) {
         return res.status(400).json({ msg: "Venue id is required." });
@@ -67,9 +68,9 @@ export const deleteVenueById = async (req, res) => {
             return res.status(404).json({ msg: "Venue not found." });
         }
 
-        res.status(200).json({ message: "Venue deleted successfully." });
+        res.status(200).json({ msg: "Venue deleted successfully." });
     } catch (error) {
-        res.status(500).json({ msg: "Server error...", error });
+        res.status(500).json({ msg: "This Venue is Already used, Can't deleted it.", error });
     }
 };
 
@@ -127,4 +128,10 @@ export const updateVenueById = async (req, res) => {
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
     }
+}
+
+export const checkVenuIdInBooking = async (req, res) => {
+    const { venueId } = req.params;
+    const bookingExists = await checkBookingByVenueId(venueId);
+    res.status(200).json({ exists: bookingExists });
 }
