@@ -2,8 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/Authcontext";
 import { getCustomerBookings } from "../services/EventService";
 import { useNavigate } from "react-router-dom";
-import { encryptBookingId,encryptCustId } from "../utills/encryptionUtils";    
-
+import { encryptBookingId, encryptCustId } from "../utills/encryptionUtils";
+import { Calendar, User, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 const CustomerBookings = () => {
     const { user } = useContext(AuthContext);
@@ -12,13 +12,9 @@ const CustomerBookings = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-//take this part
     useEffect(() => {
         let customerID = sessionStorage.getItem("id");
-
-        if (!customerID && user) {
-            customerID = user.id;
-        }
+        if (!customerID && user) customerID = user.id;
 
         if (!customerID) {
             setError("Customer ID not found in session.");
@@ -26,30 +22,17 @@ const CustomerBookings = () => {
             return;
         }
 
-        // Fetch customer bookings using the API function
         getCustomerBookings(customerID)
             .then(data => {
                 setBookings(data);
                 setLoading(false);
             })
             .catch(error => {
-                setError("Failed to load bookings.");
+                setError("Failed to load bookings. Please try again.");
                 setLoading(false);
             });
-
     }, [user]);
-//here 
 
-// {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
-// onClick={() =>{
-// const encryptedId = encryptBookingId(booking.booking_id);
-// navigate(`/profile/${encryptedId}`)}}>
-// Plan your Event</button> */}
-
-//under construction
-
-
-    // Function to format date
     const formatDate = (isoDate) => {
         const date = new Date(isoDate);
         return date.toLocaleDateString('en-US', {
@@ -60,33 +43,70 @@ const CustomerBookings = () => {
         });
     };
 
+    if (loading) return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        </div>
+    );
 
-    if (loading) return <p className="text-center text-xl">Loading...</p>;
-    if (error) return <p className="text-center text-red-600">{error}</p>;
+    if (error) return (
+        <div className="flex flex-col items-center justify-center h-64 text-red-500">
+            <AlertCircle className="w-12 h-12 mb-4" />
+            <p className="text-xl font-medium">{error}</p>
+        </div>
+    );
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h2 className="text-3xl font-bold text-center mb-6">My Bookings</h2>
+            <h2 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                My Bookings
+            </h2>
+            
             {bookings.length === 0 ? (
-                <p className="text-center">No bookings found.</p>
+                <div className="text-center py-12">
+                    <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-xl text-gray-600">No bookings found. Start by creating a new booking!</p>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {bookings.map((booking) => (
-                        <div key={booking.booking_id} className="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
-                            <div className="p-6">
-                                <h3 className="text-2xl font-semibold text-blue-500">Booking ID: {booking.booking_id}</h3>
-                                <p className="text-lg text-gray-600 mt-2">Customer ID: {booking.customer_id}</p>
-                                <p className="text-lg text-gray-600 mt-2">Booking Date: {formatDate(booking.booking_date)}</p>
+                        <div key={booking.booking_id} className="group relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                            <div className="p-6 space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-blue-100 p-2 rounded-full">
+                                        <Calendar className="w-6 h-6 text-blue-500" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-800">Booking #{booking.booking_id}</h3>
+                                </div>
+
+                                <div className="space-y-2 pl-2">
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <User className="w-5 h-5 text-gray-400" />
+                                        <span>Customer ID: {booking.customer_id}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <Calendar className="w-5 h-5 text-gray-400" />
+                                        <span>{formatDate(booking.booking_date)}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="p-4 bg-gray-100 text-center">
-                                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300"
-                                onClick={() => {
-                                    const encryptedId = encryptBookingId(booking.booking_id);
-                                    const encryptedCustomerId = encryptCustId(booking.customer_id);
-                                    navigate(`/eventHome/${encryptedId}/${encryptedCustomerId}`);
-                                    
-                                }}>
-                                Plan your Event</button>
+
+                            <div className="border-t p-4 bg-gray-50">
+                                <button 
+                                    onClick={() => {
+                                        const encryptedId = encryptBookingId(booking.booking_id);
+                                        const encryptedCustomerId = encryptCustId(booking.customer_id);
+                                        navigate(`/eventHome/${encryptedId}/${encryptedCustomerId}`);
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+                                >
+                                    Plan Your Event
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl blur-lg filter opacity-20"></div>
                             </div>
                         </div>
                     ))}
