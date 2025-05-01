@@ -33,6 +33,8 @@ const Profile = () => {
         return <CustomerBookings />;
       case 'my-events':
         return <div className="bg-white p-6 rounded-lg shadow"><h2 className="text-2xl font-bold mb-4">My Events</h2></div>;
+      case 'sadali':
+        return //add your frontend component here sadali;
       case 'dashboard':
       default:
         return (
