@@ -25,6 +25,8 @@ router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
 
 router.post('/service-charges/calculate', serviceChargeController.calculateCharges);
 router.get('/service-charges', serviceChargeController.getAllCharges);
+router.get('/service-charges/employee/:employeeId', serviceChargeController.getEmployeeCharges);
+
 
 
 //sub admins

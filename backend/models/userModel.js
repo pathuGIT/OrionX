@@ -226,7 +226,7 @@ export class ServiceChargeModel {
     const connection = await pool.getConnection();
     try {
       const [results] = await connection.query(`
-        SELECT
+        SELECT DISTINCT
           esc.service_charge_id,
           e.employee_id,
           e.name AS employee_name,
@@ -234,14 +234,11 @@ export class ServiceChargeModel {
           esc.event_id,
           esc.amount,
           esc.calculation_date,
-          ev.Event_ID,
           b.total_price AS event_budget,
-          b.booking_date,
           c.name AS customer_name
         FROM employee_service_charges esc
         JOIN employee e ON esc.employee_id = e.employee_id
         JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
-        JOIN event_assigned_employee eae ON ae.Employee_Assign_ID = eae.Employee_Assign_ID
         JOIN event ev ON esc.event_id = ev.Event_ID
         JOIN booking b ON ev.booking_id = b.booking_id
         JOIN customer c ON b.customer_id = c.customer_id
@@ -258,16 +255,14 @@ export class ServiceChargeModel {
     const connection = await pool.getConnection();
     try {
       const [results] = await connection.query(`
-        SELECT
+        SELECT DISTINCT
           esc.service_charge_id,
           esc.event_id,
           esc.amount,
           esc.calculation_date,
           e.name AS employee_name,
           ae.User_Role AS employee_role,
-          ev.Event_ID,
-          b.total_price AS event_budget,
-          b.booking_date
+          b.total_price AS event_budget
         FROM employee_service_charges esc
         JOIN employee e ON esc.employee_id = e.employee_id
         JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID

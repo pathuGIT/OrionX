@@ -66,14 +66,38 @@ export const getEmployeesByStatus = async (status) => {
 //     return response.data;
 // };
 
-export const getAllServiceChargeData = async () => {
-    const response = await api.get("/user/getAllServiceChargeData");
-    return response.data.historicalData || [];
-};
-
-export const calculateServiceChargeDistribution = async (totalCollected) => {
-    const response = await api.post("/user/getAllServiceChargeData", {
-        totalCollectedServiceCharge: totalCollected
-    });
-    return response.data;
-};
+export const serviceChargeService = {
+    calculateCharges: async () => {
+      try {
+        const response = await api.post('/user/service-charges/calculate');
+        return {
+          success: true,
+          message: response.data.message,
+          affectedRows: response.data.affectedRows
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Calculation failed',
+          error: error.message
+        };
+      }
+    },
+  
+    getAllCharges: async () => {
+      try {
+        const response = await api.get('/user/service-charges');
+        return {
+          success: true,
+          data: response.data.data || [],
+          count: response.data.count || 0
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to fetch charges',
+          error: error.message
+        };
+      }
+    }
+  };
