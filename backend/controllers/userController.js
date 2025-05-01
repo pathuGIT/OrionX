@@ -234,53 +234,76 @@ export const getEmployeesByStatus = async (req, res) => {
 };
 //////////////////////////////////////////////////////////////////////////////
 
-export const handleServiceChargeOperations = async (req, res) => {
-    let serviceChargeData;
-    
+export const serviceChargeController = {
+  calculateCharges: async (req, res) => {
     try {
-        serviceChargeData = await ServiceChargeModel.getAllRecords();
-        
-        if (req.body.totalCollectedServiceCharge) {
-            const totalCollected = parseFloat(req.body.totalCollectedServiceCharge);
-            
-            if (isNaN(totalCollected)) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid service charge amount format",
-                    historicalData: serviceChargeData
-                });
-            }
-
-            const calculation = await ServiceChargeModel.calculateDistribution(totalCollected);
-            
-            return res.status(200).json({
-                success: true,
-                historicalData: serviceChargeData,
-                calculation: {
-                    ...calculation,
-                    distribution: calculation.distribution.map(d => ({
-                        ...d,
-                        perEmployee: +d.perEmployee.toFixed(2),
-                        totalForCategory: +d.totalForCategory.toFixed(2)
-                    }))
-                }
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            historicalData: serviceChargeData
-        });
-
+      const result = await ServiceChargeModel.calculateServiceCharges();
+      res.json({
+        success: true,
+        message: result.message,
+        affectedRows: result.affectedRows
+      });
     } catch (error) {
-        console.error("Service charge operation error:", error);
-        res.status(500).json({
-            success: false,
-            message: error.message || "Service charge operation failed",
-            ...(serviceChargeData ? { historicalData: serviceChargeData } : {})
-        });
+      res.status(500).json({
+        success: false,
+        message: "Service charge calculation failed",
+        error: error.message
+      });
     }
+  },
+
+  getAllCharges: async (req, res) => {
+    try {
+      const charges = await ServiceChargeModel.getAllCharges();
+      
+      if (!charges || charges.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No service charge records found"
+        });
+      }
+
+      res.json({
+        success: true,
+        count: charges.length,
+        data: charges
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve service charges",
+        error: error.message
+      });
+    }
+  },
+
+  getEmployeeCharges: async (req, res) => {
+    try {
+      const { employeeId } = req.params;
+      const charges = await ServiceChargeModel.getEmployeeCharges(employeeId);
+      
+      if (!charges || charges.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No charges found for this employee"
+        });
+      }
+
+      res.json({
+        success: true,
+        count: charges.length,
+        data: charges
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve employee charges",
+        error: error.message
+      });
+    }
+  }
 };
+
 /////////////////////////////////////////////////////////////////////
 // Get historical service charge calculations
 export const getServiceChargeHistory = async (req, res) => {

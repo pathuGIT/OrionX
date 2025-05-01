@@ -2,7 +2,7 @@ import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
 import { addEmployee, changeUserRole, addCustomer ,
     updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
-    getEmployeeById,handleServiceChargeOperations
+    getEmployeeById,serviceChargeController 
 } from '../controllers/userController.js';
 import { subAdmin } from '../middleware/Sub_admin.js';
 
@@ -20,8 +20,11 @@ router.get('/getEmployees', superAdmin,getEmployee);//chage get employees
 router.put('/updateEmployee',superAdmin,updateEmployees);// same
 router.get('/getEmployeesByStatus', superAdmin,getEmployeesByStatus);
 router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
-router.get('/getAllServiceChargeData',handleServiceChargeOperations);
+//router.get('/getAllServiceChargeData',handleServiceChargeOperations);
 //router.get('/getAllServiceChargeData',superAdmin,getAllServiceChargeData);
+
+router.post('/service-charges/calculate', serviceChargeController.calculateCharges);
+router.get('/service-charges', serviceChargeController.getAllCharges);
 
 
 //sub admins

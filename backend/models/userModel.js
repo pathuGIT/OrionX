@@ -203,67 +203,83 @@ export const updatePasswordByEmail = async (newPassword, email, table) => {
 };
 
 export class ServiceChargeModel {
-    // Get historical service charge records
-    static async getAllRecords() {
-      const [results] = await pool.query(`
-        SELECT
-          sc.services_charge_id,
-          ae.Employee_ID AS employee_id,
-          ea.event_id,
-          e.name,
-          ae.User_Role,
-          e.service_charge_precentage,
-          sc.amount AS base_amount,
-          ROUND((sc.amount * e.service_charge_precentage / 100), 2) AS service_charge_amount,
-          DATE_FORMAT(ea.event_date, "%Y-%m-%d") AS date
-        FROM assigned_employee ae
-        JOIN employee e ON ae.Employee_ID = e.employee_id
-        JOIN services_charge sc ON ae.Employee_Assign_ID = sc.employee_assign_id
-        JOIN event_assigned_employee ea ON ae.Employee_Assign_ID = ea.employee_assign_id
-      `);
-      return results;
-    }
-  
-    // Calculate service charge distribution
-    static async calculateDistribution(totalCollected) {
-      const [categories] = await pool.query(`
-        SELECT 
-          ae.User_Role AS role,
-          (e.service_charge_precentage / 100) AS weight,
-          COUNT(e.employee_id) AS employee_count
-        FROM employee e
-        INNER JOIN systemuser su ON e.employee_id = su.employee_id
-        INNER JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
-        WHERE su.status = 'active'
-          AND ae.Employee_Assign_ID IS NOT NULL
-        GROUP BY ae.User_Role, e.service_charge_precentage
-        HAVING employee_count > 0
-      `);
-  
-      if (categories.length === 0) {
-        throw new Error("No eligible employees available for distribution");
-      }
-  
-      const totalWeight = categories.reduce((sum, { weight, employee_count }) => 
-        sum + (weight * employee_count), 0);
-  
-      const baseRate = totalCollected / totalWeight;
-      const distribution = categories.map(({ role, weight, employee_count }) => ({
-        role,
-        weight: +weight.toFixed(4),
-        employeeCount: employee_count,
-        perEmployee: +(weight * baseRate).toFixed(2),
-        totalForCategory: +(weight * baseRate * employee_count).toFixed(2)
-      }));
-  
+  static async calculateServiceCharges() {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const [result] = await connection.query('CALL CalculateServiceCharges()');
+      await connection.commit();
       return {
-        totalCollected: +totalCollected.toFixed(2),
-        totalWeight: +totalWeight.toFixed(2),
-        baseRate: +baseRate.toFixed(2),
-        distribution,
-        grandTotal: +distribution
-          .reduce((sum, { totalForCategory }) => sum + totalForCategory, 0)
-          .toFixed(2)
+        success: true,
+        message: "Service charges calculated successfully",
+        affectedRows: result.affectedRows
       };
+    } catch (error) {
+      await connection.rollback();
+      throw new Error(`Database error: ${error.message}`);
+    } finally {
+      connection.release();
     }
   }
+
+  static async getAllCharges() {
+    const connection = await pool.getConnection();
+    try {
+      const [results] = await connection.query(`
+        SELECT
+          esc.service_charge_id,
+          e.employee_id,
+          e.name AS employee_name,
+          ae.User_Role AS employee_role,
+          esc.event_id,
+          esc.amount,
+          esc.calculation_date,
+          ev.Event_ID,
+          b.total_price AS event_budget,
+          b.booking_date,
+          c.name AS customer_name
+        FROM employee_service_charges esc
+        JOIN employee e ON esc.employee_id = e.employee_id
+        JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
+        JOIN event_assigned_employee eae ON ae.Employee_Assign_ID = eae.Employee_Assign_ID
+        JOIN event ev ON esc.event_id = ev.Event_ID
+        JOIN booking b ON ev.booking_id = b.booking_id
+        JOIN customer c ON b.customer_id = c.customer_id
+      `);
+      return results;
+    } catch (error) {
+      throw new Error(`Database error: ${error.message}`);
+    } finally {
+      connection.release();
+    }
+  }
+
+  static async getEmployeeCharges(employeeId) {
+    const connection = await pool.getConnection();
+    try {
+      const [results] = await connection.query(`
+        SELECT
+          esc.service_charge_id,
+          esc.event_id,
+          esc.amount,
+          esc.calculation_date,
+          e.name AS employee_name,
+          ae.User_Role AS employee_role,
+          ev.Event_ID,
+          b.total_price AS event_budget,
+          b.booking_date
+        FROM employee_service_charges esc
+        JOIN employee e ON esc.employee_id = e.employee_id
+        JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
+        JOIN event ev ON esc.event_id = ev.Event_ID
+        JOIN booking b ON ev.booking_id = b.booking_id
+        WHERE esc.employee_id = ?
+      `, [employeeId]);
+      return results;
+    } catch (error) {
+      throw new Error(`Database error: ${error.message}`);
+    } finally {
+      connection.release();
+    }
+  }
+}
