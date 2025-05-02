@@ -10,6 +10,7 @@ const ServiceChargeTable = () => {
   const [error, setError] = useState("");
   const [calculationLoading, setCalculationLoading] = useState(false);
 
+  // Data loading and state management functions
   const loadData = async () => {
     try {
       setLoading(true);
@@ -53,6 +54,7 @@ const ServiceChargeTable = () => {
     }
   };
 
+  // Filtering logic
   useEffect(() => {
     const filterData = () => {
       if (selectedMonth === "") {
@@ -74,6 +76,7 @@ const ServiceChargeTable = () => {
     filterData();
   }, [selectedMonth, charges]);
 
+  // Helper functions
   const formatCurrency = (value) => {
     return parseFloat(value || 0).toLocaleString("en-US", {
       minimumFractionDigits: 2,
@@ -99,6 +102,7 @@ const ServiceChargeTable = () => {
     }, []);
   };
 
+  // Loading and error states
   if (loading) {
     return (
       <div className="p-6 text-center">
@@ -122,6 +126,7 @@ const ServiceChargeTable = () => {
     );
   }
 
+  // Main component render
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto">
@@ -152,6 +157,7 @@ const ServiceChargeTable = () => {
           </button>
         </div>
 
+        {/* Filters and Stats */}
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -171,6 +177,7 @@ const ServiceChargeTable = () => {
             </select>
           </div>
 
+          {/* Total Distributed Card */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
@@ -199,6 +206,7 @@ const ServiceChargeTable = () => {
             </div>
           </div>
 
+          {/* Total Events Card */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
@@ -228,102 +236,125 @@ const ServiceChargeTable = () => {
           </div>
         </div>
 
+        {/* Main Table */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                {["Event", "SC ID", "Employee", "Role", "Event Budget", "Amount", "Date", "Customer"].map((header) => (
-                  <th
-                    key={header}
-                    className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
-                  >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {groupByEvent(filteredData).map((eventGroup) => (
-                <React.Fragment key={eventGroup.event_id}>
-                  {eventGroup.entries.map((row, index) => (
-                    <tr
-                      key={`${row.service_charge_id}-${index}`}
-                      className="transition-colors hover:bg-gray-50/50"
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 table-fixed">
+              <thead className="bg-gray-50">
+                <tr>
+                  {["Event", "SC ID", "Employee", "Role", "Event Budget", "Amount", "Date", "Customer"].map((header) => (
+                    <th
+                      key={header}
+                      className={`px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider ${
+                        header === 'SC ID' 
+                          ? 'w-[400px]'  // Fixed width for SC ID column
+                          : 'whitespace-nowrap'
+                      }`}
                     >
-                      {index === 0 && (
-                        <td
-                          rowSpan={eventGroup.entries.length}
-                          className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r-2 border-gray-100"
-                        >
-                          {eventGroup.event_id}
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {groupByEvent(filteredData).map((eventGroup) => (
+                  <React.Fragment key={eventGroup.event_id}>
+                    {eventGroup.entries.map((row, index) => (
+                      <tr
+                        key={`${row.service_charge_id}-${index}`}
+                        className="transition-colors hover:bg-gray-50/50"
+                      >
+                        {/* Event ID */}
+                        {index === 0 && (
+                          <td
+                            rowSpan={eventGroup.entries.length}
+                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r-2 border-gray-100"
+                          >
+                            {eventGroup.event_id}
+                          </td>
+                        )}
+
+                        {/* SC ID with Horizontal Scroll */}
+                        <td className="px-6 py-4 text-sm font-mono text-indigo-600 w-[400px]">
+                          <div className="whitespace-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-2">
+                            #{row.service_charge_id}
+                          </div>
                         </td>
-                      )}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-600">
-                        #{row.service_charge_id}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                            <span className="text-indigo-600 font-medium">
-                              {row.employee_name.charAt(0)}
-                            </span>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {row.employee_name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {row.employee_id}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {row.employee_role}
-                        </span>
-                      </td>
-                      {index === 0 && (
-                        <td
-                          rowSpan={eventGroup.entries.length}
-                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
-                        >
+
+                        {/* Employee Details */}
+                        <td className="px-6 py-4 min-w-[200px]">
                           <div className="flex items-center">
-                            <span className="text-gray-400 mr-1">LKR</span>
-                            {formatCurrency(eventGroup.event_budget)}
+                            <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                              <span className="text-indigo-600 font-medium">
+                                {row.employee_name?.charAt(0)}
+                              </span>
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {row.employee_name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {row.employee_id}
+                              </div>
+                            </div>
                           </div>
                         </td>
-                      )}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                        + LKR {formatCurrency(row.amount)}
-                      </td>
-                      {index === 0 && (
-                        <>
+
+                        {/* Role */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            {row.employee_role}
+                          </span>
+                        </td>
+
+                        {/* Event Budget */}
+                        {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
                             className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
                           >
-                            {new Date(eventGroup.calculation_date).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            <div className="flex items-center">
+                              <span className="text-gray-400 mr-1">LKR</span>
+                              {formatCurrency(eventGroup.event_budget)}
+                            </div>
                           </td>
-                          <td
-                            rowSpan={eventGroup.entries.length}
-                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                          >
-                            {eventGroup.customer_name}
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+                        )}
 
+                        {/* Amount */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                          + LKR {formatCurrency(row.amount)}
+                        </td>
+
+                        {/* Date and Customer */}
+                        {index === 0 && (
+                          <>
+                            <td
+                              rowSpan={eventGroup.entries.length}
+                              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
+                            >
+                              {new Date(eventGroup.calculation_date).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </td>
+                            <td
+                              rowSpan={eventGroup.entries.length}
+                              className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                            >
+                              {eventGroup.customer_name}
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Empty State */}
           {filteredData.length === 0 && (
             <div className="p-8 text-center text-gray-500">
               <svg
