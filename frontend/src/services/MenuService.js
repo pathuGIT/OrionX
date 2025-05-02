@@ -358,3 +358,15 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
     throw error;
   }
 };
+
+
+// // Get all menu types under a specific menu list type
+// export const getMenusByListType = async (listTypeId) => {
+//   try {
+//     const response = await api.get(`/menutypes/getByMenuListType/${listTypeId}`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching menu types by list type:", error);
+//     throw error;
+//   }
+// };

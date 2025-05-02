@@ -88,6 +88,8 @@ function CreateCategoryMenuType() {
   };
 
   const handleDelete = async (menu_type_id, category_id) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
+    if (!isConfirmed) return; 
     try {
       await deleteCategoryMenuType(menu_type_id, category_id);
       alert('Deleted successfully!');

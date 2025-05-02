@@ -243,6 +243,15 @@ CREATE TABLE Event_Cordinator (
 );
 
 
+create table Customer_Event_Service(
+customer_id VARCHAR(100) not null,
+event_service_id VARCHAR(100) not null,
+booking_id VARCHAR(255) NOT NULL,
+FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
+FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
+FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+);
+
 
 
 -- Trigger to format Table_Reserve_ID
@@ -296,7 +305,7 @@ BEGIN
     SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
     
     -- Format the new ID as 'EMP' followed by a zero-padded number (3 digits)
-    SET new_id = CONCAT('EMP', LPAD(max_id, 6, '0'));
+    SET new_id = CONCAT('EAE', LPAD(max_id, 6, '0'));
     SET NEW.Employee_Assign_ID = new_id;
 END //
 DELIMITER ;

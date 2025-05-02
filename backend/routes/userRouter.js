@@ -21,6 +21,7 @@ router.put('/updateEmployee',superAdmin,updateEmployees);// same
 router.get('/getEmployeesByStatus', superAdmin,getEmployeesByStatus);
 router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
 
+
 //sub admins
 
 //employee

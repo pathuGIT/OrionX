@@ -15,7 +15,7 @@ const CustomerEventPlanning = () => {
         console.error("Failed to decrypt booking ID:", error);
     }
         console.log(decryptedBookingId);
-    // ✅ Move useState above the conditional return
+    // Move useState above the conditional return
     const [eventType, setEventType] = useState("");
 
     if (!decryptedBookingId) {

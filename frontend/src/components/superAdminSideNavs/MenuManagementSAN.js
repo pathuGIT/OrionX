@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Logout } from '../../components/Logout'
+// import GetMenus from '../../pages/superAdmin/GetMenus';
 import CreateMenuListType from '../../pages/superAdmin/CreateMenuListType';
 import CreateMenuType from '../../pages/superAdmin/CreateMenuType';
 import CreateCategory from '../../pages/superAdmin/CreateCategories';
 import CreateItem from '../../pages/superAdmin/CreateItem';
 import CreateCategoryMenuType from '../../pages/superAdmin/CreateCategoryMenuType';
-import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategoryMenuType';
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -44,9 +44,6 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         break;
       case 'CreateCategoryMenuType':
         setRenderContent(() => () => <CreateCategoryMenuType />);
-        break;
-      case 'CreateItemCategoryMenuType':
-        setRenderContent(() => () => <CreateItemCategoryMenuType />);
         break;
       default:
         setRenderContent(() => () => <p>Page not found</p>);
