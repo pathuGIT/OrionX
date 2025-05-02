@@ -21,6 +21,10 @@ import DisplayEvents from './components/DisplayEvents';
 import ResetPassword from './pages/VerifyOtp';
 import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
 import UpdatePassword from './pages/UpdatePassword';
+import CustomerMenuPlanner from './components/CustomerMenuPlanner';
+import CustomerItemSelection from './components/CustomerItemSelection';
+import CustomerCategorySelection from './components/CustomerCategorySelection';
+import CustomerMenuListSelection from './components/CustomerMenuListSelection';
 
 function App() {
   return (
@@ -32,18 +36,26 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
-            <Route path="/eventHome/:bookingId/:customerID" element={<ProtectedRoute name="customer"><EventHome/></ProtectedRoute>} />
+            <Route path="/eventHome/:bookingId/:customerID" element={<ProtectedRoute name="customer"><EventHome /></ProtectedRoute>} />
             {/* <Route path="/event-planning/:bookingId" element={<ProtectedRoute name="customer"><CustomerEventPlanning /></ProtectedRoute>} />
             <Route path="/display-Events/:customerID" element={<ProtectedRoute name="customer"><DisplayEvents /></ProtectedRoute>} /> */}
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
             <Route path="/superAdminHome" element={<ProtectedRoute name="customer"> <SuperAdminHome /> </ProtectedRoute>} />
-            <Route path="/registration/register-employee" element={<EmployeeRegistration />}/>
-            <Route path="/registration/register-customer" element={<CustomerRegistration />}/>
-            <Route path="/forgot-password" element={<ResetPassword />}/>
-            <Route path="/forgot-password/success" element={<ForgotPswdSuccess />}/>
-            <Route path="/forgot-password/update" element={<UpdatePassword />}/>
+            <Route path="/registration/register-employee" element={<EmployeeRegistration />} />
+            <Route path="/registration/register-customer" element={<CustomerRegistration />} />
+            <Route path="/forgot-password" element={<ResetPassword />} />
+            <Route path="/forgot-password/success" element={<ForgotPswdSuccess />} />
+            <Route path="/forgot-password/update" element={<UpdatePassword />} />
+
+            {/* sandli */}
+
+            <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
+            {/* <Route path="/menu-type/:menuTypeId" element={<CustomerMenuTypeSelection />} /> */}
+            <Route path="/menu-category/:categoryId" element={<CustomerCategorySelection />} />
+            <Route path="/menu-item/:itemId" element={<CustomerItemSelection />} />
+            <Route path="/customer-menu-planner" element={<CustomerMenuPlanner />} />
           </Routes>
         </main>
         <Footer />

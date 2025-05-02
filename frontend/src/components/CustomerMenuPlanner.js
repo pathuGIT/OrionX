@@ -8,12 +8,10 @@ import CustomerItemSelection from "./CustomerItemSelection";
 
 const CustomerMenuPlanner = () => {
   return (
-    <Routes>
-      <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuSelection />} />
-      <Route path="/menu-type/:menuTypeId" element={<CustomerMenuTypeSelection />} />
-      <Route path="/menu-category/:categoryId" element={<CustomerCategorySelection/>}/>
-      <Route path="/menu-item/:itemId" element={<CustomerItemSelection/>}/>
-    </Routes>
+    <>
+      <h2>Customer Menu Planner</h2>
+      <CustomerItemSelection />
+    </>
   );
 };
 

@@ -4,6 +4,7 @@ import api from './Api';
 export const getMenus = async () => {
   try {
     const response = await api.get('/menuListType/getAll');
+    console.log("getMenus response:", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching menus:", error);

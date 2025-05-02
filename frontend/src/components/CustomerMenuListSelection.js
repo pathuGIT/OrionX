@@ -12,10 +12,12 @@ const CustomerMenuListSelection = () => {
     useEffect(() => {
         getMenus()
             .then(data => {
+                console.log("Menu list types loaded:", data); // Add this line
                 setMenuListTypes(data);
                 setLoading(false);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error("getMenus failed:", err); // Add this line
                 setError("Failed to load menu list types.");
                 setLoading(false);
             });
