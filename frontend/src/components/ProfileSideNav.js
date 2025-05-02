@@ -80,7 +80,7 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                Create New Menu
+                Select New Menu
               </button>
               <button
                 onClick={() => {
