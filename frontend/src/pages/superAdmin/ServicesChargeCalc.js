@@ -15,13 +15,11 @@ const ServiceChargeTable = () => {
       setLoading(true);
       setError("");
 
-      // First calculate charges
       const calculationResult = await serviceChargeService.calculateCharges();
       if (!calculationResult.success) {
         throw new Error(calculationResult.message);
       }
 
-      // Then get updated charges
       const result = await serviceChargeService.getAllCharges();
       if (result.success) {
         const data = result.data;
@@ -83,8 +81,22 @@ const ServiceChargeTable = () => {
     });
   };
 
-  const calculateBaseAmount = (eventBudget) => {
-    return (eventBudget * 0.05).toFixed(2);
+  const groupByEvent = (data) => {
+    return data.reduce((acc, current) => {
+      const existing = acc.find(item => item.event_id === current.event_id);
+      if (!existing) {
+        acc.push({
+          event_id: current.event_id,
+          customer_name: current.customer_name,
+          calculation_date: current.calculation_date,
+          event_budget: current.event_budget,
+          entries: [current]
+        });
+      } else {
+        existing.entries.push(current);
+      }
+      return acc;
+    }, []);
   };
 
   if (loading) {
@@ -113,7 +125,6 @@ const ServiceChargeTable = () => {
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold text-gray-800 bg-clip-text bg-gradient-to-r from-blue-600 to-green-500">
             Service Charge Distribution
@@ -141,7 +152,6 @@ const ServiceChargeTable = () => {
           </button>
         </div>
 
-        {/* Filter and Stats Section */}
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -218,21 +228,11 @@ const ServiceChargeTable = () => {
           </div>
         </div>
 
-        {/* Table Section */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {[
-                  "SC ID",
-                  "Employee",
-                  "Role",
-                  "Event",
-                  "Event Budget",
-                  "Amount",
-                  "Date",
-                  "Customer",
-                ].map((header) => (
+                {["Event", "SC ID", "Employee", "Role", "Event Budget", "Amount", "Date", "Customer"].map((header) => (
                   <th
                     key={header}
                     className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
@@ -243,62 +243,83 @@ const ServiceChargeTable = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredData.map((row) => (
-                <tr
-                  key={row.service_charge_id}
-                  className="transition-colors hover:bg-gray-50/50"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-600">
-                    #{row.service_charge_id}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                        <span className="text-indigo-600 font-medium">
-                          {row.employee_name.charAt(0)}
+              {groupByEvent(filteredData).map((eventGroup) => (
+                <React.Fragment key={eventGroup.event_id}>
+                  {eventGroup.entries.map((row, index) => (
+                    <tr
+                      key={`${row.service_charge_id}-${index}`}
+                      className="transition-colors hover:bg-gray-50/50"
+                    >
+                      {index === 0 && (
+                        <td
+                          rowSpan={eventGroup.entries.length}
+                          className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r-2 border-gray-100"
+                        >
+                          {eventGroup.event_id}
+                        </td>
+                      )}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-600">
+                        #{row.service_charge_id}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <span className="text-indigo-600 font-medium">
+                              {row.employee_name.charAt(0)}
+                            </span>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {row.employee_name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {row.employee_id}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          {row.employee_role}
                         </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {row.employee_name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {row.employee_id}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      {row.employee_role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                    {row.event_id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <span className="text-gray-400 mr-1">LKR</span>
-                      {formatCurrency(row.event_budget)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                    + LKR {formatCurrency(row.amount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(row.calculation_date).toLocaleDateString(
-                      "en-GB",
-                      {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      }
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {row.customer_name}
-                  </td>
-                </tr>
+                      </td>
+                      {index === 0 && (
+                        <td
+                          rowSpan={eventGroup.entries.length}
+                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
+                        >
+                          <div className="flex items-center">
+                            <span className="text-gray-400 mr-1">LKR</span>
+                            {formatCurrency(eventGroup.event_budget)}
+                          </div>
+                        </td>
+                      )}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                        + LKR {formatCurrency(row.amount)}
+                      </td>
+                      {index === 0 && (
+                        <>
+                          <td
+                            rowSpan={eventGroup.entries.length}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
+                          >
+                            {new Date(eventGroup.calculation_date).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td
+                            rowSpan={eventGroup.entries.length}
+                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                          >
+                            {eventGroup.customer_name}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
