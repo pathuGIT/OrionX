@@ -8,9 +8,8 @@ const ServiceChargeTable = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [totalDistributed, setTotalDistributed] = useState(0);
   const [error, setError] = useState("");
-  const [calculationLoading, setCalculationLoading] = useState(false);
 
-  // Data loading and state management functions
+  // Data loading and state management
   const loadData = async () => {
     try {
       setLoading(true);
@@ -24,10 +23,7 @@ const ServiceChargeTable = () => {
       const result = await serviceChargeService.getAllCharges();
       if (result.success) {
         const data = result.data;
-        const total = data.reduce(
-          (sum, item) => sum + parseFloat(item.amount || 0),
-          0
-        );
+        const total = data.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
         setCharges(data);
         setFilteredData(data);
         setTotalDistributed(total);
@@ -45,16 +41,7 @@ const ServiceChargeTable = () => {
     loadData();
   }, []);
 
-  const handleRefresh = async () => {
-    try {
-      setCalculationLoading(true);
-      await loadData();
-    } finally {
-      setCalculationLoading(false);
-    }
-  };
-
-  // Filtering logic
+  // Filter handling
   useEffect(() => {
     const filterData = () => {
       if (selectedMonth === "") {
@@ -76,14 +63,7 @@ const ServiceChargeTable = () => {
     filterData();
   }, [selectedMonth, charges]);
 
-  // Helper functions
-  const formatCurrency = (value) => {
-    return parseFloat(value || 0).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
-
+  // Group charges by event
   const groupByEvent = (data) => {
     return data.reduce((acc, current) => {
       const existing = acc.find(item => item.event_id === current.event_id);
@@ -102,7 +82,15 @@ const ServiceChargeTable = () => {
     }, []);
   };
 
-  // Loading and error states
+  // Format currency values
+  const formatCurrency = (value) => {
+    return parseFloat(value || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  // Loading state
   if (loading) {
     return (
       <div className="p-6 text-center">
@@ -112,12 +100,13 @@ const ServiceChargeTable = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="p-6 text-center text-red-500">
         Error: {error}
         <button
-          onClick={handleRefresh}
+          onClick={loadData}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Try Again
@@ -126,47 +115,19 @@ const ServiceChargeTable = () => {
     );
   }
 
-  // Main component render
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-          <h1 className="text-3xl font-bold text-gray-800 bg-clip-text bg-gradient-to-r from-blue-600 to-green-500">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+          <h1 className="text-2xl font-bold text-gray-800">
             Service Charge Distribution
           </h1>
-          <button
-            onClick={handleRefresh}
-            disabled={calculationLoading}
-            className="flex items-center px-5 py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-all disabled:opacity-50"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            {calculationLoading ? "Refreshing..." : "Refresh Data"}
-          </button>
-        </div>
-
-        {/* Filters and Stats */}
-        <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Filter by Month
-            </label>
+          <div className="flex items-center gap-4">
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Months</option>
               {Array.from({ length: 12 }, (_, i) => (
@@ -176,60 +137,37 @@ const ServiceChargeTable = () => {
               ))}
             </select>
           </div>
+        </div>
 
-          {/* Total Distributed Card */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Total Distributed
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-green-600">
+                <p className="text-sm text-gray-600">Total Distributed</p>
+                <p className="text-2xl font-semibold text-green-600">
                   LKR {formatCurrency(totalDistributed)}
                 </p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
+              <div className="bg-green-100 p-2 rounded-full">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          {/* Total Events Card */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Total Events
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-indigo-600">
+                <p className="text-sm text-gray-600">Total Events</p>
+                <p className="text-2xl font-semibold text-blue-600">
                   {new Set(filteredData.map((item) => item.event_id)).size}
                 </p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-full">
-                <svg
-                  className="w-8 h-8 text-indigo-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
+              <div className="bg-blue-100 p-2 rounded-full">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
             </div>
@@ -237,19 +175,15 @@ const ServiceChargeTable = () => {
         </div>
 
         {/* Main Table */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {["Event", "SC ID", "Employee", "Role", "Event Budget", "Amount", "Date", "Customer"].map((header) => (
+                  {['EVENT', 'SC ID', 'EMPLOYEE', 'ROLE', 'EVENT BUDGET', 'AMOUNT', 'DATE', 'CUSTOMER'].map((header) => (
                     <th
                       key={header}
-                      className={`px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider ${
-                        header === 'SC ID' 
-                          ? 'w-[400px]'  // Fixed width for SC ID column
-                          : 'whitespace-nowrap'
-                      }`}
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
                       {header}
                     </th>
@@ -260,91 +194,81 @@ const ServiceChargeTable = () => {
                 {groupByEvent(filteredData).map((eventGroup) => (
                   <React.Fragment key={eventGroup.event_id}>
                     {eventGroup.entries.map((row, index) => (
-                      <tr
-                        key={`${row.service_charge_id}-${index}`}
-                        className="transition-colors hover:bg-gray-50/50"
-                      >
+                      <tr key={`${row.service_charge_id}-${index}`} className="hover:bg-gray-50">
                         {/* Event ID */}
                         {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
-                            className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r-2 border-gray-100"
+                            className="px-4 py-3 text-sm font-semibold text-gray-900 align-top border-r"
                           >
                             {eventGroup.event_id}
                           </td>
                         )}
 
-                        {/* SC ID with Horizontal Scroll */}
-                        <td className="px-6 py-4 text-sm font-mono text-indigo-600 w-[400px]">
-                          <div className="whitespace-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pb-2">
-                            #{row.service_charge_id}
-                          </div>
+                        {/* SC ID */}
+                        <td className="px-4 py-3 text-sm text-blue-600 font-mono">
+                          #{row.service_charge_id}
                         </td>
 
-                        {/* Employee Details */}
-                        <td className="px-6 py-4 min-w-[200px]">
+                        {/* Employee */}
+                        <td className="px-4 py-3 text-sm text-gray-900">
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                              <span className="text-indigo-600 font-medium">
+                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-blue-600 text-sm">
                                 {row.employee_name?.charAt(0)}
                               </span>
                             </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {row.employee_name}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {row.employee_id}
-                              </div>
+                            <div className="ml-3">
+                              <div className="font-medium">{row.employee_name}</div>
+                              <div className="text-gray-500 text-xs">{row.employee_id}</div>
                             </div>
                           </div>
                         </td>
 
                         {/* Role */}
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        <td className="px-4 py-3 text-sm text-gray-500">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             {row.employee_role}
                           </span>
                         </td>
 
-                        {/* Event Budget */}
+                        {/* Event Budget - Centered */}
                         {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
-                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
+                            className="px-4 py-3 text-sm text-gray-900 align-middle border-r"
                           >
-                            <div className="flex items-center">
-                              <span className="text-gray-400 mr-1">LKR</span>
-                              {formatCurrency(eventGroup.event_budget)}
-                            </div>
+                            LKR {formatCurrency(eventGroup.event_budget)}
                           </td>
                         )}
 
                         {/* Amount */}
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                        <td className="px-4 py-3 text-sm font-semibold text-green-600">
                           + LKR {formatCurrency(row.amount)}
                         </td>
 
-                        {/* Date and Customer */}
+                        {/* Date - Centered */}
                         {index === 0 && (
-                          <>
-                            <td
-                              rowSpan={eventGroup.entries.length}
-                              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r-2 border-gray-100"
-                            >
-                              {new Date(eventGroup.calculation_date).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </td>
-                            <td
-                              rowSpan={eventGroup.entries.length}
-                              className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                            >
-                              {eventGroup.customer_name}
-                            </td>
-                          </>
+                          <td
+                            rowSpan={eventGroup.entries.length}
+                            className="px-4 py-3 text-sm text-gray-500 align-middle border-r"
+                          >
+                            {new Date(eventGroup.calculation_date).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </td>
+                        )}
+
+                        {/* Customer - Centered */}
+                        {index === 0 && (
+                          <td
+                            rowSpan={eventGroup.entries.length}
+                            className="px-4 py-3 text-sm text-gray-900 align-middle"
+                          >
+                            {eventGroup.customer_name}
+                          </td>
                         )}
                       </tr>
                     ))}
@@ -370,7 +294,7 @@ const ServiceChargeTable = () => {
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                 />
               </svg>
-              <p className="mt-4">No records found for selected month</p>
+              <p className="mt-2 text-sm">No service charges found for selected period</p>
             </div>
           )}
         </div>
