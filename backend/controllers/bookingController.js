@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -189,6 +189,13 @@ export async function createBooking(req, res) {
     if(payDeposit){
         status = 'confirmed';
     }
+
+    // Valid new booking is already booked with same booking_date & slot
+    const existingBooking = await checkBookingExists(date, slot, venueId);
+    if (existingBooking) {
+      return res.status(400).json({ error: 'Booking already exists for this date and slot' });
+    }
+
     const insertedId = await insertBooking({
       date,
       slot,

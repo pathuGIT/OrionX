@@ -153,3 +153,11 @@ export const getBookingById = async (id) => {
   const [rows] = await pool.query('SELECT * FROM booking WHERE booking_id = ?', [id]);
   return rows[0];
 }
+
+// checkBookingExists model
+export const checkBookingExists = (date, slot, venueId) => {
+    return pool.query(
+        'SELECT 1 FROM booking WHERE booking_date = ? AND time_slot = ? AND venue_id = ? AND status = ? LIMIT 1',
+        [date, slot, venueId, 'confirmed']
+    ).then(([rows]) => rows.length > 0);
+}
