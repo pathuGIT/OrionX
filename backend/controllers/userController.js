@@ -393,3 +393,75 @@ export const saveServiceChargeCalculation = async (req, res) => {
     connection.release();
   }
 };
+
+//deduction.............
+
+export const deductionController = {
+  calculateDeductions: async (req, res) => {
+    try {
+      const result = await DeductionModel.calculateDeductions();
+      res.json({
+        success: true,
+        message: result.message,
+        affectedRows: result.affectedRows
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Deduction calculation failed",
+        error: error.message
+      });
+    }
+  },
+
+  getAllDeductions: async (req, res) => {
+    try {
+      const deductions = await DeductionModel.getAllDeductions();
+      res.json({
+        success: true,
+        data: deductions
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve deductions",
+        error: error.message
+      });
+    }
+  },
+
+  getDeductionDetails: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deduction = await DeductionModel.getDeductionDetails(id);
+      res.json({
+        success: true,
+        data: deduction
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve deduction details",
+        error: error.message
+      });
+    }
+  },
+
+  updateDeductionStatus: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      await DeductionModel.updateDeductionStatus(id, status);
+      res.json({
+        success: true,
+        message: "Deduction status updated successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to update deduction status",
+        error: error.message
+      });
+    }
+  }
+};

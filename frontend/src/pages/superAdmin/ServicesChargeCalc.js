@@ -9,7 +9,6 @@ const ServiceChargeTable = () => {
   const [totalDistributed, setTotalDistributed] = useState(0);
   const [error, setError] = useState("");
 
-  // Data loading and state management
   const loadData = async () => {
     try {
       setLoading(true);
@@ -41,7 +40,6 @@ const ServiceChargeTable = () => {
     loadData();
   }, []);
 
-  // Filter handling
   useEffect(() => {
     const filterData = () => {
       if (selectedMonth === "") {
@@ -63,7 +61,6 @@ const ServiceChargeTable = () => {
     filterData();
   }, [selectedMonth, charges]);
 
-  // Group charges by event
   const groupByEvent = (data) => {
     return data.reduce((acc, current) => {
       const existing = acc.find(item => item.event_id === current.event_id);
@@ -82,7 +79,6 @@ const ServiceChargeTable = () => {
     }, []);
   };
 
-  // Format currency values
   const formatCurrency = (value) => {
     return parseFloat(value || 0).toLocaleString("en-US", {
       minimumFractionDigits: 2,
@@ -90,7 +86,6 @@ const ServiceChargeTable = () => {
     });
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="p-6 text-center">
@@ -100,7 +95,6 @@ const ServiceChargeTable = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="p-6 text-center text-red-500">
@@ -118,7 +112,6 @@ const ServiceChargeTable = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
           <h1 className="text-2xl font-bold text-gray-800">
             Service Charge Distribution
@@ -139,7 +132,6 @@ const ServiceChargeTable = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <div className="flex justify-between items-center">
@@ -174,7 +166,6 @@ const ServiceChargeTable = () => {
           </div>
         </div>
 
-        {/* Main Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -195,22 +186,20 @@ const ServiceChargeTable = () => {
                   <React.Fragment key={eventGroup.event_id}>
                     {eventGroup.entries.map((row, index) => (
                       <tr key={`${row.service_charge_id}-${index}`} className="hover:bg-gray-50">
-                        {/* Event ID */}
+                        {/* Centered EVENT Column */}
                         {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
-                            className="px-4 py-3 text-sm font-semibold text-gray-900 align-top border-r"
+                            className="px-4 py-3 text-sm font-semibold text-gray-900 align-middle border-r"
                           >
                             {eventGroup.event_id}
                           </td>
                         )}
 
-                        {/* SC ID */}
                         <td className="px-4 py-3 text-sm text-blue-600 font-mono">
                           #{row.service_charge_id}
                         </td>
 
-                        {/* Employee */}
                         <td className="px-4 py-3 text-sm text-gray-900">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -225,14 +214,12 @@ const ServiceChargeTable = () => {
                           </div>
                         </td>
 
-                        {/* Role */}
                         <td className="px-4 py-3 text-sm text-gray-500">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             {row.employee_role}
                           </span>
                         </td>
 
-                        {/* Event Budget - Centered */}
                         {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
@@ -242,12 +229,10 @@ const ServiceChargeTable = () => {
                           </td>
                         )}
 
-                        {/* Amount */}
                         <td className="px-4 py-3 text-sm font-semibold text-green-600">
                           + LKR {formatCurrency(row.amount)}
                         </td>
 
-                        {/* Date - Centered */}
                         {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
@@ -261,7 +246,6 @@ const ServiceChargeTable = () => {
                           </td>
                         )}
 
-                        {/* Customer - Centered */}
                         {index === 0 && (
                           <td
                             rowSpan={eventGroup.entries.length}
@@ -278,7 +262,6 @@ const ServiceChargeTable = () => {
             </table>
           </div>
 
-          {/* Empty State */}
           {filteredData.length === 0 && (
             <div className="p-8 text-center text-gray-500">
               <svg

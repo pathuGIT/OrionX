@@ -1,4 +1,5 @@
 import api from './Api';
+import axios from 'axios';
 
 export const getEmployees = async () => {
     const response = await api.get('/user/getEmployees');
@@ -100,4 +101,14 @@ export const serviceChargeService = {
         };
       }
     }
+  };
+
+  //deduction......................
+
+  export const deductionService = {
+    calculateDeductions: () => axios.post('/user/deductions/calculate'),
+    getAllDeductions: () => axios.get('/user/deductions'),
+    getDeductionDetails: (id) => axios.get(`/user/deductions/${id}`),
+    updateDeductionStatus: (id, status) => 
+      axios.patch(`/user/deductions/${id}/status`, { status })
   };
