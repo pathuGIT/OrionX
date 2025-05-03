@@ -42,18 +42,18 @@ export const addCustomer = async (req, res) => {
     const { name, email, address, phone } = req.body;
     try {
         const checkPhone = await getCustomerByPhoneModel(phone);
-        console.log(checkPhone)
         if (checkPhone) return res.status(400).json({ message: 'Phone already exist...' });
 
         const checkEmail = await getCustomerByEmailModel(email);
         if (checkEmail) return res.status(400).json({ message: 'Email already exist...' });
 
-        await addCustomerModel(name, email, address, phone);
+        const customer = await addCustomerModel(name, email, address, phone);
 
         const user = await getCustomerByEmailModel(email);
         await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
-
-        res.status(201).json({ message: `User registered successfully and User ID sent to email: ${email}` });
+        
+        console.log(`User ID sent toooooooo: ${customer}`);
+        res.status(201).json({ message: `User registered successfully and User ID sent to email: ${email}`, cus_id: customer });
 
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });

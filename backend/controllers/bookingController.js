@@ -169,6 +169,8 @@ export async function createBooking(req, res) {
       extraHours,
       payDeposit // boolean
     } = req.body;
+
+    console.log("Bookk:",req.body)
     // 1. Fetch venue details
     const venue = await getVenueBytId(venueId);
     if (!venue) return res.status(404).json({ error: 'Venue not found' });
@@ -208,9 +210,7 @@ export async function createBooking(req, res) {
     const forfeitedDeposit = await getDamageFeeForfeited(bookingId);
 
     // 7. Insert pricing row
-    console.log("Total is: ", hallCharge ,"+", extraHourFee);
     const overallTotal = Number(hallCharge) + Number(extraHourFee);
-    console.log("Total is: ", overallTotal);
     await insertPricing({
       bookingId,
       menuPriceTotal: 0.00,
