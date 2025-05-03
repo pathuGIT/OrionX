@@ -169,7 +169,6 @@ export async function createBooking(req, res) {
       extraHours,
       payDeposit // boolean
     } = req.body;
-    console.log("as",req.body)
     // 1. Fetch venue details
     const venue = await getVenueBytId(venueId);
     if (!venue) return res.status(404).json({ error: 'Venue not found' });
@@ -177,20 +176,25 @@ export async function createBooking(req, res) {
     // 2. Calculate hall charge
     let hallCharge = 0.00;
     if (guests >= venue.min_capacity && guests <= venue.max_capacity) {
-      hallCharge = 35000.00;
+      hallCharge = venue.price;
     }
 
     // 3. Calculate extra hour fee
     const extraHourFee = extraHours * parseFloat(venue.additional_hour_fee || 0);
 
     // 4. Insert booking
+    let status = 'pending';
+    if(payDeposit){
+        status = 'confirmed';
+    }
     const insertedId = await insertBooking({
       date,
       slot,
       customerId,
       guests,
       venueId,
-      extraHours
+      extraHours,
+      status
     });
     const bookingId = insertedId; // if varchar, adjust accordingly
 
@@ -204,7 +208,9 @@ export async function createBooking(req, res) {
     const forfeitedDeposit = await getDamageFeeForfeited(bookingId);
 
     // 7. Insert pricing row
-    const overallTotal = hallCharge + extraHourFee;
+    console.log("Total is: ", hallCharge ,"+", extraHourFee);
+    const overallTotal = Number(hallCharge) + Number(extraHourFee);
+    console.log("Total is: ", overallTotal);
     await insertPricing({
       bookingId,
       menuPriceTotal: 0.00,

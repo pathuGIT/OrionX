@@ -40,7 +40,7 @@ const BookingView = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      console.log(form);
+      console.log("sasas",form);
       const res = await BookingService.createBooking(form);
       setResult(`Booking created: ${res.data.booking_id}`);
     } catch (err) {

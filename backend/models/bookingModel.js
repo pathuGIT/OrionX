@@ -96,9 +96,9 @@ export const insertBooking = async (booking) => {
   const sql = `
     INSERT INTO booking
       (time_slot, status, booking_date, total_price, created_at, updated_at, venue_id, customer_id, number_of_guests, additional_hours)
-    VALUES (?, 'confirmed', ?, 0.00, NOW(), NOW(), ?, ?, ?, ?)
+    VALUES (?, ?, ?, 0.00, NOW(), NOW(), ?, ?, ?, ?)
   `;
-  const params = [booking.slot, booking.date, booking.venueId, booking.customerId, booking.guests, booking.extraHours];
+  const params = [booking.slot, booking.status, booking.date, booking.venueId, booking.customerId, booking.guests, booking.extraHours || 0];
   await pool.query(sql, params);
 
   // Fetch the latest booking_id for this customer, venue, and date
