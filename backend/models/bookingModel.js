@@ -102,12 +102,16 @@ export const insertBooking = async (booking) => {
   await pool.query(sql, params);
 
   // Fetch the latest booking_id for this customer, venue, and date
+//   const [rows] = await pool.query(
+//     `SELECT booking_id FROM booking
+//      WHERE customer_id = ? AND venue_id = ? AND booking_date = ?
+//      ORDER BY created_at DESC LIMIT 1`,
+//     [booking.customerId, booking.venueId, booking.date]
+//   );
   const [rows] = await pool.query(
-    `SELECT booking_id FROM booking
-     WHERE customer_id = ? AND venue_id = ? AND booking_date = ?
-     ORDER BY created_at DESC LIMIT 1`,
-    [booking.customerId, booking.venueId, booking.date]
+    `SELECT booking_id FROM booking ORDER BY booking_id DESC LIMIT 1`
   );
+  console.log("assssssssss:",rows[0].booking_id);
   return rows.length ? rows[0].booking_id : null;
 }
 
