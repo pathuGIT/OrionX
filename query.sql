@@ -262,6 +262,9 @@ CREATE TABLE booking_pricing (
   menu_price_total DECIMAL(10,2) NOT NULL,
   hall_charge DECIMAL(10,2) NOT NULL,
   extra_hour_fee DECIMAL(10,2) DEFAULT 0.00,
+  bites_payment DECIMAL(10,2) DEFAULT 0.00,
+  fountain_payment DECIMAL(10,2) DEFAULT 0.00, -- for champagne or milk fountain
+  other_payment DECIMAL(10,2) DEFAULT 0.00,
   overall_total DECIMAL(10,2) NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

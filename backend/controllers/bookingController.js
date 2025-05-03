@@ -193,7 +193,7 @@ export async function createBooking(req, res) {
     // Valid new booking is already booked with same booking_date & slot
     const existingBooking = await checkBookingExists(date, slot, venueId);
     if (existingBooking) {
-      return res.status(400).json({ error: 'Booking already exists for this date and slot' });
+      return res.status(400).json({ message: 'Booking already exists for this date and slot!!. Please check another date or venue.' });
     }
 
     const insertedId = await insertBooking({
