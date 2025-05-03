@@ -1,8 +1,9 @@
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId } from "../models/bookingModel.js";
+import { v4 as uuidv4 } from 'uuid';
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
-    const { name, time, location, minCapacity, maxCapacity, price } = req.body;
+    const { name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod } = req.body;
 
     // Validation
     if (
@@ -11,7 +12,10 @@ export const addVenue = async (req, res) => {
         !location ||
         minCapacity == null ||
         maxCapacity == null ||
-        price == null
+        price == null ||
+        additionalHourFee == null ||
+        openedTimePeriod == null
+        
     ) {
         return res.status(400).json({ msg: "All fields are required." });
     }
@@ -27,12 +31,17 @@ export const addVenue = async (req, res) => {
     if (isNaN(price) || price < 0) {
         return res.status(400).json({ msg: "price must be a non-negative number." });
     }
+    if (isNaN(additionalHourFee) || additionalHourFee < 0) {
+        return res.status(400).json({ msg: "additionalHourFee must be a non-negative number." });
+    }
+    if (isNaN(additionalHourFee) || additionalHourFee < 0) {
+        return res.status(400).json({ msg: "openedTimePeriod is required." });
+    }
 
     try {
-        await addNewVenue({ name, time, location, minCapacity, maxCapacity, price });
+        await addNewVenue({ name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod });
         res.status(201).json({ message: `Venue added successfully` });
     } catch (error) {
-        console.error(error); // <-- add this
         res.status(500).json({ msg: 'Server error...', error });
     }
 
@@ -91,7 +100,7 @@ export const getVenueById = async (req, res) => {
 
 export const updateVenueById = async (req, res) => {
     const { id } = req.query;
-    const { name, time, location, minCapacity, maxCapacity, price } = req.body;
+    const { name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod } = req.body;
 
     // Correct way to check if venue exists
     if (!(await checkVenuById(id))) {
@@ -105,7 +114,10 @@ export const updateVenueById = async (req, res) => {
         !location ||
         minCapacity == null ||
         maxCapacity == null ||
-        price == null
+        price == null ||
+        additionalHourFee == null ||
+        openedTimePeriod == null
+        
     ) {
         return res.status(400).json({ msg: "All fields are required." });
     }
@@ -121,9 +133,16 @@ export const updateVenueById = async (req, res) => {
     if (isNaN(price) || price < 0) {
         return res.status(400).json({ msg: "price must be a non-negative number." });
     }
-
+    
+    if (isNaN(additionalHourFee) || additionalHourFee < 0) {
+        return res.status(400).json({ msg: "additionalHourFee must be a non-negative number." });
+    }
+    if (isNaN(openedTimePeriod) || openedTimePeriod < 0) {
+        return res.status(400).json({ msg: "openedTimePeriod must be a non-negative number." });
+    }
+    
     try {
-        await updateNewVenueModel({ id, name, time, location, minCapacity, maxCapacity, price });
+        await updateNewVenueModel({ id, name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod });
         res.status(201).json({ message: `Venue updated successfully` });
     } catch (error) {
         res.status(500).json({ msg: 'Server error...', error });
@@ -134,4 +153,81 @@ export const checkVenuIdInBooking = async (req, res) => {
     const { venueId } = req.params;
     const bookingExists = await checkBookingByVenueId(venueId);
     res.status(200).json({ exists: bookingExists });
+}
+
+
+
+/////////////////
+export async function createBooking(req, res) {
+  try {
+    const {
+      date,
+      slot,
+      customerId,
+      guests,
+      venueId,
+      extraHours,
+      payDeposit // boolean
+    } = req.body;
+    console.log("as",req.body)
+    // 1. Fetch venue details
+    const venue = await getVenueBytId(venueId);
+    if (!venue) return res.status(404).json({ error: 'Venue not found' });
+
+    // 2. Calculate hall charge
+    let hallCharge = 0.00;
+    if (guests >= venue.min_capacity && guests <= venue.max_capacity) {
+      hallCharge = 35000.00;
+    }
+
+    // 3. Calculate extra hour fee
+    const extraHourFee = extraHours * parseFloat(venue.additional_hour_fee || 0);
+
+    // 4. Insert booking
+    const insertedId = await insertBooking({
+      date,
+      slot,
+      customerId,
+      guests,
+      venueId,
+      extraHours
+    });
+    const bookingId = insertedId; // if varchar, adjust accordingly
+
+    // 5. Insert contract if paid
+    if (payDeposit) {
+      const contractId = uuidv4();
+      await insertContract({ bookingId });
+    }
+
+    // 6. Forfeited deposit (damage fee) if any
+    const forfeitedDeposit = await getDamageFeeForfeited(bookingId);
+
+    // 7. Insert pricing row
+    const overallTotal = hallCharge + extraHourFee;
+    await insertPricing({
+      bookingId,
+      menuPriceTotal: 0.00,
+      hallCharge,
+      extraHourFee,
+      overallTotal,
+      forfeitedDeposit
+    });
+
+    return res.status(201).json({ booking_id: bookingId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+export async function getBooking(req, res) {
+  try {
+    const booking = await getBookingById(req.params.id);
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    res.json(booking);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 }

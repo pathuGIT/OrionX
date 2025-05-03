@@ -242,6 +242,32 @@ CREATE TABLE Event_Cordinator (
     FOREIGN KEY (Cordinator_Name) REFERENCES Cordinator(Cordinator_Name) ON DELETE CASCADE
 );
 
+-- Table: contract
+CREATE TABLE contract (
+  contract_id VARCHAR(20) PRIMARY KEY,
+  booking_id VARCHAR(20),
+  deposit_amount DECIMAL(10,2) NOT NULL,
+  damage_fee DECIMAL(10,2) DEFAULT 0.00,
+  refund_amount DECIMAL(10,2) DEFAULT 0.00,
+  status ENUM('pending', 'refunded', 'forfeited') DEFAULT 'pending',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (booking_id) REFERENCES booking(booking_id)
+);
+
+-- Table: booking_pricing
+CREATE TABLE booking_pricing (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  booking_id VARCHAR(20),
+  menu_price_total DECIMAL(10,2) NOT NULL,
+  hall_charge DECIMAL(10,2) NOT NULL,
+  extra_hour_fee DECIMAL(10,2) DEFAULT 0.00,
+  overall_total DECIMAL(10,2) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (booking_id) REFERENCES booking(booking_id)
+);
+
 
 
 
@@ -484,6 +510,20 @@ BEGIN
 END //
 
 DELIMITER //
+-- Trigger to format booking_id
+CREATE TRIGGER before_booking_contract
+BEFORE INSERT ON contract
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(contract_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM contract;
+    SET new_id = CONCAT('CON', LPAD(max_id, 6, '0'));
+    SET NEW.contract_id = new_id;
+END //
+
+DELIMITER //
 CREATE TRIGGER before_bookig_history_insert
 BEFORE INSERT ON bookig_history
 FOR EACH ROW
@@ -534,3 +574,5 @@ BEGIN
     DELETE FROM otp_store WHERE created_at < NOW() - INTERVAL 3 MINUTE;
 END //
 DELIMITER ;
+
+
