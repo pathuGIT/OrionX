@@ -1,5 +1,5 @@
 import api from './Api';
-import axios from 'axios';
+ 
 
 export const getEmployees = async () => {
     const response = await api.get('/user/getEmployees');
@@ -105,10 +105,75 @@ export const serviceChargeService = {
 
   //deduction......................
 
-  export const deductionService = {
-    calculateDeductions: () => axios.post('/user/deductions/calculate'),
-    getAllDeductions: () => axios.get('/user/deductions'),
-    getDeductionDetails: (id) => axios.get(`/user/deductions/${id}`),
-    updateDeductionStatus: (id, status) => 
-      axios.patch(`/user/deductions/${id}/status`, { status })
-  };
+  // src/services/UserService.js
+ 
+
+export const deductionService = {
+  calculateDeductions: async () => {
+    try {
+      const response = await api.post('/user/deductions/calculate');
+      return {
+        success: true,
+        message: response.data.message,
+        affectedRows: response.data.affectedRows,
+        data: response.data.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Deduction calculation failed',
+        error: error.message
+      };
+    }
+  },
+
+  getAllDeductions: async () => {
+    try {
+      const response = await api.get('/user/deductions');
+      return {
+        success: true,
+        data: response.data.data || [],
+        count: response.data.count || 0
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch deductions',
+        error: error.message
+      };
+    }
+  },
+
+  getDeductionDetails: async (id) => {
+    try {
+      const response = await api.get(`/user/deductions/${id}`);
+      return {
+        success: true,
+        data: response.data.data || null
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch deduction details',
+        error: error.message
+      };
+    }
+  },
+
+  updateDeductionStatus: async (id, status) => {
+    try {
+      const response = await api.patch(`/user/deductions/${id}/status`, { status });
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update deduction status',
+        error: error.message
+      };
+    }
+  }
+};

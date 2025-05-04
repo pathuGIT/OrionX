@@ -27,10 +27,10 @@ router.post('/service-charges/calculate', serviceChargeController.calculateCharg
 router.get('/service-charges', serviceChargeController.getAllCharges);
 router.get('/service-charges/employee/:employeeId', serviceChargeController.getEmployeeCharges);
 
-router.get('/deductions', superAdmin, deductionController.getAllDeductions);
-router.post('/deductions/calculate', superAdmin, deductionController.calculateDeductions);
-router.get('/deductions/:id', superAdmin, deductionController.getDeductionDetails);
-router.patch('/deductions/:id/status', superAdmin, deductionController.updateDeductionStatus);
+router.get('/deductions', deductionController.getAllDeductions);
+router.post('/deductions/calculate',  deductionController.calculateDeductions);
+router.get('/deductions/:id',  deductionController.getDeductionDetails);
+router.patch('/deductions/:id/status',  deductionController.updateDeductionStatus);
 
 
 

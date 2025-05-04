@@ -10,6 +10,8 @@ import {
   deleteEmployeesModel,
   updateEmployeesStatusModel,
   ServiceChargeModel,
+  DeductionModel
+  ,
 
   
 } from "../models/userModel.js";

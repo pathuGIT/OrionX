@@ -207,12 +207,12 @@ export class ServiceChargeModel {
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
-      const [result] = await connection.query('CALL CalculateServiceCharges()');
+      const [result] = await connection.query("CALL CalculateServiceCharges()");
       await connection.commit();
       return {
         success: true,
         message: "Service charges calculated successfully",
-        affectedRows: result.affectedRows
+        affectedRows: result.affectedRows,
       };
     } catch (error) {
       await connection.rollback();
@@ -254,7 +254,8 @@ export class ServiceChargeModel {
   static async getEmployeeCharges(employeeId) {
     const connection = await pool.getConnection();
     try {
-      const [results] = await connection.query(`
+      const [results] = await connection.query(
+        `
         SELECT DISTINCT
           esc.service_charge_id,
           esc.event_id,
@@ -269,7 +270,9 @@ export class ServiceChargeModel {
         JOIN event ev ON esc.event_id = ev.Event_ID
         JOIN booking b ON ev.booking_id = b.booking_id
         WHERE esc.employee_id = ?
-      `, [employeeId]);
+      `,
+        [employeeId]
+      );
       return results;
     } catch (error) {
       throw new Error(`Database error: ${error.message}`);
@@ -286,12 +289,17 @@ export class DeductionModel {
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
-      const [result] = await connection.query('CALL CalculateEmployeeDeductions()');
+      const [result] = await connection.query(`SELECT
+        DATE_FORMAT(calculation_date, '%Y-%m') AS month,
+        SUM(total_deductions) AS total_deductions,
+        COUNT(*) AS deduction_count
+        FROM deductions
+        GROUP BY DATE_FORMAT(calculation_date, '%Y-%m');`);
       await connection.commit();
       return {
         success: true,
         message: "Deductions calculated successfully",
-        affectedRows: result.affectedRows
+        affectedRows: result.affectedRows,
       };
     } catch (error) {
       await connection.rollback();
@@ -328,23 +336,23 @@ export class DeductionModel {
     const connection = await pool.getConnection();
     try {
       const [deduction] = await connection.query(
-        'SELECT * FROM deductions WHERE id = ?', 
+        "SELECT * FROM deductions WHERE id = ?",
         [id]
       );
-      
+
       const [details] = await connection.query(
         `SELECT 
           dd.*,
           e.name AS employee_name
         FROM deduction_details dd
-        JOIN employees e ON dd.employee_id = e.employee_id
+        JOIN employee e ON dd.employee_id = e.employee_id
         WHERE dd.deduction_id = ?`,
         [id]
       );
-      
+
       return {
         ...deduction[0],
-        details
+        details,
       };
     } catch (error) {
       throw new Error(`Database error: ${error.message}`);
@@ -356,10 +364,10 @@ export class DeductionModel {
   static async updateDeductionStatus(id, status) {
     const connection = await pool.getConnection();
     try {
-      await connection.query(
-        'UPDATE deductions SET status = ? WHERE id = ?',
-        [status, id]
-      );
+      await connection.query("UPDATE deductions SET status = ? WHERE id = ?", [
+        status,
+        id,
+      ]);
       return true;
     } catch (error) {
       throw new Error(`Database error: ${error.message}`);
