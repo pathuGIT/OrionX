@@ -161,3 +161,49 @@ export const checkBookingExists = (date, slot, venueId) => {
         [date, slot, venueId, 'confirmed']
     ).then(([rows]) => rows.length > 0);
 }
+
+
+///////////////////// advance booking view models
+
+export const getAllBookings = (status) => {
+  let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
+    p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
+    FROM booking b
+    LEFT JOIN contract c ON b.booking_id = c.booking_id
+    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+  const params = [];
+  if (status && status !== 'all') {
+    sql += ` WHERE b.status = ?`;
+    params.push(status);
+  }
+  sql += ` ORDER BY b.booking_date DESC`;
+  return pool.query(sql, params).then(([rows]) => rows);
+}
+
+export const getBookingByIdAdvance = (bookingId) => {
+  const sql = `SELECT b.*, c.*, p.* FROM booking b
+    LEFT JOIN contract c ON b.booking_id = c.booking_id
+    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id
+    WHERE b.booking_id = ?`;
+  return pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
+
+export const updateBookingStatusModel = async (bookingId, status) => {
+  return await pool.query(
+        `UPDATE booking SET status = ?, updated_at = NOW() WHERE booking_id = ?`,
+        [status, bookingId]
+    );
+}
+
+export const updateContractModel = (bookingId, data) => {
+  const { depositAmount, damageFee, refundAmount, status } = data;
+  const sql = `UPDATE contract SET deposit_amount=?, damage_fee=?, refund_amount=?, status=?, updated_at=NOW() WHERE booking_id=?`;
+  return pool.query(sql, [depositAmount, damageFee, refundAmount, status, bookingId]);
+}
+
+export const updatePricingModel = (bookingId, data) => {
+  const { menuPriceTotal, hallCharge, extraHourFee, bitesPayment, fountainPayment, otherPayment, overallTotal } = data;
+  const sql = `UPDATE booking_pricing SET menu_price_total=?, hall_charge=?, extra_hour_fee=?, bites_payment=?, fountain_payment=?, other_payment=?, overall_total=?, updated_at=NOW() WHERE booking_id=?`;
+  return pool.query(sql, [menuPriceTotal, hallCharge, extraHourFee, bitesPayment, fountainPayment, otherPayment, overallTotal, bookingId]);
+}
+

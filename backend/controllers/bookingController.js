@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -244,3 +244,100 @@ export async function getBooking(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+
+/////////////// Advance booking view controllers
+
+export const getBookings = async (req, res) => {
+    try {
+        const status = req.query.status || "all";
+        const bookings = await getAllBookings(status);
+        res.status(200).json({ success: true, data: bookings });
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch bookings." });
+    }
+};
+
+// Get details of a single booking
+export const getBookingDetails = async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const bookingDetails = await getBookingByIdAdvance(bookingId);
+        if (!bookingDetails) {
+            return res.status(404).json({ success: false, message: "Booking not found." });
+        }
+        res.status(200).json({ success: true, data: bookingDetails });
+    } catch (error) {
+        console.error("Error fetching booking details:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch booking details." });
+    }
+};
+
+// Update booking status
+export const updateBookingStatus = async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const { status } = req.body;
+        const result = await updateBookingStatusModel(bookingId, status);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Booking not found or status not updated." });
+        }
+        res.status(200).json({ success: true, message: "Booking status updated successfully." });
+    } catch (error) {
+        console.error("Error updating booking status:", error);
+        res.status(500).json({ success: false, message: "Failed to update booking status." });
+    }
+};
+
+// Update contract information
+export const updateContract = async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const { depositAmount, damageFee, refundAmount, status } = req.body;
+        const result = await updateContractModel(bookingId, { depositAmount, damageFee, refundAmount, status });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Contract not found or not updated." });
+        }
+        res.status(200).json({ success: true, message: "Contract updated successfully." });
+    } catch (error) {
+        console.error("Error updating contract:", error);
+        res.status(500).json({ success: false, message: "Failed to update contract." });
+    }
+};
+
+// Update booking pricing information
+export const updatePricing = async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const {
+            menuPriceTotal,
+            hallCharge,
+            extraHourFee,
+            bitesPayment,
+            fountainPayment,
+            otherPayment,
+            overallTotal,
+            forfeitedDeposit,
+        } = req.body;
+
+        const result = await updatePricingModel(bookingId, {
+            menuPriceTotal,
+            hallCharge,
+            extraHourFee,
+            bitesPayment,
+            fountainPayment,
+            otherPayment,
+            overallTotal,
+            forfeitedDeposit,
+        });
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Pricing not found or not updated." });
+        }
+        res.status(200).json({ success: true, message: "Pricing updated successfully." });
+    } catch (error) {
+        console.error("Error updating pricing:", error);
+        res.status(500).json({ success: false, message: "Failed to update pricing." });
+    }
+};
