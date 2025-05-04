@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid';
-import { addCustomer } from '../../services/CustomerServise';
+import { addCustomer, searchCustomer } from '../../services/CustomerServise';
 import BookingService from '../../services/BookngService';
 import { getAllVenues } from '../../services/VenueService';
 
@@ -38,8 +38,7 @@ const VenueDropdown = ({ venues, booking, setBooking }) => {
                 <Listbox.Option
                   key={venue.venue_id}
                   className={({ active }) =>
-                    `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
-                      active ? 'bg-blue-100 text-blue-900' : 'text-gray-700'
+                    `relative cursor-pointer select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-100 text-blue-900' : 'text-gray-700'
                     }`
                   }
                   value={venue}
@@ -75,6 +74,7 @@ const BookingView = () => {
   const [customer, setCustomer] = useState({ name: '', email: '', address: '', phone: '' });
   const [customerSuccess, setCustomerSuccess] = useState(false);
   const [bookSuccess, setBookSuccess] = useState(false);
+  const [searchresult, setSearchresult] = useState(false);
   const [errmsg, setErrmsg] = useState({ msg: '', color: '' });
   const [bErrmsg, setBErrmsg] = useState({ msg: '', color: '' });
   const [btnText, setBtnText] = useState('Add Customer');
@@ -83,6 +83,7 @@ const BookingView = () => {
   const [cusres, setCusres] = useState('');
   const [addedCustomer, setAddedCustomer] = useState(null);
   const [venues, setVenues] = useState([]);
+  const [serachlist, setSerachlist] = useState([]);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
@@ -151,7 +152,7 @@ const BookingView = () => {
       setAddedCustomer(customer);
       setCustomer({ name: '', email: '', address: '', phone: '' });
       setErrmsg({ msg: res.message || 'Customer added!', color: 'text-green-600' });
-      setCustomerIdMsg(res.message);
+      setCustomerIdMsg( res.message);
     } catch (err) {
       console.error(err);
       if (err.response?.data?.message) {
@@ -172,6 +173,10 @@ const BookingView = () => {
     venueId: '',
     extraHours: 0,
     payDeposit: false,
+    searchCustomer: false,
+  });
+  const [search, setSearch] = useState({
+    property: ''
   });
 
   // Sync booking.customerId when cusres changes
@@ -187,19 +192,61 @@ const BookingView = () => {
       ...frm,
       [name]: type === 'checkbox' ? checked : value,
     }));
+    if (booking.searchCustomer == false && checked && name === 'searchCustomer') { // if err occur check this {new} 
+      console.log("Search customer is enabled");
+      setCustomerSuccess(true)
+      console.log("add butn: ", customerSuccess)
+    }else{
+      console.log("Search customer is disbled");
+      console.log(cusres)
+      setBooking(b => ({ ...b, customerId: cusres }));
+      setCustomerSuccess(false)
+      console.log("add butn: ", customerSuccess)
+
+    }
   };
+
+  const handleSearch = (e) => {
+    setSearchresult(false)
+    setSearch({ property: e.target.value });
+    const id = e.target.value;
+    setBooking(b => ({ ...b, customerId: id }));
+  }
+
+  const handleSearchChange = async (e) => {
+    setSearchresult(true)
+    const { name, value } = e.target;
+    setSearch(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+    try {
+      const response = await searchCustomer((value.trim())); // use trimmed input value
+      setSerachlist(response.customers);
+    } catch (error) {
+
+      console.error("Error searching customer:", error);
+    }
+  };
+
 
   const submitBooking = async (e) => {
     e.preventDefault();
     setBtnBookingText("Adding...")
     try {
-      if(booking.customerId) {
+      if (booking.customerId) {
+        
+        // testing customer_id
+        console.log("Cusres customer id:", cusres);
+        console.log("search customer_id:",booking.customerId);
+        console.log("as", booking);
+
+
         const res = await BookingService.createBooking(booking);
         setBookSuccess(true);
-        console.log("mawe:",res);
         setResult(`Successfully booking created: ${res.booking_id}`);
         setBErrmsg({ msg: '', color: 'text-red-600' });
-      }else{
+      } else {
         setBErrmsg({ msg: 'Customer ID is required to create a booking. Create a new customer first!!', color: 'text-red-600' });
       }
     } catch (err) {
@@ -208,25 +255,27 @@ const BookingView = () => {
       if (err.response?.data?.message) {
         setBErrmsg({ msg: err.response.data.message, color: 'text-red-600' });
       } else {
-        setBErrmsg({ msg: 'An unexpected error occurred.', color: 'text-red-600' });
+        setBErrmsg({ msg: 'Every fields must be filled.', color: 'text-red-600' }); 
       }
-    }finally{
+    } finally {
       setBtnBookingText("Add Booking");
     }
   };
 
-  const inputClass =
-    'bg-white border border-gray-300 text-gray-900 placeholder-gray-500 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none';
-
+  const inputClass ='bg-white border border-gray-300 text-gray-900 placeholder-gray-500 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none';
+  const mark = (
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
       {/* Customer Form */}
       <div className="bg-white rounded-2xl shadow-lg p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-6">Customer Information</h3>
         <p
-          className={`${errmsg.color} text-center mb-4 ${
-            errmsg.color === 'text-green-600' ? 'hidden' : 'visible'
-          }`}
+          className={`${errmsg.color} text-center mb-4 ${errmsg.color === 'text-green-600' ? 'hidden' : 'visible'
+            }`}
         >
           {errmsg.msg}
         </p>
@@ -287,7 +336,7 @@ const BookingView = () => {
           </div>
         </div>
         <div className="mt-6">
-          {!customerSuccess ? (
+          {!customerSuccess && addedCustomer == null? (
             <button
               onClick={submitCustomer}
               className="bg-zinc-300 border hover:bg-slate-50 hover:border-black text-black font-medium py-2 px-6 rounded-md"
@@ -296,34 +345,57 @@ const BookingView = () => {
             </button>
           ) : (
             <div className="mt-4">
-              <div className="flex items-center text-green-600 text-sm">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Successfully added customer.
+              <div className="flex items-center text-green-700 text-sm">
+                {customerIdMsg ? mark : ''} {customerIdMsg}
+                <p></p>
               </div>
-              <div className="mt-1 text-sm text-green-700">{customerIdMsg}</div>
             </div>
           )}
         </div>
-      
-       {/* Booking form */}
+
+        {/* Booking form */}
         <h3 className="text-lg font-semibold text-gray-800 mb-6 mt-10">Booking Information</h3>
-        <p
-          className={`${bErrmsg.color} text-center mb-4 ${
-            bErrmsg.color === 'text-green-600' ? 'hidden' : 'visible'
-          }`}
-        >
+        <p className={`${bErrmsg.color} text-center mb-4 ${bErrmsg.color === 'text-green-600' ? 'hidden' : 'visible'}`}>
           {bErrmsg.msg}
         </p>
+
         <form onSubmit={submitBooking} className="space-y-4">
+          {/* display Search box if needed */}
+          <label className="flex items-center mt-4">
+            <input
+              name="searchCustomer"
+              type="checkbox"
+              checked={booking.searchCustomer}
+              onChange={handleBookingChange}
+              className="h-5 w-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <span className="ml-3 text-gray-700 text-sm">
+              Add booking for already registered customers.
+            </span>
+          </label>
+
+          <div className={`flex flex-col ${booking.searchCustomer ? 'visible' : 'hidden'}`} >
+            <input
+              placeholder={'Search Customer'}
+              name="property"
+              type="text"
+              value={search.property}
+              onChange={handleSearchChange}
+              className={inputClass}
+            />
+            <div id="dropdown" class={`z-10 ${searchresult ? 'visible' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700`}>
+                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
+                  {serachlist.map((item)=>(
+                    <li key={item.customer_id}>
+                      <button type="button" value={item.customer_id} onClick={handleSearch} class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{item.name}</button>
+                    </li>
+                  ))}
+                </ul>
+            </div>
+          </div>
+
+
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Date */}
             <div className="flex flex-col">
@@ -410,33 +482,33 @@ const BookingView = () => {
             </span>
           </label>
 
-        <div className="mt-6">
-          {!bookSuccess ? (
-            <button
-            type="submit"
-              className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md"
-            >
-              {btnBookingText}
-            </button>
-          ) : (
-            <div className="mt-4">
-              <div className="flex items-center text-green-600 text-sm">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Successfully added booking.
+          <div className="mt-6">
+            {!bookSuccess ? (
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md"
+              >
+                {btnBookingText}
+              </button>
+            ) : (
+              <div className="mt-4">
+                <div className="flex items-center text-green-600 text-sm">
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Successfully added booking.
+                </div>
+                <div className="mt-1 text-sm text-green-700">{result}</div>
               </div>
-              <div className="mt-1 text-sm text-green-700">{result}</div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
         </form>
         {/* {result && <p className="mt-4 text-center">{result}</p>} */}
