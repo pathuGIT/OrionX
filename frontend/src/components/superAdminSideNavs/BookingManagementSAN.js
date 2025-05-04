@@ -3,9 +3,10 @@ import { Logout } from '../../components/Logout'
 import CalenderView from '../../pages/superAdmin/CalenderView';
 import BookingView from '../../pages/superAdmin/BookingView';
 import VenueView from '../../pages/superAdmin/VenueView';
-import BookingHistoryView from '../../pages/superAdmin/BookingHistoryView';
+import BookingHistoryView from '../../pages/superAdmin/BookingsView';
 import InvoiceView from '../../pages/superAdmin/InvoiceView';
 import SearchView from '../../pages/superAdmin/SearchView';
+import BookingsView from '../../pages/superAdmin/BookingsView';
 
 const BookingManagementSAN = ({ setRenderContent }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,7 +33,7 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                 break;
             case 'booking-history-view':
                 setClickedItem('booking-history-view');
-                setRenderContent(() => () => <BookingHistoryView />);
+                setRenderContent(() => () => <BookingsView />);
                 break;
             case 'invoice-view':
                 setClickedItem('invoice-view');
@@ -69,7 +70,15 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                             </svg>
 
-                            <span class="ml-3">New Bookings</span>
+                            <span class="ml-3">New Booking</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onClick={() => handleRenderContent('booking-history-view')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'booking-history-view' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
+                            <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13h2c1.1046 0 2 .8954 2 2s-.8954 2-2 2h-2.5M10 3c0 2.4-3 1.6-3 4m8-4c0 2.4-3 1.6-3 4m-7 4 .6398 6.398C5.84428 19.4428 7.56494 21 9.61995 21H10.38c2.0551 0 3.7757-1.5572 3.9802-3.602L15 11H5Z" />
+                            </svg>
+                            <span class="ml-3">Bookings</span>
                         </a>
                     </li>
                     <li>
@@ -95,14 +104,6 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
                             </svg>
                             <span class="ml-3">Search / Filter</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => handleRenderContent('booking-history-view')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'booking-history-view' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
-                            <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13h2c1.1046 0 2 .8954 2 2s-.8954 2-2 2h-2.5M10 3c0 2.4-3 1.6-3 4m8-4c0 2.4-3 1.6-3 4m-7 4 .6398 6.398C5.84428 19.4428 7.56494 21 9.61995 21H10.38c2.0551 0 3.7757-1.5572 3.9802-3.602L15 11H5Z" />
-                            </svg>
-                            <span class="ml-3">Booking History</span>
                         </a>
                     </li>
 

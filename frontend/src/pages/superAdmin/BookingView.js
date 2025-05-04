@@ -187,16 +187,16 @@ const BookingView = () => {
   }, [cusres]);
 
   const handleBookingChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { id, name, value, type, checked } = e.target;
     setBooking(frm => ({
       ...frm,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    if (booking.searchCustomer == false && checked && name === 'searchCustomer') { // if err occur check this {new} 
+    if (booking.searchCustomer == false && type === 'checkbox' && id === 'searchId') { // if err occur check this {new}
       console.log("Search customer is enabled");
       setCustomerSuccess(true)
       console.log("add butn: ", customerSuccess)
-    }else{
+    }else if (booking.searchCustomer == true && type === 'checkbox' && id === 'searchId'){
       console.log("Search customer is disbled");
       console.log(cusres)
       setBooking(b => ({ ...b, customerId: cusres }));
@@ -363,6 +363,7 @@ const BookingView = () => {
           {/* display Search box if needed */}
           <label className="flex items-center mt-4">
             <input
+              id= 'searchId'
               name="searchCustomer"
               type="checkbox"
               checked={booking.searchCustomer}
