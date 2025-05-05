@@ -272,6 +272,31 @@ CREATE TABLE booking_pricing (
 );
 
 
+DELIMITER //
+
+-- After a new pricing row is inserted
+CREATE TRIGGER trg_booking_pricing_after_insert
+AFTER INSERT ON booking_pricing
+FOR EACH ROW
+BEGIN
+  UPDATE booking
+    SET total_price = NEW.overall_total
+  WHERE booking_id = NEW.booking_id;
+END;
+//
+
+-- After an existing pricing row is updated
+CREATE TRIGGER trg_booking_pricing_after_update
+AFTER UPDATE ON booking_pricing
+FOR EACH ROW
+BEGIN
+  UPDATE booking
+    SET total_price = NEW.overall_total
+  WHERE booking_id = NEW.booking_id;
+END;
+//
+
+DELIMITER ;
 
 
 -- Trigger to format Table_Reserve_ID

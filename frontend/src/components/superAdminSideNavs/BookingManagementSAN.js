@@ -3,10 +3,11 @@ import { Logout } from '../../components/Logout'
 import CalenderView from '../../pages/superAdmin/CalenderView';
 import BookingView from '../../pages/superAdmin/BookingView';
 import VenueView from '../../pages/superAdmin/VenueView';
-import BookingHistoryView from '../../pages/superAdmin/BookingsView';
+import BookingHistoryView from '../../pages/superAdmin/BookingsAnalyze';
 import InvoiceView from '../../pages/superAdmin/InvoiceView';
 import SearchView from '../../pages/superAdmin/SearchView';
-import BookingsView from '../../pages/superAdmin/BookingsView';
+import BookingsView from '../../pages/superAdmin/BookingsAnalyze';
+import BookingsAnalyze from '../../pages/superAdmin/BookingsAnalyze';
 
 const BookingManagementSAN = ({ setRenderContent }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,9 +32,9 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                 setClickedItem('venue-view');
                 setRenderContent(() => () => <VenueView />);
                 break;
-            case 'booking-history-view':
-                setClickedItem('booking-history-view');
-                setRenderContent(() => () => <BookingsView />);
+            case 'booking-analyze':
+                setClickedItem('booking-analyze');
+                setRenderContent(() => () => <BookingsAnalyze />);
                 break;
             case 'invoice-view':
                 setClickedItem('invoice-view');
@@ -74,7 +75,7 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                         </a>
                     </li>
                     <li>
-                        <a href="#" onClick={() => handleRenderContent('booking-history-view')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'booking-history-view' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
+                        <a href="#" onClick={() => handleRenderContent('booking-analyze')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'booking-analyze' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
                             <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13h2c1.1046 0 2 .8954 2 2s-.8954 2-2 2h-2.5M10 3c0 2.4-3 1.6-3 4m8-4c0 2.4-3 1.6-3 4m-7 4 .6398 6.398C5.84428 19.4428 7.56494 21 9.61995 21H10.38c2.0551 0 3.7757-1.5572 3.9802-3.602L15 11H5Z" />
                             </svg>
