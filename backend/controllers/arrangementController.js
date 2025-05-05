@@ -57,7 +57,7 @@ export const createArrangement = async (req, res) => {
             });
         }
 
-        const arrangementId = await TableChairArrangementModel.createArrangement(
+        const arrangementId = await TableChairArrangementModel.createOrUpdateArrangement(
             bookingid,
             arrangementData
         );

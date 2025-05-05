@@ -3,64 +3,86 @@ import { EventLinkModel } from './eventTableChairModel.js';
 
 
 export class TableChairArrangementModel {
-    static async createArrangement(booking_id, arrangementData) {
-
+    static async createOrUpdateArrangement(booking_id, arrangementData) {
+        const connection = await db.getConnection();
         try {
+            await connection.query('START TRANSACTION');
 
-            await db.query('START TRANSACTION');
-
-            // 1. Get event ID with validation
-            const [event] = await db.query(
+            // 1. Get event ID
+            const [event] = await connection.query(
                 `SELECT Event_ID FROM Event WHERE booking_id = ?`,
                 [booking_id]
             );
+            if (!event.length) throw new Error('Event not found');
+            const eventId = event[0].Event_ID;
 
-            const newEventID = event[0].Event_ID;
-            console.log(newEventID);
-            console.log(booking_id);
-
-            // 2. Generate arrangement ID
-            const [lastId] = await db.query(
-                `SELECT Arrangement_ID 
-                FROM table_chair_arrangement 
-                ORDER BY Arrangement_ID DESC 
-                LIMIT 1`
+            // 2. Check for existing arrangement
+            const [existing] = await connection.query(
+                `SELECT Arrangement_Id FROM event_table_chair
+                 WHERE Event_ID = ?`,
+                [eventId]
             );
 
-            let newIdNumber = 1;
-            if (lastId.length > 0) {
-                const lastIdString = lastId[0].Arrangement_ID.replace('TCA', '');
-                newIdNumber = parseInt(lastIdString, 10) + 1;
+            let arrangementId;
+            
+            if (existing.length > 0) {
+                // Update existing arrangement
+                arrangementId = existing[0].Arrangement_Id;
+                await connection.query(
+                    `UPDATE table_chair_arrangement 
+                     SET Head_Table_Pax = ?,
+                         Top_Cloth_Color = ?,
+                         Table_Cloth_Color = ?,
+                         Bow_Color = ?,
+                         Chair_Cover_Color = ?
+                     WHERE Arrangement_ID = ?`,
+                    [
+                        arrangementData.headPax,
+                        arrangementData.topClothColor,
+                        arrangementData.tableClothColor,
+                        arrangementData.bowColor,
+                        arrangementData.chairCoverColor,
+                        arrangementId
+                    ]
+                );
+            } else {
+                // Create new arrangement
+                const [lastId] = await connection.query(
+                    `SELECT Arrangement_ID FROM table_chair_arrangement 
+                     ORDER BY Arrangement_ID DESC LIMIT 1`
+                );
+
+                let newIdNumber = lastId.length ? 
+                    parseInt(lastId[0].Arrangement_ID.replace('TCA', '')) + 1 : 1;
+                arrangementId = `TCA${String(newIdNumber).padStart(6, '0')}`;
+
+                await connection.query(
+                    `INSERT INTO table_chair_arrangement 
+                    (Arrangement_ID, Head_Table_Pax, Top_Cloth_Color,
+                     Table_Cloth_Color, Bow_Color, Chair_Cover_Color)
+                    VALUES (?, ?, ?, ?, ?, ?)`,
+                    [
+                        arrangementId,
+                        arrangementData.headPax,
+                        arrangementData.topClothColor,
+                        arrangementData.tableClothColor,
+                        arrangementData.bowColor,
+                        arrangementData.chairCoverColor
+                    ]
+                );
+
+                await EventLinkModel.linkArrangement(eventId, arrangementId);
             }
-            const newArrangementId = `TCA${newIdNumber.toString().padStart(6, '0')}`;
 
-            // 3. Insert arrangement
-            await db.query(
-                `INSERT INTO table_chair_arrangement 
-                (Arrangement_ID, Head_Table_Pax, Top_Cloth_Color, 
-                 Table_Cloth_Color, Bow_Color, Chair_Cover_Color)
-                VALUES (?, ?, ?, ?, ?, ?)`,
-                [
-                    newArrangementId,
-                    arrangementData.headPax,
-                    arrangementData.topClothColor,
-                    arrangementData.tableClothColor,
-                    arrangementData.bowColor,
-                    arrangementData.chairCoverColor,
-                ]
-            );
-
-
-            // 4. Link to event
-            await EventLinkModel.linkArrangement(newEventID, newArrangementId);
-
-            await db.query('COMMIT');
-            return newArrangementId;
+            await connection.query('COMMIT');
+            return arrangementId;
 
         } catch (error) {
-            await db.query('ROLLBACK');
-            console.error("Database Error (createArrangement):", error.message);
-            throw new Error(error.message || "Failed to create arrangement");
+            await connection.query('ROLLBACK');
+            console.error("Database Error:", error.message);
+            throw error;
+        } finally {
+            connection.release();
         }
     }
 
@@ -83,7 +105,6 @@ export class TableChairArrangementModel {
             );
 
             const NewArrangement_Id = event_table_chair[0].Arrangement_Id;
-
 
 
 
@@ -124,13 +145,15 @@ export class TableChairArrangementModel {
                 [newReservationId, tableData.tableNumber, tableData.reserveName]
             );
 
-            // Update arrangement with reservation ID
+            // Link reservation to arrangement
+            
             await connection.query(
-                `UPDATE table_chair_arrangement 
-                             SET Table_Reserve_ID = ?
-                             WHERE Arrangement_ID = ?`,
-                [newReservationId, NewArrangement_Id]
+                `INSERT INTO arrangement_reservation 
+                (Arrangement_ID, Table_Reserve_ID)
+                VALUES (?, ?)`,
+                [NewArrangement_Id, newReservationId]
             );
+
 
 
             await connection.query('COMMIT');

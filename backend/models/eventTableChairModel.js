@@ -2,27 +2,30 @@ import db from '../config/db.js';
 
 export class EventLinkModel {
     static async linkArrangement(eventId, arrangementId) {
-        let connection;
+        const connection = await db.getConnection();
         try {
-            connection = await db.getConnection();
             await connection.query('START TRANSACTION');
 
-            // Link arrangement to event
+            // Remove any existing links
+            await connection.query(
+                `DELETE FROM event_table_chair WHERE Event_ID = ?`,
+                [eventId]
+            );
+
+            // Create new link
             await connection.query(
                 `INSERT INTO event_table_chair (Event_ID, Arrangement_Id)
                 VALUES (?, ?)`,
                 [eventId, arrangementId]
             );
 
-
             await connection.query('COMMIT');
             return true;
         } catch (error) {
             await connection.query('ROLLBACK');
-            console.error("Database Error (linkArrangement):", error.message);
-            throw new Error(error.message || "Failed to link arrangement to event");
+            throw error;
         } finally {
-            if (connection) connection.release();
+            connection.release();
         }
     }
 
