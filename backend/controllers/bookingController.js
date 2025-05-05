@@ -264,6 +264,7 @@ export const getBookingDetails = async (req, res) => {
     try {
         const bookingId = req.params.id;
         const bookingDetails = await getBookingByIdAdvance(bookingId);
+        console.log("xxxxxxxxxxx",bookingDetails)
         if (!bookingDetails) {
             return res.status(404).json({ success: false, message: "Booking not found." });
         }

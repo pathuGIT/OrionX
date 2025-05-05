@@ -20,6 +20,7 @@ export const getBookings = async (status = 'all') => {
 
 export const getBookingDetails = async (id) => {
   const res = await api.get(`/booking/${id}`);
+  console.log("xxxxxxxxxxx", res.data);
   return res.data;
 }
 
