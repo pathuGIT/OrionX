@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateBookingPricingModel, updateDamageFeeModel, getContractById, getBookingPricingById } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateBookingPricingModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -179,9 +179,9 @@ export async function createBooking(req, res) {
         let hallCharge = 0.00;
         if (guests >= venue.min_capacity && guests <= venue.max_capacity) {
             hallCharge = venue.price;
-        }else if (guests > venue.max_capacity){
+        } else if (guests > venue.max_capacity) {
             hallCharge = 0;
-        }else if(guests < venue.min_capacity){
+        } else if (guests < venue.min_capacity) {
             hallCharge = venue.price;
         }
 
@@ -295,7 +295,7 @@ export const updateBookingStatus = async (req, res) => {
             console.log("currentContract", currentContract.data)
             // change contract
             await updateDamageFeeModel(bookingId, 0, 0, 50000, 'pending');
-            
+
 
             // change booking_pricing forfeited_deposit
             const currentBookingPrice = await getBookingPricingById(bookingId);
@@ -311,11 +311,11 @@ export const updateBookingStatus = async (req, res) => {
             await updatePricingModel(bookingId, newBookingPrice);
         }
 
-        if( status === "1"){
-           await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
-           
-           const currentBookingPrice = await getBookingPricingById(bookingId);
-           const newBookingPrice = {
+        if (status === "1") {
+            await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
+
+            const currentBookingPrice = await getBookingPricingById(bookingId);
+            const newBookingPrice = {
                 menuPriceTotal: currentBookingPrice.menu_price_total,
                 hallCharge: currentBookingPrice.hall_charge,
                 extraHourFee: currentBookingPrice.extra_hour_fee,
@@ -494,5 +494,84 @@ export const updateDamageFee = async (req, res) => {
     } catch (error) {
         console.error("Error updating damage fee:", error);
         res.status(500).json({ success: false, message: "Failed to update damage fee." });
+    }
+}
+
+export const updateGuests = async (req, res) => {
+    const bookingId = req.params.id;
+    const { number_of_guests } = req.body;
+
+    try {
+        // get current booking
+        const currBooking = await getBookingById(bookingId);
+        
+        // update current booking guest
+        await updateGuestsModel(bookingId, number_of_guests);
+        console.log(bookingId,number_of_guests)
+
+        // get current venue 
+        const venue = await getVenueBytId(currBooking.venue_id);
+
+        let hallCharge = 0.00;
+        if (number_of_guests >= venue.min_capacity && number_of_guests <= venue.max_capacity) {
+            hallCharge = venue.price;
+        } else if (number_of_guests > venue.max_capacity) {
+            hallCharge = 0;
+        } else if (number_of_guests < venue.min_capacity) {
+            hallCharge = venue.price;
+        }
+
+        // Calculate extra hour fee if needed
+        const extraHourFee = (currBooking.additional_hours || 0) * parseFloat(venue.additional_hour_fee || 0);
+
+        // get curr booking pricing
+        const currentBookingPrice = await getBookingPricingById(bookingId);
+        const newBookingPrice = {
+            menuPriceTotal: currentBookingPrice.menu_price_total,
+            hallCharge: hallCharge,
+            extraHourFee: extraHourFee,
+            bitesPayment: currentBookingPrice.bites_payment,
+            fountainPayment: currentBookingPrice.fountain_payment,
+            otherPayment: currentBookingPrice.other_payment,
+            forfeitedDeposit: currentBookingPrice.forfeited_deposit
+        };
+        // update curr booking pricing
+        await updatePricingModel(bookingId, newBookingPrice);
+        res.status(200).json({ success: true, message: "No.of guests updated successfully." });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to update No.of guests.", error: err.message });
+    }
+}
+
+export const updateAdditionalHours = async (req, res) => {
+    const bookingId = req.params.id;
+    const { additionalHours } = req.body;
+
+    try {
+        await updateAdditionalHoursModel(bookingId, additionalHours);
+        
+        const currBooking = await getBookingById(bookingId);
+        // get current venue 
+        const venue = await getVenueBytId(currBooking.venue_id);
+
+        // get curr booking pricing
+        const currentBookingPrice = await getBookingPricingById(bookingId);
+        const newExtraHourFee = Number(venue.additional_hour_fee) * Number(additionalHours);
+        const newBookingPrice = {
+            menuPriceTotal: currentBookingPrice.menu_price_total,
+            hallCharge: currentBookingPrice.hall_charge,
+            extraHourFee: newExtraHourFee,
+            bitesPayment: currentBookingPrice.bites_payment,
+            fountainPayment: currentBookingPrice.fountain_payment,
+            otherPayment: currentBookingPrice.other_payment,
+            forfeitedDeposit: currentBookingPrice.forfeited_deposit
+        };
+        // update curr booking pricing
+        await updatePricingModel(bookingId, newBookingPrice);
+
+        res.status(200).json({ success: true, message: "Additional hours updated successfully." });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to update additional hours.", error: err.message });
     }
 }

@@ -31,11 +31,6 @@ const BookingsAnalyze = () => {
             <StatusFilter currentStatus={status} onChange={setStatus} />
             <BookingTable bookings={bookings} onRowClick={handleRowClick} />
             {selectedBooking && (
-                // <BookingDetailModal
-                //     details={selectedBooking}
-                //     onClose={() => setSelectedBooking(null)}
-                //     onSave={handleSaveDetails}
-                // />
                 <BookingDetailsView 
                     bookingId={selectedBooking.booking_id} 
                     onClose={() => setSelectedBooking(null)}

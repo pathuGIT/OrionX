@@ -235,3 +235,17 @@ export const getBookingPricingById = async (bookingId) => {
   const sql = `SELECT * FROM booking_pricing WHERE booking_id = ?`;
   return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
 }
+
+export const updateGuestsModel = async (bookingId, guests) => {
+  return pool.query(
+    `UPDATE booking SET number_of_guests = ?, updated_at = NOW() WHERE booking_id = ?`,
+    [guests, bookingId]
+  );
+}
+
+export const updateAdditionalHoursModel = async (bookingId, additionalHours) => {
+  return pool.query(
+    `UPDATE booking SET additional_hours = ?, updated_at = NOW() WHERE booking_id = ?`,
+    [additionalHours, bookingId]
+  );
+}

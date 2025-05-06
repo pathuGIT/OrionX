@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import BookingService, { getBookingDetails, updateBookingStatus, updateBookingVenue, updateDamageFee } from '../../services/BookngService';
+import BookingService, { getBookingDetails, updateAdditionalHours, updateBookingGuest, updateBookingStatus, updateBookingVenue, updateDamageFee } from '../../services/BookngService';
 import VenueDropdown from './VenueDropdown';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
 
@@ -27,7 +27,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
         }
     }, [label]);
 
-    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)") return (
+    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours") return (
         <div className="flex flex-col border relative group">
             {/* Display label and value when not editing */}
             {!edit && (
@@ -67,6 +67,22 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
                             onChange={e => setSelectedVenue({"damageFee": e.target.value, "refundAmount":"", "depositAmount":"", "status":"" })}
                         />
                     )}
+                    {label === "Guests" &&(
+                        <input
+                            type="number"
+                            className="border rounded p-1"
+                            value={selectedVenue.number_of_guests}
+                            onChange={e => setSelectedVenue({"number_of_guests": e.target.value})}
+                        />
+                    )}
+                    {label === "Additional Hours" &&(
+                        <input
+                            type="number"
+                            className="border rounded p-1"
+                            value={selectedVenue.additionalHours}
+                            onChange={e => setSelectedVenue({"additionalHours": e.target.value})}
+                        />
+                    )}
                     <div className="flex gap-2 mt-1">
                         <button
                             className="px-2 py-1 bg-green-500 text-white rounded"
@@ -84,6 +100,14 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
                                         setEdit(false);
                                     } else if(label === "Damage Fee (Rs)") {
                                         await updateDamageFee(bookingId, selectedVenue);
+                                        setRefresh(true);
+                                        setEdit(false);
+                                    } else if(label === "Guests") {
+                                        await updateBookingGuest(bookingId, selectedVenue)
+                                        setRefresh(true);
+                                        setEdit(false);
+                                    } else if(label === "Additional Hours"){
+                                        await updateAdditionalHours(bookingId, selectedVenue);
                                         setRefresh(true);
                                         setEdit(false);
                                     }
@@ -230,8 +254,18 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         setRefresh={setRefresh}
                                     />
                                     <DetailRow label="Customer ID" value={b.customer_id} />
-                                    <DetailRow label="Guests" value={b.number_of_guests} />
-                                    <DetailRow label="Additional Hours" value={b.additional_hours} />
+                                    <DetailRow 
+                                        label="Guests" 
+                                        value={b.number_of_guests} 
+                                        bookingId={b.booking_id}
+                                        setRefresh={setRefresh}
+                                    />
+                                    <DetailRow 
+                                        label="Additional Hours" 
+                                        value={b.additional_hours} 
+                                        bookingId={b.booking_id}
+                                        setRefresh={setRefresh}
+                                    />
                                 </div>
                             </section>
 

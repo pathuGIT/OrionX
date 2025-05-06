@@ -49,5 +49,15 @@ export const updateBookingVenue = async (id, venueId) => {
   return res.data;
 }
 
+export const updateBookingGuest = async (id, {number_of_guests}) => {
+  const res = await api.put(`/booking/${id}/guests`,{number_of_guests});
+  return res.data;
+}
+
+export const updateAdditionalHours = async (id, {additionalHours}) => {
+  console.log("ssssssssssssssssss:",id,additionalHours)
+  const res = await api.put(`/booking/${id}/additional-hours`, { additionalHours });
+  return res.data;
+}
 
 export default BookingService;
