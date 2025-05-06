@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getBookingDetails, getBookings, updateContract, updatePricing } from '../../services/BookngService';
+import { getBookingDetails, getBookings, updateContract } from '../../services/BookngService';
 import { StatusFilter } from '../../components/bookings/StatusFilter';
 import { BookingTable } from '../../components/bookings/BookingTable';
-import { BookingDetailModal } from '../../components/bookings/BookingDetailModal';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
 
 const BookingsAnalyze = () => {
@@ -24,14 +23,7 @@ const BookingsAnalyze = () => {
         getBookingDetails(id).then((data) => setSelectedBooking(data.data));
     };
 
-    const handleSaveDetails = (updatedDetails) => {
-        if (updatedDetails.contract) {
-            updateContract(selectedBooking.booking_id, updatedDetails.contract);
-        }
-        if (updatedDetails.pricing) {
-            updatePricing(selectedBooking.booking_id, updatedDetails.pricing);
-        }
-    };
+    
 
     return (
         <div className="p-6">

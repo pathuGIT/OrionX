@@ -285,17 +285,36 @@ BEGIN
 END;
 //
 
--- After an existing pricing row is updated
+-- 2) Switch to a custom delimiter so MySQL knows where the trigger body ends
+DELIMITER $$
+
+-- 3) BEFORE UPDATE: recompute overall_total from all the NEW values
+CREATE TRIGGER trg_booking_pricing_before_update
+BEFORE UPDATE ON booking_pricing
+FOR EACH ROW
+BEGIN
+  SET NEW.overall_total =
+       COALESCE(NEW.menu_price_total,   0)
+     + COALESCE(NEW.hall_charge,        0)
+     + COALESCE(NEW.extra_hour_fee,     0)
+     + COALESCE(NEW.bites_payment,      0)
+     + COALESCE(NEW.fountain_payment,   0)
+     + COALESCE(NEW.other_payment,      0)
+     + COALESCE(NEW.forfeited_deposit,  0);
+END$$
+
+-- 4) AFTER UPDATE: propagate that new overall_total into booking.total_price
 CREATE TRIGGER trg_booking_pricing_after_update
 AFTER UPDATE ON booking_pricing
 FOR EACH ROW
 BEGIN
   UPDATE booking
-    SET total_price = NEW.overall_total
-  WHERE booking_id = NEW.booking_id;
-END;
-//
+     SET total_price = NEW.overall_total,
+         updated_at   = NOW()
+   WHERE booking_id = NEW.booking_id;
+END$$
 
+-- 5) Restore the normal delimiter
 DELIMITER ;
 
 

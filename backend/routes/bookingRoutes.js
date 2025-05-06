@@ -1,6 +1,6 @@
 import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
-import { addVenue, checkVenuIdInBooking, createBooking, deleteVenueById, getAllVenue, getBooking, getBookingDetails, getBookings, getVenueById, updateBookingStatus, updateContract, updatePricing, updateVenueById } from '../controllers/bookingController.js';
+import { addVenue, checkVenuIdInBooking, createBooking, deleteVenueById, getAllVenue, getBooking, getBookingDetails, getBookings, getVenueById, updateBookingStatus, updateBookingVenue, updateContract, updateDamageFee, updateVenueById } from '../controllers/bookingController.js';
 
 
 const router = express.Router();
@@ -22,6 +22,8 @@ router.get('/',  getBookings); // ?status=confirmed|pending|done|...
 router.get('/:id',  getBookingDetails);
 router.put('/:id/status',  updateBookingStatus);
 router.put('/:id/contract', updateContract);
-router.put('/:id/pricing',  updatePricing);
+router.put('/:id/pricing',  updateDamageFee)
+router.put('/:id/venue',  updateBookingVenue);
+router.put('/:id/damage-fee',  updateDamageFee);
 
 export default router;

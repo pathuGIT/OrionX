@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateBookingPricingModel, updateDamageFeeModel, getContractById, getBookingPricingById } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -15,7 +15,7 @@ export const addVenue = async (req, res) => {
         price == null ||
         additionalHourFee == null ||
         openedTimePeriod == null
-        
+
     ) {
         return res.status(400).json({ msg: "All fields are required." });
     }
@@ -117,7 +117,7 @@ export const updateVenueById = async (req, res) => {
         price == null ||
         additionalHourFee == null ||
         openedTimePeriod == null
-        
+
     ) {
         return res.status(400).json({ msg: "All fields are required." });
     }
@@ -133,14 +133,14 @@ export const updateVenueById = async (req, res) => {
     if (isNaN(price) || price < 0) {
         return res.status(400).json({ msg: "price must be a non-negative number." });
     }
-    
+
     if (isNaN(additionalHourFee) || additionalHourFee < 0) {
         return res.status(400).json({ msg: "additionalHourFee must be a non-negative number." });
     }
     if (isNaN(openedTimePeriod) || openedTimePeriod < 0) {
         return res.status(400).json({ msg: "openedTimePeriod must be a non-negative number." });
     }
-    
+
     try {
         await updateNewVenueModel({ id, name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod });
         res.status(201).json({ message: `Venue updated successfully` });
@@ -159,90 +159,94 @@ export const checkVenuIdInBooking = async (req, res) => {
 
 /////////////////
 export async function createBooking(req, res) {
-  try {
-    const {
-      date,
-      slot,
-      customerId,
-      guests,
-      venueId,
-      extraHours,
-      payDeposit // boolean
-    } = req.body;
+    try {
+        const {
+            date,
+            slot,
+            customerId,
+            guests,
+            venueId,
+            extraHours,
+            payDeposit // boolean
+        } = req.body;
 
-    console.log("Bookk:",req.body)
-    // 1. Fetch venue details
-    const venue = await getVenueBytId(venueId);
-    if (!venue) return res.status(404).json({ error: 'Venue not found' });
+        console.log("Bookk:", req.body)
+        // 1. Fetch venue details
+        const venue = await getVenueBytId(venueId);
+        if (!venue) return res.status(404).json({ error: 'Venue not found' });
 
-    // 2. Calculate hall charge
-    let hallCharge = 0.00;
-    if (guests >= venue.min_capacity && guests <= venue.max_capacity) {
-      hallCharge = venue.price;
+        // 2. Calculate hall charge
+        let hallCharge = 0.00;
+        if (guests >= venue.min_capacity && guests <= venue.max_capacity) {
+            hallCharge = venue.price;
+        }else if (guests > venue.max_capacity){
+            hallCharge = 0;
+        }else if(guests < venue.min_capacity){
+            hallCharge = venue.price;
+        }
+
+        // 3. Calculate extra hour fee
+        const extraHourFee = extraHours * parseFloat(venue.additional_hour_fee || 0);
+
+        // 4. Insert booking
+        let status = 'pending';
+        if (payDeposit) {
+            status = 'confirmed';
+        }
+
+        // Valid new booking is already booked with same booking_date & slot
+        const existingBooking = await checkBookingExists(date, slot, venueId);
+        if (existingBooking) {
+            return res.status(400).json({ message: 'Booking already exists for this date and slot!!. Please check another date or venue.' });
+        }
+
+        const insertedId = await insertBooking({
+            date,
+            slot,
+            customerId,
+            guests,
+            venueId,
+            extraHours,
+            status
+        });
+        const bookingId = insertedId; // if varchar, adjust accordingly
+
+        // 5. Insert contract if paid
+        if (payDeposit) {
+            const contractId = uuidv4();
+            await insertContract({ bookingId });
+        }
+
+        // 6. Forfeited deposit (damage fee) if any
+        const forfeitedDeposit = await getDamageFeeForfeited(bookingId);
+
+        // 7. Insert pricing row
+        const overallTotal = Number(hallCharge) + Number(extraHourFee);
+        await insertPricing({
+            bookingId,
+            menuPriceTotal: 0.00,
+            hallCharge,
+            extraHourFee,
+            overallTotal,
+            forfeitedDeposit
+        });
+
+        return res.status(201).json({ booking_id: bookingId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
     }
-
-    // 3. Calculate extra hour fee
-    const extraHourFee = extraHours * parseFloat(venue.additional_hour_fee || 0);
-
-    // 4. Insert booking
-    let status = 'pending';
-    if(payDeposit){
-        status = 'confirmed';
-    }
-
-    // Valid new booking is already booked with same booking_date & slot
-    const existingBooking = await checkBookingExists(date, slot, venueId);
-    if (existingBooking) {
-      return res.status(400).json({ message: 'Booking already exists for this date and slot!!. Please check another date or venue.' });
-    }
-
-    const insertedId = await insertBooking({
-      date,
-      slot,
-      customerId,
-      guests,
-      venueId,
-      extraHours,
-      status
-    });
-    const bookingId = insertedId; // if varchar, adjust accordingly
-
-    // 5. Insert contract if paid
-    if (payDeposit) {
-      const contractId = uuidv4();
-      await insertContract({ bookingId });
-    }
-
-    // 6. Forfeited deposit (damage fee) if any
-    const forfeitedDeposit = await getDamageFeeForfeited(bookingId);
-
-    // 7. Insert pricing row
-    const overallTotal = Number(hallCharge) + Number(extraHourFee);
-    await insertPricing({
-      bookingId,
-      menuPriceTotal: 0.00,
-      hallCharge,
-      extraHourFee,
-      overallTotal,
-      forfeitedDeposit
-    });
-
-    return res.status(201).json({ booking_id: bookingId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 }
 
 export async function getBooking(req, res) {
-  try {
-    const booking = await getBookingById(req.params.id);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
-    res.json(booking);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+    try {
+        const booking = await getBookingById(req.params.id);
+        if (!booking) return res.status(404).json({ error: 'Booking not found' });
+        res.json(booking);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 }
 
 
@@ -264,7 +268,6 @@ export const getBookingDetails = async (req, res) => {
     try {
         const bookingId = req.params.id;
         const bookingDetails = await getBookingByIdAdvance(bookingId);
-        console.log("xxxxxxxxxxx",bookingDetails)
         if (!bookingDetails) {
             return res.status(404).json({ success: false, message: "Booking not found." });
         }
@@ -280,10 +283,55 @@ export const updateBookingStatus = async (req, res) => {
     try {
         const bookingId = req.params.id;
         const { status } = req.body;
-        const result = await updateBookingStatusModel(bookingId, status);
-        if (result.affectedRows === 0) {
+
+
+        if (status === "2") {
+            const currentContract = await getContractById(bookingId);
+            if (!currentContract) {
+                await insertContract({ bookingId });
+                return res.status(201).json({ success: true, message: "Contract created successfully." });
+            }
+
+            console.log("currentContract", currentContract.data)
+            // change contract
+            await updateDamageFeeModel(bookingId, 0, 0, 50000, 'pending');
+            
+
+            // change booking_pricing forfeited_deposit
+            const currentBookingPrice = await getBookingPricingById(bookingId);
+            const newBookingPrice = {
+                menuPriceTotal: currentBookingPrice.menu_price_total,
+                hallCharge: currentBookingPrice.hall_charge,
+                extraHourFee: currentBookingPrice.extra_hour_fee,
+                bitesPayment: currentBookingPrice.bites_payment,
+                fountainPayment: currentBookingPrice.fountain_payment,
+                otherPayment: currentBookingPrice.other_payment,
+                forfeitedDeposit: 0
+            };
+            await updatePricingModel(bookingId, newBookingPrice);
+        }
+
+        if( status === "1"){
+           await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
+           
+           const currentBookingPrice = await getBookingPricingById(bookingId);
+           const newBookingPrice = {
+                menuPriceTotal: currentBookingPrice.menu_price_total,
+                hallCharge: currentBookingPrice.hall_charge,
+                extraHourFee: currentBookingPrice.extra_hour_fee,
+                bitesPayment: currentBookingPrice.bites_payment,
+                fountainPayment: currentBookingPrice.fountain_payment,
+                otherPayment: currentBookingPrice.other_payment,
+                forfeitedDeposit: 0
+            };
+            await updatePricingModel(bookingId, newBookingPrice);
+        }
+
+        const result1 = await updateBookingStatusModel(bookingId, status);
+        if (result1.affectedRows === 0) {
             return res.status(404).json({ success: false, message: "Booking not found or status not updated." });
         }
+
         res.status(200).json({ success: true, message: "Booking status updated successfully." });
     } catch (error) {
         console.error("Error updating booking status:", error);
@@ -308,37 +356,143 @@ export const updateContract = async (req, res) => {
 };
 
 // Update booking pricing information
-export const updatePricing = async (req, res) => {
+// export const updatePricing = async (req, res) => {
+//     try {
+//         const bookingId = req.params.id;
+//         const {
+//             menuPriceTotal,
+//             hallCharge,
+//             extraHourFee,
+//             bitesPayment,
+//             fountainPayment,
+//             otherPayment,
+//             overallTotal,
+//             forfeitedDeposit,
+//         } = req.body;
+
+//         const result = await updatePricingModel(bookingId, {
+//             menuPriceTotal,
+//             hallCharge,
+//             extraHourFee,
+//             bitesPayment,
+//             fountainPayment,
+//             otherPayment,
+//             overallTotal,
+//             forfeitedDeposit,
+//         });
+
+//         if (result.affectedRows === 0) {
+//             return res.status(404).json({ success: false, message: "Pricing not found or not updated." });
+//         }
+//         res.status(200).json({ success: true, message: "Pricing updated successfully." });
+//     } catch (error) {
+//         console.error("Error updating pricing:", error);
+//         res.status(500).json({ success: false, message: "Failed to update pricing." });
+//     }
+// };
+
+export const updateBookingVenue = async (req, res) => {
+    //const [booking, setBooking] = useState(null);
     try {
         const bookingId = req.params.id;
-        const {
-            menuPriceTotal,
-            hallCharge,
-            extraHourFee,
-            bitesPayment,
-            fountainPayment,
-            otherPayment,
-            overallTotal,
-            forfeitedDeposit,
-        } = req.body;
+        const { venueId } = req.body;
+        const result = await updateBookingVenueModel(bookingId, venueId);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Booking not found or venue not updated." });
+        }
 
-        const result = await updatePricingModel(bookingId, {
-            menuPriceTotal,
+        // update booking pricing 
+
+        // get booking from booking id
+        const bookingResult = await getBookingById(req.params.id);
+        // If your model returns an array, get the first item
+        const booking = Array.isArray(bookingResult) ? bookingResult[0] : bookingResult;
+        if (!booking) return res.status(404).json({ error: 'Booking not found' });
+
+        // 1. Fetch venue details
+        const venue = await getVenueByIdModel(venueId);
+        if (!venue) return res.status(404).json({ error: 'Venue not found' });
+
+        // 2. Calculate hall charge
+        let hallCharge = 0.00;
+        if (booking.number_of_guests >= venue[0].min_capacity && booking.number_of_guests <= venue[0].max_capacity) {
+            hallCharge = venue[0].price;
+        }
+
+        // 3. Calculate extra hour fee
+        const extraHourFee = booking.additional_hours * parseFloat(venue[0].additional_hour_fee);
+
+        // 4. Calculate overall total
+        //const overallTotal = hallCharge + extraHourFee;
+        //const overallTotal = Number(hallCharge) + Number(extraHourFee);
+
+        console.log("hallcharge:", hallCharge)
+        console.log("extraHourFee:", extraHourFee)
+
+        // Update booking with new pricing information
+        await updateBookingPricingModel(bookingId, {
             hallCharge,
-            extraHourFee,
-            bitesPayment,
-            fountainPayment,
-            otherPayment,
-            overallTotal,
-            forfeitedDeposit,
+            extraHourFee
         });
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ success: false, message: "Pricing not found or not updated." });
-        }
-        res.status(200).json({ success: true, message: "Pricing updated successfully." });
+        res.status(200).json({ success: true, message: "Booking venue updated successfully." });
     } catch (error) {
-        console.error("Error updating pricing:", error);
-        res.status(500).json({ success: false, message: "Failed to update pricing." });
+        console.error("Error updating booking venue:", error);
+        res.status(500).json({ success: false, message: "Failed to update booking venue." });
     }
 };
+
+export const updateDamageFee = async (req, res) => {
+    const bookingId = req.params.id;
+    const { damageFee, refundAmount, depositAmount, status } = req.body;
+
+    try {
+        const currentContract = await getContractById(bookingId);
+
+        // change contract
+        if (currentContract.deposit_amount < damageFee) {
+            return res.status(400).json({ success: false, message: "Damage fee exceeds current deposit amount." });
+        }
+        const newRefundAmount = currentContract.deposit_amount - Number(damageFee);
+        const newDamageFee = Number(damageFee);
+        const newDepositAmount = Number(currentContract.deposit_amount);
+        let newStatus = "";
+        if (currentContract.deposit_amount == damageFee) {
+            newStatus = "forfeited";
+        } else {
+            newStatus = "refunded";
+        }
+
+        console.log("contract data:", bookingId, newDamageFee, newRefundAmount, newDepositAmount, newStatus, "curr:", currentContract);
+        const result = await updateDamageFeeModel(bookingId, newDamageFee, newRefundAmount, newDepositAmount, newStatus);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Damage fee not found or not updated." });
+        }
+
+        // change booking status
+        const newBookingStatus = "done";
+        await updateBookingStatusModel(bookingId, newBookingStatus);
+
+        // change booking_pricing forfeited_deposit
+        const currentBookingPrice = await getBookingPricingById(bookingId);
+        const newBookingPrice = {
+            menuPriceTotal: currentBookingPrice.menu_price_total,
+            hallCharge: currentBookingPrice.hall_charge,
+            extraHourFee: currentBookingPrice.extra_hour_fee,
+            bitesPayment: currentBookingPrice.bites_payment,
+            fountainPayment: currentBookingPrice.fountain_payment,
+            otherPayment: currentBookingPrice.other_payment,
+            forfeitedDeposit: newDamageFee
+        };
+        await updatePricingModel(bookingId, newBookingPrice);
+
+        console.log("New booking price:", newBookingPrice);
+        console.log("booking status:", status);
+        console.log("contract data:", bookingId, newDamageFee, newRefundAmount, newDepositAmount, newStatus);
+
+        res.status(200).json({ success: true, message: "Damage fee updated successfully." });
+    } catch (error) {
+        console.error("Error updating damage fee:", error);
+        res.status(500).json({ success: false, message: "Failed to update damage fee." });
+    }
+}

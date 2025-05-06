@@ -29,6 +29,11 @@ export const updateBookingStatus = async (id, status) => {
   return res.data;
 }
 
+export const updateDamageFee = async (id, { damageFee, refundAmount, depositAmount, status }) => {
+  const res = await api.put(`/booking/${id}/damage-fee`, { damageFee, refundAmount, depositAmount, status });
+  return res.data;
+}
+
 export const updateContract = async (id, contractData) => {
   const res = await api.put(`/booking/${id}/contract`, contractData);
   return res.data;
@@ -36,6 +41,11 @@ export const updateContract = async (id, contractData) => {
 
 export const updatePricing = async (id, pricingData) => {
   const res = await api.put(`/booking/${id}/pricing`, pricingData);
+  return res.data;
+}
+
+export const updateBookingVenue = async (id, venueId) => {
+  const res = await api.put(`/booking/${id}/venue`, { venueId });
   return res.data;
 }
 

@@ -154,7 +154,6 @@ export const getBookingById = async (id) => {
   return rows[0];
 }
 
-// checkBookingExists model
 export const checkBookingExists = (date, slot, venueId) => {
     return pool.query(
         'SELECT 1 FROM booking WHERE booking_date = ? AND time_slot = ? AND venue_id = ? AND status = ? LIMIT 1',
@@ -166,6 +165,7 @@ export const checkBookingExists = (date, slot, venueId) => {
 ///////////////////// advance booking view models
 
 export const getAllBookings = (status) => {
+  console.log("Status:", status);
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
     p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
     FROM booking b
@@ -181,7 +181,7 @@ export const getAllBookings = (status) => {
 }
 
 export const getBookingByIdAdvance = (bookingId) => {
-  const sql = `SELECT b.*, c.*, p.* FROM booking b
+  const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.* FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
     LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id
     WHERE b.booking_id = ?`;
@@ -189,6 +189,7 @@ export const getBookingByIdAdvance = (bookingId) => {
 }
 
 export const updateBookingStatusModel = async (bookingId, status) => {
+  console.log(bookingId, status)
   return await pool.query(
         `UPDATE booking SET status = ?, updated_at = NOW() WHERE booking_id = ?`,
         [status, bookingId]
@@ -202,8 +203,35 @@ export const updateContractModel = (bookingId, data) => {
 }
 
 export const updatePricingModel = (bookingId, data) => {
-  const { menuPriceTotal, hallCharge, extraHourFee, bitesPayment, fountainPayment, otherPayment, overallTotal } = data;
-  const sql = `UPDATE booking_pricing SET menu_price_total=?, hall_charge=?, extra_hour_fee=?, bites_payment=?, fountain_payment=?, other_payment=?, overall_total=?, updated_at=NOW() WHERE booking_id=?`;
-  return pool.query(sql, [menuPriceTotal, hallCharge, extraHourFee, bitesPayment, fountainPayment, otherPayment, overallTotal, bookingId]);
+  const { menuPriceTotal, hallCharge, extraHourFee, bitesPayment, fountainPayment, otherPayment, forfeitedDeposit } = data;
+  const sql = `UPDATE booking_pricing SET menu_price_total=?, hall_charge=?, extra_hour_fee=?, bites_payment=?, fountain_payment=?, other_payment=?, forfeited_deposit=?, updated_at=NOW() WHERE booking_id=?`;
+  return pool.query(sql, [menuPriceTotal, hallCharge, extraHourFee, bitesPayment, fountainPayment, otherPayment, forfeitedDeposit, bookingId]);
 }
 
+export const updateBookingPricingModel = (bookingId, data) => {
+  const { hallCharge, extraHourFee } = data;
+  const sql = `UPDATE booking_pricing SET hall_charge=?, extra_hour_fee=?, updated_at=NOW() WHERE booking_id=?`;
+  return pool.query(sql, [hallCharge, extraHourFee, bookingId]);
+}
+
+export const updateBookingVenueModel = (bookingId, venueId) => {
+  return pool.query(
+    `UPDATE booking SET venue_id = ? WHERE booking_id = ?`,
+    [venueId, bookingId]
+  );
+}
+
+export const updateDamageFeeModel = async (bookingId, damageFee, refundAmount, depositAmount, status) => {
+  const sql = `UPDATE contract SET damage_fee = ?, refund_amount = ?, deposit_amount = ?, status = ?,  updated_at = NOW() WHERE booking_id = ?`;
+  return await pool.query(sql, [damageFee, refundAmount, depositAmount, status, bookingId]);
+}
+
+export const getContractById = async (bookingId) => {
+  const sql = `SELECT * FROM contract WHERE booking_id = ?`;
+  return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
+
+export const getBookingPricingById = async (bookingId) => {
+  const sql = `SELECT * FROM booking_pricing WHERE booking_id = ?`;
+  return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
