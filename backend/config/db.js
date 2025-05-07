@@ -16,6 +16,7 @@ try {
     connectionLimit: 10,
     queueLimit: 0,
     ssl: { rejectUnauthorized: true }
+    
   });
 
   console.log('Connected to Azure MySQL successfully!');

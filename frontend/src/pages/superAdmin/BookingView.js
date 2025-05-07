@@ -1,349 +1,524 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { addVenue, getAllVenues, deleteVenueById, updateVenueById } from '../../services/VenueService';
-import { BuildingOffice2Icon, ClockIcon, MapPinIcon, UserGroupIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect, Fragment } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
+import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid';
+import { addCustomer, searchCustomer } from '../../services/CustomerServise';
+import BookingService from '../../services/BookngService';
+import { getAllVenues } from '../../services/VenueService';
+import VenueDropdown from '../../components/bookings/VenueDropdown';
+
+// const VenueDropdown = ({ venues, booking, setBooking }) => {
+//   const selectedVenue = venues.find(v => v.venue_id === booking.venueId) || null;
+
+//   return (
+//     <div className="flex flex-col">
+//       <label htmlFor="venue_id" className="text-gray-700 text-sm mb-1">Venue</label>
+//       <Listbox
+//         value={selectedVenue}
+//         onChange={(venue) => setBooking(b => ({ ...b, venueId: venue?.venue_id || '' }))}
+//       >
+//         <div className="relative">
+//           <Listbox.Button className="w-full cursor-pointer rounded-xl bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm">
+//             <span className="block truncate">
+//               {selectedVenue
+//                 ? `${selectedVenue.venue_name} (${selectedVenue.time_slot})`
+//                 : '-- Select Venue --'}
+//             </span>
+//             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+//               <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+//             </span>
+//           </Listbox.Button>
+
+//           <Transition
+//             as={Fragment}
+//             leave="transition ease-in duration-100"
+//             leaveFrom="opacity-100"
+//             leaveTo="opacity-0"
+//           >
+//             <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+//               {venues.map((venue) => (
+//                 <Listbox.Option
+//                   key={venue.venue_id}
+//                   className={({ active }) =>
+//                     `relative cursor-pointer select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-100 text-blue-900' : 'text-gray-700'
+//                     }`
+//                   }
+//                   value={venue}
+//                 >
+//                   {({ selected }) => (
+//                     <div className='border-b-2'>
+//                       <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+//                         {venue.venue_name}
+//                       </span>
+//                       <tr className=" text-xs text-gray-500 ml-5">
+//                         <td className='px-2'>{venue.venue_id}</td>
+//                         <td className='px-2'> {venue.time_slot.charAt(0).toUpperCase() + venue.time_slot.slice(1)}</td>
+//                         <td className='px-2'> {venue.Location}</td>
+//                       </tr>
+//                       {selected && (
+//                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+//                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
+//                         </span>
+//                       )}
+//                     </div>
+//                   )}
+//                 </Listbox.Option>
+//               ))}
+//             </Listbox.Options>
+//           </Transition>
+//         </div>
+//       </Listbox>
+//     </div>
+//   );
+// };
 
 const BookingView = () => {
-  const [viewAction, setViewAction] = useState(true);
+  const [customer, setCustomer] = useState({ name: '', email: '', address: '', phone: '' });
+  const [customerSuccess, setCustomerSuccess] = useState(false);
+  const [bookSuccess, setBookSuccess] = useState(false);
+  const [searchresult, setSearchresult] = useState(false);
+  const [errmsg, setErrmsg] = useState({ msg: '', color: '' });
+  const [bErrmsg, setBErrmsg] = useState({ msg: '', color: '' });
+  const [btnText, setBtnText] = useState('Add Customer');
+  const [btnBookingText, setBtnBookingText] = useState('Add Booking');
+  const [customerIdMsg, setCustomerIdMsg] = useState("");
+  const [cusres, setCusres] = useState('');
+  const [addedCustomer, setAddedCustomer] = useState(null);
   const [venues, setVenues] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [editRowId, setEditRowId] = useState(null);
-  const [editVenueData, setEditVenueData] = useState({});
-  const [viewAddRaw, setViewAddRaw] = useState(false);
-  const dropdownRef = useRef(null);
+  const [serachlist, setSerachlist] = useState([]);
+  const [result, setResult] = useState(null);
 
-  const toggleAction = () => {
-    setViewAction((prev) => !prev);
-  };
-
-  // Hide dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        event.target.id !== "dropdownActionButton"
-      ) {
-        setViewAction(true); // Hide dropdown
-      }
-    };
-    if (!viewAction) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [viewAction]);
-
-  // Load all venues when page loads
   useEffect(() => {
     fetchVenues();
-    if (viewAddRaw != false) {
-      setEditVenueData({});
-    }
-  }, [viewAddRaw]);
+  }, []);
 
   const fetchVenues = async () => {
     try {
-      const data = await getAllVenues();
-      setVenues(data);
-      console.log(venues);
-    } catch (error) {
-      console.error('Error fetching venues:', error);
+      const res = await getAllVenues();
+      setVenues(res);
+    } catch (err) {
+      console.error('Error fetching venues:', err);
     }
   };
 
-  const handleCheckboxChange = (venueId) => {
-    setSelectedIds((prev) =>
-      prev.includes(venueId)
-        ? prev.filter((id) => id !== venueId)
-        : [...prev, venueId]
-    );
-  };
-
-  const deleteAllTikBox = async () => {
-    setViewAction(true)
-    console.log("lalal")
-    if (window.confirm('Are you sure you want to delete this venue?')) {
-      try {
-        for (const id of selectedIds) {
-          await deleteVenueById(id);
+  const validateField = (name, value) => {
+    let error = { msg: '', color: '' };
+    switch (name) {
+      case 'name':
+        if (/[^a-zA-Z\s]/.test(value)) {
+          error = { msg: 'Name must not contain numbers or symbols.', color: 'text-red-600' };
         }
-
-        fetchVenues();
-        setSelectedIds([])
-      } catch (error) {
-        console.error('Error deleting venue:', error);
-      }
+        break;
+      case 'phone':
+        if (!/^\d{10}$/.test(value)) {
+          error = { msg: 'Phone number must contain exactly 10 digits.', color: 'text-red-600' };
+        }
+        break;
+      case 'email':
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = { msg: 'Invalid email address.', color: 'text-red-600' };
+        }
+        break;
+      case 'address':
+        if (value.trim() === '') {
+          error = { msg: 'Address cannot be empty.', color: 'text-red-600' };
+        }
+        break;
+      default:
+        break;
     }
+    setErrmsg(error);
+    return error.msg === '';
+  };
+
+  const handleCustomerChange = (e) => {
+    const { name, value } = e.target;
+    setCustomer(prev => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  };
+
+  const submitCustomer = async (e) => {
+    e.preventDefault();
+    setErrmsg({ msg: '', color: '' });
+    const isValid = Object.keys(customer).every((key) =>
+      validateField(key, customer[key])
+    );
+    if (!isValid) return;
+
+    setBtnText('Adding...');
+    try {
+      const res = await addCustomer(customer);
+      const newId = res.cus_id.customer_id;
+      setCusres(newId);
+      setCustomerSuccess(true);
+      setAddedCustomer(customer);
+      setCustomer({ name: '', email: '', address: '', phone: '' });
+      setErrmsg({ msg: res.message || 'Customer added!', color: 'text-green-600' });
+      setCustomerIdMsg( res.message);
+    } catch (err) {
+      console.error(err);
+      if (err.response?.data?.message) {
+        setErrmsg({ msg: err.response.data.message, color: 'text-red-600' });
+      } else {
+        setErrmsg({ msg: 'An unexpected error occurred.', color: 'text-red-600' });
+      }
+    } finally {
+      setBtnText('Add Customer');
+    }
+  };
+
+  const [booking, setBooking] = useState({
+    date: '',
+    slot: 'day',
+    customerId: '',
+    guests: 150,
+    venueId: '',
+    extraHours: 0,
+    payDeposit: false,
+    searchCustomer: false,
+  });
+  const [search, setSearch] = useState({
+    property: ''
+  });
+
+  // Sync booking.customerId when cusres changes
+  useEffect(() => {
+    if (cusres) {
+      setBooking(b => ({ ...b, customerId: cusres }));
+    }
+  }, [cusres]);
+
+  const handleBookingChange = (e) => {
+    const { id, name, value, type, checked } = e.target;
+    setBooking(frm => ({
+      ...frm,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+    if (booking.searchCustomer == false && type === 'checkbox' && id === 'searchId') { // if err occur check this {new}
+      console.log("Search customer is enabled");
+      setCustomerSuccess(true)
+      console.log("add butn: ", customerSuccess)
+    }else if (booking.searchCustomer == true && type === 'checkbox' && id === 'searchId'){
+      console.log("Search customer is disbled");
+      console.log(cusres)
+      setBooking(b => ({ ...b, customerId: cusres }));
+      setCustomerSuccess(false)
+      console.log("add butn: ", customerSuccess)
+
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearchresult(false)
+    setSearch({ property: e.target.value });
+    const id = e.target.value;
+    setBooking(b => ({ ...b, customerId: id }));
   }
 
-  const handleEdit = (venue) => {
-    setEditRowId(venue.venue_id);
-    setEditVenueData({
-      venue_name: venue.venue_name,
-      time_slot: venue.time_slot,
-      Location: venue.Location,
-      min_capacity: venue.min_capacity,
-      max_capacity: venue.max_capacity,
-      price: venue.price,
-    });
-  };
-
-  const handleEditVenueChange = (field, value) => {
-    setEditVenueData((prev) => ({
+  const handleSearchChange = async (e) => {
+    setSearchresult(true)
+    const { name, value } = e.target;
+    setSearch(prev => ({
       ...prev,
-      [field]: value,
+      [name]: value,
     }));
-  };
+    try {
+      const response = await searchCustomer((value.trim())); // use trimmed input value
+      setSerachlist(response.customers);
+    } catch (error) {
 
-  const handleUpdate = async (venue_id) => {
-    if (window.confirm(`Are you sure you want to ${venue_id == 0 ? 'Add' : 'Update'} this venue?`)) {
-      try {
-        // Prepare payload for update
-        const payload = {
-          name: editVenueData.venue_name,
-          time: editVenueData.time_slot,
-          location: editVenueData.Location,
-          minCapacity: Number(editVenueData.min_capacity),
-          maxCapacity: Number(editVenueData.max_capacity),
-          price: Number(editVenueData.price),
-        };
-        // You should have an updateVenueById service method
-        if (venue_id == 0) {
-          console.log("aaa")
-          await addVenue(payload);
-        }
-        if (venue_id != 0) await updateVenueById(venue_id, payload);
-        setEditRowId(null);
-        setEditVenueData({
-          venue_name: null,
-          time_slot: null,
-          Location: null,
-          min_capacity: null,
-          max_capacity: null,
-          price: null,
-        });
-        fetchVenues();
-      } catch (error) {
-        console.error('Error Adding venue:', error);
-      }
+      console.error("Error searching customer:", error);
     }
   };
 
-  return (
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
-      <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900 p-5">
-        <div>
-          {/* buuton for dropdown */}
-          <button
-            onClick={toggleAction}
-            class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
-            Action
-            <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-            </svg>
-          </button>
 
-          {/* Dropdown positioned absolutely below the button */}
-          <div
-            ref={dropdownRef}
-            id="dropdownAction"
-            class={`z-10 ${!viewAction ? 'block absolute mt-2' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600`}
-            style={{ minWidth: '11rem' }}
-          >
-            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownActionButton">
-              <li>
-                <a href="#" onClick={() => { setViewAddRaw(true); setViewAction(true); }} class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">New Venue</a>
-              </li>
-            </ul>
-            <div class="py-1">
-              <a href="#" onClick={() => { deleteAllTikBox(); setViewAction(true); }} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete Venues</a>
+  const submitBooking = async (e) => {
+    e.preventDefault();
+    setBtnBookingText("Adding...")
+    try {
+      if (booking.customerId) {
+        
+        // testing customer_id
+        console.log("Cusres customer id:", cusres);
+        console.log("search customer_id:",booking.customerId);
+        console.log("as", booking);
+
+
+        const res = await BookingService.createBooking(booking);
+        setBookSuccess(true);
+        setResult(`Successfully booking created: ${res.booking_id}`);
+        setBErrmsg({ msg: '', color: 'text-red-600' });
+      } else {
+        setBErrmsg({ msg: 'Customer ID is required to create a booking. Create a new customer first!!', color: 'text-red-600' });
+      }
+    } catch (err) {
+      setResult('Error creating booking');
+      console.error(err);
+      if (err.response?.data?.message) {
+        setBErrmsg({ msg: err.response.data.message, color: 'text-red-600' });
+      } else {
+        setBErrmsg({ msg: 'Every fields must be filled.', color: 'text-red-600' }); 
+      }
+    } finally {
+      setBtnBookingText("Add Booking");
+    }
+  };
+
+  const inputClass ='bg-white border border-gray-300 text-gray-900 placeholder-gray-500 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none';
+  const mark = (
+    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+  return (
+    <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
+      {/* Customer Form */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-6">Customer Information</h3>
+        <p
+          className={`${errmsg.color} text-center mb-4 ${errmsg.color === 'text-green-600' ? 'hidden' : 'visible'
+            }`}
+        >
+          {errmsg.msg}
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Name */}
+          <div className="flex flex-col">
+            <label htmlFor="name" className="text-gray-700 text-sm mb-1">Full Name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={customer.name}
+              onChange={handleCustomerChange}
+              placeholder={addedCustomer?.name || 'e.g. Shahan Aththalage'}
+              className={inputClass}
+            />
+          </div>
+          {/* Email */}
+          <div className="flex flex-col">
+            <label htmlFor="email" className="text-gray-700 text-sm mb-1">Email Address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={customer.email}
+              onChange={handleCustomerChange}
+              placeholder={addedCustomer?.email || 'e.g. example@gmail.com'}
+              className={inputClass}
+            />
+          </div>
+          {/* Phone */}
+          <div className="flex flex-col">
+            <label htmlFor="phone" className="text-gray-700 text-sm mb-1">Phone Number</label>
+            <input
+              id="phone"
+              name="phone"
+              type="text"
+              value={customer.phone}
+              onChange={handleCustomerChange}
+              placeholder={addedCustomer?.phone || 'e.g. 0712345678'}
+              className={inputClass}
+            />
+          </div>
+          {/* Address */}
+          <div className="flex flex-col md:col-span-2">
+            <label htmlFor="address" className="text-gray-700 text-sm mb-1">Address</label>
+            <input
+              id="address"
+              name="address"
+              type="text"
+              value={customer.address}
+              onChange={handleCustomerChange}
+              placeholder={
+                addedCustomer?.address || 'e.g. No: xx, Saddathissa Road, Galle'
+              }
+              className={inputClass}
+            />
+          </div>
+        </div>
+        <div className="mt-6">
+          {!customerSuccess && addedCustomer == null? (
+            <button
+              onClick={submitCustomer}
+              className="bg-zinc-300 border hover:bg-slate-50 hover:border-black text-black font-medium py-2 px-6 rounded-md"
+            >
+              {btnText}
+            </button>
+          ) : (
+            <div className="mt-4">
+              <div className="flex items-center text-green-700 text-sm">
+                {customerIdMsg ? mark : ''} {customerIdMsg}
+                <p></p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Booking form */}
+        <h3 className="text-lg font-semibold text-gray-800 mb-6 mt-10">Booking Information</h3>
+        <p className={`${bErrmsg.color} text-center mb-4 ${bErrmsg.color === 'text-green-600' ? 'hidden' : 'visible'}`}>
+          {bErrmsg.msg}
+        </p>
+
+        <form onSubmit={submitBooking} className="space-y-4">
+          {/* display Search box if needed */}
+          <label className="flex items-center mt-4">
+            <input
+              id= 'searchId'
+              name="searchCustomer"
+              type="checkbox"
+              checked={booking.searchCustomer}
+              onChange={handleBookingChange}
+              className="h-5 w-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <span className="ml-3 text-gray-700 text-sm">
+              Add booking for already registered customers.
+            </span>
+          </label>
+
+          <div className={`flex flex-col ${booking.searchCustomer ? 'visible' : 'hidden'}`} >
+            <input
+              placeholder={'Search Customer'}
+              name="property"
+              type="text"
+              value={search.property}
+              onChange={handleSearchChange}
+              className={inputClass}
+            />
+            <div id="dropdown" class={`z-10 ${searchresult ? 'visible' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700`}>
+                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
+                  {serachlist.map((item)=>(
+                    <li key={item.customer_id}>
+                      <button type="button" value={item.customer_id} onClick={handleSearch} class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{item.name}</button>
+                    </li>
+                  ))}
+                </ul>
             </div>
           </div>
-        </div>
 
-        <label for="table-search" class="sr-only">Search</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-            </svg>
+
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Date */}
+            <div className="flex flex-col">
+              <label htmlFor="booking_date" className="text-gray-700 text-sm mb-1">
+                Booking Date
+              </label>
+              <input
+                id="booking_date"
+                name="date"
+                type="date"
+                required
+                value={booking.date}
+                onChange={handleBookingChange}
+                className={inputClass}
+              />
+            </div>
+
+            {/* Slot */}
+            <div className="flex flex-col">
+              <label htmlFor="slot" className="text-gray-700 text-sm mb-1">
+                Time Slot
+              </label>
+              <select
+                id="slot"
+                name="slot"
+                required
+                value={booking.slot}
+                onChange={handleBookingChange}
+                className={inputClass}
+              >
+                <option value="day">Day</option>
+                <option value="night">Night</option>
+              </select>
+            </div>
+
+            {/* Venue Dropdown */}
+            <VenueDropdown venues={venues} booking={booking} setBooking={setBooking} />
+
+            {/* Guests */}
+            <div className="flex flex-col">
+              <label htmlFor="number_of_guests" className="text-gray-700 text-sm mb-1">
+                Number of Guests
+              </label>
+              <input
+                id="number_of_guests"
+                name="guests"
+                type="number"
+                required
+                value={booking.guests}
+                onChange={handleBookingChange}
+                className={inputClass}
+              />
+            </div>
+
+            {/* Extra Hours */}
+            <div className="flex flex-col">
+              <label htmlFor="additional_hours" className="text-gray-700 text-sm mb-1">
+                Additional Hours
+              </label>
+              <input
+                id="additional_hours"
+                name="extraHours"
+                type="number"
+                min={0}
+                value={booking.extraHours}
+                onChange={handleBookingChange}
+                className="w-32 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
           </div>
-          <input type="text" id="table-search-users" class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for users" />
-        </div>
-      </div>
 
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="p-4">
-              <div class="flex items-center">
-                <input id="checkbox-all-search" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <label for="checkbox-all-search" class="sr-only">checkbox</label>
-              </div>
-            </th>
-            <th className='px-6 py-3'>Name</th>
-            <th className='px-6 py-3'>Time</th>
-            <th className='px-6 py-3'>Location</th>
-            <th className='px-6 py-3'>Min Capacity</th>
-            <th className='px-6 py-3'>Max Capacity</th>
-            <th className='px-6 py-3'>Price</th>
-            <th className='px-6 py-3'>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Table raw for adding new venue */}
-          <tr class={`${viewAddRaw == false ? 'hidden' : 'visible'}  bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600`}>
-            <td class="w-4 p-4">
-              <div class="flex items-center">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <input type="text" value={editVenueData.venue_name} onChange={(e) => handleEditVenueChange('venue_name', e.target.value)} className="border rounded px-2 py-1" size="15" />
-            </td>
-            <td class="px-6 py-4">
-              <select value={editVenueData.time_slot} onChange={(e) => handleEditVenueChange('time_slot', e.target.value)} className="border rounded px-2 py-1">
-                <option value="">Default</option>
-                <option value="day">day</option>
-                <option value="night">night</option>
-              </select>
-            </td>
-            <td class="px-6 py-4">
-              <select value={editVenueData.Location} onChange={(e) => handleEditVenueChange('Location', e.target.value)} className="border rounded px-2 py-1">
-                <option value="">Default</option>
-                <option value="indoor">indoor</option>
-                <option value="outdoor">outdoor</option>
-                <option value="both">both</option>
-              </select>
-            </td>
-            <td class="px-6 py-4">
-              <input type="text" value={editVenueData.min_capacity} onChange={(e) => handleEditVenueChange('min_capacity', e.target.value)} className="border rounded px-2 py-1" size="1" />
-            </td>
-            <td class="px-6 py-4">
-              <input type="text" value={editVenueData.max_capacity} onChange={(e) => handleEditVenueChange('max_capacity', e.target.value)} className="border rounded px-2 py-1" size="1" />
-            </td>
-            <td class="px-6 py-4">
-              <input type="text" value={editVenueData.price} onChange={(e) => handleEditVenueChange('price', e.target.value)} className="border rounded px-2 py-1" size="10" />
-            </td>
-            <td class="px-6 py-4">
-              <button onClick={() => handleUpdate(0)} className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2'>Add</button>
-              <button onClick={() => { setViewAddRaw(false) }} className='bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded' >Cancel</button>
-            </td>
-          </tr>
-          {venues.map((venue) => (
-            <tr key={venue.venue_id} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <td class="w-4 p-4">
-                <div class="flex items-center">
-                  <input
-                    id={`checkbox-table-search-${venue.venue_id}`}
-                    type="checkbox"
-                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    checked={selectedIds.includes(venue.venue_id)}
-                    onChange={() => handleCheckboxChange(venue.venue_id)}
-                  />
+          {/* Deposit */}
+          <label className="flex items-center mt-4">
+            <input
+              id="pay_deposit"
+              name="payDeposit"
+              type="checkbox"
+              checked={booking.payDeposit}
+              onChange={handleBookingChange}
+              className="h-5 w-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <span className="ml-3 text-gray-700 text-sm">
+              Pay Key Money Deposit (Rs. 50,000)
+            </span>
+          </label>
+
+          <div className="mt-6">
+            {!bookSuccess ? (
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md"
+              >
+                {btnBookingText}
+              </button>
+            ) : (
+              <div className="mt-4">
+                <div className="flex items-center text-green-600 text-sm">
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Successfully added booking.
                 </div>
-              </td>
-              {editRowId === venue.venue_id ? (
-                <>
-                  <td class="px-6 py-4">
-                    <input
-                      type="text"
-                      value={editVenueData.venue_name}
-                      onChange={(e) => handleEditVenueChange('venue_name', e.target.value)}
-                      className="border rounded px-2 py-1"
-                      size="15"
-                    />
-                  </td>
-                  <td class="px-6 py-4">
-                    <select
-                      value={editVenueData.time_slot}
-                      onChange={(e) => handleEditVenueChange('time_slot', e.target.value)}
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="day">day</option>
-                      <option value="night">night</option>
-                    </select>
-                  </td>
-                  <td class="px-6 py-4">
-                    <select
-                      value={editVenueData.Location}
-                      onChange={(e) => handleEditVenueChange('Location', e.target.value)}
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="indoor">indoor</option>
-                      <option value="outdoor">outdoor</option>
-                      <option value="both">both</option>
-                    </select>
-                  </td>
-                  <td class="px-6 py-4">
-                    <input
-                      type="text"
-                      value={editVenueData.min_capacity}
-                      onChange={(e) => handleEditVenueChange('min_capacity', e.target.value)}
-                      className="border rounded px-2 py-1"
-                      size="1"
-                    />
-                  </td>
-                  <td class="px-6 py-4">
-                    <input
-                      type="text"
-                      value={editVenueData.max_capacity}
-                      onChange={(e) => handleEditVenueChange('max_capacity', e.target.value)}
-                      className="border rounded px-2 py-1"
-                      size="1"
-                    />
-                  </td>
-                  <td class="px-6 py-4">
-                    <input
-                      type="text"
-                      value={editVenueData.price}
-                      onChange={(e) => handleEditVenueChange('price', e.target.value)}
-                      className="border rounded px-2 py-1"
-                      size="10"
-                    />
-                  </td>
-                  <td class="px-6 py-4">
-                    <button
-                      onClick={() => handleUpdate(venue.venue_id)}
-                      className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2'
-                    >
-                      Update
-                    </button>
-                    <button
-                      onClick={() => setEditRowId(null)}
-                      className='bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded'
-                    >
-                      Cancel
-                    </button>
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td class="px-6 py-4">{venue.venue_name}</td>
-                  <td class="px-6 py-4">{venue.time_slot}</td>
-                  <td class="px-6 py-4">{venue.Location}</td>
-                  <td class="px-6 py-4">{venue.min_capacity}</td>
-                  <td class="px-6 py-4">{venue.max_capacity}</td>
-                  <td class="px-6 py-4">RS.{venue.price}</td>
-                  <td class="px-6 py-4">
-                    <button
-                      onClick={() => handleEdit(venue)}
-                      className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded'
-                    >
-                      Edit
-                    </button>
-                  </td>
-                </>
-              )}
-            </tr>
-          ))}
+                <div className="mt-1 text-sm text-green-700">{result}</div>
+              </div>
+            )}
+          </div>
 
-        </tbody>
-      </table>
+        </form>
+        {/* {result && <p className="mt-4 text-center">{result}</p>} */}
+      </div>
     </div>
+  );
+};
 
-  )
-}
+export default BookingView;
 
-export default BookingView
+

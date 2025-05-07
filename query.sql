@@ -242,16 +242,80 @@ CREATE TABLE Event_Cordinator (
     FOREIGN KEY (Cordinator_Name) REFERENCES Cordinator(Cordinator_Name) ON DELETE CASCADE
 );
 
-
-create table Customer_Event_Service(
-customer_id VARCHAR(100) not null,
-event_service_id VARCHAR(100) not null,
-booking_id VARCHAR(255) NOT NULL,
-FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
-FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
-FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+-- Table: contract
+CREATE TABLE contract (
+  contract_id VARCHAR(20) PRIMARY KEY,
+  booking_id VARCHAR(20),
+  deposit_amount DECIMAL(10,2) NOT NULL,
+  damage_fee DECIMAL(10,2) DEFAULT 0.00,
+  refund_amount DECIMAL(10,2) DEFAULT 0.00,
+  status ENUM('pending', 'refunded', 'forfeited') DEFAULT 'pending',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (booking_id) REFERENCES booking(booking_id)
 );
 
+-- Table: booking_pricing
+CREATE TABLE booking_pricing (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  booking_id VARCHAR(20),
+  menu_price_total DECIMAL(10,2) NOT NULL,
+  hall_charge DECIMAL(10,2) NOT NULL,
+  extra_hour_fee DECIMAL(10,2) DEFAULT 0.00,
+  bites_payment DECIMAL(10,2) DEFAULT 0.00,
+  fountain_payment DECIMAL(10,2) DEFAULT 0.00, -- for champagne or milk fountain
+  other_payment DECIMAL(10,2) DEFAULT 0.00,
+  overall_total DECIMAL(10,2) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (booking_id) REFERENCES booking(booking_id)
+);
+
+
+DELIMITER //
+
+-- After a new pricing row is inserted
+CREATE TRIGGER trg_booking_pricing_after_insert
+AFTER INSERT ON booking_pricing
+FOR EACH ROW
+BEGIN
+  UPDATE booking
+    SET total_price = NEW.overall_total
+  WHERE booking_id = NEW.booking_id;
+END;
+//
+
+-- 2) Switch to a custom delimiter so MySQL knows where the trigger body ends
+DELIMITER $$
+
+-- 3) BEFORE UPDATE: recompute overall_total from all the NEW values
+CREATE TRIGGER trg_booking_pricing_before_update
+BEFORE UPDATE ON booking_pricing
+FOR EACH ROW
+BEGIN
+  SET NEW.overall_total =
+       COALESCE(NEW.menu_price_total,   0)
+     + COALESCE(NEW.hall_charge,        0)
+     + COALESCE(NEW.extra_hour_fee,     0)
+     + COALESCE(NEW.bites_payment,      0)
+     + COALESCE(NEW.fountain_payment,   0)
+     + COALESCE(NEW.other_payment,      0)
+     + COALESCE(NEW.forfeited_deposit,  0);
+END$$
+
+-- 4) AFTER UPDATE: propagate that new overall_total into booking.total_price
+CREATE TRIGGER trg_booking_pricing_after_update
+AFTER UPDATE ON booking_pricing
+FOR EACH ROW
+BEGIN
+  UPDATE booking
+     SET total_price = NEW.overall_total,
+         updated_at   = NOW()
+   WHERE booking_id = NEW.booking_id;
+END$$
+
+-- 5) Restore the normal delimiter
+DELIMITER ;
 
 
 -- Trigger to format Table_Reserve_ID
@@ -305,7 +369,7 @@ BEGIN
     SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
     
     -- Format the new ID as 'EMP' followed by a zero-padded number (3 digits)
-    SET new_id = CONCAT('EAE', LPAD(max_id, 6, '0'));
+    SET new_id = CONCAT('EMP', LPAD(max_id, 6, '0'));
     SET NEW.Employee_Assign_ID = new_id;
 END //
 DELIMITER ;
@@ -493,6 +557,20 @@ BEGIN
 END //
 
 DELIMITER //
+-- Trigger to format booking_id
+CREATE TRIGGER before_booking_contract
+BEFORE INSERT ON contract
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(contract_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM contract;
+    SET new_id = CONCAT('CON', LPAD(max_id, 6, '0'));
+    SET NEW.contract_id = new_id;
+END //
+
+DELIMITER //
 CREATE TRIGGER before_bookig_history_insert
 BEFORE INSERT ON bookig_history
 FOR EACH ROW
@@ -543,3 +621,5 @@ BEGIN
     DELETE FROM otp_store WHERE created_at < NOW() - INTERVAL 3 MINUTE;
 END //
 DELIMITER ;
+
+
