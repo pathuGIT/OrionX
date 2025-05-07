@@ -2,7 +2,9 @@ import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
 import { addEmployee, changeUserRole, addCustomer ,
     updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
-    getEmployeeById,serviceChargeController,deductionController 
+    getEmployeeById,serviceChargeController,
+    deductionController,
+     
 } from '../controllers/userController.js';
 import { subAdmin } from '../middleware/Sub_admin.js';
 
@@ -27,10 +29,9 @@ router.post('/service-charges/calculate', serviceChargeController.calculateCharg
 router.get('/service-charges', serviceChargeController.getAllCharges);
 router.get('/service-charges/employee/:employeeId', serviceChargeController.getEmployeeCharges);
 
-router.get('/deductions', deductionController.getAllDeductions);
-router.post('/deductions/calculate',  deductionController.calculateDeductions);
-router.get('/deductions/:id',  deductionController.getDeductionDetails);
-router.patch('/deductions/:id/status',  deductionController.updateDeductionStatus);
+router.post('/deductions', deductionController.createDeduction);
+router.get('/deduction-entries', deductionController.getAllDeductionEntries);
+
 
 
 

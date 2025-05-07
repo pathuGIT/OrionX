@@ -3,6 +3,7 @@ import { Logout } from '../../components/Logout'
 import ServicesChargeCalc from '../../pages/superAdmin/ServicesChargeCalc'
 import Deductions from '../../pages/superAdmin/Deductions';
 
+
 const PayrollManagementSAN = ({ setRenderContent }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -110,6 +111,12 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
                             <span class="ml-3"><Logout /></span>
                         </button>
                     </li>
+
+                    
+
+
+
+
                 </ul>
             </ul>
         </div>

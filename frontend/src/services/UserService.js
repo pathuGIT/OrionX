@@ -1,4 +1,5 @@
 import api from './Api';
+
  
 
 export const getEmployees = async () => {
@@ -103,75 +104,48 @@ export const serviceChargeService = {
     }
   };
 
-  //deduction......................
+ 
+ 
+  
 
-  // src/services/UserService.js
+ // Deduction Service.......................
  
 
 export const deductionService = {
-  calculateDeductions: async () => {
+  createDeduction: async (data) => {
     try {
-      const response = await api.post('/user/deductions/calculate');
+      const response = await api.post('/user/deductions', {
+        calculation_date: data.calculation_date,
+        description: data.description,
+        employee_id: data.employee_id,
+        amount: data.amount
+      });
       return {
         success: true,
-        message: response.data.message,
-        affectedRows: response.data.affectedRows,
-        data: response.data.data
+        data: response.data,
+        message: 'Deduction created successfully'
       };
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Deduction calculation failed',
+        message: error.response?.data?.message || 'Failed to create deduction',
         error: error.message
       };
     }
   },
 
-  getAllDeductions: async () => {
+  getAllDeductionEntries: async () => {
     try {
-      const response = await api.get('/user/deductions');
+      const response = await api.get('/user/deduction-entries');
       return {
         success: true,
         data: response.data.data || [],
-        count: response.data.count || 0
+        message: 'Deductions retrieved successfully'
       };
     } catch (error) {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to fetch deductions',
-        error: error.message
-      };
-    }
-  },
-
-  getDeductionDetails: async (id) => {
-    try {
-      const response = await api.get(`/user/deductions/${id}`);
-      return {
-        success: true,
-        data: response.data.data || null
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch deduction details',
-        error: error.message
-      };
-    }
-  },
-
-  updateDeductionStatus: async (id, status) => {
-    try {
-      const response = await api.patch(`/user/deductions/${id}/status`, { status });
-      return {
-        success: true,
-        message: response.data.message,
-        data: response.data.data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to update deduction status',
         error: error.message
       };
     }

@@ -1,5 +1,7 @@
 import pool from "../config/db.js";
 
+ 
+
 //register super admin only once
 export const registerSuperAdminSystemUserModel = async (pswd, employee_id) => {
   const [result] = await pool.query(
@@ -284,93 +286,57 @@ export class ServiceChargeModel {
 
 //deduction model...........
 
+
+
 export class DeductionModel {
-  static async calculateDeductions() {
+  // ... existing methods ...
+
+  static async createDeduction(calculation_date, description, employee_id, amount) {
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
-      const [result] = await connection.query(`SELECT
-        DATE_FORMAT(calculation_date, '%Y-%m') AS month,
-        SUM(total_deductions) AS total_deductions,
-        COUNT(*) AS deduction_count
-        FROM deductions
-        GROUP BY DATE_FORMAT(calculation_date, '%Y-%m');`);
+      
+      const deductions_id = uuidv4().substring(0, 10);
+      
+      await connection.query(
+        `INSERT INTO deductions 
+        (deductions_id, calculation_date, description, total_deductions, status) 
+        VALUES (?, ?, ?, ?, 'pending')`,
+        [deductions_id, calculation_date, description, amount]
+      );
+
+      await connection.query(
+        `INSERT INTO deduction_details 
+        (deduction_details_id, deduction_id, employee_id, amount) 
+        VALUES (?, ?, ?, ?)`,
+        [uuidv4().substring(0, 10), deductions_id, employee_id, amount]
+      );
+
       await connection.commit();
-      return {
-        success: true,
-        message: "Deductions calculated successfully",
-        affectedRows: result.affectedRows,
-      };
+      return { success: true };
     } catch (error) {
       await connection.rollback();
-      throw new Error(`Database error: ${error.message}`);
+      throw error;
     } finally {
       connection.release();
     }
   }
 
-  static async getAllDeductions() {
+  static async getAllDeductionEntries() {
     const connection = await pool.getConnection();
     try {
       const [results] = await connection.query(`
         SELECT 
-          d.id,
-          d.total_deductions,
+          e.employee_id,
           d.calculation_date,
-          d.status,
-          COUNT(dd.id) AS employee_count
-        FROM deductions d
-        LEFT JOIN deduction_details dd ON d.id = dd.deduction_id
-        GROUP BY d.id
+          d.description,
+          dd.amount
+        FROM deduction_details dd
+        JOIN deductions d ON dd.deduction_id = d.deductions_id
+        JOIN employee e ON dd.employee_id = e.employee_id
         ORDER BY d.calculation_date DESC
       `);
       return results;
-    } catch (error) {
-      throw new Error(`Database error: ${error.message}`);
-    } finally {
-      connection.release();
-    }
-  }
-
-  static async getDeductionDetails(id) {
-    const connection = await pool.getConnection();
-    try {
-      const [deduction] = await connection.query(
-        "SELECT * FROM deductions WHERE id = ?",
-        [id]
-      );
-
-      const [details] = await connection.query(
-        `SELECT 
-          dd.*,
-          e.name AS employee_name
-        FROM deduction_details dd
-        JOIN employee e ON dd.employee_id = e.employee_id
-        WHERE dd.deduction_id = ?`,
-        [id]
-      );
-
-      return {
-        ...deduction[0],
-        details,
-      };
-    } catch (error) {
-      throw new Error(`Database error: ${error.message}`);
-    } finally {
-      connection.release();
-    }
-  }
-
-  static async updateDeductionStatus(id, status) {
-    const connection = await pool.getConnection();
-    try {
-      await connection.query("UPDATE deductions SET status = ? WHERE id = ?", [
-        status,
-        id,
-      ]);
-      return true;
-    } catch (error) {
-      throw new Error(`Database error: ${error.message}`);
     } finally {
       connection.release();
     }
