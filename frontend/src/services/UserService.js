@@ -52,3 +52,52 @@ export const getEmployeesByStatus = async (status) => {
     const response = await api.get(`/user/getEmployeesByStatus/${status}`);
     return response.data;
 };
+
+// Get all service charge data
+// export const getAllServiceChargeData = async () => {
+//     const response = await api.get("/user/getAllServiceChargeData");
+//     // console.log("adoooo");
+//     // console.log(response.data);
+//     return response.data;
+// };
+// Service Charge Calculation Logic
+// export const calculateServiceChargeDistribution = async () => {
+//     const response = await api.get("/user/getAllServiceChargeData");
+//     return response.data;
+// };
+
+export const serviceChargeService = {
+    calculateCharges: async () => {
+      try {
+        const response = await api.post('/user/service-charges/calculate');
+        return {
+          success: true,
+          message: response.data.message,
+          affectedRows: response.data.affectedRows
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Calculation failed',
+          error: error.message
+        };
+      }
+    },
+  
+    getAllCharges: async () => {
+      try {
+        const response = await api.get('/user/service-charges');
+        return {
+          success: true,
+          data: response.data.data || [],
+          count: response.data.count || 0
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to fetch charges',
+          error: error.message
+        };
+      }
+    }
+  };
