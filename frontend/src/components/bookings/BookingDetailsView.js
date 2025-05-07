@@ -16,7 +16,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
         if (label === "Venue ID") {
             getAllVenues().then((data) => setVenues(data));
         }
-        if(label === "Status") {
+        if (label === "Status") {
             setVenues([{
                 'venue_id': 1,
                 'venue_name': "pending"
@@ -64,23 +64,23 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
                             type="number"
                             className="border rounded p-1"
                             value={selectedVenue.damageFee}
-                            onChange={e => setSelectedVenue({"damageFee": e.target.value, "refundAmount":"", "depositAmount":"", "status":"" })}
+                            onChange={e => setSelectedVenue({ "damageFee": e.target.value, "refundAmount": "", "depositAmount": "", "status": "" })}
                         />
                     )}
-                    {label === "Guests" &&(
+                    {label === "Guests" && (
                         <input
                             type="number"
                             className="border rounded p-1"
                             value={selectedVenue.number_of_guests}
-                            onChange={e => setSelectedVenue({"number_of_guests": e.target.value})}
+                            onChange={e => setSelectedVenue({ "number_of_guests": e.target.value })}
                         />
                     )}
-                    {label === "Additional Hours" &&(
+                    {label === "Additional Hours" && (
                         <input
                             type="number"
                             className="border rounded p-1"
                             value={selectedVenue.additionalHours}
-                            onChange={e => setSelectedVenue({"additionalHours": e.target.value})}
+                            onChange={e => setSelectedVenue({ "additionalHours": e.target.value })}
                         />
                     )}
                     <div className="flex gap-2 mt-1">
@@ -94,19 +94,19 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
                                         await updateBookingVenue(bookingId, selectedVenue);
                                         setRefresh(true);
                                         setEdit(false);
-                                    } else if(label === "Status"){
+                                    } else if (label === "Status") {
                                         await updateBookingStatus(bookingId, selectedVenue);
                                         setRefresh(true);
                                         setEdit(false);
-                                    } else if(label === "Damage Fee (Rs)") {
+                                    } else if (label === "Damage Fee (Rs)") {
                                         await updateDamageFee(bookingId, selectedVenue);
                                         setRefresh(true);
                                         setEdit(false);
-                                    } else if(label === "Guests") {
+                                    } else if (label === "Guests") {
                                         await updateBookingGuest(bookingId, selectedVenue)
                                         setRefresh(true);
                                         setEdit(false);
-                                    } else if(label === "Additional Hours"){
+                                    } else if (label === "Additional Hours") {
                                         await updateAdditionalHours(bookingId, selectedVenue);
                                         setRefresh(true);
                                         setEdit(false);
@@ -162,7 +162,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                 setTimeout(() => {
                     setBooking(res.data);
                     setLoading(false);
-                }, 3000);
+                }, 1000);
             } catch (err) {
                 setError('Failed to load booking details');
                 setLoading(false);
@@ -184,56 +184,85 @@ export default function BookingDetailsView({ bookingId, onClose }) {
     };
 
     return (
-        <div  className=" w-full fixed m-auto bg-black left-0 top-0 right-0 bottom-0 bg-opacity-10 flex justify-center p-16 overflow-y-auto z-50">
-            <div className="flex flex-col bg-white rounded-lg p-6 w-3/4">
-                <h1 class="flex items-end text-xl font-extrabold dark:text-white mb-3">Advance<span class="bg-blue-100 text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-200 dark:text-blue-800 ms-2"> View</span></h1>
+        <div className=" w-full fixed m-auto bg-black left-0 top-0 right-0 bottom-0 bg-opacity-10 flex justify-center p-16 overflow-y-auto z-50">
+            <div className="flex flex-col align-middle justify-center bg-white rounded-lg p-6 w-3/4">
+                <h1 class="flex items-end ml-12 text-xl font-extrabold dark:text-white mb-3">Advance<span class="bg-blue-100 text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-200 dark:text-blue-800 ms-2"> View</span></h1>
                 {/* Booking Information */}
-                {(loading ? <div className='flex flex-row justify-center gap gap-5 border'>
+                {(loading ? <div className='flex flex-row justify-center gap gap-5'>
                     {/* Loading... */}
 
-                    <div role="status" class="max-w-md p-4 space-y-4 border border-gray-200 divide-y divide-gray-200 rounded-sm shadow-sm animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700">
+                    <div className='flex flex-col gap-4'>
+                        <div role="status" class="max-w-sm p-4 border border-gray-100 rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700">
+
+                            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                            <div class="flex items-center mt-4">
+                                <div>
+                                    <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
+                                    <div class="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                </div>
+                            </div>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div role="status" class="max-w-sm p-4 border border-gray-100 rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700">
+
+                            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                            <div class="flex items-center mt-4">
+                                <div>
+                                    <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
+                                    <div class="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                </div>
+                            </div>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div role="status" class=" max-w-md p-4 border border-gray-100 space-y-4 divide-y divide-gray-200 rounded-sm shadow-sm animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
+                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
                             <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                         </div>
                         <div class="flex items-center justify-between pt-4">
                             <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
+                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
                             <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                         </div>
                         <div class="flex items-center justify-between pt-4">
                             <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
+                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
                             <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                         </div>
                         <div class="flex items-center justify-between pt-4">
                             <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
+                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
                             <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                         </div>
                         <div class="flex items-center justify-between pt-4">
                             <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                                <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
+                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
                             <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                         </div>
                         <span class="sr-only">Loading...</span>
-                        
-                        <h3>Loading...</h3>
                     </div>
                 </div>
 
-                    : <div className='flex flex-row justify-center gap gap-5 border'>
+                    : <div className='flex flex-row justify-center gap gap-10 border'>
                         <div className='flex flex-col'>
                             <section>
                                 <h2 className="text-base font-semibold text-gray-800 mb-2">Booking Information</h2>
@@ -241,9 +270,9 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                     <DetailRow label="Booking ID" value={b.booking_id} />
                                     <DetailRow label="Date" value={formatDate(b.booking_date)} />
                                     <DetailRow label="Time Slot" value={b.time_slot} />
-                                    <DetailRow 
-                                        label="Status" 
-                                        value={b.status} 
+                                    <DetailRow
+                                        label="Status"
+                                        value={b.status}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                     />
@@ -254,15 +283,15 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         setRefresh={setRefresh}
                                     />
                                     <DetailRow label="Customer ID" value={b.customer_id} />
-                                    <DetailRow 
-                                        label="Guests" 
-                                        value={b.number_of_guests} 
+                                    <DetailRow
+                                        label="Guests"
+                                        value={b.number_of_guests}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                     />
-                                    <DetailRow 
-                                        label="Additional Hours" 
-                                        value={b.additional_hours} 
+                                    <DetailRow
+                                        label="Additional Hours"
+                                        value={b.additional_hours}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                     />
@@ -275,7 +304,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                 <div className="border grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <DetailRow label="Contract ID" value={b.contract_id} />
                                     <DetailRow label="Deposit Amount (Rs)" value={b.deposit_amount} />
-                                    <DetailRow 
+                                    <DetailRow
                                         label="Damage Fee (Rs)"
                                         value={b.damage_fee}
                                         bookingId={b.booking_id}
