@@ -333,4 +333,53 @@ ORDER BY
       connection.release();
     }
   }
+
+  //updatededuction......................
+
+  static async updateDeduction(id, calculation_date, description, employee_id, amount) {
+    const connection = await pool.getConnection();
+    try {
+      const [result] = await connection.query(
+        `UPDATE deductions 
+         SET calculation_date = ?, 
+             description = ?, 
+             total_deductions = ?, 
+             employee_id = ?
+         WHERE deductions_id = ?`,
+        [calculation_date, description, amount, employee_id, id]
+      );
+  
+      await connection.commit();
+      return result.affectedRows > 0;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+
+  //deletededuction......................
+
+  
+static async deleteDeduction(id) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      `DELETE FROM deductions WHERE deductions_id = ?`,
+      [id]
+    );
+    await connection.commit();
+    return result.affectedRows > 0;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+  
+
+
 }

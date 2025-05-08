@@ -425,5 +425,45 @@ export const deductionController = {createDeduction: async (req, res) => {
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
+  },
+
+ // updatededuction..................................
+  updateDeduction: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { calculation_date, description, employee_id, amount } = req.body;
+  
+      const updated = await DeductionModel.updateDeduction(
+        id,
+        calculation_date,
+        description,
+        employee_id,
+        amount
+      );
+  
+      if (updated) {
+        res.json({ success: true, message: 'Deduction updated successfully' });
+      } else {
+        res.status(404).json({ success: false, message: 'Deduction not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // userController.js
+deleteDeduction: async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await DeductionModel.deleteDeduction(id);
+    if (deleted) {
+      res.json({ success: true, message: 'Deduction deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, message: 'Deduction not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
+}
+  
 };

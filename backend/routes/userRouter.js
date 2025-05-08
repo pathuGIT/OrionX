@@ -31,6 +31,8 @@ router.get('/service-charges/employee/:employeeId', serviceChargeController.getE
 
 router.post('/deductions', deductionController.createDeduction);
 router.get('/deduction-entries', deductionController.getAllDeductionEntries);
+router.put('/deduction-entries/:id', deductionController.updateDeduction);
+router.delete('/deduction-entries/:id', deductionController.deleteDeduction);
 
 
 

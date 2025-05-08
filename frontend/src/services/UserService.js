@@ -137,23 +137,15 @@ export const deductionService = {
   //updateDeduction.................
   updateDeduction: async (id, data) => {
     try {
-      const response = await api.put(`/user/deductions/${id}`, {
+      const response = await api.put(`/user/deduction-entries/${id}`, { // Correct endpoint
         calculation_date: data.calculation_date,
         description: data.description,
         employee_id: data.employee_id,
         amount: data.amount
       });
-      return {
-        success: true,
-        data: response.data,
-        message: 'Deduction updated successfully'
-      };
+      return { success: true, data: response.data };
     } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to update deduction',
-        error: error.message
-      };
+      // ... existing code ...
     }
   },
   
@@ -173,5 +165,20 @@ export const deductionService = {
         error: error.message
       };
     }
+  },
+
+
+  // deleteDeduction..................
+deleteDeduction: async (id) => {
+  try {
+    const response = await api.delete(`/user/deduction-entries/${id}`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to delete deduction',
+      error: error.message
+    };
   }
+}
 };

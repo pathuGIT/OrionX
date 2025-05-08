@@ -21,7 +21,7 @@ const DeductionsPage = () => {
                 ]);
 
                 if (entriesRes.success) setEntries(entriesRes.data);
-                setEmployees(employeesRes.employees);
+                 setEmployees(employeesRes.employees);
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Error loading initial data');
@@ -55,7 +55,7 @@ const DeductionsPage = () => {
                 });
                 setEditEntryId(null);
             } else {
-                alert(response.error || `Failed to ${operation} deduction`);
+                alert(response.message || `Failed to ${operation} deduction`);
             }
         } catch (error) {
             console.error('Error saving deduction:', error);
@@ -70,7 +70,7 @@ const DeductionsPage = () => {
             description: entry.description,
             amount: entry.total_deductions
         });
-        setEditEntryId(entry.id);
+        setEditEntryId(entry.deductions_id);
     };
 
     const handleDelete = async (id) => {
@@ -84,7 +84,7 @@ const DeductionsPage = () => {
                 }
             } catch (error) {
                 console.error('Error deleting deduction:', error);
-                alert('Error deleting deduction');
+                alert(error.message || 'Error deleting deduction');
             }
         }
     };
@@ -192,7 +192,7 @@ const DeductionsPage = () => {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {entries.map((entry) => (
-                                <tr key={entry.id}>
+                                <tr key={entry.deductions_id}>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">{entry.employee_id}</td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                                         {new Date(entry.calculation_date).toLocaleDateString()}
@@ -213,7 +213,7 @@ const DeductionsPage = () => {
                                                 Edit
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(entry.id)}
+                                                onClick={() => handleDelete(entry.deductions_id)}
                                                 className="text-red-600 hover:text-red-900 px-2 py-1 rounded transition-colors"
                                             >
                                                 Delete
