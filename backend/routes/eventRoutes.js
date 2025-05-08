@@ -10,6 +10,8 @@ import { getEventServices } from '../controllers/eventServiceController.js';
 import { saveSelectedServices } from '../controllers/saveSelectedServiceController.js';
 import { createArrangement } from '../controllers/arrangementController.js';
 import { createReservation } from '../controllers/arrangementController.js';
+import { getArrangementsByBooking } from '../controllers/arrangementController.js';
+
 
 
 // Create separate routers for events and weddings
@@ -35,5 +37,7 @@ EventServiceRoutes.get('/getEventService',customer, getEventServices);
 saveSelectedServiceRoutes.post('/saveServices',customer, saveSelectedServices);
 tableArrangementRoutes.post('/createTableArrangement/:bookingid', createArrangement);
 reservationRoutes.post('/createReservation/:bookingid', createReservation);
+tableArrangementRoutes.get('/getTableArrangement/:bookingid', getArrangementsByBooking);
+
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes};

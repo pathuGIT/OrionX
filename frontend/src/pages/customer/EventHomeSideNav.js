@@ -117,6 +117,44 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
 
         <div className="border-t border-gray-700 my-2"></div>
 
+        <div
+          className="relative"
+          onMouseEnter={isHoverSupported ? () => setOpenMenu('TableManage') : undefined}
+          onMouseLeave={isHoverSupported ? () => setOpenMenu(null) : undefined}
+        >
+          <button 
+            onClick={!isHoverSupported ? () => toggleMenu('TableManage') : undefined}
+            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
+          >
+            <div className="flex items-center">
+              <i className="fas fa-calendar mr-3"></i>Arrange Tables
+            </div>
+            <i className={`fas ${openMenu === 'TableManage' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+          </button>
+          {openMenu === 'TableManage' && (
+            <div className="bg-gray-700">
+              <button
+                onClick={() => {
+                  setActivePage('Select-Tables');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Select Designs
+              </button>
+              <button
+                onClick={() => {
+                  setActivePage('Reserve-Tables');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Book Tables 
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="mt-auto">
           <div className="px-4 py-2 text-gray-100 hover:bg-gray-700 cursor-pointer">
             <Logout />

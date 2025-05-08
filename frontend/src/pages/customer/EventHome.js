@@ -5,7 +5,9 @@ import EventPlan from './CustomerEventPlanning';
 import DisplayEvents from '../../components/DisplayEvents';
 import EventServicesSelector from './EventServicesSelector';
 import ServiceVendor from './ServiceVendor';
-// import ProfileNavbar from '../components/ProfileNavbar';
+import TableReservation from './TableReservation';
+import ChairArrangement from './ChairArrangement';
+
 
 const EventHome = () => {
   const { bookingId, customerID } = useParams();
@@ -39,9 +41,13 @@ const EventHome = () => {
       case 'view-events':
         return <DisplayEvents customerID={customerID} />;
       case 'Select-Services':
-        return <EventServicesSelector customerID={customerID}  bookingId={bookingId}/>;
+        return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
       case 'view-Vendors':
-        return <ServiceVendor customerID={customerID}  bookingId={bookingId} />;
+        return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
+      case 'Select-Tables':
+        return <ChairArrangement bookingId={bookingId} />;
+      case 'Reserve-Tables':
+        return <TableReservation bookingId={bookingId} />;
       case 'dashboard':
       default:
         return (

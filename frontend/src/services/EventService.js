@@ -72,3 +72,57 @@ export const getServiceVendors = async (customerId, bookingId) => {
         throw new Error(error.response?.data?.message || "Failed to load vendors");
     }
 };
+
+
+
+export const createOrUpdateArrangement = async (bookingId, data) => {
+    try {
+        const response = await api.post(`/tableArrangement/createTableArrangement/${bookingId}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to save arrangement');
+    }
+};
+
+export const createReservation = async (bookingId, data) => {
+    try {
+        const response = await api.post(`/reservation/createReservation/${bookingId}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to create reservation');
+    }
+};
+
+export const getArrangementsByBooking = async (bookingId) => {
+    try {
+        const response = await api.get(`/tableArrangement/getTableArrangement/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        if (error.response?.status === 404) return null;
+        throw new Error(error.response?.data?.error || 'Failed to fetch arrangement');
+    }
+};
+
+export const getReservationsByBooking = async (bookingId) => {
+    try {
+        const response = await api.get(`/reservations/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch reservations');
+    }
+};
+
+export const ColorPicker = ({ label, color, onChange }) => (
+    <div className="form-group">
+        <label>{label}</label>
+        <div className="flex items-center gap-2">
+            <input
+                type="color"
+                value={color}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-12 h-12 rounded cursor-pointer"
+            />
+            <span className="font-mono">{color}</span>
+        </div>
+    </div>
+)

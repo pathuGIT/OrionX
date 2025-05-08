@@ -5,7 +5,7 @@ export class EventLinkModel {
         const connection = await db.getConnection();
         try {
             await connection.query('START TRANSACTION');
-
+            console.log("Linking arrangement:", eventId, arrangementId);
             // Remove any existing links
             await connection.query(
                 `DELETE FROM event_table_chair WHERE Event_ID = ?`,
@@ -20,7 +20,6 @@ export class EventLinkModel {
             );
 
             await connection.query('COMMIT');
-            return true;
         } catch (error) {
             await connection.query('ROLLBACK');
             throw error;

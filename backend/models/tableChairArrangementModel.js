@@ -13,6 +13,7 @@ export class TableChairArrangementModel {
                 `SELECT Event_ID FROM Event WHERE booking_id = ?`,
                 [booking_id]
             );
+            console.log("Event ID:", event); // Debugging line
             if (!event.length) throw new Error('Event not found');
             const eventId = event[0].Event_ID;
 
@@ -22,7 +23,7 @@ export class TableChairArrangementModel {
                  WHERE Event_ID = ?`,
                 [eventId]
             );
-
+            console.log("Existing Arrangement:", existing); // Debugging line
             let arrangementId;
             
             if (existing.length > 0) {
@@ -45,17 +46,18 @@ export class TableChairArrangementModel {
                         arrangementId
                     ]
                 );
+              //  console.log("Updated Arrangement ID:", arrangementId); // Debugging line
             } else {
                 // Create new arrangement
                 const [lastId] = await connection.query(
                     `SELECT Arrangement_ID FROM table_chair_arrangement 
                      ORDER BY Arrangement_ID DESC LIMIT 1`
                 );
-
+             //   console.log("Last Arrangement ID:", lastId); // Debugging line
                 let newIdNumber = lastId.length ? 
                     parseInt(lastId[0].Arrangement_ID.replace('TCA', '')) + 1 : 1;
                 arrangementId = `TCA${String(newIdNumber).padStart(6, '0')}`;
-
+              //  console.log("New Arrangement ID:", arrangementId); // Debugging line
                 await connection.query(
                     `INSERT INTO table_chair_arrangement 
                     (Arrangement_ID, Head_Table_Pax, Top_Cloth_Color,
@@ -71,10 +73,34 @@ export class TableChairArrangementModel {
                     ]
                 );
 
-                await EventLinkModel.linkArrangement(eventId, arrangementId);
+                // await EventLinkModel.linkArrangement(eventId, arrangementId);
+
+                try {
+                  //  console.log("Linking arrangement:", eventId, arrangementId);
+                    // Remove any existing links
+                    await connection.query(
+                        `DELETE FROM event_table_chair WHERE Event_ID = ?`,
+                        [eventId]
+                    );
+                 //   console.log("Deleted existing links for Event ID:", eventId); // Debugging line
+        
+                    // Create new link
+                    await connection.query(
+                        `INSERT INTO event_table_chair (Event_ID, Arrangement_Id)
+                        VALUES (?, ?)`,
+                        [eventId, arrangementId]
+                    );
+                   // console.log("Inserted new link for Event ID:", eventId,arrangementId); // Debugging line
+                } catch (error) {
+                    await connection.query('ROLLBACK');
+                    throw error;
+                }
+
             }
 
             await connection.query('COMMIT');
+            console.log("Transaction committed successfully"); // Debugging line
+            console.log("Final Arrangement ID:", arrangementId); // Debugging line
             return arrangementId;
 
         } catch (error) {
