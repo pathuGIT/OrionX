@@ -9,7 +9,11 @@ const DeductionsPage = () => {
         calculation_date: '',
         description: '',
         amount: ''
+        
     });
+
+
+    
     const [editEntryId, setEditEntryId] = useState(null);
 
     useEffect(() => {
@@ -52,8 +56,12 @@ const DeductionsPage = () => {
                     calculation_date: '',
                     description: '',
                     amount: ''
+
+                    
                 });
                 setEditEntryId(null);
+
+                
             } else {
                 alert(response.message || `Failed to ${operation} deduction`);
             }
@@ -62,6 +70,8 @@ const DeductionsPage = () => {
             alert(`Error: Failed to ${editEntryId ? 'update' : 'create'} deduction`);
         }
     };
+
+    
 
     const handleEdit = (entry) => {
         setFormData({
@@ -196,6 +206,7 @@ const DeductionsPage = () => {
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">{entry.employee_id}</td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                                         {new Date(entry.calculation_date).toLocaleDateString()}
+                                      
                                     </td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">{entry.description}</td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">

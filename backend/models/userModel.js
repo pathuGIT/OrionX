@@ -318,7 +318,7 @@ export class DeductionModel {
       const [results] = await connection.query(`
         SELECT 
     deductions_id, 
-    calculation_date, 
+    DATE_FORMAT(calculation_date, "%Y-%m-%d") AS calculation_date, 
     description, 
     total_deductions, 
     employee_id
