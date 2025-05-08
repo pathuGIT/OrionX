@@ -134,6 +134,30 @@ export const deductionService = {
     }
   },
 
+  //updateDeduction.................
+  updateDeduction: async (id, data) => {
+    try {
+      const response = await api.put(`/user/deductions/${id}`, {
+        calculation_date: data.calculation_date,
+        description: data.description,
+        employee_id: data.employee_id,
+        amount: data.amount
+      });
+      return {
+        success: true,
+        data: response.data,
+        message: 'Deduction updated successfully'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update deduction',
+        error: error.message
+      };
+    }
+  },
+  
+  //getall........................
   getAllDeductionEntries: async () => {
     try {
       const response = await api.get('/user/deduction-entries');
