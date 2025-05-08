@@ -294,32 +294,22 @@ export class DeductionModel {
   static async createDeduction(calculation_date, description, employee_id, amount) {
     const connection = await pool.getConnection();
     try {
-      await connection.beginTransaction();
-      
-      const deductions_id = uuidv4().substring(0, 10);
-      
+    
       await connection.query(
         `INSERT INTO deductions 
-        (deductions_id, calculation_date, description, total_deductions, status) 
+        (calculation_date, description, total_deductions, employee_id, status) 
         VALUES (?, ?, ?, ?, 'pending')`,
-        [deductions_id, calculation_date, description, amount]
-      );
+        [  calculation_date, description, amount, employee_id]
+    );
 
-      await connection.query(
-        `INSERT INTO deduction_details 
-        (deduction_details_id, deduction_id, employee_id, amount) 
-        VALUES (?, ?, ?, ?)`,
-        [uuidv4().substring(0, 10), deductions_id, employee_id, amount]
-      );
-
-      await connection.commit();
-      return { success: true };
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
+    await connection.commit();
+    return { success: true, deductionId: employee_id };
+} catch (error) {
+    await connection.rollback();
+    throw error;
+} finally {
+    connection.release();
+}
   }
 
   static async getAllDeductionEntries() {
@@ -327,14 +317,16 @@ export class DeductionModel {
     try {
       const [results] = await connection.query(`
         SELECT 
-          e.employee_id,
-          d.calculation_date,
-          d.description,
-          dd.amount
-        FROM deduction_details dd
-        JOIN deductions d ON dd.deduction_id = d.deductions_id
-        JOIN employee e ON dd.employee_id = e.employee_id
-        ORDER BY d.calculation_date DESC
+    deductions_id, 
+    calculation_date, 
+    description, 
+    total_deductions, 
+    employee_id
+FROM 
+    deductions
+ORDER BY 
+    calculation_date DESC;
+
       `);
       return results;
     } finally {

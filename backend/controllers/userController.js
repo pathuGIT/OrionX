@@ -412,7 +412,7 @@ export const deductionController = {createDeduction: async (req, res) => {
         employee_id,
         amount
       );
-      res.json({ success: true });
+      res.json({ success: true});
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
