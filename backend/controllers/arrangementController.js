@@ -80,8 +80,8 @@ export const createArrangement = async (req, res) => {
 // Get all arrangements by booking ID
 export const getArrangementsByBooking = async (req, res) => {
     try {
-        const { bookingId } = req.params;
-        const arrangements = await EventLinkModel.getArrangementsByBooking(bookingId);
+        const { bookingid } = req.params;
+        const arrangements = await EventLinkModel.getArrangementsByBooking(bookingid);
 
         if (!arrangements.length) {
             return res.status(404).json({
@@ -90,12 +90,21 @@ export const getArrangementsByBooking = async (req, res) => {
             });
         }
 
-        res.status(200).json({
-            success: true,
-            count: arrangements.length,
-            data: arrangements
-        });
+        // Transform data for frontend
+        const transformed = arrangements.map(arr => ({
+            Arrangement_ID: arr.Arrangement_ID,
+            Head_Table_Pax: arr.Head_Table_Pax,
+            Colors: {
+                Top: arr.Top_Cloth_Color,
+                Table: arr.Table_Cloth_Color,
+                Bow: arr.Bow_Color,
+                Chair: arr.Chair_Cover_Color
+            },
+            UpdatedAt: arr.updated_at || new Date().toISOString(),
+            Reservations: arr.Reservations
+        }));
 
+        res.status(200).json(transformed);
     } catch (error) {
         res.status(500).json({
             success: false,

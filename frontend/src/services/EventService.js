@@ -93,10 +93,28 @@ export const createReservation = async (bookingId, data) => {
     }
 };
 
+// export const getArrangementsByBooking = async (bookingId) => {
+//     try {
+//         const response = await api.get(`/tableArrangement/getTableArrangement/${bookingId}`);
+//         return response.data;
+//     } catch (error) {
+//         if (error.response?.status === 404) return null;
+//         throw new Error(error.response?.data?.error || 'Failed to fetch arrangement');
+//     }
+// };
+
 export const getArrangementsByBooking = async (bookingId) => {
     try {
         const response = await api.get(`/tableArrangement/getTableArrangement/${bookingId}`);
-        return response.data;
+        return response.data.map(arr => ({
+            Arrangement_ID: arr.Arrangement_ID,
+            Head_Table_Pax: arr.Head_Table_Pax,
+            Top_Cloth_Color: arr.Top_Cloth_Color,
+            Table_Cloth_Color: arr.Table_Cloth_Color,
+            Bow_Color: arr.Bow_Color,
+            Chair_Cover_Color: arr.Chair_Cover_Color,
+            updated_at: arr.updated_at
+        }));
     } catch (error) {
         if (error.response?.status === 404) return null;
         throw new Error(error.response?.data?.error || 'Failed to fetch arrangement');

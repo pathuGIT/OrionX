@@ -7,6 +7,7 @@ import EventServicesSelector from './EventServicesSelector';
 import ServiceVendor from './ServiceVendor';
 import TableReservation from './TableReservation';
 import ChairArrangement from './ChairArrangement';
+import ArrangementDetailsPage from './ArrangementDetailsPage';
 
 
 const EventHome = () => {
@@ -48,6 +49,8 @@ const EventHome = () => {
         return <ChairArrangement bookingId={bookingId} />;
       case 'Reserve-Tables':
         return <TableReservation bookingId={bookingId} />;
+      case 'see-arrangements':
+        return <ArrangementDetailsPage bookingId={bookingId} />;
       case 'dashboard':
       default:
         return (

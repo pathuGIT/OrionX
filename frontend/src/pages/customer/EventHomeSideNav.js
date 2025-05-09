@@ -151,6 +151,15 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
               >
                 Book Tables 
               </button>
+                            <button
+                onClick={() => {
+                  setActivePage('see-arrangements');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                See Arrangements
+              </button>
             </div>
           )}
         </div>
