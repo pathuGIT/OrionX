@@ -361,6 +361,8 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
 };
 
 
+
+
 // // Get all menu types under a specific menu list type
 // export const getMenusByListType = async (listTypeId) => {
 //   try {
@@ -371,3 +373,109 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
 //     throw error;
 //   }
 // };
+////////////////////////////////////////////////////////////////////////////
+
+//to display all menulisttypes and add new menulisttypes through form
+export const CusgetMenuListType = async () => {
+  try {
+    const response = await api.get('/menuListType/getAll');
+    console.log("getMenus response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching menus:", error);
+    throw error;
+  }
+};
+
+//get menu list type by id
+export const CusgetMenuListTypeById = async (id) => {
+  try {
+    const response = await api.get(`/menuListType/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting menu list type:", error);
+    throw error;
+  }
+}; 
+
+//to display all menytypes and add new menu types through form
+export const CusgetMenuTypes = async () => {
+  try {
+    const response = await api.get('/menutypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching menu types:", error);
+    throw error;
+  }
+};
+
+
+//to display all categories and add new categories through form
+export const CusgetCategories = async () => {
+  try {
+    const response = await api.get('/categories/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+//to display all items and add new items through form
+export const CusgetItems = async () => {
+  try {
+    const response = await api.get('/items/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    throw error;
+  }
+};
+
+
+// to display all category menu types and add new category menu types through form
+export const CusgetCategoryMenuTypes = async () => {
+  try {
+    const response = await api.get('/categoryMenuTypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category menu types:", error);
+    throw error;
+  }
+};
+
+// to display all item category menu types 
+export const CusgetItemCategoryMenuTypes = async () => {
+  try {
+    const response = await api.get('/itemCategoryMenuTypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching item category menu types:", error);
+    throw error;
+  }
+}
+
+
+
+// To display all menu views
+export const getAllMenuViews = async () => {
+  try {
+    const response = await api.get('/advanceMenuView/getAll');
+    console.log("getMenuViews response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching menu views:", error);
+    throw error;
+  }
+};
+
+// Get a menu view by ID
+export const getMenuViewById = async (id) => {
+  try {
+    const response = await api.get(`/advanceMenuView/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting menu view by ID:", error);
+    throw error;
+  }
+};
