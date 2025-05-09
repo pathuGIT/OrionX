@@ -4,6 +4,8 @@ import { addEmployee, changeUserRole, addCustomer ,
     updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
     getEmployeeById,serviceChargeController,
     deductionController,
+    calculateAndSaveMonthlyDeduction
+    
      
 } from '../controllers/userController.js';
 import { subAdmin } from '../middleware/Sub_admin.js';
@@ -35,6 +37,9 @@ router.put('/deduction-entries/:id', deductionController.updateDeduction);
 router.delete('/deduction-entries/:id', deductionController.deleteDeduction);
 
 
+router.post('/monthly/calculate', calculateAndSaveMonthlyDeduction );
+router.post('/monthly/save', deductionController.saveMonthlyDeduction);
+ 
 
 
 //sub admins

@@ -106,8 +106,6 @@ export const serviceChargeService = {
 
  
  
-  
-
  // Deduction Service.......................
  
 
@@ -167,8 +165,7 @@ export const deductionService = {
     }
   },
 
-
-  // deleteDeduction..................
+ 
 deleteDeduction: async (id) => {
   try {
     const response = await api.delete(`/user/deduction-entries/${id}`);
@@ -180,5 +177,72 @@ deleteDeduction: async (id) => {
       error: error.message
     };
   }
+},
+
+  // Calculate monthly deduction
+  calculateMonthlyDeduction: async (employeeId, monthYear) => {
+    try {
+      const response = await api.post('/user/monthly/calculate', {
+        employee_id: employeeId,
+        month_year: monthYear,
+      });
+      return {
+        success: true,
+        data: response.data,
+        message: 'Monthly deduction calculated successfully',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to calculate monthly deduction',
+        error: error.message,
+      };
+    }
+  },
+
+  // Save monthly deduction
+  saveMonthlyDeduction: async (data) => {
+    try {
+      const response = await api.post('/user/monthly/save', {
+        employee_id: data.employee_id,
+        month_year: data.month_year,
+        total_deduction: data.total_deduction,
+      });
+      return {
+        success: true,
+        data: response.data,
+        message: 'Monthly deduction saved successfully',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to save monthly deduction',
+        error: error.message,
+      };
+    }
+  },
+ 
+  calculateAndSaveMonthlyDeduction: async (employeeId, monthYear) => {
+    try {
+        const response = await api.post('/user/monthly/calculate-and-save', {
+            employee_id: employeeId,
+            month_year: monthYear,
+        });
+        return {
+            success: true,
+            message: response.data.message,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: error.response?.data?.message || 'Failed to calculate and save monthly deduction',
+            error: error.message,
+        };
+    }
 }
+
+ 
+
+
 };
+

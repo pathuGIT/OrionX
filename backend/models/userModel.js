@@ -1,7 +1,6 @@
 import pool from "../config/db.js";
 
  
-
 //register super admin only once
 export const registerSuperAdminSystemUserModel = async (pswd, employee_id) => {
   const [result] = await pool.query(
@@ -359,9 +358,6 @@ ORDER BY
     }
   }
 
-
-  //deletededuction......................
-
   
 static async deleteDeduction(id) {
   const connection = await pool.getConnection();
@@ -379,7 +375,75 @@ static async deleteDeduction(id) {
     connection.release();
   }
 }
-  
+ //....................................................problem
+  // static async calculateMonthlyDeduction(employeeId, monthYear) {
+  //   const connection = await pool.getConnection();
+  //   try {
+  //     const [results] = await connection.query(
+  //       `CALL CalculateAndSaveMonthlyDeduction(?, ?)`, {
+  //         replacements: [employeeId, `${monthYear}-01`]
+  //       }
+  //     );
+  //     return { 
+  //         success: true, 
+  //         data: results[0][0] 
+  //     };
+  //   } catch (error) {
+  //     throw new Error('Monthly calculation failed: ' + error.message);
+  //   } finally {
+  //     connection.release();
+  //   }
+  // }
+
+  static async saveMonthlyDeduction(employeeId, monthYear, totalDeductions) {
+    const connection = await pool.getConnection();
+    try {
+      const [result] = await connection.query(
+        `INSERT INTO monthly_deductions (employee_id, month_year, total_deductions) VALUES (?, ?, ?)`,
+        [employeeId, monthYear, totalDeductions]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw new Error('Failed to save monthly deduction: ' + error.message);
+    } finally {
+      connection.release();
+    }
+  }
+
+
+
+  static async calculateAndSaveMonthlyDeductionmodel(employee_id, month_year) {
+    const connection = await pool.getConnection();
+    try {
+      const [result] = await connection.query(
+        'CALL CalculateAndSaveMonthlyDeduction(?, ?)',
+        [employee_id, `${month_year}-01`]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw new Error('Monthly deduction calculation failed: ' + error.message);
+    } finally {
+      connection.release();
+    }
+  }
+
+  static async saveMonthlyDeduction(employeeId, monthYear, totalDeductions) {
+    const connection = await pool.getConnection();
+    try {
+      const [result] = await connection.query(
+        `INSERT INTO monthly_deductions (employee_id, month_year, total_deductions) 
+         VALUES (?, ?, ?)`,
+        [employeeId, `${monthYear}-01`, totalDeductions]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw new Error('Failed to save monthly deduction: ' + error.message);
+    } finally {
+      connection.release();
+    }
+  }
 
 
 }
+
+ 

@@ -10,7 +10,9 @@ import {
   deleteEmployeesModel,
   updateEmployeesStatusModel,
   ServiceChargeModel, 
-  DeductionModel
+  DeductionModel,
+  
+   
   
   
 } from "../models/userModel.js";
@@ -464,6 +466,71 @@ deleteDeduction: async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+},
+
+
+
+
+
+
+
+calculateMonthlyDeduction: async (req, res) => {
+  try {
+      const { employee_id, month_year } = req.body;
+      const result = await calculateAndSaveMonthlyDeductionModel.calculateAndSaveMonthlyDeduction(employee_id, month_year);
+      res.status(200).json(result);
+  } catch (error) {
+      res.status(500).json({ 
+          success: false, 
+          message: error.message 
+      });
+  }
+},
+saveMonthlyDeduction: async (req, res) => {
+  try {
+      const result = await DeductionModel.saveMonthlyDeduction(req.body);
+      res.status(201).json(result);
+  } catch (error) {
+      res.status(500).json({ 
+          success: false, 
+          message: error.message 
+      });
+  }
 }
+
+
+
+
   
 };
+
+
+export const calculateAndSaveMonthlyDeduction = async (req, res) => {
+  try {
+    const { employee_id, month_year } = req.body;
+    
+    const success = await DeductionModel.calculateAndSaveMonthlyDeductionmodel(
+      employee_id,
+      month_year
+    );
+
+    if (success) {
+      res.status(200).json({
+        success: true,
+        message: 'Monthly deduction calculated and saved successfully'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'No deductions found for this period'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+ 
