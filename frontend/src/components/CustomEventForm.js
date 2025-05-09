@@ -172,8 +172,47 @@ const EventForm = ({ bookingId }) => {
                         </div>
                     </div>
                 )}
-
                 {step === 2 && (
+                    <div className="space-y-4">
+                        <div className="border-b pb-4 mb-4">
+                            <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-600">
+                                <Clock className="w-6 h-6" />
+                                Function Duration
+                            </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                                <div className="relative">
+                                    <input
+                                        type="time"
+                                        name="functionDurationFrom"
+                                        value={formData.functionDurationFrom}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                                <div className="relative">
+                                    <input
+                                        type="time"
+                                        name="functionDurationTo"
+                                        value={formData.functionDurationTo}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {step === 3 && (
                     <div className="space-y-4">
                         <div className="border-b pb-4 mb-4">
                             <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-600">
@@ -204,47 +243,6 @@ const EventForm = ({ bookingId }) => {
                                         type="time"
                                         name="buffetTimeTo"
                                         value={formData.buffetTimeTo}
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {step === 3 && (
-                    <div className="space-y-4">
-                        <div className="border-b pb-4 mb-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-600">
-                                <Clock className="w-6 h-6" />
-                                Function Duration
-                            </h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                                <div className="relative">
-                                    <input
-                                        type="time"
-                                        name="functionDurationFrom"
-                                        value={formData.functionDurationFrom}
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                    <Clock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                </div>
-                            </div>
-
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                                <div className="relative">
-                                    <input
-                                        type="time"
-                                        name="functionDurationTo"
-                                        value={formData.functionDurationTo}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
