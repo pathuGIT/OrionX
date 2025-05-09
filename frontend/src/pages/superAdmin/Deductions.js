@@ -168,8 +168,11 @@ const handleCalculate = async () => {
       if (response.success) {
           alert(response.message);
 
-          calculationState:''
-
+          setCalculationState({
+            employee_id: '',
+            month: '',
+            calculatedTotal: null
+        });
         
       } else {
           alert(response.message || 'Failed to calculate and save monthly deduction');
