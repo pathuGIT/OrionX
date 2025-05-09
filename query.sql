@@ -623,3 +623,22 @@ END //
 DELIMITER ;
 
 
+-- new trigger for Item_Category_Menu_Type
+DELIMITER //
+
+CREATE TRIGGER Before_Insert_Item_Category_Menu_Type
+BEFORE INSERT ON Item_Category_Menu_Type
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(ICMT_Id, 5) AS UNSIGNED)), 0) + 1 
+    INTO max_id 
+    FROM Item_Category_Menu_Type;
+
+    SET new_id = CONCAT('ICMT', LPAD(max_id, 3, '0'));
+    SET NEW.ICMT_Id = new_id;
+END //
+
+DELIMITER ;
