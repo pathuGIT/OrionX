@@ -224,7 +224,7 @@ deleteDeduction: async (id) => {
  
   calculateAndSaveMonthlyDeduction: async (employeeId, monthYear) => {
     try {
-        const response = await api.post('/user/monthly/calculate-and-save', {
+        const response = await api.post('/user/monthly/calculate', {
             employee_id: employeeId,
             month_year: monthYear,
         });

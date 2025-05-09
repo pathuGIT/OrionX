@@ -167,6 +167,10 @@ const handleCalculate = async () => {
 
       if (response.success) {
           alert(response.message);
+
+          calculationState:''
+
+        
       } else {
           alert(response.message || 'Failed to calculate and save monthly deduction');
       }
