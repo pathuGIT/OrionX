@@ -371,3 +371,10 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
 //     throw error;
 //   }
 // };
+
+
+////////////////////////// advance view
+export const getMenuOverview = async () => {
+  const response = await api.get('/advanceMenu/overview');
+  return response.data.data; // nested menu array
+};

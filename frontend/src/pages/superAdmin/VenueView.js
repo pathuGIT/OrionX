@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { addVenue, getAllVenues, deleteVenueById, updateVenueById, checkVenueIDByBooking } from '../../services/VenueService';
-import { BuildingOffice2Icon, ClockIcon, MapPinIcon, UserGroupIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+//import { BuildingOffice2Icon, ClockIcon, MapPinIcon, UserGroupIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 const BookingView = () => {
   const [viewAction, setViewAction] = useState(true);
