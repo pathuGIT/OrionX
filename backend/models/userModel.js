@@ -454,7 +454,9 @@ ORDER BY
   try {
     console.log("Query Parameters:", employee_id, date); // Log parameters
     const [results] = await connection.query(
-      `SELECT *
+      `SELECT employee_id,
+      total_deduction,
+      DATE_FORMAT(month_year, "%Y-%m") AS month_year 
        FROM deduction_month
        WHERE employee_id = ? AND DATE_FORMAT(month_year, "%Y-%m") = ?`,
       [employee_id, date]

@@ -239,10 +239,27 @@ deleteDeduction: async (id) => {
             error: error.message,
         };
     }
-}
+},
 
+//.......................
+
+// In userServices.js
  
+getMonthlyDeductionEntriesByEmployeeAndDate: async (employeeId, date) => {
+  try {
+    const response = await api.get(`/user/monthly/entries/${employeeId}/${date}`);
+    return {
+      success: true,
+      data: response.data?.data || []  // Adjust based on your API response structure
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to fetch monthly entries',
+      data: []
+    };
+  } 
 
-
+}
 };
 
