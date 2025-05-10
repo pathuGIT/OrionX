@@ -3,7 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRouter from './routes/userRouter.js';
 import mailRouter from './routes/mailRouter.js';
-import { eventRoute, weddingRoutes,cusBookingRoutes ,dispayEventsRoutes ,serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes,tableArrangementRoutes,reservationRoutes } from './routes/eventRoutes.js';
+import { eventRoute, weddingRoutes,cusBookingRoutes ,dispayEventsRoutes ,serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes,tableArrangementRoutes,reservationRoutes,planBarRoutes } from './routes/eventRoutes.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -42,6 +42,7 @@ app.use('/api/EventService', EventServiceRoutes);
 app.use('/api/CustomerService', saveSelectedServiceRoutes);
 app.use('/api/tableArrangement', tableArrangementRoutes);
 app.use('/api/reservation', reservationRoutes);
+app.use('/api/Bar', planBarRoutes);
 
 
 

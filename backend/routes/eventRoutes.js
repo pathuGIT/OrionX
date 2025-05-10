@@ -11,6 +11,8 @@ import { saveSelectedServices } from '../controllers/saveSelectedServiceControll
 import { createArrangement } from '../controllers/arrangementController.js';
 import { createReservation } from '../controllers/arrangementController.js';
 import { getArrangementsByBooking } from '../controllers/arrangementController.js';
+import { createPlanBarEvent } from '../controllers/planBarController.js';
+
 
 
 
@@ -24,6 +26,7 @@ const EventServiceRoutes = express.Router();
 const saveSelectedServiceRoutes = express.Router();
 const tableArrangementRoutes = express.Router();
 const reservationRoutes = express.Router();
+const planBarRoutes = express.Router();
 
 
 
@@ -38,6 +41,7 @@ saveSelectedServiceRoutes.post('/saveServices',customer, saveSelectedServices);
 tableArrangementRoutes.post('/createTableArrangement/:bookingid', createArrangement);
 reservationRoutes.post('/createReservation/:bookingid', createReservation);
 tableArrangementRoutes.get('/getTableArrangement/:bookingid', getArrangementsByBooking);
+planBarRoutes.post('/planBar/:bookingid', createPlanBarEvent );
 
 
-export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes};
+export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes};
