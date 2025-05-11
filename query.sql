@@ -3,6 +3,9 @@ CREATE DATABASE orionX;
 
 USE orionX;
 
+mysql -h mysql2025.mysql.database.azure.com -u wannige -p
+Pathu@2189
+
 -- Create Employee table
 CREATE TABLE Employee (
     employee_id VARCHAR(10) PRIMARY KEY,
