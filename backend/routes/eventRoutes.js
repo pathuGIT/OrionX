@@ -12,6 +12,10 @@ import { createArrangement } from '../controllers/arrangementController.js';
 import { createReservation } from '../controllers/arrangementController.js';
 import { getArrangementsByBooking } from '../controllers/arrangementController.js';
 import { createPlanBarEvent } from '../controllers/planBarController.js';
+import { getPlanBarEvent } from '../controllers/planBarController.js';
+import { deletePlanBarEvent } from '../controllers/planBarController.js';
+import { updatePlanBarEvent } from '../controllers/planBarController.js';
+
 
 
 
@@ -41,7 +45,10 @@ saveSelectedServiceRoutes.post('/saveServices',customer, saveSelectedServices);
 tableArrangementRoutes.post('/createTableArrangement/:bookingid', createArrangement);
 reservationRoutes.post('/createReservation/:bookingid', createReservation);
 tableArrangementRoutes.get('/getTableArrangement/:bookingid', getArrangementsByBooking);
-planBarRoutes.post('/planBar/:bookingid', createPlanBarEvent );
+planBarRoutes.post('/planBar/:bookingid', createPlanBarEvent );//did
+planBarRoutes.get('/getPlanBar/:bookingid', getPlanBarEvent);
+planBarRoutes.delete('/deletePlanBar/:bookingid', deletePlanBarEvent );
+planBarRoutes.put('/updatePlanBar/:bookingid', updatePlanBarEvent );
 
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes};

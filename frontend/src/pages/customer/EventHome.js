@@ -8,6 +8,7 @@ import ServiceVendor from './ServiceVendor';
 import TableReservation from './TableReservation';
 import ChairArrangement from './ChairArrangement';
 import ArrangementDetailsPage from './ArrangementDetailsPage';
+import PlanBarForm from './PlanBarForm';
 
 
 const EventHome = () => {
@@ -51,6 +52,12 @@ const EventHome = () => {
         return <TableReservation bookingId={bookingId} />;
       case 'see-arrangements':
         return <ArrangementDetailsPage bookingId={bookingId} />;
+      case 'Select-bar-Times':
+        return <PlanBarForm bookingId={bookingId} />;
+      case 'setect-bites':
+        return ;
+      case 'see-bar-arrangements':
+        return ;
       case 'dashboard':
       default:
         return (

@@ -164,6 +164,56 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
           )}
         </div>
 
+
+        <div className="border-t border-gray-700 my-2"></div>
+
+        <div
+          className="relative"
+          onMouseEnter={isHoverSupported ? () => setOpenMenu('BarPlan') : undefined}
+          onMouseLeave={isHoverSupported ? () => setOpenMenu(null) : undefined}
+        >
+          <button 
+            onClick={!isHoverSupported ? () => toggleMenu('BarPlan') : undefined}
+            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
+          >
+            <div className="flex items-center">
+              <i className="fas fa-calendar mr-3"></i>Arrange Tables
+            </div>
+            <i className={`fas ${openMenu === 'BarPlan' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+          </button>
+          {openMenu === 'BarPlan' && (
+            <div className="bg-gray-700">
+              <button
+                onClick={() => {
+                  setActivePage('Select-bar-Times');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Bar Times
+              </button>
+              <button
+                onClick={() => {
+                  setActivePage('setect-bites');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Bites & Drinks
+              </button>
+                            <button
+                onClick={() => {
+                  setActivePage('see-bar-arrangements');
+                  closeSidebar();
+                }}
+                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
+              >
+                Bar Arrangements
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="mt-auto">
           <div className="px-4 py-2 text-gray-100 hover:bg-gray-700 cursor-pointer">
             <Logout />

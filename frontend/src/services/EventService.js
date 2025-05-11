@@ -122,3 +122,39 @@ export const getReservationsByBooking = async (bookingId) => {
     }
 };
 
+export const createPlanBar = async (bookingId, planBarData) => {
+    try {
+        const response = await api.post(`/Bar/planBar/${bookingId}`, planBarData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to save bar plan');
+    }
+};
+
+export const updatePlanBar = async (bookingId, data) => {
+    try {
+        const response = await api.put(`/Bar/updatePlanBar/${bookingId}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to update bar plan');
+    }
+};
+
+export const deletePlanBar = async (bookingId) => {
+    try {
+        const response = await api.delete(`/Bar/deletePlanBar/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to delete bar plan');
+    }
+};
+
+export const getPlanBar = async (bookingId) => {
+    try {
+        const response = await api.get(`/Bar/getPlanBar/${bookingId}`);
+        return response.data?.data || null;
+    } catch (error) {
+        if (error.response?.status === 404) return null;
+        throw new Error(error.response?.data?.error || 'Failed to fetch bar plan');
+    }
+};
