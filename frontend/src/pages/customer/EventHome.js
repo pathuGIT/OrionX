@@ -88,37 +88,38 @@ const EventHome = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* <ProfileNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} /> */}
-
-      <div className="flex">
-        {/* Overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-        )}
-
-        <EventHomeSideNav
-          setActivePage={setActivePage}
-          closeSidebar={closeSidebar}
-          className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } md:translate-x-0`}
-        />
-
-        <main
-          className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarOpen ? 'md:ml-3' : 'ml-0'
-            }`}
-        >
-          <div className="bg-white shadow-md rounded-lg p-6">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
+return (
+  <div className="min-h-screen bg-gray-100 flex">
+    {/* Side Navigation */}
+    <div className="fixed md:relative z-50">
+      <EventHomeSideNav
+        setActivePage={setActivePage}
+        closeSidebar={closeSidebar}
+        className={`transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      />
     </div>
-  );
+
+    {/* Main Content */}
+    <main className="flex-1 min-h-screen md:ml-15 transition-margin duration-300">
+      {/* Content Container */}
+      <div className="p-6">
+        <div className="bg-white shadow-md rounded-lg p-6">
+          {renderContent()}
+        </div>
+      </div>
+    </main>
+
+    {/* Mobile Overlay */}
+    {sidebarOpen && (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+        onClick={() => setSidebarOpen(false)}
+      ></div>
+    )}
+  </div>
+);
 };
 
 export default EventHome;
