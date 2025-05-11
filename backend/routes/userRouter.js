@@ -39,6 +39,8 @@ router.delete('/deduction-entries/:id', deductionController.deleteDeduction);
 
 router.post('/monthly/calculate', calculateAndSaveMonthlyDeduction );
 router.post('/monthly/save', deductionController.saveMonthlyDeduction);
+//router.get('/monthly/entries', deductionController.getMonthlyDeductionEntries);
+router.get('/monthly/entries/:employee_id/:date', deductionController.getMonthlyDeductionEntriesByEmployeeAndDate);
  
 
 

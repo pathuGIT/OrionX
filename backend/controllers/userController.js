@@ -470,14 +470,10 @@ deleteDeduction: async (req, res) => {
 
 
 
-
-
-
-
 calculateMonthlyDeduction: async (req, res) => {
   try {
       const { employee_id, month_year } = req.body;
-      const result = await calculateAndSaveMonthlyDeductionModel.calculateAndSaveMonthlyDeduction(employee_id, month_year);
+      const result = await DeductionModel.calculateAndSaveMonthlyDeduction(employee_id, month_year);
       res.status(200).json(result);
   } catch (error) {
       res.status(500).json({ 
@@ -496,13 +492,41 @@ saveMonthlyDeduction: async (req, res) => {
           message: error.message 
       });
   }
+},
+//..........................................................
+
+getMonthlyDeductionEntriesByEmployeeAndDate: async (req, res) => {
+  try {
+    const { employee_id, date } = req.params;
+
+    console.log("Request Parameters:", employee_id, date); // Log request parameters
+    const entries = await DeductionModel.getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date);
+
+    if (!entries || entries.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No deduction entries found for the specified employee and date",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: entries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 
-
-
+ 
   
 };
+
+
 
 
 export const calculateAndSaveMonthlyDeduction = async (req, res) => {

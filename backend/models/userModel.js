@@ -1,6 +1,5 @@
 import pool from "../config/db.js";
 
- 
 //register super admin only once
 export const registerSuperAdminSystemUserModel = async (pswd, employee_id) => {
   const [result] = await pool.query(
@@ -285,30 +284,32 @@ export class ServiceChargeModel {
 
 //deduction model...........
 
-
-
 export class DeductionModel {
   // ... existing methods ...
 
-  static async createDeduction(calculation_date, description, employee_id, amount) {
+  static async createDeduction(
+    calculation_date,
+    description,
+    employee_id,
+    amount
+  ) {
     const connection = await pool.getConnection();
     try {
-    
       await connection.query(
         `INSERT INTO deductions 
         (calculation_date, description, total_deductions, employee_id, status) 
         VALUES (?, ?, ?, ?, 'pending')`,
-        [  calculation_date, description, amount, employee_id]
-    );
+        [calculation_date, description, amount, employee_id]
+      );
 
-    await connection.commit();
-    return { success: true, deductionId: employee_id };
-} catch (error) {
-    await connection.rollback();
-    throw error;
-} finally {
-    connection.release();
-}
+      await connection.commit();
+      return { success: true, deductionId: employee_id };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   static async getAllDeductionEntries() {
@@ -335,7 +336,13 @@ ORDER BY
 
   //updatededuction......................
 
-  static async updateDeduction(id, calculation_date, description, employee_id, amount) {
+  static async updateDeduction(
+    id,
+    calculation_date,
+    description,
+    employee_id,
+    amount
+  ) {
     const connection = await pool.getConnection();
     try {
       const [result] = await connection.query(
@@ -347,7 +354,7 @@ ORDER BY
          WHERE deductions_id = ?`,
         [calculation_date, description, amount, employee_id, id]
       );
-  
+
       await connection.commit();
       return result.affectedRows > 0;
     } catch (error) {
@@ -358,24 +365,23 @@ ORDER BY
     }
   }
 
-  
-static async deleteDeduction(id) {
-  const connection = await pool.getConnection();
-  try {
-    const [result] = await connection.query(
-      `DELETE FROM deductions WHERE deductions_id = ?`,
-      [id]
-    );
-    await connection.commit();
-    return result.affectedRows > 0;
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
+  static async deleteDeduction(id) {
+    const connection = await pool.getConnection();
+    try {
+      const [result] = await connection.query(
+        `DELETE FROM deductions WHERE deductions_id = ?`,
+        [id]
+      );
+      await connection.commit();
+      return result.affectedRows > 0;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
-}
- //....................................................problem
+  //....................................................problem
   // static async calculateMonthlyDeduction(employeeId, monthYear) {
   //   const connection = await pool.getConnection();
   //   try {
@@ -384,9 +390,9 @@ static async deleteDeduction(id) {
   //         replacements: [employeeId, `${monthYear}-01`]
   //       }
   //     );
-  //     return { 
-  //         success: true, 
-  //         data: results[0][0] 
+  //     return {
+  //         success: true,
+  //         data: results[0][0]
   //     };
   //   } catch (error) {
   //     throw new Error('Monthly calculation failed: ' + error.message);
@@ -404,24 +410,22 @@ static async deleteDeduction(id) {
       );
       return result.affectedRows > 0;
     } catch (error) {
-      throw new Error('Failed to save monthly deduction: ' + error.message);
+      throw new Error("Failed to save monthly deduction: " + error.message);
     } finally {
       connection.release();
     }
   }
 
-
-
   static async calculateAndSaveMonthlyDeductionmodel(employee_id, month_year) {
     const connection = await pool.getConnection();
     try {
       const [result] = await connection.query(
-        'CALL CalculateAndSaveMonthlyDeduction(?, ?)',
+        "CALL CalculateAndSaveMonthlyDeduction(?, ?)",
         [employee_id, `${month_year}-01`]
       );
       return result.affectedRows > 0;
     } catch (error) {
-      throw new Error('Monthly deduction calculation failed: ' + error.message);
+      throw new Error("Monthly deduction calculation failed: " + error.message);
     } finally {
       connection.release();
     }
@@ -437,13 +441,34 @@ static async deleteDeduction(id) {
       );
       return result.affectedRows > 0;
     } catch (error) {
-      throw new Error('Failed to save monthly deduction: ' + error.message);
+      throw new Error("Failed to save monthly deduction: " + error.message);
     } finally {
       connection.release();
     }
   }
 
+  //...........................
 
+  static async getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date) {
+  const connection = await pool.getConnection();
+  try {
+    console.log("Query Parameters:", employee_id, date); // Log parameters
+    const [results] = await connection.query(
+      `SELECT employee_id,
+      total_deduction,
+      DATE_FORMAT(month_year, "%Y-%m") AS month_year 
+       FROM deduction_month
+       WHERE employee_id = ? AND DATE_FORMAT(month_year, "%Y-%m") = ?`,
+      [employee_id, date]
+    );
+    console.log("Query Results:", results); // Log results
+    return results;
+  } catch (error) {
+    throw new Error(
+      "Failed to fetch monthly deduction summary: " + error.message
+    );
+  } finally {
+    connection.release();
+  }
 }
-
- 
+}
