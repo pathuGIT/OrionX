@@ -5,8 +5,7 @@ import VenueDropdown from './VenueDropdown';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
 
 // Reusable detail row
-function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
-
+function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh }) {
     const [edit, setEdit] = useState(false);
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
@@ -33,7 +32,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
             {!edit && (
                 <>
                     <span className="text-gray-500 text-sm">{label}</span>
-                    <span className="text-gray-800 text-sm font-medium">{value || '-'}</span>
+                    <span className="text-gray-800 text-sm font-medium">{ refresh ? '-' : "value"}</span>
                     <button
                         className="absolute top-2 right-2 px-2 py-1 text-xs  text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Edit Venue"
@@ -152,17 +151,18 @@ export default function BookingDetailsView({ bookingId, onClose }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refresh, setRefresh] = useState(false);
+    const [textBuffer, setTextBuffer] = useState(null);
 
     useEffect(() => {
         async function fetchBooking() {
             try {
                 const res = await getBookingDetails(bookingId)
-                setRefresh(null);
                 // Wait 3 seconds before setting booking and loading
                 setTimeout(() => {
                     setBooking(res.data);
                     setLoading(false);
-                }, 1000);
+                    setRefresh(false);
+                }, 2000);
             } catch (err) {
                 setError('Failed to load booking details');
                 setLoading(false);
@@ -294,6 +294,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.additional_hours}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        refresh={refresh}
                                     />
                                 </div>
                             </section>
