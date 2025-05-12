@@ -10,6 +10,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
     const [saving, setSaving] = useState(false);
+    const [textBuffer, setTextBuffer] = useState(value);
 
     useEffect(() => {
         if (label === "Venue ID") {
@@ -24,7 +25,9 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                 'venue_name': "confirmed"
             }]);
         }
+
     }, [label]);
+
 
     if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours") return (
         <div className="flex flex-col border relative group">
@@ -32,7 +35,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
             {!edit && (
                 <>
                     <span className="text-gray-500 text-sm">{label}</span>
-                    <span className="text-gray-800 text-sm font-medium">{ refresh ? '-' : "value"}</span>
+                    <span className="text-gray-800 text-sm font-medium">{value}</span>
                     <button
                         className="absolute top-2 right-2 px-2 py-1 text-xs  text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Edit Venue"
@@ -162,7 +165,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                     setBooking(res.data);
                     setLoading(false);
                     setRefresh(false);
-                }, 2000);
+                }, 500);
             } catch (err) {
                 setError('Failed to load booking details');
                 setLoading(false);
