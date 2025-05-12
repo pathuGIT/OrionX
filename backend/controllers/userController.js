@@ -1,18 +1,26 @@
-import { 
-    addEmployeeModel, 
-    getEmployeeByEmailModel, 
-    getEmployeeByPhoneModel,
-    getEmployeeModel,
-    updateUserRoleModel,
-    updateEmployeesModel,
-    getEmployeeByuserIdModel,
-    getEmployeesByStatusModel,
-    deleteEmployeesModel,
-    updateEmployeesStatusModel,
-    checkUserIsActive,
-    searchCustomerByTerm} from '../models/userModel.js';
-import { sendIdToUserMethod, } from '../controllers/mailController.js';
-import { getCustomerByEmailModel, getCustomerByPhoneModel, addCustomerModel } from '../models/customerModel.js';
+import {
+  addEmployeeModel,
+  getEmployeeByEmailModel,
+  getEmployeeByPhoneModel,
+  getEmployeeModel,
+  updateUserRoleModel,
+  updateEmployeesModel,
+  getEmployeeByuserIdModel,
+  getEmployeesByStatusModel,
+  deleteEmployeesModel,
+  updateEmployeesStatusModel,
+  ServiceChargeModel,
+  checkUserIsActive,
+  searchCustomerByTerm
+
+  
+} from "../models/userModel.js";
+import { sendIdToUserMethod } from "../controllers/mailController.js";
+import {
+  getCustomerByEmailModel,
+  getCustomerByPhoneModel,
+  addCustomerModel,
+} from "../models/customerModel.js";
 
 //add employees (employees add to system by admin)
 export const addEmployee = async (req, res) => {
@@ -55,9 +63,8 @@ export const addCustomer = async (req, res) => {
         const checkPhone = await getCustomerByPhoneModel(phone);
         if (checkPhone) return res.status(400).json({ message: 'Phone already exist...' });
 
-    const checkEmail = await getCustomerByEmailModel(email);
-    if (checkEmail)
-      return res.status(400).json({ message: "Email already exist..." });
+        const checkEmail = await getCustomerByEmailModel(email);
+        if (checkEmail) return res.status(400).json({ message: 'Email already exist...' });
 
         const customer = await addCustomerModel(name, email, address, phone);
 
@@ -113,6 +120,21 @@ export const searchCustomer = async (req, res) => {
         res.status(500).json({ msg: 'Server error...', error });
     }
 }
+
+// update employee details
+// export const updateEmployees = async (req, res) => {
+//     const { employee_id, name, phone, email, bod, salary, hire_date} = req.body;
+//     try {
+//         const checkUserId = await getEmployeeByuserIdModel(employee_id);
+//         if (checkUserId.employee_id !== employee_id) return res.status(400).json({ message: 'User ID does not exist' });
+
+//         await updateEmployeesModel(employee_id, name, phone, email, bod, salary, hire_date);
+
+//         res.status(200).json({ message: 'Employee updated successfully' });
+//     } catch (error) {
+//         res.status(500).json({ msg: 'Server error...', error });
+//     }
+// };
 
 // delete employee
 export const deleteEmployees = async (req, res) => {
