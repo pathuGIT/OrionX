@@ -27,7 +27,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Header />
-        <main className=' px-20'>
+        <main className=''>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
