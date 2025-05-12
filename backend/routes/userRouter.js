@@ -1,16 +1,18 @@
 import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
+import { subAdmin } from '../middleware/Sub_admin.js';
 import { addEmployee, changeUserRole, addCustomer ,
     updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
-    getEmployeeById,serviceChargeController 
+    getEmployeeById,serviceChargeController, 
+    searchCustomer
 } from '../controllers/userController.js';
-import { subAdmin } from '../middleware/Sub_admin.js';
 
 const router = express.Router();
 
 //super admins
 router.post('/addEmployee',superAdmin,  addEmployee);
 router.post('/addCustomer', superAdmin, addCustomer);
+router.get('/searchCustomer', searchCustomer);
 router.post('/changeUserRole', superAdmin, changeUserRole);
 router.delete('/deleteEmployee',superAdmin,deleteEmployees);
 router.put('/updateStatus', updateEmployeesStatus);

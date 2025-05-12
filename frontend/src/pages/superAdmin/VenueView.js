@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { addVenue, getAllVenues, deleteVenueById, updateVenueById, checkVenueIDByBooking } from '../../services/VenueService';
+import { addVenue, getAllVenues, deleteVenueById, updateVenueById, checkVenueIDByBooking, getVenueById } from '../../services/VenueService';
 import { BuildingOffice2Icon, ClockIcon, MapPinIcon, UserGroupIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 const BookingView = () => {
@@ -38,7 +38,8 @@ const BookingView = () => {
   useEffect(() => {
     fetchVenues();
     if (viewAddRaw != false) {
-      setEditVenueData({});
+      //setEditVenueData({});
+      console.log("aaaaaaaaaaaaaaaazs")
     }
   }, [viewAddRaw]);
 
@@ -46,7 +47,6 @@ const BookingView = () => {
     try {
       const data = await getAllVenues();
       setVenues(data);
-      console.log(venues);
     } catch (error) {
       console.error('Error fetching venues:', error);
     }
@@ -80,15 +80,18 @@ const BookingView = () => {
   };
 
 
-  const handleEdit = (venue) => {
+  const handleEdit = async (venue) => {
     setEditRowId(venue.venue_id);
+    const venueData = await getVenueById(venue.venue_id);
     setEditVenueData({
-      venue_name: venue.venue_name,
-      time_slot: venue.time_slot,
-      Location: venue.Location,
-      min_capacity: venue.min_capacity,
-      max_capacity: venue.max_capacity,
-      price: venue.price,
+      venue_name: venueData.venue_name || "",
+      time_slot: venueData.time_slot || "day", // Default to "day"
+      Location: venueData.Location || "indoor", // Default to "indoor"
+      min_capacity: venueData.min_capacity || "",
+      max_capacity: venueData.max_capacity || "",
+      price: venueData.price || "",
+      additional_hour_fee: venueData.additional_hour_fee || "",
+      opened_time_period: venueData.opened_time_period  || ""
     });
   };
 
@@ -102,7 +105,6 @@ const BookingView = () => {
   const handleUpdate = async (venue_id) => {
     if (window.confirm(`Are you sure you want to ${venue_id == 0 ? 'Add' : 'Update'} this venue?`)) {
       try {
-        // Prepare payload for update
         const payload = {
           name: editVenueData.venue_name,
           time: editVenueData.time_slot,
@@ -110,42 +112,50 @@ const BookingView = () => {
           minCapacity: Number(editVenueData.min_capacity),
           maxCapacity: Number(editVenueData.max_capacity),
           price: Number(editVenueData.price),
+          additionalHourFee: Number(editVenueData.additional_hour_fee),
+          openedTimePeriod: Number(editVenueData.opened_time_period),
         };
-        // You should have an updateVenueById service method
-        if (venue_id == 0) {
-          console.log("aaa")
-          //validate if the feilds ar correct?
-          handleEditVenueChange('venue_name', "");
-          handleEditVenueChange('time_slot', "");
-          handleEditVenueChange('Location', "");
-          handleEditVenueChange('min_capacity', "");
-          handleEditVenueChange('max_capacity', "");
-          handleEditVenueChange('price', "");
-          console.log("ssaaaaaaaaaaaaas", editVenueData)
-          await addVenue(payload);
-        }
+        console.log("Sending payload to backend:", payload);
 
-        if (venue_id != 0) await updateVenueById(venue_id, payload);
-        setEditRowId(null);
-        setEditVenueData({
-          venue_name: null,
-          time_slot: null,
-          Location: null,
-          min_capacity: null,
-          max_capacity: null,
-          price: null,
-        });
+        if (venue_id == 0) {
+          setEditVenueData({
+            venue_name: "",
+            time_slot: "",
+            Location: "",
+            min_capacity: "",
+            max_capacity: "",
+            price: "",
+            additional_hour_fee: "",
+            opened_time_period: "",
+          });
+          const res = await addVenue(payload);
+        } else {
+          console.log("aaaaaaaaa",venue_id);
+          const res = await updateVenueById(venue_id, payload);
+          setEditRowId(null);
+          setEditVenueData({
+            venue_name: null,
+            time_slot: null,
+            Location: null,
+            min_capacity: null,
+            max_capacity: null,
+            price: null,
+            additional_hour_fee: null,
+            opened_time_period: null,
+          });
+        }
         fetchVenues();
-        console.log("ssssssssss", editVenueData)
       } catch (error) {
-        console.error('Error Adding venue:', error);
+        console.error('Error Adding/Updating venue:', error);
+        const backendMsg = error?.response?.data?.msg || error?.response?.data?.message || error.message || 'Failed to add/update venue.';
+        alert(backendMsg);
       }
     }
   };
 
   const [cvib, setCvib] = useState();
   const checkVenuById = (venueId) => {
-     checkVenueIDByBooking(venueId);
+    checkVenueIDByBooking(venueId);
   }
 
   return (
@@ -171,7 +181,26 @@ const BookingView = () => {
           >
             <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownActionButton">
               <li>
-                <a href="#" onClick={() => { setViewAddRaw(true); setViewAction(true); }} class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">New Venue</a>
+                <a
+                  href="#"
+                  onClick={() => {
+                    setEditVenueData({
+                      venue_name: "",
+                      time_slot: "",
+                      Location: "",
+                      min_capacity: "",
+                      max_capacity: "",
+                      price: "",
+                      additional_hour_fee: "",
+                      opened_time_period: "",
+                    });
+                    setViewAddRaw(true);
+                    setViewAction(true);
+                  }}
+                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  New Venue
+                </a>
               </li>
             </ul>
             <div class="py-1">
@@ -207,7 +236,9 @@ const BookingView = () => {
             <th className='px-6 py-3'>Min Capacity</th>
             <th className='px-6 py-3'>Max Capacity</th>
             <th className='px-6 py-3'>Price</th>
-            <th className='px-6 py-3'>Actions</th>
+            <th className='px-6 py-3'>Additional hour fee</th>
+            <th className='px-6 py-3'>opened time period</th>
+            <th className='px-6 py-3'>Action</th>
           </tr>
         </thead>
 
@@ -247,11 +278,17 @@ const BookingView = () => {
               <input type="text" value={editVenueData.price} onChange={(e) => handleEditVenueChange('price', e.target.value)} className="border rounded px-2 py-1" size="10" />
             </td>
             <td class="px-6 py-4">
+              <input type="text" value={editVenueData.additional_hour_fee} onChange={(e) => handleEditVenueChange('additional_hour_fee', e.target.value)} className="border rounded px-2 py-1" size="10" />
+            </td>
+            <td class="px-6 py-4">
+              <input type="text" value={editVenueData.opened_time_period} onChange={(e) => handleEditVenueChange('opened_time_period', e.target.value)} className="border rounded px-2 py-1" size="10" />
+            </td>
+            <td class="px-6 py-4">
               <button onClick={() => handleUpdate(0)} className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2'>Add</button>
               <button onClick={() => { setViewAddRaw(false) }} className='bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded' >Cancel</button>
             </td>
           </tr>
-          
+
           {venues.map((venue) => (
             <tr key={venue.venue_id} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
               <td class="w-4 p-4">
@@ -259,7 +296,7 @@ const BookingView = () => {
                   <input
                     id={`checkbox-table-search-${venue.venue_id}`}
                     type="checkbox"
-                    class={`${venue.status === 'booked' ? 'hidden':'visible'} w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"`}
+                    class={`${venue.status === 'booked' ? 'hidden' : 'visible'} w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"`}
                     checked={selectedIds.includes(venue.venue_id)}
                     onChange={() => handleCheckboxChange(venue.venue_id)}
                   />
@@ -321,7 +358,25 @@ const BookingView = () => {
                       value={editVenueData.price}
                       onChange={(e) => handleEditVenueChange('price', e.target.value)}
                       className="border rounded px-2 py-1"
-                      size="10"
+                      size="1"
+                    />
+                  </td>
+                  <td class="px-6 py-4">
+                    <input
+                      type="text"
+                      value={editVenueData.additional_hour_fee}
+                      onChange={(e) => handleEditVenueChange('additional_hour_fee', e.target.value)}
+                      className="border rounded px-2 py-1"
+                      size="1"
+                    />
+                  </td>
+                  <td class="px-6 py-4">
+                    <input
+                      type="text"
+                      value={editVenueData.opened_time_period}
+                      onChange={(e) => handleEditVenueChange('opened_time_period', e.target.value)}
+                      className="border rounded px-2 py-1"
+                      size="1"
                     />
                   </td>
                   <td class="px-6 py-4">
@@ -347,6 +402,8 @@ const BookingView = () => {
                   <td class="px-6 py-4">{venue.min_capacity}</td>
                   <td class="px-6 py-4">{venue.max_capacity}</td>
                   <td class="px-6 py-4">RS.{venue.price}</td>
+                  <td class="px-6 py-4">RS.{venue.additional_hour_fee}</td>
+                  <td class="px-6 py-4">{venue.opened_time_period}</td>
                   <td class="px-6 py-4">
                     <button
                       onClick={() => handleEdit(venue)}
