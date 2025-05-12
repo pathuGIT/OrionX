@@ -189,14 +189,6 @@ export const Home = () => {
                 image: '/packages/package3.jpg'
               }
             ].map((pkg, index) => (
-              // <div key={index} className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition">
-              //   <img src={pkg.image} alt={pkg.name} className="h-56 w-full object-cover" />
-              //   <div className="p-6">
-              //     <h3 className="text-2xl font-cormorant text-orange-700">{pkg.name}</h3>
-              //     <p className="text-gray-600 mt-2">{pkg.detail}</p>
-              //     <p className="text-orange-500 text-xl mt-4 font-semibold">{pkg.price}</p>
-              //   </div>
-              // </div>
               <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <a href="#">
                   <img class="p-8 rounded-t-lg" src="/docs/images/products/apple-watch.png" alt="product image" />
@@ -206,9 +198,9 @@ export const Home = () => {
                     <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{pkg.name}</h5>
                   </a>
                   <div class="">
-                    <span class="text-3xl font-bold text-gray-900 dark:text-white">{pkg.price}</span><br/>
-                    
-                    <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <span class="text-3xl font-bold text-gray-900 dark:text-white">{pkg.price}</span><br />
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-sm dark:bg-blue-200 dark:text-blue-800">{pkg.detail}</span><br/>
+                    <a href="#" class="inline-flex items-center mt-5 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                       Read more
                       <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
