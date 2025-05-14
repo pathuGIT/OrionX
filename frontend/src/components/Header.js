@@ -31,10 +31,12 @@ export const Header = () => {
     if (sessionStorage.getItem('role') === 'customer') {
       fetchCustomerName();
     }
-  },[] );
+  }, [user]);
 
   const fetchCustomerName = async () => {
+    console.log('Fetching customer name...: ', sessionStorage.getItem('id'));
     const name = await getCusName(sessionStorage.getItem('id'));
+    console.log('Fetching customer name...: ', name);
     setCustomerName(name);
   };
 
@@ -55,6 +57,10 @@ export const Header = () => {
     };
   }, []);
 
+  const firstCharacter = customerName.charAt(0); // Using charAt
+  // or
+  const firstCharacterAlt = customerName[0]; // Using array indexing
+
   return (
     // <header className="mx-20 mt-10 border border-black">
     <header className="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -73,8 +79,9 @@ export const Header = () => {
               className="border flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
               id="user-menu-button"
               onClick={toggleUserDropdown} // Toggle dropdown on click
-            >
-              <img className={`w-8 h-8 rounded-full ${sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'}`} src="/docs/images/people/profile-picture-3.jpg" alt="user photo" />
+            > 
+              <div className={`w-8 h-8 rounded-full bg-white flex justify-center items-center overflow-hidden ${sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'}`}>{firstCharacter}</div>
+              {/* <img className={`w-8 h-8 rounded-full ${sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'}`} src="/docs/images/people/profile-picture-3.jpg" alt="user photo" /> */}
               <span className="sr-only">Open user menu</span>
             </button>
 
