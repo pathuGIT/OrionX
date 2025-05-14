@@ -1,10 +1,12 @@
 import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
 import { subAdmin } from '../middleware/Sub_admin.js';
+import { customer } from '../middleware/Customer.js';
 import { addEmployee, changeUserRole, addCustomer ,
     updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
     getEmployeeById,serviceChargeController, 
-    searchCustomer
+    searchCustomer,
+    getLogedUserName
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -36,5 +38,6 @@ router.get('/service-charges/employee/:employeeId', serviceChargeController.getE
 //employee
 
 //customers
+router.get('/getCusName', getLogedUserName);
 
 export default router;

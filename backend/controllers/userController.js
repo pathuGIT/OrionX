@@ -20,6 +20,7 @@ import {
   getCustomerByEmailModel,
   getCustomerByPhoneModel,
   addCustomerModel,
+  getCusName,
 } from "../models/customerModel.js";
 
 //add employees (employees add to system by admin)
@@ -397,5 +398,18 @@ export const saveServiceChargeCalculation = async (req, res) => {
     });
   } finally {
     connection.release();
+  }
+};
+
+// Get loged user name
+export const getLogedUserName = async (req, res) => {
+  const userId = req.query.id;
+  console.log("assssss:::",userId);
+  try {
+    const customer = await getCusName(userId);
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
+    res.status(200).json(customer);
+  } catch (error) {
+    res.status(500).json({ msg: "Server error...", error });
   }
 };

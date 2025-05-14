@@ -76,3 +76,11 @@ export const registerCustomerModel = async (password, customer_id) => {
     );
     return result[0];
 }
+
+export const getCusName = async (id) => {
+  const [result] = await pool.query(
+        `SELECT name FROM customer WHERE customer_id = ?`,
+      [id]
+    );
+  return result[0].name;
+};
