@@ -497,6 +497,34 @@ export const updateDamageFee = async (req, res) => {
     }
 }
 
+// update menu budget
+export const updateMenuFee = async (req, res) => {
+    const bookingId = req.params.id;
+    const { menueFee } = req.body;
+
+    try {
+
+        // change booking_pricing forfeited_deposit
+        const currentBookingPrice = await getBookingPricingById(bookingId);
+        const newBookingPrice = {
+            menuPriceTotal: menueFee,
+            hallCharge: currentBookingPrice.hall_charge,
+            extraHourFee: currentBookingPrice.extra_hour_fee,
+            bitesPayment: currentBookingPrice.bites_payment,
+            fountainPayment: currentBookingPrice.fountain_payment,
+            otherPayment: currentBookingPrice.other_payment,
+            forfeitedDeposit: currentBookingPrice.forfeited_deposit
+        };
+        await updatePricingModel(bookingId, newBookingPrice);
+
+        res.status(200).json({ success: true, message: "Menu fee updated successfully." });
+    } catch (error) {
+        console.error("Error updating menu fee:", error);
+        res.status(500).json({ success: false, message: "Failed to update menu fee." });
+    }
+}
+
+
 export const updateGuests = async (req, res) => {
     const bookingId = req.params.id;
     const { number_of_guests } = req.body;
