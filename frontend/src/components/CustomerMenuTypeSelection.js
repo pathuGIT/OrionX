@@ -125,7 +125,7 @@ const CustomerMenuTypeSelection = () => {
       <div className="min-h-screen bg-white bg-opacity-40 backdrop-blur-sm px-4 py-8">
         <div className="p-6 max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-center text-blue-900 drop-shadow-md">
-            Select a Menu Type
+            Select a Menu You Like!
           </h2>
 
           {/* Display each grouped menu type */}

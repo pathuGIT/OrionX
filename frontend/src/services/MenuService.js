@@ -306,7 +306,7 @@ export const updateCategoryMenuType = async (id, data) => {
 // to display all item category menu types 
 export const getItemCategoryMenuTypes = async () => {
   try {
-    const response = await api.get('/itemCategoryMenuTypes/getAll');
+    const response = await api.get('/itemCategoryMenuTypes/');
     return response.data;
   } catch (error) {
     console.error("Error fetching item category menu types:", error);
@@ -317,7 +317,7 @@ export const getItemCategoryMenuTypes = async () => {
 //to insert an item category menu type
 export const addItemCategoryMenuType = async (itemCategoryMenu) => {
   try {
-    const response = await api.post('/itemCategoryMenuTypes/add', itemCategoryMenu);
+    const response = await api.post('/itemCategoryMenuTypes/', itemCategoryMenu);
     return response.data;
   } catch (error) {
     console.error("Error adding item category menu type:", error);
@@ -328,7 +328,7 @@ export const addItemCategoryMenuType = async (itemCategoryMenu) => {
 //to get item category menu type by id
 export const getItemCategoryMenuTypeById = async (id) => {
   try {
-    const response = await api.get(`/itemCategoryMenuTypes/get/${id}`);
+    const response = await api.get(`/itemCategoryMenuTypes/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error getting item category menu type:", error);
@@ -339,7 +339,7 @@ export const getItemCategoryMenuTypeById = async (id) => {
 //to delete item category menu type by id
 export const deleteItemCategoryMenuType = async (id) => {
   try {
-    const response = await api.delete(`/itemCategoryMenuTypes/delete/${id}`);
+    const response = await api.delete(`/itemCategoryMenuTypes/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting item category menu type:", error);
@@ -352,7 +352,7 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
   console.log(id,data);
   const name = {itemCategoryMenuType_name:data}
   try {
-    const response = await api.put(`/itemCategoryMenuTypes/update/${id}`, name);
+    const response = await api.put(`/itemCategoryMenuTypes/${id}`, name);
     return response.data;
   } catch (error) {
     console.error("Error updating item category menu type:", error);
