@@ -287,6 +287,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.venue_id}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow label="Customer ID" value={b.customer_id} />
                                     <DetailRow
@@ -294,6 +295,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.number_of_guests}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow
                                         label="Additional Hours"
@@ -301,6 +303,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         refresh={refresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                 </div>
                             </section>
@@ -316,6 +319,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.damage_fee}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow label="Refund Amount (Rs)" value={b.refund_amount} />
                                     <DetailRow label="Contract Status" value={b.contract_status} />
