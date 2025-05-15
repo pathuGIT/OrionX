@@ -14,7 +14,7 @@ import EmployeeRegistration from './pages/EmployeeRegistration';
 import CustomerRegistration from './pages/CustomerRegistration';
 import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import EventHome from './pages/customer/EventHome';
-import DisplayEvents from './components/DisplayEvents';
+import DisplayEvents from './pages/customer/DisplayEvents';
 //import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 // import DisplayEvents from './components/DisplayEvents';
 
@@ -29,7 +29,8 @@ function App() {
     <AuthProvider>
       <Router>
         <Header />
-        <main className=' px-20'>
+        {/* <main className=' px-20'> */}
+        <main> 
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

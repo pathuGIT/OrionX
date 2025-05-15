@@ -8,7 +8,7 @@ export const customer = (req, res, next) => {
     //assign the refreshtoken
     const token = req.headers.authorization.split(' ')[1];
 
-    //check user role is admin?
+    //check user role is customer?
     const decoded = jwt.decode(token);
     const userRole = decoded?.role;
     if(userRole !== 'customer'){
@@ -18,7 +18,6 @@ export const customer = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) return res.status(401).json({ message: 'Invalid token' });
         req.user = user;
-        console.log(user)
         next(); // Call next only when everything is valid
     });
 };

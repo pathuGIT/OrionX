@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/Authcontext";
-import { getCustomerBookings } from "../services/EventService";
+import { AuthContext } from "../../context/Authcontext";
+import { getCustomerBookings } from "../../services/EventService";
 import { useNavigate } from "react-router-dom";
-import { encryptBookingId, encryptCustId } from "../utills/encryptionUtils";
+import { encryptBookingId, encryptCustId } from "../../utills/encryptionUtils";
 import { Calendar, User, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 const CustomerBookings = () => {
@@ -94,6 +94,7 @@ const CustomerBookings = () => {
                             <div className="border-t p-4 bg-gray-50">
                                 <button 
                                     onClick={() => {
+                                        localStorage.setItem('bookingId', booking.booking_id); //save booking id on local
                                         const encryptedId = encryptBookingId(booking.booking_id);
                                         const encryptedCustomerId = encryptCustId(booking.customer_id);
                                         navigate(`/eventHome/${encryptedId}/${encryptedCustomerId}`);

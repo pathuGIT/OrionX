@@ -10,31 +10,32 @@ export const getSelections = async (req, res) => {
   }
 };
 
-// Get a selection by customer_id and ICMT_Id
-export const getSelectionById = async (req, res) => {
-  try {
-    const { customer_id, ICMT_Id } = req.params;
-    const selection = await CustomerMenuItemSelection.getSelectionById(customer_id, ICMT_Id);
+// Get a selection by booking_id and ICMT_Id
+// export const getSelectionById = async (req, res) => {
+//   try {
+//     const { booking_id, ICMT_Id } = req.params;
+//     const selection = await CustomerMenuItemSelection.getSelectionById(booking_id, ICMT_Id);
 
-    if (!selection) {
-      return res.status(404).json({ error: "Selection not found" });
-    }
+//     if (!selection) {
+//       return res.status(404).json({ error: "Selection not found" });
+//     }
 
-    res.json(selection);
-  } catch (error) {
-    res.status(500).json({ error: "Database error" });
-  }
-};
+//     res.json(selection);
+//   } catch (error) {
+//     res.status(500).json({ error: "Database error" });
+//   }
+// };
 
 // Create a new selection
 export const createSelection = async (req, res) => {
-  const { customer_id, ICMT_Id } = req.body;
+  const { booking_id, ICMT_Id } = req.body;
+  console.log("sasa::",req.body)
   try {
-    if (!customer_id || !ICMT_Id) {
+    if (!booking_id || !ICMT_Id) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    await CustomerMenuItemSelection.createSelection(customer_id, ICMT_Id);
+    await CustomerMenuItemSelection.createSelection(booking_id, ICMT_Id);
     res.status(201).json({ message: "Selection created successfully" });
   } catch (error) {
     res.status(500).json({ error: "Error inserting selection" });
@@ -44,9 +45,9 @@ export const createSelection = async (req, res) => {
 // Delete a selection
 export const deleteSelection = async (req, res) => {
   try {
-    const { customer_id, ICMT_Id } = req.params;
+    const { booking_id, ICMT_Id } = req.params;
 
-    const deletedRows = await CustomerMenuItemSelection.deleteSelection(customer_id, ICMT_Id);
+    const deletedRows = await CustomerMenuItemSelection.deleteSelection(booking_id, ICMT_Id);
 
     if (deletedRows === 0) {
       return res.status(404).json({ error: "Selection not found" });
@@ -58,4 +59,15 @@ export const deleteSelection = async (req, res) => {
   }
 };
 
-export default { getSelections, getSelectionById, createSelection, deleteSelection };
+// Check if booking_id exists in selections
+export const checkBookingSelection = async (req, res) => {
+  try {
+    const { booking_id } = req.params;
+    const exists = await CustomerMenuItemSelection.existsBookingSelection(booking_id);
+    res.json({ exists });
+  } catch (error) {
+    res.status(500).json({ error: "Database error" });
+  }
+};
+
+export default { getSelections, createSelection, deleteSelection, checkBookingSelection };

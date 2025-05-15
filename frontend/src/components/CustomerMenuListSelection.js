@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CusgetMenuListType } from "../services/MenuService";
 import { Loader2, AlertCircle } from "lucide-react";
 
-const CustomerMenuListSelection = () => {
+const CustomerMenuListSelection = ({setActivePage}) => {
   // State to hold fetched menu list types
   const [menuListTypes, setMenuListTypes] = useState([]);
 

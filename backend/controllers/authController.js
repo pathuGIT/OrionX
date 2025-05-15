@@ -55,7 +55,6 @@ export const login = async (req, res) => {
         if (!user) {
             user = await getUserByUserEmailORPswdModel(credential);
         }
-        console.log("User found:", user);
 
         // If still not found, return error
         if (!user) {
@@ -94,8 +93,6 @@ export const refresh = async (req, res) => {
     // Assuming you have a way to get the user ID from the refresh token
     const decodedRToken = jwt.decode(refreshToken);
     const userId = decodedRToken?.useId;
-
-    console.log(userId)
     if (await isRefreshTokenValidModel(userId, refreshToken)) {
         console.error('Invalid refresh token');
         return res.sendStatus(403);
@@ -131,7 +128,6 @@ export const checkEmail = async (req, res) => {
 export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
-    console.log(otp);
     const token = jwt.sign({ email, otp }, process.env.JWT_SECRET, { expiresIn: '3m' });
 
     try {

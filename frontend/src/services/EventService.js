@@ -72,3 +72,89 @@ export const getServiceVendors = async (customerId, bookingId) => {
         throw new Error(error.response?.data?.message || "Failed to load vendors");
     }
 };
+
+
+
+export const createOrUpdateArrangement = async (bookingId, data) => {
+    try {
+        const response = await api.post(`/tableArrangement/createTableArrangement/${bookingId}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to save arrangement');
+    }
+};
+
+export const createReservation = async (bookingId, data) => {
+    try {
+        const response = await api.post(`/reservation/createReservation/${bookingId}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to create reservation');
+    }
+};
+
+// export const getArrangementsByBooking = async (bookingId) => {
+//     try {
+//         const response = await api.get(`/tableArrangement/getTableArrangement/${bookingId}`);
+//         return response.data;
+//     } catch (error) {
+//         if (error.response?.status === 404) return null;
+//         throw new Error(error.response?.data?.error || 'Failed to fetch arrangement');
+//     }
+// };
+
+export const getArrangementsByBooking = async (bookingId) => {
+    try {
+        const response = await api.get(`/tableArrangement/getTableArrangement/${bookingId}`);
+        return response.data; // Directly return the array of arrangements
+    } catch (error) {
+        if (error.response?.status === 404) return []; // Return empty array for 404
+        throw new Error(error.response?.data?.error || 'Failed to fetch arrangements');
+    }
+};
+
+export const getReservationsByBooking = async (bookingId) => {
+    try {
+        const response = await api.get(`/reservations/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch reservations');
+    }
+};
+
+export const createPlanBar = async (bookingId, planBarData) => {
+    try {
+        const response = await api.post(`/Bar/planBar/${bookingId}`, planBarData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to save bar plan');
+    }
+};
+
+export const updatePlanBar = async (bookingId, data) => {
+    try {
+        const response = await api.put(`/Bar/updatePlanBar/${bookingId}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to update bar plan');
+    }
+};
+
+export const deletePlanBar = async (bookingId) => {
+    try {
+        const response = await api.delete(`/Bar/deletePlanBar/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to delete bar plan');
+    }
+};
+
+export const getPlanBar = async (bookingId) => {
+    try {
+        const response = await api.get(`/Bar/getPlanBar/${bookingId}`);
+        return response.data?.data || null;
+    } catch (error) {
+        if (error.response?.status === 404) return null;
+        throw new Error(error.response?.data?.error || 'Failed to fetch bar plan');
+    }
+};

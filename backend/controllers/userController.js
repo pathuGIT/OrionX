@@ -10,14 +10,17 @@ import {
   deleteEmployeesModel,
   updateEmployeesStatusModel,
   ServiceChargeModel,
-
-  
+  checkUserIsActive,
+  searchCustomerByTerm,
+  DeductionModel,
 } from "../models/userModel.js";
+
 import { sendIdToUserMethod } from "../controllers/mailController.js";
 import {
   getCustomerByEmailModel,
   getCustomerByPhoneModel,
   addCustomerModel,
+  getCusName,
 } from "../models/customerModel.js";
 
 //add employees (employees add to system by admin)
@@ -56,37 +59,26 @@ export const addEmployee = async (req, res) => {
 
 // add new customer
 export const addCustomer = async (req, res) => {
-  const { name, email, address, phone } = req.body;
-  try {
-    const checkPhone = await getCustomerByPhoneModel(phone);
-    console.log(checkPhone);
-    if (checkPhone)
-      return res.status(400).json({ message: "Phone already exist..." });
+    const { name, email, address, phone } = req.body;
+    try {
+        const checkPhone = await getCustomerByPhoneModel(phone);
+        if (checkPhone) return res.status(400).json({ message: 'Phone already exist...' });
 
-    const checkEmail = await getCustomerByEmailModel(email);
-    if (checkEmail)
-      return res.status(400).json({ message: "Email already exist..." });
+        const checkEmail = await getCustomerByEmailModel(email);
+        if (checkEmail) return res.status(400).json({ message: 'Email already exist...' });
 
-    await addCustomerModel(name, email, address, phone);
+        const customer = await addCustomerModel(name, email, address, phone);
 
-    const user = await getCustomerByEmailModel(email);
-    await sendIdToUserMethod(
-      name,
-      "Deandra Registration",
-      email,
-      user.customer_id,
-      "http://localhost:3000/registration/register-customer"
-    );
+        const user = await getCustomerByEmailModel(email);
+        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
+        
+        console.log(`User ID sent toooooooo: ${customer}`);
+        res.status(201).json({ message: `User registered successfully with this '${email}' email.`, cus_id: customer });
 
-    res
-      .status(201)
-      .json({
-        message: `User registered successfully and User ID sent to email: ${email}`,
-      });
-  } catch (error) {
-    res.status(500).json({ msg: "Server error...", error });
-  }
-};
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+}
 
 // change user role
 export const changeUserRole = async (req, res) => {
@@ -106,14 +98,28 @@ export const changeUserRole = async (req, res) => {
 
 //get employees data
 export const getEmployee = async (req, res) => {
-  try {
-    const result = await getEmployeeModel();
-    result.forEach((employee) => console.log(employee.bod));
-    res.status(201).json({ employees: result });
-  } catch (error) {
-    res.status(500).json({ msg: "Server error...", error });
-  }
-};
+    try{
+        const result = await getEmployeeModel();
+        result.forEach(employee => console.log(employee.bod));
+        res.status(201).json({ employees: result });
+        
+    }catch(error){
+        res.status(500).json({ msg: 'Server error...', error });
+    } 
+}
+
+export const searchCustomer = async (req, res) => {
+    const search_term = req.query.q;
+    
+    try {
+        const customers = await searchCustomerByTerm(search_term);
+        if (!customers || customers.length === 0) return res.status(404).json({ message: 'Customer not found' });
+        res.status(200).json({ customers });
+        
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error...', error });
+    }
+}
 
 // update employee details
 // export const updateEmployees = async (req, res) => {
@@ -167,7 +173,6 @@ export const updateEmployeesStatus = async (req, res) => {
 // Get employee by ID
 export const getEmployeeById = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
 
   try {
     const employee = await getEmployeeByuserIdModel(id);
@@ -203,7 +208,7 @@ export const updateEmployees = async (req, res) => {
       salary,
       service_charge_precentage,
       hire_date
-    );
+    )
     await updateEmployeesModel(
       id,
       name,
@@ -224,7 +229,6 @@ export const updateEmployees = async (req, res) => {
 // Get employees by status
 export const getEmployeesByStatus = async (req, res) => {
   const { status } = req.params;
-  console.log(status);
   try {
     const employees = await getEmployeesByStatusModel(status);
     res.status(200).json({ employees });
@@ -393,3 +397,175 @@ export const saveServiceChargeCalculation = async (req, res) => {
     connection.release();
   }
 };
+
+// Get loged user name
+export const getLogedUserName = async (req, res) => {
+  const userId = req.query.id;
+  try {
+    const customer = await getCusName(userId);
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
+    res.status(200).json(customer);
+  } catch (error) {
+    res.status(500).json({ msg: "Server error...", error });
+  }
+};
+
+
+//deduction.............
+
+
+
+
+export const deductionController = {createDeduction: async (req, res) => {
+    try {
+      const { calculation_date, description, employee_id, amount } = req.body;
+      await DeductionModel.createDeduction(
+        calculation_date,
+        description,
+        employee_id,
+        amount
+      );
+      res.json({ success: true});
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  getAllDeductionEntries: async (req, res) => {
+    try {
+      const entries = await DeductionModel.getAllDeductionEntries();
+      res.json({ success: true, data: entries });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+ // updatededuction..................................
+  updateDeduction: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { calculation_date, description, employee_id, amount } = req.body;
+  
+      const updated = await DeductionModel.updateDeduction(
+        id,
+        calculation_date,
+        description,
+        employee_id,
+        amount
+      );
+  
+      if (updated) {
+        res.json({ success: true, message: 'Deduction updated successfully' });
+      } else {
+        res.status(404).json({ success: false, message: 'Deduction not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // userController.js
+deleteDeduction: async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await DeductionModel.deleteDeduction(id);
+    if (deleted) {
+      res.json({ success: true, message: 'Deduction deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, message: 'Deduction not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+},
+
+
+
+calculateMonthlyDeduction: async (req, res) => {
+  try {
+      const { employee_id, month_year } = req.body;
+      const result = await DeductionModel.calculateAndSaveMonthlyDeduction(employee_id, month_year);
+      res.status(200).json(result);
+  } catch (error) {
+      res.status(500).json({ 
+          success: false, 
+          message: error.message 
+      });
+  }
+},
+saveMonthlyDeduction: async (req, res) => {
+  try {
+      const result = await DeductionModel.saveMonthlyDeduction(req.body);
+      res.status(201).json(result);
+  } catch (error) {
+      res.status(500).json({ 
+          success: false, 
+          message: error.message 
+      });
+  }
+},
+//..........................................................
+
+getMonthlyDeductionEntriesByEmployeeAndDate: async (req, res) => {
+  try {
+    const { employee_id, date } = req.params;
+
+    console.log("Request Parameters:", employee_id, date); // Log request parameters
+    const entries = await DeductionModel.getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date);
+
+    if (!entries || entries.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No deduction entries found for the specified employee and date",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: entries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+
+ 
+  
+};
+
+
+
+
+export const calculateAndSaveMonthlyDeduction = async (req, res) => {
+  try {
+    const { employee_id, month_year } = req.body;
+    
+    const success = await DeductionModel.calculateAndSaveMonthlyDeductionmodel(
+      employee_id,
+      month_year
+    );
+
+    if (success) {
+      res.status(200).json({
+        success: true,
+        message: 'Monthly deduction calculated and saved successfully'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'No deductions found for this period'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+ 
