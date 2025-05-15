@@ -94,6 +94,7 @@ const CustomerBookings = () => {
                             <div className="border-t p-4 bg-gray-50">
                                 <button 
                                     onClick={() => {
+                                        localStorage.setItem('bookingId', booking.booking_id); //save booking id on local
                                         const encryptedId = encryptBookingId(booking.booking_id);
                                         const encryptedCustomerId = encryptCustId(booking.customer_id);
                                         navigate(`/eventHome/${encryptedId}/${encryptedCustomerId}`);

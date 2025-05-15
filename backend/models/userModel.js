@@ -270,7 +270,16 @@ export class ServiceChargeModel {
 }
 
 //deduction model...........
+export const searchCustomerByTerm = async (search_term) => {
+    const [result] = await pool.query(
+        `SELECT * FROM customer WHERE customer_id LIKE ? OR name LIKE ? OR email LIKE ? OR role LIKE ? OR address LIKE ? OR phone LIKE ?`,
+    [`%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`]
+    );
+return result;
+};
 
+
+//deduction model...........
 export class DeductionModel {
   // ... existing methods ...
 

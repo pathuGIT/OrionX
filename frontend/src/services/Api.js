@@ -1,13 +1,11 @@
 import axios from 'axios';
-import { useContext } from 'react';
-import { AuthContext } from '../context/Authcontext';
 
-const Api = axios.create({
-    baseURL: 'http://localhost:8000/api', // Backend base URL
+const api = axios.create({
+  baseURL: 'http://localhost:8000/api', // <-- Make sure this matches your backend
 });
 
 //Attach token to requests if available
-Api.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => {
     const token = sessionStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -16,7 +14,7 @@ Api.interceptors.request.use((config) => {
     return config;
 });
 
-Api.interceptors.response.use(
+api.interceptors.response.use(
     (response) => response,
     async (error) => {
         console.log('Interceptor triggered');
@@ -41,7 +39,7 @@ Api.interceptors.response.use(
                 //Retry the original request with the new token
                 originalRequest.headers.Authorization = `Bearer ${data.token}`;
                 console.log("gini:::::" + originalRequest);
-                return Api(originalRequest);
+                return api(originalRequest);
             } catch (refreshError) {
                 console.error('Refresh token expired or invalid');
                 // Redirect to login page or handle logout
@@ -56,4 +54,4 @@ Api.interceptors.response.use(
     }
 );
 
-export default Api;
+export default api;

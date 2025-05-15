@@ -34,6 +34,12 @@ export const updateDamageFee = async (id, { damageFee, refundAmount, depositAmou
   return res.data;
 }
 
+// cal from customer side
+export const updateMenuFee = async (id, { menueFee }) => {
+  const res = await api.put(`/booking/${id}/menu-fee`, { menueFee });
+  return res.data;
+}
+
 export const updateContract = async (id, contractData) => {
   const res = await api.put(`/booking/${id}/contract`, contractData);
   return res.data;

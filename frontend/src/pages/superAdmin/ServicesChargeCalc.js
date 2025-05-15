@@ -22,9 +22,10 @@ const ServiceChargeTable = () => {
       const result = await serviceChargeService.getAllCharges();
       if (result.success) {
         const data = result.data;
-        const total = data.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-        setCharges(data);
-        setFilteredData(data);
+        const sortedData = data.sort((a, b) => a.employee_id.localeCompare(b.employee_id));
+        const total = sortedData.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+        setCharges(sortedData);
+        setFilteredData(sortedData);
         setTotalDistributed(total);
       } else {
         setError(result.message);
@@ -62,22 +63,28 @@ const ServiceChargeTable = () => {
   }, [selectedMonth, charges]);
 
   const groupByEvent = (data) => {
-    return data.reduce((acc, current) => {
-      const existing = acc.find(item => item.event_id === current.event_id);
-      if (!existing) {
-        acc.push({
-          event_id: current.event_id,
-          customer_name: current.customer_name,
-          calculation_date: current.calculation_date,
-          event_budget: current.event_budget,
-          entries: [current]
-        });
-      } else {
-        existing.entries.push(current);
-      }
-      return acc;
-    }, []);
-  };
+  // First group the data
+  const grouped = data.reduce((acc, current) => {
+    const existing = acc.find(item => item.event_id === current.event_id);
+    if (!existing) {
+      acc.push({
+        event_id: current.event_id,
+        customer_name: current.customer_name,
+        calculation_date: current.calculation_date,
+        event_budget: current.event_budget,
+        entries: [current]
+      });
+    } else {
+      existing.entries.push(current);
+    }
+    return acc;
+  }, []);
+
+  // Then sort the grouped array by event_id in DESCENDING order
+  return grouped.sort((b, a) => 
+    b.event_id.localeCompare(a.event_id)  // Reverse comparison for descending order
+  );
+};
 
   const formatCurrency = (value) => {
     return parseFloat(value || 0).toLocaleString("en-US", {

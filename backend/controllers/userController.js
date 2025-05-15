@@ -11,9 +11,11 @@ import {
   updateEmployeesStatusModel,
   ServiceChargeModel,
   checkUserIsActive,
-  searchCustomerByTerm
+  searchCustomerByTerm,
 
   
+  searchCustomerByTerm,
+  DeductionModel,
 } from "../models/userModel.js";
 
 import { sendIdToUserMethod } from "../controllers/mailController.js";
@@ -21,6 +23,7 @@ import {
   getCustomerByEmailModel,
   getCustomerByPhoneModel,
   addCustomerModel,
+  getCusName,
 } from "../models/customerModel.js";
 
 //add employees (employees add to system by admin)
@@ -114,7 +117,6 @@ export const searchCustomer = async (req, res) => {
     try {
         const customers = await searchCustomerByTerm(search_term);
         if (!customers || customers.length === 0) return res.status(404).json({ message: 'Customer not found' });
-        console.log(customers)
         res.status(200).json({ customers });
         
     } catch (error) {
@@ -174,7 +176,6 @@ export const updateEmployeesStatus = async (req, res) => {
 // Get employee by ID
 export const getEmployeeById = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
 
   try {
     const employee = await getEmployeeByuserIdModel(id);
@@ -210,7 +211,7 @@ export const updateEmployees = async (req, res) => {
       salary,
       service_charge_precentage,
       hire_date
-    );
+    )
     await updateEmployeesModel(
       id,
       name,
@@ -231,7 +232,6 @@ export const updateEmployees = async (req, res) => {
 // Get employees by status
 export const getEmployeesByStatus = async (req, res) => {
   const { status } = req.params;
-  console.log(status);
   try {
     const employees = await getEmployeesByStatusModel(status);
     res.status(200).json({ employees });
@@ -401,6 +401,17 @@ export const saveServiceChargeCalculation = async (req, res) => {
   }
 };
 
+// Get loged user name
+export const getLogedUserName = async (req, res) => {
+  const userId = req.query.id;
+  try {
+    const customer = await getCusName(userId);
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
+    res.status(200).json(customer);
+  } catch (error) {
+    res.status(500).json({ msg: "Server error...", error });
+  }
+};
 
 
 //deduction.............

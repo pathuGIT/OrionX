@@ -10,6 +10,9 @@ import ChairArrangement from './ChairArrangement';
 import ArrangementDetailsPage from './ArrangementDetailsPage';
 import PlanBarForm from './PlanBarForm';
 
+import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+
+// import ProfileNavbar from '../components/ProfileNavbar';
 
 const EventHome = () => {
   const { bookingId, customerID } = useParams();
@@ -58,6 +61,8 @@ const EventHome = () => {
         return ;
       case 'see-bar-arrangements':
         return ;
+      case 'plan-menulist':
+        return <CustomerMenuListSelection/>;
       case 'dashboard':
       default:
         return (

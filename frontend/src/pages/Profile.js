@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ProfileSideNav from '../components/ProfileSideNav';
 import CustomerBookings from './customer/CustomerBooking';
 
+
 const Profile = () => {
   const [activePage, setActivePage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
