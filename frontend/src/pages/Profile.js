@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import ProfileNavbar from '../components/ProfileNavbar';
 import ProfileSideNav from '../components/ProfileSideNav';
-import CustomerBookings from '../components/CustomerBooking';
+import CustomerBookings from './customer/CustomerBooking';
 
 const Profile = () => {
   const [activePage, setActivePage] = useState('dashboard');
