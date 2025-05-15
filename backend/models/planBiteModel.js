@@ -2,23 +2,23 @@ import db from '../config/db.js';
 
 class PlanBite {
     // Fetch all available bite menu items (e.g., Chicken, Pork, etc.)
-// In getBiteMenuItems method
-static async getBiteMenuItems() {
-    const connection = await db.getConnection();
-    try {
-        const [menuItems] = await connection.query(
-            `SELECT menu_type_id, menu_type_name, CAST(price AS DECIMAL(10,2)) AS price 
+    // In getBiteMenuItems method
+    static async getBiteMenuItems() {
+        const connection = await db.getConnection();
+        try {
+            const [menuItems] = await connection.query(
+                `SELECT menu_type_id, menu_type_name, CAST(price AS DECIMAL(10,2)) AS price 
              FROM menu_type 
              WHERE menu_list_type_id = 'MLT000005'`
-        );
-        connection.release();
-        return menuItems;
-    } catch (error) {
-        connection.release();
-        console.error("Database Error:", error);
-        throw new Error("Failed to fetch menu items");
+            );
+            connection.release();
+            return menuItems;
+        } catch (error) {
+            connection.release();
+            console.error("Database Error:", error);
+            throw new Error("Failed to fetch menu items");
+        }
     }
-}
 
     // Store selected bite items and calculate total price
     static async PlanBiteMenu(booking_id, biteItems) {
@@ -81,6 +81,13 @@ static async getBiteMenuItems() {
                 [BarRequirementID]
             );
             const totalPrice = totalResult[0].total || 0;
+
+            await connection.query(
+                `UPDATE Bar 
+                 SET TotalBitePrice = ?
+                 WHERE BarRequirementID = ?`,
+                [totalPrice, BarRequirementID]
+            );
 
             await connection.query('COMMIT');
             connection.release();
