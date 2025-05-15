@@ -362,7 +362,6 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
 
 
 
-
 // // Get all menu types under a specific menu list type
 // export const getMenusByListType = async (listTypeId) => {
 //   try {
@@ -459,7 +458,6 @@ export const CusgetItemCategoryMenuTypes = async () => {
 export const getAllMenuViews = async () => {
   try {
     const response = await api.get('/advanceMenuView/getAll');
-    console.log("getMenuViews response:", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching menu views:", error);
@@ -479,15 +477,27 @@ export const getMenuViewById = async (id) => {
 };
 
 // Save customer menu item selection
-export const saveCustomerMenuSelection = async (customer_id, ICMT_Id) => {
+export const saveCustomerMenuSelection = async (booking_id, ICMT_Id) => {
+  console.log("Saving customer menu selection:", booking_id, ICMT_Id);
   try {
     const response = await api.post('/customerMenuSelection/', {
-      customer_id,
+      booking_id,
       ICMT_Id,
     });
     return response.data;
   } catch (error) {
     console.error("Error saving customer menu selection:", error);
+    throw error;
+  }
+};
+
+// Check if booking_id exists in customer menu selection
+export const checkBookingMenuSelection = async (booking_id) => {
+  try {
+    const response = await api.get(`/customerMenuSelection/check-booking/${booking_id}`);
+    return response.data.exists;
+  } catch (error) {
+    console.error("Error checking booking menu selection:", error);
     throw error;
   }
 };

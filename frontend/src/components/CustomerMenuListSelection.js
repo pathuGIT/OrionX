@@ -67,8 +67,7 @@ const CustomerMenuListSelection = ({setActivePage}) => {
         {menuListTypes.map((type) => (
           <div
             key={type.menu_list_type_id}
-            // onClick={() => navigate(`/menu-types/${type.menu_list_type_id}`)}
-             onClick={() => setActivePage('dashboard')}
+            onClick={() => navigate(`/menu-types/${type.menu_list_type_id}`)}
             className="group bg-white border border-gray-100 hover:shadow-xl hover:border-blue-400 rounded-2xl overflow-hidden transition-transform transform hover:scale-[1.02] cursor-pointer"
           >
             {/* Image */}

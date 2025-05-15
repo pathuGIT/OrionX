@@ -502,12 +502,16 @@ export const updateMenuFee = async (req, res) => {
     const bookingId = req.params.id;
     const { menueFee } = req.body;
 
+    console.log("menueFee:", menueFee, bookingId)
+
     try {
+
+        const bookingData = await getBookingById(bookingId);
 
         // change booking_pricing forfeited_deposit
         const currentBookingPrice = await getBookingPricingById(bookingId);
         const newBookingPrice = {
-            menuPriceTotal: menueFee,
+            menuPriceTotal: menueFee * bookingData.number_of_guests,
             hallCharge: currentBookingPrice.hall_charge,
             extraHourFee: currentBookingPrice.extra_hour_fee,
             bitesPayment: currentBookingPrice.bites_payment,
