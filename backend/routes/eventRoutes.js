@@ -15,6 +15,13 @@ import { createPlanBarEvent } from '../controllers/planBarController.js';
 import { getPlanBarEvent } from '../controllers/planBarController.js';
 import { deletePlanBarEvent } from '../controllers/planBarController.js';
 import { updatePlanBarEvent } from '../controllers/planBarController.js';
+import { 
+    getBiteMenuItems,
+    createBiteMenu,
+    getBiteMenu,
+    updateBiteMenu,
+    deleteBiteMenu
+} from '../controllers/planBiteController.js';
 
 
 
@@ -31,6 +38,7 @@ const saveSelectedServiceRoutes = express.Router();
 const tableArrangementRoutes = express.Router();
 const reservationRoutes = express.Router();
 const planBarRoutes = express.Router();
+const planBiteRoutes = express.Router();
 
 
 
@@ -49,6 +57,11 @@ planBarRoutes.post('/planBar/:bookingid', createPlanBarEvent );//did
 planBarRoutes.get('/getPlanBar/:bookingid', getPlanBarEvent);
 planBarRoutes.delete('/deletePlanBar/:bookingid', deletePlanBarEvent );
 planBarRoutes.put('/updatePlanBar/:bookingid', updatePlanBarEvent );
+planBiteRoutes.get('/bite-menu-items', getBiteMenuItems);
+planBiteRoutes.post('/planBite/:bookingid', createBiteMenu);
+planBiteRoutes.get('/getPlanBite/:bookingid', getBiteMenu);
+planBiteRoutes.put('/updatePlanBite/:bookingid', updateBiteMenu);
+planBiteRoutes.delete('/deletePlanBite/:bookingid', deleteBiteMenu);
 
 
-export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes};
+export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes, planBiteRoutes};
