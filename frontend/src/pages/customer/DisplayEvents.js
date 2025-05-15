@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/Authcontext";
-import { getPlannedEvents } from "../services/EventService";
+import { AuthContext } from "../../context/Authcontext";
+import { getPlannedEvents } from "../../services/EventService";
 import { Calendar, Clock, Phone, User, CheckCircle, XCircle, PartyPopper, Heart, X } from "lucide-react";
 
 const DisplayEvents = () => {

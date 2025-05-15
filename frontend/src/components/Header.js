@@ -2,11 +2,13 @@ import { useContext, React, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/Authcontext';
 import { Logout } from './Logout';
+import { getCusName } from '../services/CustomerServise';
 
 export const Header = () => {
   const { user } = useContext(AuthContext);
   const [dashboard, setDashboard] = useState();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false); // State for user dropdown visibility
+  const [customerName, setCustomerName] = useState('');
   const dropdownRef = useRef(null); // Ref for dropdown
 
   useEffect(() => {
@@ -22,6 +24,19 @@ export const Header = () => {
       setDashboard(null);
     }
   }, [user]);
+
+  // Fetch customer name
+  useEffect(() => {
+
+    if (sessionStorage.getItem('role') === 'customer') {
+      fetchCustomerName();
+    }
+  }, [user]);
+
+  const fetchCustomerName = async () => {
+    const name = await getCusName(sessionStorage.getItem('id'));
+    setCustomerName(name);
+  };
 
   const toggleUserDropdown = () => {
     setIsUserDropdownOpen((prev) => !prev); // Toggle dropdown visibility
@@ -40,8 +55,13 @@ export const Header = () => {
     };
   }, []);
 
+  const firstCharacter = customerName.charAt(0); // Using charAt
+  // or
+  const firstCharacterAlt = customerName[0]; // Using array indexing
+
   return (
-    <header className="mx-20 mt-10 border border-black">
+    // <header className="mx-20 mt-10 border border-black">
+    <header className="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <nav className="bg-white border-gray-200 dark:bg-gray-900 ">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
           <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -51,33 +71,31 @@ export const Header = () => {
           <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse ">
             {/* User Menu Button */}
             <Link to="/login" className={`${sessionStorage.getItem('role') == 'customer' || sessionStorage.getItem('role') != null ? 'hidden ' : 'visible absolute right-2'}`}>Login</Link>
-            
+
             <button
               type="button"
               className="border flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
               id="user-menu-button"
               onClick={toggleUserDropdown} // Toggle dropdown on click
-            >
-              <img className={`w-8 h-8 rounded-full ${sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'}`} src="/docs/images/people/profile-picture-3.jpg" alt="user photo" />
+            > 
+              <div className={`w-8 h-8 rounded-full bg-white flex justify-center items-center overflow-hidden ${sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'}`}>{firstCharacter}</div>
+              {/* <img className={`w-8 h-8 rounded-full ${sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'}`} src="/docs/images/people/profile-picture-3.jpg" alt="user photo" /> */}
               <span className="sr-only">Open user menu</span>
             </button>
 
             {/* User Dropdown */}
             <div
               ref={dropdownRef} // Attach ref to dropdown
-              className={`absolute right-0 mt-72 z-50 ${isUserDropdownOpen ? 'block' : 'hidden'} w-48 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
+              className={`absolute right-0 mt-[200px] z-50 ${isUserDropdownOpen ? 'block' : 'hidden'} w-48 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
               id="user-dropdown"
             >
               <div className="px-4 py-3">
-                <span className="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-                <span className="block text-sm text-gray-500 truncate dark:text-gray-400">name@flowbite.com</span>
+                <span className="block text-sm text-gray-900 dark:text-white">{customerName || 'Loading...'}</span>
+                <span className="block text-sm text-gray-500 truncate dark:text-gray-400">{sessionStorage.getItem('credential')}</span>
               </div>
               <ul className="py-2" aria-labelledby="user-menu-button">
                 <li>
                   <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white" >Dashboard</Link>
-                </li>
-                <li>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>
                 </li>
                 <li>
                   <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
@@ -109,8 +127,8 @@ export const Header = () => {
             <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               <li>
                 {/* <a href="#" className="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Home</a> */}
-                <Link to="/" className={`${dashboard == null || sessionStorage.getItem('role') == 'customer' ? 'visible': 'hidden'} block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500`}>Home</Link>
-                <Link to={dashboard} className={`${user != null && sessionStorage.getItem('role') != 'customer' ? 'visible': 'hidden'}`} >Dashboard</Link>
+                <Link to="/" className={`${dashboard == null || sessionStorage.getItem('role') == 'customer' ? 'visible' : 'hidden'} block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500`}>Home</Link>
+                <Link to={dashboard} className={`${user != null && sessionStorage.getItem('role') != 'customer' ? 'visible' : 'hidden'}`} >Dashboard</Link>
               </li>
               <li>
                 <a href="#" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">About</a>

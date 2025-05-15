@@ -25,17 +25,8 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
 
         {/* Event Planning Section */}
         <div>
-          <button 
-            onClick={() => toggleMenu('events')}
-            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
-          >
             <div className="flex items-center">
-              <i className="fas fa-calendar-alt mr-3"></i>Event Planning
-            </div>
-            <i className={`fas ${openMenu === 'events' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-          </button>
-          {openMenu === 'events' && (
-            <div className="bg-gray-700">
+              <i className="fas fa-calendar-alt mr-3"></i>
               <button
                 onClick={() => {
                   setActivePage('plan-event');
@@ -43,60 +34,10 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
                 }}
                 className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
               >
-                Plan Event
-              </button>
-              <button
-                onClick={() => {
-                  setActivePage('my-events');
-                  closeSidebar();
-                }}
-                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
-              >
-                My Events
+                Event Planning
               </button>
             </div>
-          )}
-        </div>
-
-        <div className="border-t border-gray-700 my-2"></div>
-
-        {/* Menu Planning Section */}
-        <div>
-          <button 
-            onClick={() => toggleMenu('menu')}
-            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
-          >
-            <div className="flex items-center">
-              <i className="fas fa-utensils mr-3"></i>Menu Planning
             </div>
-            <i className={`fas ${openMenu === 'menu' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-          </button>
-          {openMenu === 'menu' && (
-            <div className="bg-gray-700">
-              <button
-                onClick={() => {
-                  setActivePage('plan-menu');
-                  closeSidebar();
-                }}
-                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
-              >
-                Create New Menu
-              </button>
-              <button
-                onClick={() => {
-                  setActivePage('my-menu');
-                  closeSidebar();
-                }}
-                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
-              >
-                Saved Menus
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="border-t border-gray-700 my-2"></div>
-
         <div className="border-t border-gray-700 my-2"></div>
 
         {/* Logout Section */}
