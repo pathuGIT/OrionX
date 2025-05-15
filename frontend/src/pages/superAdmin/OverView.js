@@ -42,7 +42,7 @@ const OverView = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card title="Total Bookings">{kpis.totalBookings}</Card>
         <Card title="Upcoming Events">{kpis.upcomingEvents}</Card>
-        <Card title="Revenue (This Month)">₹{kpis.monthlyRevenue}</Card>
+        <Card title="Revenue (This Month)">Rs.{kpis.monthlyRevenue}</Card>
         <Card title="Total Customers">{kpis.totalCustomers}</Card>
       </div>
 
