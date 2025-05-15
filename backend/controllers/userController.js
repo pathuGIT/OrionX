@@ -11,10 +11,10 @@ import {
   updateEmployeesStatusModel,
   ServiceChargeModel,
   checkUserIsActive,
-  searchCustomerByTerm
-
-  
+  searchCustomerByTerm,
+  DeductionModel,
 } from "../models/userModel.js";
+
 import { sendIdToUserMethod } from "../controllers/mailController.js";
 import {
   getCustomerByEmailModel,
@@ -409,3 +409,163 @@ export const getLogedUserName = async (req, res) => {
     res.status(500).json({ msg: "Server error...", error });
   }
 };
+
+
+//deduction.............
+
+
+
+
+export const deductionController = {createDeduction: async (req, res) => {
+    try {
+      const { calculation_date, description, employee_id, amount } = req.body;
+      await DeductionModel.createDeduction(
+        calculation_date,
+        description,
+        employee_id,
+        amount
+      );
+      res.json({ success: true});
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  getAllDeductionEntries: async (req, res) => {
+    try {
+      const entries = await DeductionModel.getAllDeductionEntries();
+      res.json({ success: true, data: entries });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+ // updatededuction..................................
+  updateDeduction: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { calculation_date, description, employee_id, amount } = req.body;
+  
+      const updated = await DeductionModel.updateDeduction(
+        id,
+        calculation_date,
+        description,
+        employee_id,
+        amount
+      );
+  
+      if (updated) {
+        res.json({ success: true, message: 'Deduction updated successfully' });
+      } else {
+        res.status(404).json({ success: false, message: 'Deduction not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // userController.js
+deleteDeduction: async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await DeductionModel.deleteDeduction(id);
+    if (deleted) {
+      res.json({ success: true, message: 'Deduction deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, message: 'Deduction not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+},
+
+
+
+calculateMonthlyDeduction: async (req, res) => {
+  try {
+      const { employee_id, month_year } = req.body;
+      const result = await DeductionModel.calculateAndSaveMonthlyDeduction(employee_id, month_year);
+      res.status(200).json(result);
+  } catch (error) {
+      res.status(500).json({ 
+          success: false, 
+          message: error.message 
+      });
+  }
+},
+saveMonthlyDeduction: async (req, res) => {
+  try {
+      const result = await DeductionModel.saveMonthlyDeduction(req.body);
+      res.status(201).json(result);
+  } catch (error) {
+      res.status(500).json({ 
+          success: false, 
+          message: error.message 
+      });
+  }
+},
+//..........................................................
+
+getMonthlyDeductionEntriesByEmployeeAndDate: async (req, res) => {
+  try {
+    const { employee_id, date } = req.params;
+
+    console.log("Request Parameters:", employee_id, date); // Log request parameters
+    const entries = await DeductionModel.getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date);
+
+    if (!entries || entries.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No deduction entries found for the specified employee and date",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: entries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+
+ 
+  
+};
+
+
+
+
+export const calculateAndSaveMonthlyDeduction = async (req, res) => {
+  try {
+    const { employee_id, month_year } = req.body;
+    
+    const success = await DeductionModel.calculateAndSaveMonthlyDeductionmodel(
+      employee_id,
+      month_year
+    );
+
+    if (success) {
+      res.status(200).json({
+        success: true,
+        message: 'Monthly deduction calculated and saved successfully'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'No deductions found for this period'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+ 

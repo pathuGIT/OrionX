@@ -2,11 +2,21 @@ import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
 import { subAdmin } from '../middleware/Sub_admin.js';
 import { customer } from '../middleware/Customer.js';
-import { addEmployee, changeUserRole, addCustomer ,
-    updateEmployees,deleteEmployees,getEmployee,updateEmployeesStatus,getEmployeesByStatus,
-    getEmployeeById,serviceChargeController, 
+import { 
+    addEmployee, 
+    changeUserRole, 
+    addCustomer ,
+    updateEmployees,
+    deleteEmployees,
+    getEmployee,
+    updateEmployeesStatus,
+    getEmployeesByStatus,
     searchCustomer,
-    getLogedUserName
+    getLogedUserName,
+    getEmployeeById,
+    serviceChargeController,
+    deductionController,
+    calculateAndSaveMonthlyDeduction
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -31,6 +41,17 @@ router.post('/service-charges/calculate', serviceChargeController.calculateCharg
 router.get('/service-charges', serviceChargeController.getAllCharges);
 router.get('/service-charges/employee/:employeeId', serviceChargeController.getEmployeeCharges);
 
+router.post('/deductions', deductionController.createDeduction);
+router.get('/deduction-entries', deductionController.getAllDeductionEntries);
+router.put('/deduction-entries/:id', deductionController.updateDeduction);
+router.delete('/deduction-entries/:id', deductionController.deleteDeduction);
+
+
+router.post('/monthly/calculate', calculateAndSaveMonthlyDeduction );
+router.post('/monthly/save', deductionController.saveMonthlyDeduction);
+//router.get('/monthly/entries', deductionController.getMonthlyDeductionEntries);
+router.get('/monthly/entries/:employee_id/:date', deductionController.getMonthlyDeductionEntriesByEmployeeAndDate);
+ 
 
 
 //sub admins
@@ -38,6 +59,6 @@ router.get('/service-charges/employee/:employeeId', serviceChargeController.getE
 //employee
 
 //customers
-router.get('/getCusName', getLogedUserName);
+router.get('/getCusName', customer, getLogedUserName);
 
 export default router;
