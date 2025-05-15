@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getAllMenuViews } from "../services/MenuService";
+import { getAllMenuViews, saveCustomerMenuSelection } from "../services/MenuService";
 import { Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 
 const CustomerMenuTypeSelection = () => {
@@ -26,6 +26,7 @@ const CustomerMenuTypeSelection = () => {
             view.menu_list_type_id?.trim().toLowerCase() ===
             menuListTypeId?.trim().toLowerCase()
         );
+        console.log("Filtered menu views:", filtered);
         setMenuViews(filtered);
       } catch (err) {
         console.error(err);
@@ -38,29 +39,50 @@ const CustomerMenuTypeSelection = () => {
     fetchMenuViews();
   }, [menuListTypeId]);
 
-  // Handle selection of items (radio or checkbox depending on item limit)
-  const handleSelect = (menuTypeId, categoryId, itemId, isSingleChoice) => {
+  useEffect(() => {
+    console.log("Selections updated:", selections);
+  }, [selections]);
+
+  // Update: handle selection with item_limit enforcement
+  const handleSelect = (menuTypeId, categoryId, ICMT_Id, isSingleChoice) => {
     setSelections((prev) => {
-      const updated = { ...prev };
+      const prevMenu = prev[menuTypeId] || {};
+      const prevCategory = prevMenu[categoryId] || [];
 
-      // Initialize menu type selection if not present
-      if (!updated[menuTypeId]) updated[menuTypeId] = {};
-      if (!updated[menuTypeId][categoryId]) updated[menuTypeId][categoryId] = [];
-
+      let updatedCategory;
       if (isSingleChoice) {
-        // Radio button behavior
-        updated[menuTypeId][categoryId] = [itemId];
+        // Only one can be selected (radio)
+        updatedCategory = [ICMT_Id];
       } else {
-        // Checkbox behavior
-        const current = updated[menuTypeId][categoryId];
-        if (current.includes(itemId)) {
-          updated[menuTypeId][categoryId] = current.filter((id) => id !== itemId);
+        // Multiple can be selected (checkbox)
+        if (prevCategory.includes(ICMT_Id)) {
+          // Deselect if already selected
+          updatedCategory = prevCategory.filter((id) => id !== ICMT_Id);
         } else {
-          updated[menuTypeId][categoryId] = [...current, itemId];
+          // Add if under limit
+          const categoryLimit = (
+            menuViews.find(
+              (v) =>
+                v.menu_type_id === menuTypeId &&
+                v.category_id === categoryId
+            )?.item_limit || 1
+          );
+          if (prevCategory.length < categoryLimit) {
+            updatedCategory = [...prevCategory, ICMT_Id];
+          } else {
+            // At limit, do not add more
+            updatedCategory = prevCategory;
+          }
         }
       }
 
-      return updated;
+      return {
+        ...prev,
+        [menuTypeId]: {
+          ...prevMenu,
+          [categoryId]: updatedCategory,
+        },
+      };
     });
   };
 
@@ -111,8 +133,11 @@ const CustomerMenuTypeSelection = () => {
       menu.categories[item.category_id].items.push({
         item_id: item.item_id,
         item_name: item.item_name,
+        ICMT_Id: item.ICMT_Id,
       });
     });
+
+    console.log("Grouped menu map:", map); // <-- Add this line to view the map in the console
 
     return Array.from(map.values());
   };
@@ -152,8 +177,7 @@ const CustomerMenuTypeSelection = () => {
                   <div className="px-6 py-4 bg-blue-50/80 rounded-b space-y-6 transition-all">
                     {Object.values(menu.categories).map((category) => {
                       const isSingleChoice = category.item_limit === 1;
-                      const selectedItems =
-                        selections[menu.menu_type_id]?.[category.category_id] || [];
+                      const selectedItems = selections[menu.menu_type_id]?.[category.category_id] || [];
 
                       return (
                         <div
@@ -173,13 +197,13 @@ const CustomerMenuTypeSelection = () => {
                               >
                                 <input
                                   type={isSingleChoice ? "radio" : "checkbox"}
-                                  name={`${menu.menu_type_id}-${category.category_id}`}
-                                  checked={selectedItems.includes(item.item_id)}
+                                  name={`${menu.menu_type_id}_${category.category_id}`}
+                                  checked={selectedItems.includes(item.ICMT_Id)}
                                   onChange={() =>
                                     handleSelect(
                                       menu.menu_type_id,
                                       category.category_id,
-                                      item.item_id,
+                                      item.ICMT_Id,
                                       isSingleChoice
                                     )
                                   }
@@ -199,6 +223,38 @@ const CustomerMenuTypeSelection = () => {
               </div>
             );
           })}
+        </div>
+        
+        {/* Add Save button below the menu selection */}
+        <div className="flex justify-center mt-8">
+          <button
+            className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-8 rounded shadow transition"
+            onClick={async () => {
+              // TODO: Replace with actual customer_id if available
+              const customer_id = sessionStorage.getItem("id");
+              // Flatten all ICMT_Ids from selections
+              const ICMT_Ids = [];
+              Object.values(selections).forEach((categories) => {
+                Object.values(categories).forEach((ids) => {
+                  ICMT_Ids.push(...ids);
+                });
+              });
+
+              try {
+                // Save each selection
+                for (const ICMT_Id of ICMT_Ids) {
+                  await saveCustomerMenuSelection(customer_id, ICMT_Id);
+                }
+                alert("Selections saved to backend!");
+              } catch (err) {
+                alert("Failed to save selections.");
+                console.error(err);
+              }
+            }}
+            type="button"
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>

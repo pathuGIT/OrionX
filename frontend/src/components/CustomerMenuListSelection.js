@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CusgetMenuListType } from "../services/MenuService";
 import { Loader2, AlertCircle } from "lucide-react";
 
-const CustomerMenuListSelection = () => {
+const CustomerMenuListSelection = ({setActivePage}) => {
   // State to hold fetched menu list types
   const [menuListTypes, setMenuListTypes] = useState([]);
 
@@ -67,7 +67,8 @@ const CustomerMenuListSelection = () => {
         {menuListTypes.map((type) => (
           <div
             key={type.menu_list_type_id}
-            onClick={() => navigate(`/menu-types/${type.menu_list_type_id}`)}
+            // onClick={() => navigate(`/menu-types/${type.menu_list_type_id}`)}
+             onClick={() => setActivePage('dashboard')}
             className="group bg-white border border-gray-100 hover:shadow-xl hover:border-blue-400 rounded-2xl overflow-hidden transition-transform transform hover:scale-[1.02] cursor-pointer"
           >
             {/* Image */}

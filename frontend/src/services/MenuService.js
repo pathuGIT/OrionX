@@ -455,8 +455,6 @@ export const CusgetItemCategoryMenuTypes = async () => {
   }
 }
 
-
-
 // To display all menu views
 export const getAllMenuViews = async () => {
   try {
@@ -476,6 +474,20 @@ export const getMenuViewById = async (id) => {
     return response.data;
   } catch (error) {
     console.error("Error getting menu view by ID:", error);
+    throw error;
+  }
+};
+
+// Save customer menu item selection
+export const saveCustomerMenuSelection = async (customer_id, ICMT_Id) => {
+  try {
+    const response = await api.post('/customerMenuSelection/', {
+      customer_id,
+      ICMT_Id,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error saving customer menu selection:", error);
     throw error;
   }
 };
