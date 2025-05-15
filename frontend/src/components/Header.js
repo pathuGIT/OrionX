@@ -34,9 +34,7 @@ export const Header = () => {
   }, [user]);
 
   const fetchCustomerName = async () => {
-    console.log('Fetching customer name...: ', sessionStorage.getItem('id'));
     const name = await getCusName(sessionStorage.getItem('id'));
-    console.log('Fetching customer name...: ', name);
     setCustomerName(name);
   };
 
