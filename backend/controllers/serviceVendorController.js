@@ -3,6 +3,7 @@ import ServiceVendorModel from '../models/serviceVendorModel.js';
 export const getVendorsForCustomerBooking = async (req, res) => {
     try {
         const { customerId, bookingId } = req.params;
+        //console.log("booking ID:", bookingId);
         
         if (!customerId || !bookingId) {
             return res.status(400).json({

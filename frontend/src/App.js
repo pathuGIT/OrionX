@@ -14,7 +14,7 @@ import EmployeeRegistration from './pages/EmployeeRegistration';
 import CustomerRegistration from './pages/CustomerRegistration';
 import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import EventHome from './pages/customer/EventHome';
-import DisplayEvents from './components/DisplayEvents';
+import DisplayEvents from './pages/customer/DisplayEvents';
 //import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 // import DisplayEvents from './components/DisplayEvents';
 
