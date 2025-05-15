@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import EventHomeSideNav from './EventHomeSideNav';
 import EventPlan from './CustomerEventPlanning';
-import DisplayEvents from '../../components/DisplayEvents';
+import DisplayEvents from '../../pages/customer/DisplayEvents';
 import EventServicesSelector from './EventServicesSelector';
 import ServiceVendor from './ServiceVendor';
 import TableReservation from './TableReservation';

@@ -8,7 +8,7 @@ export const customer = (req, res, next) => {
     //assign the refreshtoken
     const token = req.headers.authorization.split(' ')[1];
 
-    //check user role is admin?
+    //check user role is customer?
     const decoded = jwt.decode(token);
     const userRole = decoded?.role;
     if(userRole !== 'customer'){

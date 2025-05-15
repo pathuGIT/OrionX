@@ -107,6 +107,18 @@ CREATE TABLE Bite (
     FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
+ALTER TABLE bite 
+  ADD COLUMN menu_type_id VARCHAR(10),
+  ADD COLUMN custom_description TEXT;
+
+CREATE TABLE bite_menu (
+    item_id VARCHAR(10) PRIMARY KEY,
+    item_name VARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
+);
+
+
 -- Create BiteByGuest table
 
 CREATE TABLE BiteByGuest (
@@ -441,6 +453,27 @@ BEGIN
     SET new_id = CONCAT('BITE', LPAD(max_id, 6, '0'));
     SET NEW.Bite_ID = new_id;
 END //
+DELIMITER ;
+
+-- Trigger to format Bite_menu
+DELIMITER //
+
+CREATE TRIGGER before_bite_menu_insert
+BEFORE INSERT ON bite_menu
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    -- Get the max numeric part of item_id
+    SELECT COALESCE(MAX(CAST(SUBSTRING(item_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id
+    FROM bite_menu;
+
+    -- Create new ID with prefix 'BIT' and 6-digit padding
+    SET new_id = CONCAT('BIT', LPAD(max_id, 6, '0'));
+    SET NEW.item_id = new_id;
+END //
+
 DELIMITER ;
 
 
