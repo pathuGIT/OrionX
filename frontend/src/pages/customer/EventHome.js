@@ -47,7 +47,6 @@ const EventHome = () => {
         return <DisplayEvents customerID={customerID} />;
       case 'Select-Services':
         return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
-        return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
       case 'view-Vendors':
         return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
       case 'Select-Tables':
@@ -62,7 +61,6 @@ const EventHome = () => {
         return ;
       case 'see-bar-arrangements':
         return ;
-      //  return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
       case 'plan-menulist':
         return <CustomerMenuListSelection/>;
       case 'dashboard':
