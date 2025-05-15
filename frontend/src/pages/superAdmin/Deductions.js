@@ -122,7 +122,7 @@ const DeductionsPage = () => {
         setCalculationState({
           employee_id: "",
           month: "",
-          calculatedTotal: '',
+          calculatedTotal:null,
         });
       } else {
         alert(
@@ -318,7 +318,7 @@ const DeductionsPage = () => {
                 onClick={handleShowHistory}
                 className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
               >
-                Show History
+                Total
               </button>
             </div>
           </div>
