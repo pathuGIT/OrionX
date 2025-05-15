@@ -13,6 +13,7 @@ import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
 import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
 import bookingRoutes from './routes/bookingRoutes.js';
 import advanceMenuViewRoute from './routes/advanceMenuViewRoute.js'
+import menuViewRoutes from './routes/menuViewRoutes.js';
 
 const app = express();
 
@@ -24,7 +25,9 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRouter);
 app.use('/api/mail', mailRouter);
-app.use('/api/menuListType', menuListTypeRoutes);
+
+// Menu routes
+app.use('/api/menuListType', menuListTypeRoutes); //same
 app.use('/api/menutypes', menuTypeRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
@@ -33,6 +36,7 @@ app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 app.use('/api/customerMenuSelection', customerSelectionRoutes);
 // Menu Overview routes
 app.use('/api/advanceMenu', advanceMenuViewRoute);
+app.use('/api/advanceMenuView', menuViewRoutes); //meka tmi werdi ei
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
@@ -45,7 +49,7 @@ app.use('/api/wedding', weddingRoutes);
 app.use('/api/customer', cusBookingRoutes);
 app.use('/api/displayEvents', dispayEventsRoutes);
 app.use('/api/VendorServices', serviceVendorRoutes);
-app.use('/api/EventService', EventServiceRoutes);
+app.use('/api/Evenapi/tService', EventServiceRoutes);
 app.use('/api/CustomerService', saveSelectedServiceRoutes);
 
 

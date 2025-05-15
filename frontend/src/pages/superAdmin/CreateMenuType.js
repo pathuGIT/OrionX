@@ -2,16 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { getMenuTypes, addMenuType, getMenus, deleteMenuType, updateMenuTypeById, getMenuTypeById } from '../../services/MenuService';
 
 function CreateMenuType() {
+  // Initialize state for a single menu type, list of all menu types, and menu list types
   const [menuType, setMenuType] = useState({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
   const [menuTypes, setMenuTypes] = useState([]);
   const [menuListTypes, setMenuListTypes] = useState([]);
   const [btnname, setBtnname] = useState('Add Menu Type');
 
+  // Fetch menu types and menu list types when component mounts
   useEffect(() => {
     const fetchMenuTypes = async () => {
       try {
         const fetchedMenuTypes = await getMenuTypes();
         setMenuTypes(fetchedMenuTypes);
+
+        // Generate the next menu type ID (e.g., MT000002)
         const nextId = fetchedMenuTypes.length ? `MT${(fetchedMenuTypes.length + 1).toString().padStart(6, '0')}` : 'MT000001';
         setMenuType((prev) => ({ ...prev, menu_type_id: nextId }));
       } catch (error) {
@@ -32,12 +36,14 @@ function CreateMenuType() {
     fetchMenuListTypes();
   }, []);
 
+  // Handle form submission to add or update a menu type
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Trim name to remove leading/trailing spaces
     const trimmedName = menuType.menu_type_name.trim();
 
+    // Validation checks
     if (!trimmedName) {
       alert("Menu Type Name cannot be empty or contain only spaces!");
       return;
@@ -62,9 +68,11 @@ function CreateMenuType() {
 
     try {
       if (btnname === 'Add Menu Type') {
+        // Add new menu type
         await addMenuType({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type added successfully!');
       } else if (btnname === 'Update') {
+        // Update existing menu type
         await updateMenuTypeById({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type updated successfully!');
         setBtnname('Add Menu Type');
@@ -82,16 +90,19 @@ function CreateMenuType() {
     }
   };
 
+  // Handle input changes and validate price field
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Prevents non-numeric input in price field
     if (name === "price" && value !== "" && !/^\d+(\.\d{0,2})?$/.test(value)) {
-      return; // Prevents non-numeric input in price field
+      return; 
     }
 
     setMenuType((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle editing an existing menu type
   const handleEdit = async (id) => {
     try {
       const menuTypeData = await getMenuTypeById(id);
@@ -99,6 +110,8 @@ function CreateMenuType() {
         alert('Menu type not found.');
         return;
       }
+
+      // Populate form with existing data
       setMenuType({
         menu_type_id: id,
         menu_type_name: menuTypeData.menu_type_name,
@@ -112,6 +125,7 @@ function CreateMenuType() {
     }
   };
 
+  // Handle deletion of a menu type
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
     if (!isConfirmed) return; 
@@ -134,6 +148,7 @@ function CreateMenuType() {
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Create Menu Type</h2>
         <form onSubmit={handleSubmit}>
+          {/* Menu Type Name Input */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu Type Name</label>
             <input 
@@ -169,7 +184,7 @@ function CreateMenuType() {
         </form>
       </div>
       
-      {/* Display Menu Types */}
+      {/* Display Menu Types table */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Menu Types</h2>
         <table className="min-w-full border border-gray-300">

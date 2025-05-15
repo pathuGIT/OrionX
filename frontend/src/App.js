@@ -21,10 +21,8 @@ import DisplayEvents from './components/DisplayEvents';
 import ResetPassword from './pages/VerifyOtp';
 import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
 import UpdatePassword from './pages/UpdatePassword';
-import CustomerMenuPlanner from './components/CustomerMenuPlanner';
-import CustomerItemSelection from './components/CustomerItemSelection';
-import CustomerCategorySelection from './components/CustomerCategorySelection';
 import CustomerMenuListSelection from './components/CustomerMenuListSelection';
+import CustomerMenuTypeSelection from './components/CustomerMenuTypeSelection';
 
 function App() {
   return (
@@ -52,10 +50,8 @@ function App() {
             {/* sandli */}
 
             <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
-            {/* <Route path="/menu-type/:menuTypeId" element={<CustomerMenuTypeSelection />} /> */}
-            <Route path="/menu-category/:categoryId" element={<CustomerCategorySelection />} />
-            <Route path="/menu-item/:itemId" element={<CustomerItemSelection />} />
-            <Route path="/customer-menu-planner" element={<CustomerMenuPlanner />} />
+            <Route path="/menu-types/:menuListTypeId" element={<CustomerMenuTypeSelection />} />
+
           </Routes>
         </main>
         <Footer />

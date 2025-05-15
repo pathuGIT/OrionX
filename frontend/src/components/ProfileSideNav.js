@@ -60,40 +60,8 @@ const ProfileSideNav = ({ setActivePage, closeSidebar }) => {
 
         <div className="border-t border-gray-700 my-2"></div>
 
-        {/* Menu Planning Section */}
-        <div>
-          <button 
-            onClick={() => toggleMenu('menu')}
-            className="w-full flex items-center justify-between px-4 py-2 text-gray-100 hover:bg-gray-700"
-          >
-            <div className="flex items-center">
-              <i className="fas fa-utensils mr-3"></i>Menu Planning
-            </div>
-            <i className={`fas ${openMenu === 'menu' ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-          </button>
-          {openMenu === 'menu' && (
-            <div className="bg-gray-700">
-              <button
-                onClick={() => {
-                  setActivePage('plan-menu');
-                  closeSidebar();
-                }}
-                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
-              >
-                Select New Menu
-              </button>
-              <button
-                onClick={() => {
-                  setActivePage('my-menu');
-                  closeSidebar();
-                }}
-                className="block px-8 py-2 text-gray-200 hover:bg-gray-600 w-full text-left"
-              >
-                Saved Menus
-              </button>
-            </div>
-          )}
-        </div>
+       
+      
 
         <div className="border-t border-gray-700 my-2"></div>
 

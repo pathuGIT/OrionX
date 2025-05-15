@@ -1,42 +1,208 @@
-// import React, { useEffect, useState } from "react";
-// import { useNavigate, useParams } from "react-router-dom";
-// import { getMenusByListType } from "../services/MenuService";
-// import { ArrowLeft, ArrowRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getAllMenuViews } from "../services/MenuService";
+import { Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 
-// const CustomerMenuTypeSelection = () => {
-//     const { listTypeId } = useParams();
-//     const [menus, setMenus] = useState([]);
-//     const navigate = useNavigate();
+const CustomerMenuTypeSelection = () => {
+  // Extract menuListTypeId from URL parameters
+  const { menuListTypeId } = useParams();
 
-//     useEffect(() => {
-//         getMenusByListType(listTypeId).then(setMenus);
-//     }, [listTypeId]);
+  // State declarations
+  const [menuViews, setMenuViews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedMenuTypeId, setExpandedMenuTypeId] = useState(null);
+  const [selections, setSelections] = useState({}); // Store selected items
 
-//     return (
-//         <div className="p-6 max-w-5xl mx-auto">
-//             <button onClick={() => navigate(-1)} className="mb-4 flex items-center text-blue-600">
-//                 <ArrowLeft className="mr-2" /> Back
-//             </button>
-//             <h2 className="text-2xl font-bold mb-6 text-center">Choose a Menu Type</h2>
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                 {menus.map(menu => (
-//                     <div
-//                         key={menu.menu_type_id}
-//                         className="bg-white p-5 shadow-md rounded-xl hover:shadow-lg transition"
-//                     >
-//                         <h3 className="text-xl font-semibold">{menu.menu_type_name}</h3>
-//                         <p className="text-gray-600 mt-2">Price: Rs. {menu.price}</p>
-//                         <button
-//                             onClick={() => navigate(`/menu-categories/${menu.menu_type_id}`)}
-//                             className="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 flex justify-center items-center gap-2"
-//                         >
-//                             Select <ArrowRight size={18} />
-//                         </button>
-//                     </div>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// };
+  // Fetch menu views when component loads
+  useEffect(() => {
+    const fetchMenuViews = async () => {
+      try {
+        const data = await getAllMenuViews();
 
-// export default CustomerMenuTypeSelection;
+        // Filter menu types by selected menu list type (e.g., Wedding, Party)
+        const filtered = data.filter(
+          (view) =>
+            view.menu_list_type_id?.trim().toLowerCase() ===
+            menuListTypeId?.trim().toLowerCase()
+        );
+        setMenuViews(filtered);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load menu types.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenuViews();
+  }, [menuListTypeId]);
+
+  // Handle selection of items (radio or checkbox depending on item limit)
+  const handleSelect = (menuTypeId, categoryId, itemId, isSingleChoice) => {
+    setSelections((prev) => {
+      const updated = { ...prev };
+
+      // Initialize menu type selection if not present
+      if (!updated[menuTypeId]) updated[menuTypeId] = {};
+      if (!updated[menuTypeId][categoryId]) updated[menuTypeId][categoryId] = [];
+
+      if (isSingleChoice) {
+        // Radio button behavior
+        updated[menuTypeId][categoryId] = [itemId];
+      } else {
+        // Checkbox behavior
+        const current = updated[menuTypeId][categoryId];
+        if (current.includes(itemId)) {
+          updated[menuTypeId][categoryId] = current.filter((id) => id !== itemId);
+        } else {
+          updated[menuTypeId][categoryId] = [...current, itemId];
+        }
+      }
+
+      return updated;
+    });
+  };
+
+  // Show loading spinner
+  if (loading) {
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
+      </div>
+    );
+  }
+
+  // Show error message if fetch fails
+  if (error) {
+    return (
+      <div className="text-red-600 flex items-center gap-2 px-4 py-4">
+        <AlertCircle /> {error}
+      </div>
+    );
+  }
+
+  // Group menuViews by menu_type_id and organize by categories
+  const groupedMenu = () => {
+    const map = new Map();
+
+    menuViews.forEach((item) => {
+      if (!map.has(item.menu_type_id)) {
+        map.set(item.menu_type_id, {
+          menu_type_id: item.menu_type_id,
+          menu_type_name: item.menu_type_name,
+          price: item.price,
+          categories: {},
+        });
+      }
+
+      const menu = map.get(item.menu_type_id);
+
+      if (!menu.categories[item.category_id]) {
+        menu.categories[item.category_id] = {
+          category_id: item.category_id,
+          category_name: item.category_name,
+          item_limit: item.item_limit,
+          items: [],
+        };
+      }
+
+      // Push items to appropriate category
+      menu.categories[item.category_id].items.push({
+        item_id: item.item_id,
+        item_name: item.item_name,
+      });
+    });
+
+    return Array.from(map.values());
+  };
+
+  return (
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/images/menu8.jpg')" }} // Background image
+    >
+      <div className="min-h-screen bg-white bg-opacity-40 backdrop-blur-sm px-4 py-8">
+        <div className="p-6 max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold mb-6 text-center text-blue-900 drop-shadow-md">
+            Select a Menu You Like!
+          </h2>
+
+          {/* Display each grouped menu type */}
+          {groupedMenu().map((menu) => {
+            const isOpen = expandedMenuTypeId === menu.menu_type_id;
+
+            return (
+              <div key={menu.menu_type_id} className="border rounded mb-4 shadow bg-blue-100/60 backdrop-blur-sm">
+                {/* Expand/collapse menu type */}
+                <button
+                  onClick={() =>
+                    setExpandedMenuTypeId(isOpen ? null : menu.menu_type_id)
+                  }
+                  className="w-full flex justify-between items-center px-4 py-3 bg-blue-200 hover:bg-blue-300 text-lg font-semibold transition-colors"
+                >
+                  <span>
+                    {menu.menu_type_name} — Rs.{menu.price}
+                  </span>
+                  {isOpen ? <ChevronUp /> : <ChevronDown />}
+                </button>
+
+                {/* Show category selection when expanded */}
+                {isOpen && (
+                  <div className="px-6 py-4 bg-blue-50/80 rounded-b space-y-6 transition-all">
+                    {Object.values(menu.categories).map((category) => {
+                      const isSingleChoice = category.item_limit === 1;
+                      const selectedItems =
+                        selections[menu.menu_type_id]?.[category.category_id] || [];
+
+                      return (
+                        <div
+                          key={category.category_id}
+                          className="bg-blue-100 p-4 rounded shadow-sm"
+                        >
+                          <h3 className="text-lg font-semibold mb-2 text-blue-800">
+                            {category.category_name} (Choose {category.item_limit})
+                          </h3>
+
+                          {/* List items for selection */}
+                          <ul className="space-y-2">
+                            {category.items.map((item) => (
+                              <li
+                                key={item.item_id}
+                                className="flex items-center gap-3 p-2 bg-white rounded hover:bg-blue-100 transition"
+                              >
+                                <input
+                                  type={isSingleChoice ? "radio" : "checkbox"}
+                                  name={`${menu.menu_type_id}-${category.category_id}`}
+                                  checked={selectedItems.includes(item.item_id)}
+                                  onChange={() =>
+                                    handleSelect(
+                                      menu.menu_type_id,
+                                      category.category_id,
+                                      item.item_id,
+                                      isSingleChoice
+                                    )
+                                  }
+                                  className="accent-blue-600 w-5 h-5"
+                                />
+                                <label className="cursor-pointer text-blue-900 font-medium">
+                                  {item.item_name}
+                                </label>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CustomerMenuTypeSelection;

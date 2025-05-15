@@ -3,37 +3,56 @@ import { useNavigate } from 'react-router-dom';
 import { getItems, addItem, getItemById, deleteItem, updateItem } from '../../services/MenuService';
 
 function CreateItem() {
+  // State to hold current item input
   const [item, setItem] = useState({ item_id: '', item_name: '' });
+
+  // State to hold the list of all items
   const [items, setItems] = useState([]);
+
+  // Button name toggles between "Add Item" and "Update"
   const [btnname, setBtnname] = useState('Add Item');
+
   const navigate = useNavigate();
 
+  // Fetch items and generate next item ID on component mount
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const fetchedItems = await getItems();
         setItems(fetchedItems);
-        const nextId = fetchedItems.length ? `IT${(fetchedItems.length + 1).toString().padStart(6, '0')}` : 'IT000001';
+
+        // Generate next item ID (e.g., IT000002)
+        const nextId = fetchedItems.length
+          ? `IT${(fetchedItems.length + 1).toString().padStart(6, '0')}`
+          : 'IT000001';
+
         setItem((prevItem) => ({ ...prevItem, item_id: nextId }));
       } catch (error) {
         console.error('Error fetching items:', error);
       }
     };
+
     fetchItems();
   }, []);
 
+  // Check if item name already exists (case-insensitive)
   const handleValidation = () => {
-    return items.some((existingItem) => existingItem.item_name.toLowerCase() === item.item_name.toLowerCase());
+    return items.some(
+      (existingItem) => existingItem.item_name.toLowerCase() === item.item_name.toLowerCase()
+    );
   };
 
+  // Handle add or update item
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    // Check if item name is not empty or only spaces
     if (!item.item_name.trim()) {
       alert('Item name cannot be empty or just spaces!');
       return;
     }
-    
+
+    // Validate uniqueness
     if (handleValidation()) {
       alert('This item name already exists! Please enter a unique name.');
       return;
@@ -41,13 +60,17 @@ function CreateItem() {
 
     try {
       if (btnname === 'Add Item') {
+        // Call service to add new item
         await addItem(item);
         alert('Item added successfully!');
       } else {
+        // Call service to update existing item
         await updateItem(item.item_id, item.item_name);
         alert('Item updated successfully!');
-        setBtnname('Add Item');
+        setBtnname('Add Item'); // Reset button label
       }
+
+      // Clear form and refresh items list
       setItem({ item_name: '' });
       const updatedItems = await getItems();
       setItems(updatedItems);
@@ -57,11 +80,13 @@ function CreateItem() {
     }
   };
 
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setItem((prevItem) => ({ ...prevItem, [name]: value }));
   };
 
+  // Populate form fields with selected item data for editing
   const handleEdit = async (id) => {
     try {
       const itemById = await getItemById(id);
@@ -69,16 +94,20 @@ function CreateItem() {
         alert('Item ID not found.');
         return;
       }
+
+      // Set the item to be edited
       setItem({ item_id: id, item_name: itemById.item_name });
-      setBtnname('Update');
+      setBtnname('Update'); // Change button label to Update
     } catch (error) {
       console.error('Error fetching item by ID:', error);
     }
   };
 
+  // Delete an item after confirmation
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
-    if (!isConfirmed) return; 
+    if (!isConfirmed) return;
+
     try {
       const deleteResponse = await deleteItem(id);
       if (deleteResponse) {
@@ -93,6 +122,7 @@ function CreateItem() {
 
   return (
     <div className="flex justify-between items-start mt-10 px-10 gap-2">
+      {/* Left side: Form to add/update item */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Create Item</h2>
         <form onSubmit={handleSubmit}>
@@ -114,6 +144,7 @@ function CreateItem() {
         </form>
       </div>
 
+      {/* Right side: Table displaying existing items */}
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Items</h2>
         <table className="min-w-full border border-gray-300">
@@ -130,12 +161,18 @@ function CreateItem() {
                 <td className="border px-4 py-2 text-sm">{it.item_id}</td>
                 <td className="border px-4 py-2 text-sm">{it.item_name}</td>
                 <td>
-                  <button className="border px-3 py-1 bg-blue-500 text-sm" onClick={() => handleEdit(it.item_id)}>
+                  <button
+                    className="border px-3 py-1 bg-blue-500 text-sm"
+                    onClick={() => handleEdit(it.item_id)}
+                  >
                     Edit
                   </button>
                 </td>
                 <td>
-                  <button className="border px-3 py-1 bg-red-500 text-sm" onClick={() => handleDelete(it.item_id)}>
+                  <button
+                    className="border px-3 py-1 bg-red-500 text-sm"
+                    onClick={() => handleDelete(it.item_id)}
+                  >
                     Delete
                   </button>
                 </td>

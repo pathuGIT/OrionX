@@ -7,6 +7,7 @@ import CreateCategory from '../../pages/superAdmin/CreateCategories';
 import CreateItem from '../../pages/superAdmin/CreateItem';
 import CreateCategoryMenuType from '../../pages/superAdmin/CreateCategoryMenuType';
 import MenuOverview from '../../pages/superAdmin/MenuOverview';
+import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategoryMenuType';
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -49,6 +50,9 @@ const MenuManagementSAN = ({ setRenderContent }) => {
       case 'MenuOverview':
         setRenderContent(() => () => <MenuOverview />);
         break;
+      case 'CreateItemCategoryMenuType':
+        setRenderContent(() => () => <CreateItemCategoryMenuType />);
+        break;
       default:
         setRenderContent(() => () => <p>Page not found</p>);
     }
@@ -90,6 +94,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               <li><a href="#" onClick={() => handleRenderContent('createCategory')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Create Categories</a></li>
               <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Create Items</a></li>
               <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Category Menu Type Mapping</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateItemCategoryMenuType')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Item,Category & MenuType Map</a></li>
             </ul>
           </li>
 

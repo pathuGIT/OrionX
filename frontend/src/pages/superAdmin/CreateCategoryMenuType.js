@@ -1,3 +1,4 @@
+// Import necessary React hooks and service functions
 import React, { useState, useEffect } from 'react';
 import {
   getCategoryMenuTypes,
@@ -10,18 +11,23 @@ import {
 } from '../../services/MenuService';
 
 function CreateCategoryMenuType() {
+  // Form state
   const [categoryMenu, setCategoryMenu] = useState({
     menu_type_id: '',
     category_id: '',
     item_limit: '',
   });
 
-  const [categoryMenuTypes, setCategoryMenuTypes] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [menuTypes, setMenuTypes] = useState([]);
-  const [btnName, setBtnName] = useState('Add Category Menu Type');
-  const [selectedId, setSelectedId] = useState(null);
+  // List states
+  const [categoryMenuTypes, setCategoryMenuTypes] = useState([]); // stores list of all category-menu-type mappings
+  const [categories, setCategories] = useState([]); // stores list of available categories
+  const [menuTypes, setMenuTypes] = useState([]); // stores list of available menu types
 
+  // UI control states
+  const [btnName, setBtnName] = useState('Add Category Menu Type'); // button text for add/update
+  const [selectedId, setSelectedId] = useState(null); // stores the selected ID for editing
+
+  // Fetch all required data when the component loads
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,9 +45,11 @@ function CreateCategoryMenuType() {
     fetchData();
   }, []);
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Only allow positive integers for item_limit
     if (name === 'item_limit') {
       if (!/^\d*$/.test(value)) return;
       if (value !== '' && parseInt(value, 10) <= 0) return;
@@ -50,6 +58,7 @@ function CreateCategoryMenuType() {
     setCategoryMenu((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle form submission for both add and update
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -63,6 +72,7 @@ function CreateCategoryMenuType() {
         setSelectedId(null);
       }
 
+      // Clear the form and refresh the list
       setCategoryMenu({ menu_type_id: '', category_id: '', item_limit: '' });
       const updated = await getCategoryMenuTypes();
       setCategoryMenuTypes(updated);
@@ -72,6 +82,7 @@ function CreateCategoryMenuType() {
     }
   };
 
+  // Populate the form for editing
   const handleEdit = async (menu_type_id, category_id) => {
     try {
       const result = await getCategoryMenuTypeById(menu_type_id, category_id);
@@ -87,9 +98,10 @@ function CreateCategoryMenuType() {
     }
   };
 
+  // Delete a category-menu-type record
   const handleDelete = async (menu_type_id, category_id) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
-    if (!isConfirmed) return; 
+    if (!isConfirmed) return;
     try {
       await deleteCategoryMenuType(menu_type_id, category_id);
       alert('Deleted successfully!');
@@ -106,6 +118,7 @@ function CreateCategoryMenuType() {
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-sm font-semibold text-black mb-5">Create Category Menu Type</h2>
         <form onSubmit={handleSubmit}>
+          {/* Menu Type Dropdown */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Menu Type</label>
             <select
@@ -124,6 +137,7 @@ function CreateCategoryMenuType() {
             </select>
           </div>
 
+          {/* Category Dropdown */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Category</label>
             <select
@@ -142,6 +156,7 @@ function CreateCategoryMenuType() {
             </select>
           </div>
 
+          {/* Item Limit Field */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900">Item Limit</label>
             <input
@@ -156,6 +171,7 @@ function CreateCategoryMenuType() {
             />
           </div>
 
+          {/* Submit Button */}
           <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">
             {btnName}
           </button>

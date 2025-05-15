@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import ProfileNavbar from '../components/ProfileNavbar';
 import ProfileSideNav from '../components/ProfileSideNav';
 import CustomerBookings from '../components/CustomerBooking';
-import CustomerMenuPlanner from '../components/CustomerMenuPlanner';
+
 
 const Profile = () => {
   const [activePage, setActivePage] = useState('dashboard');
@@ -34,8 +34,7 @@ const Profile = () => {
         return <CustomerBookings />;
       case 'my-events':
         return <div className="bg-white p-6 rounded-lg shadow"><h2 className="text-2xl font-bold mb-4">My Events</h2></div>;
-      case 'plan-menu':
-        return <CustomerMenuPlanner />;
+
       case 'my-menu':
         return //add your frontend component here sadali;
 
