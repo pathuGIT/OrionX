@@ -77,6 +77,8 @@ function CreateItem() {
   };
 
   const handleDelete = async (id) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
+    if (!isConfirmed) return; 
     try {
       const deleteResponse = await deleteItem(id);
       if (deleteResponse) {

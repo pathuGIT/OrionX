@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Logout } from '../../components/Logout'
-import GetMenus from '../../pages/superAdmin/GetMenus';
+// import GetMenus from '../../pages/superAdmin/GetMenus';
 import CreateMenuListType from '../../pages/superAdmin/CreateMenuListType';
 import CreateMenuType from '../../pages/superAdmin/CreateMenuType';
 import CreateCategory from '../../pages/superAdmin/CreateCategories';

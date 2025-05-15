@@ -10,6 +10,9 @@ import ChairArrangement from './ChairArrangement';
 import ArrangementDetailsPage from './ArrangementDetailsPage';
 import PlanBarForm from './PlanBarForm';
 
+import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+
+// import ProfileNavbar from '../components/ProfileNavbar';
 
 const EventHome = () => {
   const { bookingId, customerID } = useParams();
@@ -44,6 +47,7 @@ const EventHome = () => {
         return <DisplayEvents customerID={customerID} />;
       case 'Select-Services':
         return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
+        return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
       case 'view-Vendors':
         return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
       case 'Select-Tables':
@@ -58,6 +62,9 @@ const EventHome = () => {
         return ;
       case 'see-bar-arrangements':
         return ;
+        return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
+      case 'plan-menulist':
+        return <CustomerMenuListSelection/>;
       case 'dashboard':
       default:
         return (
