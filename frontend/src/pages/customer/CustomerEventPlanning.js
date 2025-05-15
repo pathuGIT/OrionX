@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import WeddingForm from "./WeddingForm.js";
-import EventForm from "../../components/CustomEventForm.js";
+import EventForm from "../../pages/customer/CustomEventForm.js";
 import { useParams } from "react-router-dom";
 import { decryptBookingId } from "../../utills/encryptionUtils.js";
 

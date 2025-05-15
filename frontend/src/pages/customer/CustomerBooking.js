@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/Authcontext";
-import { getCustomerBookings } from "../services/EventService";
+import { AuthContext } from "../../context/Authcontext";
+import { getCustomerBookings } from "../../services/EventService";
 import { useNavigate } from "react-router-dom";
-import { encryptBookingId, encryptCustId } from "../utills/encryptionUtils";
+import { encryptBookingId, encryptCustId } from "../../utills/encryptionUtils";
 import { Calendar, User, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 const CustomerBookings = () => {
