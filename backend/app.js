@@ -46,7 +46,7 @@ app.use('/api/wedding', weddingRoutes);
 app.use('/api/customer', cusBookingRoutes);
 app.use('/api/displayEvents', dispayEventsRoutes);
 app.use('/api/VendorServices', serviceVendorRoutes);
-app.use('/api/Evenapi/tService', EventServiceRoutes);
+app.use('/api/EventService', EventServiceRoutes);
 app.use('/api/CustomerService', saveSelectedServiceRoutes);
 app.use('/api/tableArrangement', tableArrangementRoutes);
 app.use('/api/reservation', reservationRoutes);
