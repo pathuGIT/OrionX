@@ -49,6 +49,7 @@ export const getEventServices = async () => {
     }
 };
 
+
 export const saveSelectedServices = async (customerId, bookingId, services) => {
     try {
         const response = await api.post('/CustomerService/saveServices', {

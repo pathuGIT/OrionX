@@ -50,18 +50,18 @@ dispayEventsRoutes.get('/:customerID',customer,getPlannedEvents);
 serviceVendorRoutes.get('/getServiceVendors/:customerId/:bookingId',customer, getVendorsForCustomerBooking);
 EventServiceRoutes.get('/getEventService',customer, getEventServices);
 saveSelectedServiceRoutes.post('/saveServices',customer, saveSelectedServices);
-tableArrangementRoutes.post('/createTableArrangement/:bookingid', createArrangement);
-reservationRoutes.post('/createReservation/:bookingid', createReservation);
-tableArrangementRoutes.get('/getTableArrangement/:bookingid', getArrangementsByBooking);
-planBarRoutes.post('/planBar/:bookingid', createPlanBarEvent );//did
-planBarRoutes.get('/getPlanBar/:bookingid', getPlanBarEvent);
-planBarRoutes.delete('/deletePlanBar/:bookingid', deletePlanBarEvent );
-planBarRoutes.put('/updatePlanBar/:bookingid', updatePlanBarEvent );
-planBiteRoutes.get('/bite-menu-items', getBiteMenuItems);
-planBiteRoutes.post('/planBite/:bookingid', createBiteMenu);
-planBiteRoutes.get('/getPlanBite/:bookingid', getBiteMenu);
-planBiteRoutes.put('/updatePlanBite/:bookingid', updateBiteMenu);
-planBiteRoutes.delete('/deletePlanBite/:bookingid', deleteBiteMenu);
+tableArrangementRoutes.post('/createTableArrangement/:bookingid',customer, createArrangement);
+reservationRoutes.post('/createReservation/:bookingid',customer, createReservation);
+tableArrangementRoutes.get('/getTableArrangement/:bookingid',customer, getArrangementsByBooking);
+planBarRoutes.post('/planBar/:bookingid',customer, createPlanBarEvent );//did
+planBarRoutes.get('/getPlanBar/:bookingid',customer, getPlanBarEvent);
+planBarRoutes.delete('/deletePlanBar/:bookingid',customer, deletePlanBarEvent );
+planBarRoutes.put('/updatePlanBar/:bookingid',customer, updatePlanBarEvent );
+planBiteRoutes.get('/bite-menu-items',customer, getBiteMenuItems);
+planBiteRoutes.post('/planBite/:bookingid',customer, createBiteMenu);
+planBiteRoutes.get('/getPlanBite/:bookingid',customer, getBiteMenu);
+planBiteRoutes.put('/updatePlanBite/:bookingid',customer, updateBiteMenu);
+planBiteRoutes.delete('/deletePlanBite/:bookingid',customer, deleteBiteMenu);
 
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes, planBiteRoutes};
