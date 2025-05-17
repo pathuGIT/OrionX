@@ -200,3 +200,75 @@ export const deleteBiteMenu = async (bookingId) => {
         throw new Error(error.response?.data?.error || 'Failed to delete bite menu');
     }
 };
+
+
+
+
+export const BarService = {
+
+    // Liquor Item Services
+    addLiquorItem: async (bookingId, data) => {
+        try {
+            const response = await api.post(`/BarArrange/liquor/${bookingId}`, data);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to add liquor item');
+        }
+    },
+
+    updateLiquorItem: async (bookingId, itemId, data) => {
+        try {
+            const response = await api.put(`/BarArrange/liquor/${bookingId}/${itemId}`, data);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to update liquor item');
+        }
+    },
+
+    deleteLiquorByName: async (bookingId, itemId) => {
+        try {
+            const response = await api.delete(`/BarArrange/liquor/${bookingId}/${itemId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to delete liquor items');
+        }
+    },
+
+    deleteSoftDrinkByName: async (bookingId, itemId) => {
+        try {
+            const response = await api.delete(`/BarArrange/soft-drinks/${bookingId}/${itemId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to delete soft drink items');
+        }
+    },
+
+    // Soft Drink Item Services
+    addSoftDrinkItem: async (bookingId, data) => {
+        try {
+            const response = await api.post(`/BarArrange/soft-drinks/${bookingId}`, data);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to add soft drink item');
+        }
+    },
+
+    updateSoftDrinkItem: async (bookingId, itemId, data) => {
+        try {
+            const response = await api.put(`/BarArrange/soft-drinks/${bookingId}/${itemId}`, data);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to update soft drink item');
+        }
+    },
+
+    // General Bar Services
+    getBarDetails: async (bookingId) => {
+        try {
+            const response = await api.get(`/BarArrange/barDetails/${bookingId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.error || 'Failed to fetch bar details');
+        }
+    }
+};
