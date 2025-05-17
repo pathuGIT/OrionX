@@ -8,6 +8,7 @@ const BookingsAnalyze = () => {
     const [status, setStatus] = useState('all');
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [serchBy, setSerchBy] = useState("");
 
     useEffect(() => {
         fetchBookings();
@@ -27,7 +28,7 @@ const BookingsAnalyze = () => {
 
     return (
         <div className="p-6">
-            <StatusFilter currentStatus={status} onChange={setStatus} />
+            <StatusFilter currentStatus={status} onChange={setStatus} onSearch={setSerchBy} serchBy={serchBy}/>
             <BookingTable bookings={bookings} onRowClick={handleRowClick} />
             {selectedBooking && (
                 <BookingDetailsView 
