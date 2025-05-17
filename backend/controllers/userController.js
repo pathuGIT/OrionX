@@ -75,7 +75,7 @@ export const addCustomer = async (req, res) => {
         const user = await getCustomerByEmailModel(email);
         await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
         
-        console.log(`User ID sent toooooooo: ${customer}`);
+        console.log(`User ID sent to: ${customer}`);
         res.status(201).json({ message: `User registered successfully with this '${email}' email.`, cus_id: customer });
 
     } catch (error) {
