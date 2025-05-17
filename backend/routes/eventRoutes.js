@@ -22,6 +22,7 @@ import {
     updateBiteMenu,
     deleteBiteMenu
 } from '../controllers/planBiteController.js';
+import { barController } from '../controllers/barController.js';
 
 
 
@@ -39,6 +40,7 @@ const tableArrangementRoutes = express.Router();
 const reservationRoutes = express.Router();
 const planBarRoutes = express.Router();
 const planBiteRoutes = express.Router();
+const BarArrangeRoutes = express.Router();
 
 
 
@@ -62,6 +64,16 @@ planBiteRoutes.post('/planBite/:bookingid',customer, createBiteMenu);
 planBiteRoutes.get('/getPlanBite/:bookingid', getBiteMenu);
 planBiteRoutes.put('/updatePlanBite/:bookingid',customer, updateBiteMenu);
 planBiteRoutes.delete('/deletePlanBite/:bookingid',customer, deleteBiteMenu);
+BarArrangeRoutes.post('/liquor/:booking_id', barController.addLiquorItem);
+BarArrangeRoutes.post('/soft-drinks/:booking_id', barController.addSoftDrinkItem);
+BarArrangeRoutes.get('/barDetails/:booking_id', barController.getBarDetails);
+BarArrangeRoutes.put('/liquor/:booking_id/:item_id', barController.updateLiquorItem);
+BarArrangeRoutes.delete('/liquor/:booking_id/:item_id', barController.deleteLiquorItem);
+BarArrangeRoutes.put('/soft-drinks/:booking_id/:item_id', barController.updateSoftDrinkItem);
+BarArrangeRoutes.delete('/soft-drinks/:booking_id/:item_id', barController.deleteSoftDrinkItem);
+// BarArrangeRoutes.put('/bar/usage', barController.updateUsage);
 
 
-export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes, planBiteRoutes};
+
+
+export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes, planBiteRoutes,BarArrangeRoutes};

@@ -257,6 +257,38 @@ CREATE TABLE Event_Cordinator (
     FOREIGN KEY (Cordinator_Name) REFERENCES Cordinator(Cordinator_Name) ON DELETE CASCADE
 );
 
+alter table bar
+add column TotalLiquorPrice DECIMAL(10,2);
+
+
+alter table bar
+add column TotalSoftDrinkPrice DECIMAL(10,2);
+
+
+CREATE TABLE  liquor_items (
+    Liquor_ID VARCHAR(10) AUTO_INCREMENT PRIMARY KEY,
+    item_name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    usages VARCHAR(30), 
+    BarRequirementID VARCHAR(20) NOT NULL,
+    LiquorPrice DECIMAL(10,2),
+    FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID) ON DELETE CASCADE
+);
+
+
+-- Create Soft Drink Items Table
+CREATE TABLE soft_drink_items (
+    Soft_Drink_id VARCHAR(10) PRIMARY KEY,
+    Soft_Drink_name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    usages VARCHAR(30),
+    BarRequirementID VARCHAR(20) NOT NULL,
+    DrinkPrice DECIMAL(10,2),
+    FOREIGN KEY (BarRequirementID) 
+        REFERENCES Bar(BarRequirementID)
+        ON DELETE CASCADE
+);
+
 -- Table: contract
 CREATE TABLE contract (
   contract_id VARCHAR(20) PRIMARY KEY,

@@ -12,6 +12,7 @@ import PlanBarForm from './PlanBarForm';
 import PlanBiteForm from './PlanBiteForm';
 
 import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+import BarManagement from './BarManagement';
 
 // import ProfileNavbar from '../components/ProfileNavbar';
 
@@ -60,8 +61,8 @@ const EventHome = () => {
         return <PlanBarForm bookingId={bookingId} />;
       case 'setect-bites':
         return <PlanBiteForm bookingId={bookingId} />;
-      case 'see-bar-arrangements':
-        return ;
+      case 'select-bar-arrangements':
+        return <BarManagement bookingId={bookingId} />;
       case 'plan-menulist':
         return <CustomerMenuListSelection/>;
       case 'dashboard':
