@@ -11,27 +11,35 @@ const PlanBiteForm = () => {
     const [existingPlan, setExistingPlan] = useState(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
     const decryptedBookingId = decryptBookingId(encryptedBookingId);
 
     useEffect(() => {
         const initializeData = async () => {
             try {
-                const items = await getBiteMenuItems();
-                setMenuItems(items || []);
-                
-                const existing = await getBiteMenu(decryptedBookingId);
-                if (existing?.biteItems?.length > 0) {
-                    setExistingPlan(existing);
+                setLoading(true);
+                setError('');
+                setSuccess('');
+
+                // Load menu items
+                const menuResponse = await getBiteMenuItems();
+                setMenuItems(menuResponse || []);
+
+                // Load existing plan
+                const planResponse = await getBiteMenu(decryptedBookingId);
+                if (planResponse?.biteItems?.length > 0) {
+                    setExistingPlan(planResponse);
                     const initialSelected = {};
-                    existing.biteItems.forEach(item => {
+                    planResponse.biteItems.forEach(item => {
                         initialSelected[item.menu_type_id] = item.Quantity;
                     });
                     setSelectedItems(initialSelected);
                 }
             } catch (error) {
+                setError(error.message);
                 console.error('Initialization error:', error);
-                setMenuItems([]);
-                setExistingPlan(null);
+            } finally {
+                setLoading(false);
             }
         };
         initializeData();
@@ -63,42 +71,50 @@ const PlanBiteForm = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
-        const biteItems = Object.entries(selectedItems)
-            .filter(([_, qty]) => qty > 0)
-            .map(([menu_type_id, quantity]) => ({
-                menu_type_id,
-                quantity: Number(quantity)
-            }));
-
-        if (biteItems.length === 0) {
-            setError('Please select at least one menu item');
-            return;
-        }
+        setLoading(true);
 
         try {
-            let result;
-            if (existingPlan) {
-                result = await UpdateBiteMenu(decryptedBookingId, biteItems);
-            } else {
-                result = await PlanBiteMenu(decryptedBookingId, biteItems);
+            const biteItems = Object.entries(selectedItems)
+                .filter(([_, qty]) => qty > 0)
+                .map(([menu_type_id, quantity]) => ({
+                    menu_type_id,
+                    Quantity: Number(quantity)
+                }));
+
+            if (biteItems.length === 0) {
+                throw new Error('Please select at least one menu item');
             }
+
+            // Save or update plan
+            if (existingPlan) {
+                await UpdateBiteMenu(decryptedBookingId, biteItems);
+            } else {
+                await PlanBiteMenu(decryptedBookingId, biteItems);
+            }
+
+            // Refresh data
+            const updatedPlan = await getBiteMenu(decryptedBookingId);
+            setExistingPlan(updatedPlan);
             setSuccess('Plan saved successfully!');
-            setExistingPlan(result);
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete this bite plan?')) {
             try {
+                setLoading(true);
                 await deleteBiteMenu(decryptedBookingId);
                 setSuccess('Bite plan deleted successfully!');
                 setExistingPlan(null);
                 setSelectedItems({});
             } catch (error) {
                 setError(error.message);
+            } finally {
+                setLoading(false);
             }
         }
     };
@@ -119,7 +135,7 @@ const PlanBiteForm = () => {
                     {error}
                 </div>
             )}
-            
+
             {success && (
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
                     {success}
@@ -135,7 +151,7 @@ const PlanBiteForm = () => {
                                     {item.menu_type_name}
                                 </h3>
                                 <div className="text-orange-600 font-medium">
-                                    {formatCurrency(item.price)}
+                                    {formatCurrency(item.price || 0)}
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -143,6 +159,7 @@ const PlanBiteForm = () => {
                                     type="button"
                                     onClick={() => handleQuantityChange(item.menu_type_id, (selectedItems[item.menu_type_id] || 0) - 1)}
                                     className="px-3 py-1 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200"
+                                    disabled={loading}
                                 >
                                     -
                                 </button>
@@ -152,11 +169,13 @@ const PlanBiteForm = () => {
                                     onChange={(e) => handleQuantityChange(item.menu_type_id, parseInt(e.target.value) || 0)}
                                     className="w-20 text-center border-2 border-orange-100 rounded-lg py-1"
                                     min="0"
+                                    disabled={loading}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => handleQuantityChange(item.menu_type_id, (selectedItems[item.menu_type_id] || 0) + 1)}
                                     className="px-3 py-1 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200"
+                                    disabled={loading}
                                 >
                                     +
                                 </button>
@@ -173,9 +192,14 @@ const PlanBiteForm = () => {
                         <div className="flex gap-4">
                             <button
                                 type="submit"
-                                className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-xl"
+                                disabled={loading}
+                                className={`flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-xl ${
+                                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                             >
-                                {existingPlan ? (
+                                {loading ? (
+                                    <span>Processing...</span>
+                                ) : existingPlan ? (
                                     <>
                                         <PencilSquareIcon className="w-5 h-5" />
                                         Update
@@ -192,7 +216,10 @@ const PlanBiteForm = () => {
                                 <button
                                     type="button"
                                     onClick={handleDelete}
-                                    className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-6 rounded-xl"
+                                    disabled={loading}
+                                    className={`flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-6 rounded-xl ${
+                                        loading ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
                                 >
                                     <TrashIcon className="w-5 h-5" />
                                     Delete
@@ -203,35 +230,73 @@ const PlanBiteForm = () => {
                 </div>
             </form>
 
-            {existingPlan && (
-                <div className="mt-10 p-6 bg-white rounded-xl border border-orange-100 shadow-sm">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <ShoppingCartIcon className="w-6 h-6 text-orange-500" />
-                        Current Selection
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                        {existingPlan.biteItems.map(item => (
-                            <div key={item.Bite_ID} className="p-4 bg-orange-50 rounded-lg flex justify-between items-center">
-                                <div>
-                                    <h4 className="font-medium text-gray-800">{item.menu_type_name}</h4>
-                                    <p className="text-sm text-gray-600">Quantity: {item.Quantity}</p>
-                                </div>
-                                <div className="text-orange-600 font-medium">
-                                    {formatCurrency(item.Quantity * item.price)}
-                                </div>
-                            </div>
-                        ))}
-                        <div className="mt-4 pt-4 border-t border-orange-100">
-                            <div className="flex justify-between items-center text-xl font-bold text-orange-800">
-                                <span>Grand Total:</span>
-                                <span>{formatCurrency(existingPlan.totalPrice)}</span>
-                            </div>
+            {existingPlan?.biteItems?.length > 0 && (
+    <div className="mt-10 p-6 bg-white rounded-xl border border-orange-100 shadow-sm">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <ShoppingCartIcon className="w-6 h-6 text-orange-500" />
+            Bite Menu Details
+        </h3>
+        <div className="grid grid-cols-1 gap-4">
+            {existingPlan.biteItems.map(item => (
+                <div key={item.Bite_ID} className="p-4 bg-orange-50 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <p className="text-sm font-medium text-gray-600">Bite ID:</p>
+                            <p className="text-gray-800">{item.Bite_ID}</p>
                         </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-600">Menu Type:</p>
+                            <p className="text-gray-800">{item.menu_type_name} ({item.menu_type_id})</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-600">Quantity:</p>
+                            <p className="text-gray-800">{item.Quantity}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-600">Unit Price:</p>
+                            <p className="text-orange-600 font-medium">
+                                {formatCurrency(item.price || 0)}
+                            </p>
+                        </div>
+                        {item.Type && (
+                            <div>
+                                <p className="text-sm font-medium text-gray-600">Type:</p>
+                                <p className="text-gray-800">{item.Type}</p>
+                            </div>
+                        )}
+                        <div>
+                            <p className="text-sm font-medium text-gray-600">Bar Requirement ID:</p>
+                            <p className="text-gray-800">{item.BarRequirementID}</p>
+                        </div>
+                        {item.custom_description && (
+                            <div>
+                                <p className="text-sm font-medium text-gray-600">Custom Description:</p>
+                                <p className="text-gray-800">{item.custom_description}</p>
+                            </div>
+                        )}
+                    </div>
+                    <div className="pt-3 border-t border-orange-100">
+                        <p className="text-sm font-medium text-gray-600">Item Total:</p>
+                        <p className="text-orange-600 font-medium text-lg">
+                            {formatCurrency((item.Quantity || 0) * (item.price || 0))}
+                        </p>
                     </div>
                 </div>
-            )}
+            ))}
+            <div className="mt-6 pt-4 border-t border-orange-100">
+                <div className="flex justify-between items-center text-xl font-bold text-orange-800">
+                    <span>Grand Total:</span>
+                    <span>{formatCurrency(existingPlan.totalPrice || 0)}</span>
+                </div>
+                <div className="mt-2 text-sm text-gray-600">
+                    Bar Requirement ID: {existingPlan.biteItems[0]?.BarRequirementID}
+                </div>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
-};
+}
 
 export default PlanBiteForm;

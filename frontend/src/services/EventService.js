@@ -155,10 +155,7 @@ export const getPlanBar = async (bookingId) => {
 export const getBiteMenuItems = async () => {
     try {
         const response = await api.get('/Bite/bite-menu-items');
-        return response.data.data.map(item => ({
-            ...item,
-            price: Number(item.price) // Ensure number conversion
-        }));
+        return response.data.data || []; // Directly return data array
     } catch (error) {
         throw new Error(error.response?.data?.error || 'Failed to fetch menu items');
     }
@@ -166,10 +163,8 @@ export const getBiteMenuItems = async () => {
 
 export const PlanBiteMenu = async (bookingId, data) => {
     try {
-        const response = await api.post(`/Bite/planBite/${bookingId}`, {
-            biteItems: data // Ensure proper payload structure
-        });
-        return response.data;
+        const response = await api.post(`/Bite/planBite/${bookingId}`, { biteItems: data });
+        return response.data.data; // Return direct data
     } catch (error) {
         const message = error.response?.data?.error || 'Failed to save bite menu';
         throw new Error(message);
@@ -179,10 +174,7 @@ export const PlanBiteMenu = async (bookingId, data) => {
 export const getBiteMenu = async (bookingId) => {
     try {
         const response = await api.get(`/Bite/getPlanBite/${bookingId}`);
-        return {
-            biteItems: response.data?.data?.biteItems || [],
-            totalPrice: response.data?.data?.totalPrice || 0
-        };
+        return response.data.data || { biteItems: [], totalPrice: 0 }; // Consistent structure
     } catch (error) {
         return { biteItems: [], totalPrice: 0 };
     }
@@ -190,8 +182,8 @@ export const getBiteMenu = async (bookingId) => {
 
 export const UpdateBiteMenu = async (bookingId, data) => {
     try {
-        const response = await api.put(`/Bite/updatePlanBite/${bookingId}`, data);
-        return response.data;
+        const response = await api.put(`/Bite/updatePlanBite/${bookingId}`, { biteItems: data });
+        return response.data.data;
     } catch (error) {
         throw new Error(error.response?.data?.error || 'Failed to update bite menu');
     }
@@ -199,8 +191,8 @@ export const UpdateBiteMenu = async (bookingId, data) => {
 
 export const deleteBiteMenu = async (bookingId) => {
     try {
-        const response = await api.delete(`/Bite/deletePlanBite/${bookingId}`);
-        return response.data;
+        await api.delete(`/Bite/deletePlanBite/${bookingId}`);
+        return true;
     } catch (error) {
         throw new Error(error.response?.data?.error || 'Failed to delete bite menu');
     }

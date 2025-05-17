@@ -59,7 +59,7 @@ planBarRoutes.delete('/deletePlanBar/:bookingid',customer, deletePlanBarEvent );
 planBarRoutes.put('/updatePlanBar/:bookingid',customer, updatePlanBarEvent );
 planBiteRoutes.get('/bite-menu-items',customer, getBiteMenuItems);
 planBiteRoutes.post('/planBite/:bookingid',customer, createBiteMenu);
-planBiteRoutes.get('/getPlanBite/:bookingid',customer, getBiteMenu);
+planBiteRoutes.get('/getPlanBite/:bookingid', getBiteMenu);
 planBiteRoutes.put('/updatePlanBite/:bookingid',customer, updateBiteMenu);
 planBiteRoutes.delete('/deletePlanBite/:bookingid',customer, deleteBiteMenu);
 

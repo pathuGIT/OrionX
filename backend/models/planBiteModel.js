@@ -68,9 +68,12 @@ class PlanBite {
                     `INSERT INTO Bite 
                      (Bite_ID, Quantity, BarRequirementID, menu_type_id)
                      VALUES (?, ?, ?, ?)`,
-                    [Bite_ID, item.quantity, BarRequirementID, item.menu_type_id]
+                    [Bite_ID, item.Quantity, BarRequirementID, item.menu_type_id]
+                    
                 );
+                console.log("Quantity", item.Quantity);
             }
+            
 
             // Calculate total price
             const [totalResult] = await connection.query(
@@ -104,45 +107,49 @@ class PlanBite {
 
     // Fetch stored selections and total price for a booking
     static async getBiteMenu(booking_id) {
-        const connection = await db.getConnection();
-        try {
-            const [event] = await connection.query(
-                `SELECT BarRequirementID FROM Event WHERE booking_id = ?`,
-                [booking_id]
-            );
-            if (!event.length || !event[0].BarRequirementID) {
-                return { biteItems: [], totalPrice: 0 };
-            }
-            const BarRequirementID = event[0].BarRequirementID;
+    const connection = await db.getConnection();
+    try {
+        const [event] = await connection.query(
+            `SELECT BarRequirementID FROM Event WHERE booking_id = ?`,
+            [booking_id]
+        );
 
-            // Retrieve stored bite items
-            const [biteItems] = await connection.query(
-                `SELECT b.*, mt.menu_type_name, mt.price 
-                 FROM Bite b
-                 JOIN menu_type mt ON b.menu_type_id = mt.menu_type_id
-                 WHERE b.BarRequirementID = ?`,
-                [BarRequirementID]
-            );
-
-            // Calculate total price
-            const [totalResult] = await connection.query(
-                `SELECT SUM(b.Quantity * mt.price) AS total
-                 FROM Bite b
-                 JOIN menu_type mt ON b.menu_type_id = mt.menu_type_id
-                 WHERE b.BarRequirementID = ?`,
-                [BarRequirementID]
-            );
-            const totalPrice = totalResult[0].total || 0;
-
-            connection.release();
-            return { biteItems, totalPrice };
-
-        } catch (error) {
-            connection.release();
-            console.error("Database Error (getBiteMenu):", error.message || error);
-            throw new Error(error.message || "Failed to fetch Bite menu");
+        if (!event.length || !event[0].BarRequirementID) {
+            return { biteItems: [], totalPrice: 0 };
         }
+        const BarRequirementID = event[0].BarRequirementID;
+
+        const [biteItems] = await connection.query(
+            `SELECT b.Bite_ID, b.Quantity, mt.menu_type_id, mt.menu_type_name, mt.price 
+             FROM Bite b
+             JOIN menu_type mt ON b.menu_type_id = mt.menu_type_id
+             WHERE b.BarRequirementID = ?`,
+            [BarRequirementID]
+        );
+
+        const [totalResult] = await connection.query(
+            `SELECT SUM(b.Quantity * mt.price) AS total
+             FROM Bite b
+             JOIN menu_type mt ON b.menu_type_id = mt.menu_type_id
+             WHERE b.BarRequirementID = ?`,
+            [BarRequirementID]
+        );
+
+        connection.release();
+        return {
+            biteItems: biteItems.map(item => ({
+                ...item,
+                Quantity: Number(item.Quantity),
+                price: Number(item.price)
+            })),
+            totalPrice: Number(totalResult[0].total) || 0
+        };
+
+    } catch (error) {
+        connection.release();
+        throw new Error("Failed to fetch Bite menu");
     }
+}
 
     static async UpdateBiteMenu(booking_id, biteItems) {
         const connection = await db.getConnection();
@@ -198,6 +205,14 @@ class PlanBite {
             );
             const totalPrice = totalResult[0].total || 0;
 
+            // Update Bar with new total price
+            await connection.query(
+                `UPDATE Bar 
+                 SET TotalBitePrice = ?
+                 WHERE BarRequirementID = ?`,
+                [totalPrice, barRequirementID]
+            );
+
             await connection.query('COMMIT');
             connection.release();
 
@@ -234,15 +249,15 @@ class PlanBite {
 
             // Delete Bar entry
             await connection.query(
-                `DELETE FROM Bar WHERE BarRequirementID = ?`,
+                `UPDATE Bar SET TotalBitePrice = NULL WHERE BarRequirementID = ?`,
                 [barRequirementID]
             );
 
             // Update Event to remove BarRequirementID
-            await connection.query(
-                `UPDATE Event SET BarRequirementID = NULL WHERE Event_ID = ?`,
-                [event[0].Event_ID]
-            );
+            // await connection.query(
+            //     `UPDATE Event SET BarRequirementID = NULL WHERE Event_ID = ?`,
+            //     [event[0].Event_ID]
+            // );
 
             await connection.query('COMMIT');
             connection.release();
