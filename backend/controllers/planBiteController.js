@@ -55,7 +55,7 @@ export const getBiteMenu = async (req, res) => {
         res.status(200).json({
             success: true,
             data: {
-                items: biteItems,
+                biteItems,
                 totalPrice
             },
             message: "Bite menu fetched successfully"

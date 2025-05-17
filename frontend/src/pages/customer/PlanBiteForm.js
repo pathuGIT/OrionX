@@ -14,36 +14,48 @@ const PlanBiteForm = () => {
     const [loading, setLoading] = useState(false);
     const decryptedBookingId = decryptBookingId(encryptedBookingId);
 
-    useEffect(() => {
-        const initializeData = async () => {
-            try {
-                setLoading(true);
-                setError('');
-                setSuccess('');
+   useEffect(() => {
+    const initializeData = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            setSuccess('');
 
-                // Load menu items
-                const menuResponse = await getBiteMenuItems();
-                setMenuItems(menuResponse || []);
+            // Load menu items
+            const menuResponse = await getBiteMenuItems();
+            setMenuItems(menuResponse || []);
 
-                // Load existing plan
-                const planResponse = await getBiteMenu(decryptedBookingId);
-                if (planResponse?.biteItems?.length > 0) {
-                    setExistingPlan(planResponse);
-                    const initialSelected = {};
-                    planResponse.biteItems.forEach(item => {
-                        initialSelected[item.menu_type_id] = item.Quantity;
-                    });
-                    setSelectedItems(initialSelected);
+            // Load existing plan with retry logic
+            const loadPlan = async (attempt = 1) => {
+                try {
+                    const planResponse = await getBiteMenu(decryptedBookingId);
+                    if (planResponse.biteItems?.length > 0) {
+                        setExistingPlan(planResponse);
+                        const initialSelected = {};
+                        planResponse.biteItems.forEach(item => {
+                            initialSelected[item.menu_type_id] = item.Quantity;
+                        });
+                        setSelectedItems(initialSelected);
+                    }
+                } catch (error) {
+                    if (attempt < 3) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        return loadPlan(attempt + 1);
+                    }
+                    throw error;
                 }
-            } catch (error) {
-                setError(error.message);
-                console.error('Initialization error:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        initializeData();
-    }, [decryptedBookingId]);
+            };
+            
+            await loadPlan();
+
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    initializeData();
+}, [decryptedBookingId]);
 
     const handleQuantityChange = (menuTypeId, quantity) => {
         setSelectedItems(prev => ({

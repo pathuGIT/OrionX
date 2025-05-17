@@ -174,7 +174,10 @@ export const PlanBiteMenu = async (bookingId, data) => {
 export const getBiteMenu = async (bookingId) => {
     try {
         const response = await api.get(`/Bite/getPlanBite/${bookingId}`);
-        return response.data.data || { biteItems: [], totalPrice: 0 }; // Consistent structure
+        return {
+            biteItems: response.data?.data?.biteItems || [], // Now matches backend
+            totalPrice: response.data?.data?.totalPrice || 0
+        };
     } catch (error) {
         return { biteItems: [], totalPrice: 0 };
     }
