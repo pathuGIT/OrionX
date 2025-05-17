@@ -276,10 +276,10 @@ const PlanBiteForm = () => {
                                 <p className="text-gray-800">{item.Type}</p>
                             </div>
                         )}
-                        <div>
+                        {/* <div>
                             <p className="text-sm font-medium text-gray-600">Bar Requirement ID:</p>
                             <p className="text-gray-800">{item.BarRequirementID}</p>
-                        </div>
+                        </div> */}
                         {item.custom_description && (
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Custom Description:</p>
@@ -299,9 +299,6 @@ const PlanBiteForm = () => {
                 <div className="flex justify-between items-center text-xl font-bold text-orange-800">
                     <span>Grand Total:</span>
                     <span>{formatCurrency(existingPlan.totalPrice || 0)}</span>
-                </div>
-                <div className="mt-2 text-sm text-gray-600">
-                    Bar Requirement ID: {existingPlan.biteItems[0]?.BarRequirementID}
                 </div>
             </div>
         </div>
