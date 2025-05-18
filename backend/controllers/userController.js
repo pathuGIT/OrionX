@@ -13,6 +13,8 @@ import {
   checkUserIsActive,
   searchCustomerByTerm,
   DeductionModel,
+  calculatePayModel,
+  getPayEntriesModel,
 } from "../models/userModel.js";
 
 import { sendIdToUserMethod } from "../controllers/mailController.js";
@@ -565,6 +567,27 @@ export const calculateAndSaveMonthlyDeduction = async (req, res) => {
       success: false,
       message: error.message
     });
+  }
+};
+
+//........................pay
+export const calculatePay = async (req, res) => {
+  try {
+    const { calculation_date } = req.body;
+    const result = await calculatePayModel(calculation_date);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getPayEntries = async (req, res) => {
+  try {
+    const { date } = req.params;
+    const entries = await getPayEntriesModel(date);
+    res.status(200).json(entries);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 

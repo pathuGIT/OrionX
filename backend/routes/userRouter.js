@@ -16,7 +16,9 @@ import {
     getEmployeeById,
     serviceChargeController,
     deductionController,
-    calculateAndSaveMonthlyDeduction
+    calculateAndSaveMonthlyDeduction,
+    calculatePay,
+    getPayEntries
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -51,6 +53,10 @@ router.post('/monthly/calculate',superAdmin, calculateAndSaveMonthlyDeduction );
 router.post('/monthly/save',superAdmin, deductionController.saveMonthlyDeduction);
 //router.get('/monthly/entries', deductionController.getMonthlyDeductionEntries);
 router.get('/monthly/entries/:employee_id/:date',superAdmin, deductionController.getMonthlyDeductionEntriesByEmployeeAndDate);
+
+
+router.post('/calculate', calculatePay);
+router.get('/entries/:date',getPayEntries);
  
 
 

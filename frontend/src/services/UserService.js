@@ -263,3 +263,13 @@ getMonthlyDeductionEntriesByEmployeeAndDate: async (employeeId, date) => {
 }
 };
 
+export const calculatePay = async (date) => {
+  const response = await api.post('/user/calculate', { calculation_date: date });
+  return response.data;
+};
+
+export const getPayEntries = async (date) => {
+  const response = await api.get(`/user/entries/${date}`);
+  return response.data;
+};
+

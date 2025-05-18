@@ -467,3 +467,21 @@ ORDER BY
   }
 }
 }
+
+
+export const calculatePayModel = async (calculation_date) => {
+  const [result] = await pool.query(
+    'CALL CalculateEmployeeSalary(?)',
+    [calculation_date]
+  );
+  return result;
+};
+
+export const getPayEntriesModel = async (date) => {
+  const [rows] = await pool.query(
+    `SELECT * FROM employee_salary_calculation 
+     WHERE calculation_date = ?`,
+    [date]
+  );
+  return rows;
+};
