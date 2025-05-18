@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getItems, addItem, getItemById, deleteItem, updateItem } from '../../services/MenuService';
 
-function CreateItem() {
+function CreateItem({setRenderContent}) {
   // State to hold current item input
   const [item, setItem] = useState({ item_id: '', item_name: '' });
 
@@ -63,6 +63,8 @@ function CreateItem() {
         // Call service to add new item
         await addItem(item);
         alert('Item added successfully!');
+
+        
       } else {
         // Call service to update existing item
         await updateItem(item.item_id, item.item_name);

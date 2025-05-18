@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getMenuTypes, addMenuType, getMenus, deleteMenuType, updateMenuTypeById, getMenuTypeById } from '../../services/MenuService';
+import CreateCategory from './CreateCategories';
 
-function CreateMenuType() {
+function CreateMenuType({setRenderContent}) {
   // Initialize state for a single menu type, list of all menu types, and menu list types
   const [menuType, setMenuType] = useState({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
   const [menuTypes, setMenuTypes] = useState([]);
@@ -71,19 +72,28 @@ function CreateMenuType() {
         // Add new menu type
         await addMenuType({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type added successfully!');
+        setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
+
+         // Refresh the menu type list
+      const updatedMenuTypes = await getMenuTypes();
+      setMenuTypes(updatedMenuTypes);
+
+        setRenderContent(() => <CreateCategory/>);
+
       } else if (btnname === 'Update') {
         // Update existing menu type
         await updateMenuTypeById({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type updated successfully!');
         setBtnname('Add Menu Type');
-      }
 
-      // Reset the form
-      setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
+      // // Reset the form
+      // setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
 
       // Refresh the menu type list
       const updatedMenuTypes = await getMenuTypes();
       setMenuTypes(updatedMenuTypes);
+      setBtnname('Add Menu Type');
+    }
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while processing the menu type.');

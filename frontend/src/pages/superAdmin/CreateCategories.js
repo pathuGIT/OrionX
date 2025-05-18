@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCategories, addCategory, getCategoryById, deleteCategory, updateCategoryById } from '../../services/MenuService';
+import CreateItem from './CreateItem';
 
-function CreateCategory() {
+function CreateCategory({setRenderContent}) {
   // State to hold current category input
   const [category, setCategory] = useState({ category_id: '', category_name: '' });
 
@@ -53,7 +54,7 @@ function CreateCategory() {
 
     // Validate uniqueness
     if (handleValidation()) {
-      alert('This category name already exists! Please enter a unique name.');
+      alert('This category name already exists! PlsetRenderContent(() => () => <CreateItem />);ease enter a unique name.');
       return;
     }
 
@@ -62,6 +63,8 @@ function CreateCategory() {
         await addCategory(category);
         alert('Category added successfully!');
         setCategory({ category_name: '' }); // Reset input after adding
+
+        setRenderContent(() => () => <CreateItem/>);
       } else if (btnname === 'Update') {
         await updateCategoryById(category.category_id, category.category_name);
         alert('Category updated successfully!');

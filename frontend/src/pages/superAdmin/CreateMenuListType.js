@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addMenuListType, deleteMenuListType, getMenuListTypeById, getMenus, updateMenuListTypeById } from '../../services/MenuService';
+import CreateMenuType from './CreateMenuType';
 
-function CreateMenuListType() {
+function CreateMenuListType({setRenderContent}) {
   const [menu, setMenu] = useState({ menu_list_type_id: '', menu_list_name: '' });
   const [menus, setMenus] = useState([]);
   const [btnname, setBtnname] = useState('Add Menu');
@@ -49,10 +50,14 @@ function CreateMenuListType() {
         // Refresh menu list after adding
         const updatedMenus = await getMenus();
         setMenus(updatedMenus);
+
+        //navigate to CreateMenuType after adding a menulist type
+       setRenderContent(() => () => <CreateMenuType />);
       } else if (btnname === 'Update') {
         await updateMenuListTypeById(menu.menu_list_type_id, menu.menu_list_name);
         setMenu({ menu_list_name: '' });
         alert('Menu updated successfully!');
+
 
         // Refresh menu list after updating
         const updatedMenus = await getMenus();

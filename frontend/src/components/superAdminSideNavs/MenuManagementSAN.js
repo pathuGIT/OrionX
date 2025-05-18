@@ -33,16 +33,16 @@ const MenuManagementSAN = ({ setRenderContent }) => {
     console.log(display)
     switch (display) {
       case 'createMenuListTypes':
-        setRenderContent(() => () => <CreateMenuListType />);
+        setRenderContent(() => () => <CreateMenuListType setRenderContent={setRenderContent} />);
         break;
       case 'createMenuTypes':
-        setRenderContent(() => () => <CreateMenuType />);
+        setRenderContent(() => () => <CreateMenuType setRenderContent={setRenderContent}/>);
         break;
       case 'createCategory':
-        setRenderContent(() => () => <CreateCategory />);
+        setRenderContent(() => () => <CreateCategory setRenderContent={setRenderContent}/>);
         break;
       case 'CreateItem':
-        setRenderContent(() => () => <CreateItem />);
+        setRenderContent(() => () => <CreateItem setRenderContent={setRenderContent}/>);
         break;
       case 'CreateCategoryMenuType':
         setRenderContent(() => () => <CreateCategoryMenuType />);
