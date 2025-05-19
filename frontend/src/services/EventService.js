@@ -305,7 +305,7 @@ export const getAssignments = async () => {
 
 export const updateAssignment = async (assignmentId, data) => {
   try {
-    const response = await api.put(`/assignedEmployee/UpdateAsignments/${assignmentId}`, data);
+    const response = await api.put(`/assignedEmployee/assignments/${assignmentId}`, data);
     return response.data.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Update failed');
@@ -314,7 +314,7 @@ export const updateAssignment = async (assignmentId, data) => {
 
 export const deleteAssignment = async (assignmentId) => {
   try {
-    await api.delete(`/assignedEmployee/DeleteAssignments/${assignmentId}`);
+    await api.delete(`/assignedEmployee/assignments/${assignmentId}`);
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Delete failed');
   }
