@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Logout } from '../../components/Logout'
+import EventAssignment from '../events/EventAssignment'
 
 const EventManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -11,9 +12,9 @@ const EventManagementSAN = ({ setRenderContent }) => {
   }, [])
   const handleRenderContent = (display) => {
     switch (display) {
-      // case 'test':
-      //     setRenderContent(() => () => <AddEmployee />);
-      //     break;
+      case 'test':
+          setRenderContent(() => () =><EventAssignment />);
+          break;
       default:
         setRenderContent(() => () => <p>Page not found</p>);
     }

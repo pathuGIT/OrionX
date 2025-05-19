@@ -23,6 +23,7 @@ import {
     deleteBiteMenu
 } from '../controllers/planBiteController.js';
 import { barController } from '../controllers/barController.js';
+import { assignEmployeeToEvent,getAssignmentOptions,getAssignments,updateAssignment,deleteAssignment } from '../controllers/superAdmin/eventAssignEmployeeController.js';
 
 
 
@@ -41,6 +42,10 @@ const reservationRoutes = express.Router();
 const planBarRoutes = express.Router();
 const planBiteRoutes = express.Router();
 const BarArrangeRoutes = express.Router();
+
+
+// Admin routes 
+const AdminRoutes = express.Router();
 
 
 
@@ -71,9 +76,15 @@ BarArrangeRoutes.put('/liquor/:booking_id/:item_id', barController.updateLiquorI
 BarArrangeRoutes.delete('/liquor/:booking_id/:item_id', barController.deleteLiquorItem);
 BarArrangeRoutes.put('/soft-drinks/:booking_id/:item_id', barController.updateSoftDrinkItem);
 BarArrangeRoutes.delete('/soft-drinks/:booking_id/:item_id', barController.deleteSoftDrinkItem);
-// BarArrangeRoutes.put('/bar/usage', barController.updateUsage);
+
+AdminRoutes.post('/assignToEvent',assignEmployeeToEvent);
+AdminRoutes.get('/getAssignmentOptions',getAssignmentOptions);
+AdminRoutes.get('/assignments', getAssignments);
+AdminRoutes.put('/assignments/:id', updateAssignment);
+AdminRoutes.delete('/assignments/:id', deleteAssignment);
 
 
 
 
-export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes, planBiteRoutes,BarArrangeRoutes};
+
+export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes,planBarRoutes, planBiteRoutes,BarArrangeRoutes,AdminRoutes};

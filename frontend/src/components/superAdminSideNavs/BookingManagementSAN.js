@@ -18,6 +18,7 @@ const BookingManagementSAN = ({ setRenderContent }) => {
         handleRenderContent('null')
     }, [])
 
+    
     const handleRenderContent = (display) => {
         switch (display) {
             case 'calender-view':

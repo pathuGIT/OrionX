@@ -272,3 +272,50 @@ export const BarService = {
         }
     }
 };
+
+// Admin Services
+
+
+export const getAssignmentOptions = async () => {
+  try {
+    const response = await api.get('/assignedEmployee/getAssignmentOptions');
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch assignment options');
+  }
+};
+
+export const assignEmployeeToEvent = async (data) => {
+  try {
+    const response = await api.post('/assignedEmployee/assignToEvent', data);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Assignment failed');
+  }
+};
+
+export const getAssignments = async () => {
+  try {
+    const response = await api.get('/assignedEmployee/assignments');
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get assignments');
+  }
+};
+
+export const updateAssignment = async (assignmentId, data) => {
+  try {
+    const response = await api.put(`/assignedEmployee/UpdateAsignments/${assignmentId}`, data);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Update failed');
+  }
+};
+
+export const deleteAssignment = async (assignmentId) => {
+  try {
+    await api.delete(`/assignedEmployee/DeleteAssignments/${assignmentId}`);
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Delete failed');
+  }
+};
