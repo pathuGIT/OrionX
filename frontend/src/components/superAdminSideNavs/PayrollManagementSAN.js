@@ -1,11 +1,14 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { Logout } from "../../components/Logout";
 import ServicesChargeCalc from "../../pages/superAdmin/ServicesChargeCalc";
 import Deductions from "../../pages/superAdmin/Deductions";
 import Pay from "../../pages/superAdmin/Pay";
 
 const PayrollManagementSAN = ({ setRenderContent }) => {
+  const [clickedItem, setClickedItem] = useState(null);
+
   const handleRenderContent = useCallback((display) => {
+    setClickedItem(display);
     switch (display) {
       case "ServicesChargeCalculation":
         setRenderContent(() => () => <ServicesChargeCalc />);
@@ -16,6 +19,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
   }, [setRenderContent]);
 
   const handleRenderContentdeduction = useCallback((display) => {
+    setClickedItem(display);
     switch (display) {
       case "deductionManagement":
         setRenderContent(() => () => <Deductions />);
@@ -26,6 +30,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
   }, [setRenderContent]);
 
   const handleRenderContentPay = useCallback((display) => {
+    setClickedItem(display);
     switch (display) {
       case "PayManagement":
         setRenderContent(() => () => <Pay />);
@@ -46,7 +51,11 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           <li>
             <button
               onClick={() => handleRenderContent("ServicesChargeCalculation")}
-              className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full"
+              className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
+                clickedItem === "ServicesChargeCalculation" 
+                  ? "bg-gray-100 dark:bg-gray-700" 
+                  : ""
+              }`}
             >
               <svg
                 aria-hidden="true"
@@ -65,7 +74,11 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           <li>
             <button
               onClick={() => handleRenderContentdeduction("deductionManagement")}
-              className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full"
+              className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
+                clickedItem === "deductionManagement" 
+                  ? "bg-gray-100 dark:bg-gray-700" 
+                  : ""
+              }`}
             >
               <svg
                 className="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -91,7 +104,11 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           <li>
             <button
               onClick={() => handleRenderContentPay("PayManagement")}
-              className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full"
+              className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
+                clickedItem === "PayManagement" 
+                  ? "bg-gray-100 dark:bg-gray-700" 
+                  : ""
+              }`}
             >
               <svg
                 className="w-6 h-6 text-gray-800 dark:text-white"
