@@ -296,13 +296,31 @@ export const updateBookingStatus = async (req, res) => {
             // change contract
             await updateDamageFeeModel(bookingId, 0, 0, 50000, 'pending');
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            const currBooking = await getBookingById(bookingId);
+            console.log("currBooking", currBooking)
+            const venue = await getVenueBytId(currBooking.venue_id);
+            if (!venue) return res.status(404).json({ error: 'Venue not found' });
+
+            // Calculate hall charge
+            let hallCharge = 0.00;
+            if (currBooking.number_of_guests >= venue.min_capacity && currBooking.number_of_guests <= venue.max_capacity) {
+                hallCharge = venue.price;
+            } else if (currBooking.number_of_guests > venue.max_capacity) {
+                hallCharge = 0;
+            } else if (currBooking.number_of_guests < venue.min_capacity) {
+                hallCharge = venue.price;
+            }
+
+            // 3. Calculate extra hour fee
+            const extraHourFee = currBooking.additional_hours * parseFloat(venue.additional_hour_fee || 0);
 
             // change booking_pricing forfeited_deposit
             const currentBookingPrice = await getBookingPricingById(bookingId);
             const newBookingPrice = {
                 menuPriceTotal: currentBookingPrice.menu_price_total,
-                hallCharge: currentBookingPrice.hall_charge,
-                extraHourFee: currentBookingPrice.extra_hour_fee,
+                hallCharge: hallCharge, // Updated hall charge
+                extraHourFee: extraHourFee, // Updated extra hour fee
                 bitesPayment: currentBookingPrice.bites_payment,
                 fountainPayment: currentBookingPrice.fountain_payment,
                 otherPayment: currentBookingPrice.other_payment,
@@ -555,10 +573,10 @@ export const updateGuests = async (req, res) => {
     try {
         // get current booking
         const currBooking = await getBookingById(bookingId);
-        
+
         // update current booking guest
         await updateGuestsModel(bookingId, number_of_guests);
-        console.log(bookingId,number_of_guests)
+        console.log(bookingId, number_of_guests)
 
         // get current venue 
         const venue = await getVenueBytId(currBooking.venue_id);
@@ -601,7 +619,7 @@ export const updateAdditionalHours = async (req, res) => {
 
     try {
         await updateAdditionalHoursModel(bookingId, additionalHours);
-        
+
         const currBooking = await getBookingById(bookingId);
         // get current venue 
         const venue = await getVenueBytId(currBooking.venue_id);
