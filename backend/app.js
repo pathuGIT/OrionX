@@ -20,6 +20,8 @@ import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
 import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
 import bookingRoutes from './routes/bookingRoutes.js';
 import menuViewRoutes from './routes/menuViewRoutes.js';
+import overviewRout from './routes/overviewRoutes.js';
+import settingRoute from './routes/settingRoutes.js';
 
 const app = express();
 
@@ -44,8 +46,8 @@ app.use('/api/advanceMenuView', menuViewRoutes); //meka tmi werdi ei
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
-
-
+app.use('/api/overview', overviewRout);
+app.use('/api/setting', settingRoute);
 
 //event routes
 app.use('/api/event', eventRoute);

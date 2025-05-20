@@ -23,6 +23,8 @@
     "mysql2-promise": "^0.1.4",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
+    "react-hook-form": "^7.56.4",
+    "react-modal": "^3.16.3",
     "uuid": "^11.1.0"
   }
 }

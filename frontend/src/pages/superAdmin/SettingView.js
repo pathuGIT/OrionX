@@ -138,3 +138,138 @@ const SettingView = () => {
 }
 
 export default SettingView
+// import React, { useEffect, useState } from 'react';
+// import { useForm, useWatch } from 'react-hook-form';
+// import Modal from 'react-modal';
+// import settingService from '../../services/settingService';
+
+// Modal.setAppElement('#root');
+
+// export default function SettingView() {
+//   const [profile, setProfile] = useState({ name: '', email: '' });
+//   const [admins, setAdmins] = useState([]);
+//   const [employees, setEmployees] = useState([]);
+//   const [modalOpen, setModalOpen] = useState(false);
+//   const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+//   const newPassword = useWatch({ control, name: 'new' });
+
+//   useEffect(() => {
+//     async function fetchData() {
+//       const [me, subs, emps] = await Promise.all([
+//         settingService.getProfile(),
+//         settingService.getAdmins(),
+//         settingService.getEmployees()
+//       ]);
+//       setProfile(me);
+//       setAdmins(subs);
+//       setEmployees(emps);
+//     }
+//     fetchData();
+//   }, []);
+
+//   const onProfileSubmit = async data => {
+//     await settingService.updateProfile(data);
+//     setProfile(data);
+//   };
+
+//   const onPasswordSubmit = async data => {
+//     await settingService.changePassword(data);
+//     reset({ current: '', new: '', confirm: '' });
+//   };
+
+//   const openAssignModal = () => {
+//     reset({ employeeId: '' });
+//     setModalOpen(true);
+//   };
+
+//   const onAssignSubmit = async ({ employeeId }) => {
+//     const newAdmin = await settingService.assignRole(employeeId);
+//     setAdmins(prev => [...prev, newAdmin]);
+//     setModalOpen(false);
+//   };
+
+//   const deactivate = async id => {
+//     await settingService.deactivateAdmin(id);
+//     setAdmins(prev => prev.filter(a => a.user_id !== id));
+//   };
+
+//   return (
+//     <div className="max-w-5xl mx-auto p-6 space-y-6">
+//       {/* Profile & Password */}
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//         <section className="bg-white p-6 rounded-2xl shadow-lg">
+//           <h2 className="text-xl font-semibold mb-4">My Profile</h2>
+//           <form onSubmit={handleSubmit(onProfileSubmit)} className="space-y-4">
+//             <div>
+//               <label className="block text-sm">Name</label>
+//               <input {...register('name', { required: true })} defaultValue={profile.name} className="w-full border rounded p-2 text-base" />
+//               {errors.name && <span className="text-red-500 text-xs">Required</span>}
+//             </div>
+//             <div>
+//               <label className="block text-sm">Email</label>
+//               <input {...register('email', { required: true })} defaultValue={profile.email} className="w-full border rounded p-2 text-base" />
+//               {errors.email && <span className="text-red-500 text-xs">Required</span>}
+//             </div>
+//             <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+//           </form>
+//         </section>
+
+//         <section className="bg-white p-6 rounded-2xl shadow-lg">
+//           <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+//           <form onSubmit={handleSubmit(onPasswordSubmit)} className="space-y-4">
+//             <div>
+//               <label className="block text-sm">Current Password</label>
+//               <input type="password" {...register('current', { required: true })} className="w-full border rounded p-2 text-base" />
+//             </div>
+//             <div>
+//               <label className="block text-sm">New Password</label>
+//               <input type="password" {...register('new', { required: true, minLength: 6 })} className="w-full border rounded p-2 text-base" />
+//               {errors.new && <span className="text-red-500 text-xs">Minimum 6 chars</span>}
+//             </div>
+//             <div>
+//               <label className="block text-sm">Confirm Password</label>
+//               <input type="password" {...register('confirm', { required: true, validate: v => v === newPassword || 'Passwords must match' })} className="w-full border rounded p-2 text-base" />
+//               {errors.confirm && <span className="text-red-500 text-xs">{errors.confirm.message}</span>}
+//             </div>
+//             <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+//           </form>
+//         </section>
+//       </div>
+
+//       {/* Manage Sub-Admins */}
+//       <section className="bg-white p-6 rounded-2xl shadow-lg">
+//         <div className="flex justify-between items-center mb-4">
+//           <h2 className="text-xl font-semibold">Manage Sub-Admins</h2>
+//           <button onClick={openAssignModal} className="bg-green-600 text-white px-4 py-2 rounded">Assign Role</button>
+//         </div>
+//         <div className="overflow-x-auto">
+//           <table className="w-full text-left">
+//             <thead>
+//               <tr><th className="p-2 border-b">Name</th><th className="p-2 border-b">Email</th><th className="p-2 border-b">Role</th><th className="p-2 border-b">Actions</th></tr>
+//             </thead>
+//             <tbody>
+//               {admins.map(admin => (
+//                 <tr key={admin.user_id}><td className="p-2">{admin.name}</td><td className="p-2">{admin.email}</td><td className="p-2 capitalize">{admin.role.replace('_',' ')}</td><td className="p-2"><button onClick={()=>deactivate(admin.user_id)} className="text-red-600 text-sm">Deactivate</button></td></tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Assign Modal */}
+//       <Modal isOpen={modalOpen} onRequestClose={() => setModalOpen(false)} className="bg-white p-6 max-w-md mx-auto mt-20 rounded-2xl shadow-lg">
+//         <h2 className="text-lg font-semibold mb-4">Select Employee</h2>
+//         <form onSubmit={handleSubmit(onAssignSubmit)} className="space-y-4">
+//           <select {...register('employeeId', { required: true })} className="w-full border rounded p-2">
+//             <option value="">-- choose employee --</option>
+//             {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.name}</option>)}
+//           </select>
+//           <div className="flex justify-end space-x-2">
+//             <button type="button" onClick={()=>setModalOpen(false)} className="px-4 py-2 rounded border">Cancel</button>
+//             <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white">Assign</button>
+//           </div>
+//         </form>
+//       </Modal>
+//     </div>
+//   );
+// }

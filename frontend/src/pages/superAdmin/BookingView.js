@@ -21,7 +21,7 @@ import VenueDropdown from '../../components/bookings/VenueDropdown';
 //             <span className="block truncate">
 //               {selectedVenue
 //                 ? `${selectedVenue.venue_name} (${selectedVenue.time_slot})`
-//                 : '-- Select Venue --'}
+///                 : '-- Select Venue --'}
 //             </span>
 //             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
 //               <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -121,6 +121,14 @@ const BookingView = () => {
       case 'address':
         if (value.trim() === '') {
           error = { msg: 'Address cannot be empty.', color: 'text-red-600' };
+        }
+        break;
+      case 'nic':
+        if (!/^\d{10}$/.test(value)) {
+          error = { msg: 'NIC number must be exactly 10 digits.', color: 'text-red-600' };
+        }
+        if (value.trim() === '') {
+          error = { msg: 'NIC number cannot be empty.', color: 'text-red-600' };
         }
         break;
       default:
@@ -317,6 +325,19 @@ const BookingView = () => {
               value={customer.phone}
               onChange={handleCustomerChange}
               placeholder={addedCustomer?.phone || 'e.g. 0712345678'}
+              className={inputClass}
+            />
+          </div>
+          
+          <div className="flex flex-col">
+            <label htmlFor="nic" className="text-gray-700 text-sm mb-1">NIC Number</label>
+            <input
+              id="nic"
+              name="nic"
+              type="number"
+              value={customer.nic}
+              onChange={handleCustomerChange}
+              placeholder={addedCustomer?.nic || 'e.g. 1234567891'}
               className={inputClass}
             />
           </div>
