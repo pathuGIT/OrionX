@@ -25,19 +25,56 @@ const EventAssignment = () => {
   const [success, setSuccess] = useState('');
   const [editData, setEditData] = useState(null);
   const [filterText, setFilterText] = useState('');
+  const [selectedEvent, setSelectedEvent] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
 
-    const safeEmployees = Array.isArray(options.employees) ? options.employees : [];
+  // Safe array access
+  const safeEmployees = Array.isArray(options.employees) ? options.employees : [];
   const safeEvents = Array.isArray(options.events) ? options.events : [];
   const safeAssignments = Array.isArray(assignments) ? assignments : [];
 
+  // Get unique years and months from assignments
+  const getDateFilters = () => {
+    const years = new Set();
+    const months = new Set();
+    
+    safeAssignments.forEach(assignment => {
+      if (assignment.eventDate) {
+        const date = new Date(assignment.eventDate);
+        years.add(date.getFullYear());
+        months.add(date.getMonth() + 1);
+      }
+    });
+    
+    return {
+      years: Array.from(years).sort(),
+      months: Array.from(months).sort((a, b) => a - b)
+    };
+  };
+
+  const { years, months } = getDateFilters();
+
+  // Combined filter function
   const filteredAssignments = safeAssignments.filter(assignment => {
-  const searchText = filterText.toLowerCase();
-  return (
-    assignment.event?.label?.toLowerCase().includes(searchText) ||
-    assignment.employee?.name?.toLowerCase().includes(searchText) ||
-    assignment.userRole?.toLowerCase().includes(searchText)
-  );
-});
+    const searchText = filterText.toLowerCase();
+    const eventMatch = selectedEvent ? assignment.event?.id === selectedEvent : true;
+    const date = assignment.eventDate ? new Date(assignment.eventDate) : null;
+    
+    const yearMatch = selectedYear ? date?.getFullYear() === parseInt(selectedYear) : true;
+    const monthMatch = selectedMonth ? (date?.getMonth() + 1) === parseInt(selectedMonth) : true;
+
+    return (
+      eventMatch &&
+      yearMatch &&
+      monthMatch &&
+      (
+        assignment.event?.label?.toLowerCase().includes(searchText) ||
+        assignment.employee?.name?.toLowerCase().includes(searchText) ||
+        assignment.userRole?.toLowerCase().includes(searchText)
+      )
+    );
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,8 +98,6 @@ const EventAssignment = () => {
     };
     fetchData();
   }, []);
-
-
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
@@ -127,11 +162,6 @@ const EventAssignment = () => {
       </div>
     );
   }
-
-  // Safe array access
-  // const safeEmployees = Array.isArray(options.employees) ? options.employees : [];
-  // const safeEvents = Array.isArray(options.events) ? options.events : [];
-  // const safeAssignments = Array.isArray(assignments) ? assignments : [];
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
@@ -285,10 +315,54 @@ const EventAssignment = () => {
           </div>
         </div>
       )}
+
+      {/* Assignments Table */}
       <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">📋 Active Assignments</h2>
-          <div className="w-64">
+        <div className="flex flex-wrap gap-4 mb-6">
+          <div className="w-full md:w-64">
+            <select
+              value={selectedEvent}
+              onChange={(e) => setSelectedEvent(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm"
+            >
+              <option value="">All Events</option>
+              {safeEvents.map(event => (
+                <option key={event.id} value={event.id}>
+                  {event.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="w-32">
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm"
+            >
+              <option value="">All Years</option>
+              {years.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="w-32">
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm"
+            >
+              <option value="">All Months</option>
+              {months.map(month => (
+                <option key={month} value={month}>
+                  {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1 md:flex-none md:w-64">
             <input
               type="text"
               placeholder="Search assignments..."
