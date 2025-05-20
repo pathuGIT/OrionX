@@ -1,5 +1,5 @@
 // assignedEmployeeController.js
-import AssignedEmployee from '../../models/superAdmin/eventAssignEmployee.js';
+import AssignedEmployee from '../../models/superAdmin/eventAssignEmployeeModel.js';
 
 export const assignEmployeeToEvent = async (req, res) => {
     try {

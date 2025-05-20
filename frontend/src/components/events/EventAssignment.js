@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { 
-  getAssignmentOptions, 
+import {
+  getAssignmentOptions,
   assignEmployeeToEvent,
   getAssignments,
   updateAssignment,
-  deleteAssignment 
+  deleteAssignment
 } from '../../services/EventService';
 
 const assignmentSchema = Yup.object().shape({
@@ -24,6 +24,20 @@ const EventAssignment = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editData, setEditData] = useState(null);
+  const [filterText, setFilterText] = useState('');
+
+    const safeEmployees = Array.isArray(options.employees) ? options.employees : [];
+  const safeEvents = Array.isArray(options.events) ? options.events : [];
+  const safeAssignments = Array.isArray(assignments) ? assignments : [];
+
+  const filteredAssignments = safeAssignments.filter(assignment => {
+  const searchText = filterText.toLowerCase();
+  return (
+    assignment.event?.label?.toLowerCase().includes(searchText) ||
+    assignment.employee?.name?.toLowerCase().includes(searchText) ||
+    assignment.userRole?.toLowerCase().includes(searchText)
+  );
+});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,12 +46,12 @@ const EventAssignment = () => {
           getAssignmentOptions(),
           getAssignments()
         ]);
-        
+
         setOptions({
           employees: optionsData?.employees || [],
           events: optionsData?.events || []
         });
-        
+
         setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
         setLoading(false);
       } catch (err) {
@@ -48,17 +62,19 @@ const EventAssignment = () => {
     fetchData();
   }, []);
 
+
+
   const handleSubmit = async (values, { resetForm }) => {
     try {
       setError('');
       const selectedEvent = options.events.find(e => e?.id === values.eventId);
-      
+
       if (!selectedEvent) {
         throw new Error('Selected event not found');
       }
 
       const result = await assignEmployeeToEvent(values);
-      
+
       setAssignments(prev => [{
         ...result,
         employee: options.employees.find(e => e?.id === values.employeeId) || {},
@@ -77,7 +93,7 @@ const EventAssignment = () => {
     if (window.confirm('Are you sure you want to delete this assignment?')) {
       try {
         await deleteAssignment(assignmentId);
-        setAssignments(prev => 
+        setAssignments(prev =>
           (Array.isArray(prev) ? prev : []).filter(a => a?.assignmentId !== assignmentId)
         );
         setSuccess('Assignment deleted successfully');
@@ -91,8 +107,8 @@ const EventAssignment = () => {
   const handleUpdate = async (values) => {
     try {
       const updated = await updateAssignment(editData?.assignmentId, values);
-      setAssignments(prev => 
-        (Array.isArray(prev) ? prev : []).map(a => 
+      setAssignments(prev =>
+        (Array.isArray(prev) ? prev : []).map(a =>
           a?.assignmentId === updated?.assignmentId ? { ...a, ...updated } : a
         )
       );
@@ -113,9 +129,9 @@ const EventAssignment = () => {
   }
 
   // Safe array access
-  const safeEmployees = Array.isArray(options.employees) ? options.employees : [];
-  const safeEvents = Array.isArray(options.events) ? options.events : [];
-  const safeAssignments = Array.isArray(assignments) ? assignments : [];
+  // const safeEmployees = Array.isArray(options.employees) ? options.employees : [];
+  // const safeEvents = Array.isArray(options.events) ? options.events : [];
+  // const safeAssignments = Array.isArray(assignments) ? assignments : [];
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
@@ -269,66 +285,79 @@ const EventAssignment = () => {
           </div>
         </div>
       )}
-
-      {/* Assignments List */}
       <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">📋 Active Assignments</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {safeAssignments.map(assignment => (
-            <div
-              key={assignment?.assignmentId || Math.random()}
-              className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative group"
-            >
-              <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => setEditData(assignment)}
-                  className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={() => handleDelete(assignment?.assignmentId)}
-                  className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
-                >
-                  🗑️
-                </button>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
-                    <span className="text-indigo-600 font-bold text-lg">
-                      {assignment?.userRole?.[0]?.toUpperCase() || '?'}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    {assignment?.employee?.name || 'Unknown Employee'}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">📋 Active Assignments</h2>
+          <div className="w-64">
+            <input
+              type="text"
+              placeholder="Search assignments..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 text-sm"
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAssignments.map(assignment => (
+                <tr key={assignment?.assignmentId} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {assignment?.event?.label || 'Unknown Event'}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="px-2 py-1 bg-gray-100 rounded-md text-gray-600">
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {assignment?.employee?.name || 'Unknown Employee'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2.5 py-1.5 text-xs font-medium capitalize rounded-full bg-indigo-100 text-indigo-800">
                       {assignment?.userRole || 'Unknown Role'}
                     </span>
-                    <span className="text-gray-500">
-                      {assignment?.eventDate ? new Date(assignment.eventDate).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: '2-digit',
-                        year: 'numeric'
-                      }) : 'No Date'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-          {safeAssignments.length === 0 && (
-            <div className="col-span-full text-center py-8 text-gray-400">
-              No assignments found
-            </div>
-          )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {assignment?.eventDate ? new Date(assignment.eventDate).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: '2-digit',
+                      year: 'numeric'
+                    }) : 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <button
+                      onClick={() => setEditData(assignment)}
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      title="Edit"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDelete(assignment?.assignmentId)}
+                      className="text-red-600 hover:text-red-900"
+                      title="Delete"
+                    >
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {filteredAssignments.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                    {safeAssignments.length === 0 ? 'No assignments found' : 'No matching assignments found'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

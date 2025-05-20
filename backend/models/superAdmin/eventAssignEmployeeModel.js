@@ -8,7 +8,8 @@ class AssignedEmployee {
             const { employeeId, userRole, eventId } = assignmentData;
             connection = await db.getConnection();
 
-            await connection.beginTransaction();
+            //await connection.beginTransaction();
+            await connection.query('START TRANSACTION');
 
             const [booking] = await connection.query(
                 `SELECT b.booking_date 
@@ -79,7 +80,8 @@ class AssignedEmployee {
                 [eventId, employeeAssignId, booking[0].booking_date]
             );
 
-            await connection.commit();
+            await connection.query('COMMIT');
+            // await connection.commit();
             return { employeeAssignId, eventId};
 
         } catch (error) {
@@ -96,13 +98,15 @@ class AssignedEmployee {
             // Get all available employees
             const [employees] = await db.query(`
                 SELECT 
-                    employee_id AS id,
-                    name,
-                    phone,
-                    email,
-                    service_charge_precentage AS chargePercentage
-                FROM employee
-                ORDER BY name
+                    e.employee_id AS id,
+                    e.name,
+                    e.phone,
+                    e.email,
+                    e.service_charge_precentage AS chargePercentage
+                FROM employee e
+                INNER JOIN systemuser s ON e.employee_id = s.employee_id
+                WHERE s.status = 'active'
+                ORDER BY e.name
             `);
 
             // Get all upcoming events
@@ -133,7 +137,7 @@ class AssignedEmployee {
                 })),
                 events: events.map(evt => ({
                     ...evt,
-                    label: `${evt.event_name} (Booking ${evt.booking_id} - ${new Date(evt.event_date).toLocaleDateString('en-US', {
+                    label: `${evt.event_name} (Event ${evt.id} - ${new Date(evt.event_date).toLocaleDateString('en-US', {
                         month: 'short',
                         day: '2-digit',
                         year: 'numeric'
