@@ -327,6 +327,25 @@ export const updateBookingStatus = async (req, res) => {
             await updatePricingModel(bookingId, newBookingPrice);
         }
 
+        if (status === "3") {
+            // change contract
+            await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
+
+
+            // change booking_pricing forfeited_deposit
+            const currentBookingPrice = await getBookingPricingById(bookingId);
+            const newBookingPrice = {
+                menuPriceTotal: 0,
+                hallCharge: 0,
+                extraHourFee: 0,
+                bitesPayment: 0,
+                fountainPayment: 0,
+                otherPayment: 0,
+                forfeitedDeposit: 0
+            };
+            await updatePricingModel(bookingId, newBookingPrice);
+        }
+
         const result1 = await updateBookingStatusModel(bookingId, status);
         if (result1.affectedRows === 0) {
             return res.status(404).json({ success: false, message: "Booking not found or status not updated." });

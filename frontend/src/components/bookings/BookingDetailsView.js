@@ -23,6 +23,9 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
             }, {
                 'venue_id': 2,
                 'venue_name': "confirmed"
+            }, {
+                'venue_id': 3,
+                'venue_name': "cancelled"
             }]);
         }
 

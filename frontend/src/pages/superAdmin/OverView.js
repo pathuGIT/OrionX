@@ -73,7 +73,6 @@ const OverView = () => {
 
   // Compute max revenue value for YAxis
   const maxRevenue = React.useMemo(() => {
-    console.log('reaaaaaaaaaaaaaaaa', revenueData)
 
     const maxValue = Math.max(
       ...revenueData.flatMap(obj =>
@@ -82,8 +81,6 @@ const OverView = () => {
           .map(([, value]) => parseFloat(value))
       )
     );
-
-    console.log('cccccccccccccccccc', maxValue)
     return maxValue
   }, [revenueData, years])
 
