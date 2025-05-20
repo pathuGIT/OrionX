@@ -5,12 +5,12 @@ import VenueDropdown from './VenueDropdown';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
 
 // Reusable detail row
-function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
-
+function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCanselbtn }) {
     const [edit, setEdit] = useState(false);
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
     const [saving, setSaving] = useState(false);
+    const [textBuffer, setTextBuffer] = useState(value);
 
     useEffect(() => {
         if (label === "Venue ID") {
@@ -25,7 +25,9 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
                 'venue_name': "confirmed"
             }]);
         }
+
     }, [label]);
+
 
     if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours") return (
         <div className="flex flex-col border relative group">
@@ -33,11 +35,11 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
             {!edit && (
                 <>
                     <span className="text-gray-500 text-sm">{label}</span>
-                    <span className="text-gray-800 text-sm font-medium">{value || '-'}</span>
+                    <span className="text-gray-800 text-sm font-medium">{value}</span>
                     <button
                         className="absolute top-2 right-2 px-2 py-1 text-xs  text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Edit Venue"
-                        onClick={() => setEdit(true)}
+                        onClick={() => {setEdit(true); setCanselbtn(true)}}
                     >
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
@@ -121,13 +123,14 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh }) {
                                     alert(`Error: ${msg}`);
                                 }
                                 setSaving(false);
+                                setCanselbtn(false);
                             }}
                         >
                             {saving ? 'Saving...' : 'Confirm'}
                         </button>
                         <button
                             className="px-2 py-1 bg-gray-300 rounded"
-                            onClick={() => { setEdit(false); setSelectedVenue(value); }}
+                            onClick={() => { setEdit(false); setSelectedVenue(value); setCanselbtn(false); }}
                             disabled={saving}
                         >
                             Cancel
@@ -152,17 +155,19 @@ export default function BookingDetailsView({ bookingId, onClose }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refresh, setRefresh] = useState(false);
+    const [textBuffer, setTextBuffer] = useState(null);
+    const [cancelbtn, setCanselbtn] = useState(false);
 
     useEffect(() => {
         async function fetchBooking() {
             try {
                 const res = await getBookingDetails(bookingId)
-                setRefresh(null);
                 // Wait 3 seconds before setting booking and loading
                 setTimeout(() => {
                     setBooking(res.data);
                     setLoading(false);
-                }, 1000);
+                    setRefresh(false);
+                }, 500);
             } catch (err) {
                 setError('Failed to load booking details');
                 setLoading(false);
@@ -275,12 +280,14 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.status}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow
                                         label="Venue ID"
                                         value={b.venue_id}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow label="Customer ID" value={b.customer_id} />
                                     <DetailRow
@@ -288,12 +295,15 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.number_of_guests}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow
                                         label="Additional Hours"
                                         value={b.additional_hours}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        refresh={refresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                 </div>
                             </section>
@@ -309,6 +319,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.damage_fee}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
+                                        setCanselbtn ={setCanselbtn}
                                     />
                                     <DetailRow label="Refund Amount (Rs)" value={b.refund_amount} />
                                     <DetailRow label="Contract Status" value={b.contract_status} />
@@ -334,7 +345,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                 <div className="flex justify-end mt-4">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 bg-gray-200 rounded-lg mr-2"
+                        className={`px-4 py-2 bg-gray-200 rounded-lg mr-2 ${cancelbtn ? 'hidden' : 'visible'}`}
                     >
                         Cancel
                     </button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import EventHomeSideNav from './EventHomeSideNav';
 import EventPlan from './CustomerEventPlanning';
-import DisplayEvents from '../../components/DisplayEvents';
+import DisplayEvents from '../../pages/customer/DisplayEvents';
 import EventServicesSelector from './EventServicesSelector';
 import ServiceVendor from './ServiceVendor';
 import TableReservation from './TableReservation';
@@ -10,6 +10,9 @@ import ChairArrangement from './ChairArrangement';
 import ArrangementDetailsPage from './ArrangementDetailsPage';
 import PlanBarForm from './PlanBarForm';
 
+import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+
+// import ProfileNavbar from '../components/ProfileNavbar';
 
 const EventHome = () => {
   const { bookingId, customerID } = useParams();
@@ -58,6 +61,8 @@ const EventHome = () => {
         return ;
       case 'see-bar-arrangements':
         return ;
+      case 'plan-menulist':
+        return <CustomerMenuListSelection/>;
       case 'dashboard':
       default:
         return (

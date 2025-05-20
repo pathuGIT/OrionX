@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createEvents } from "../services/EventService";
+import { createEvents } from "../../services/EventService";
 import {
     Clock,
     User,

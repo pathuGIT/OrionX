@@ -336,7 +336,9 @@ const BookingView = () => {
             />
           </div>
         </div>
+        {/* Customer Submit Btn & Msg   */}
         <div className="mt-6">
+          {/* Submit btn */}
           {!customerSuccess && addedCustomer == null? (
             <button
               onClick={submitCustomer}
@@ -345,6 +347,7 @@ const BookingView = () => {
               {btnText}
             </button>
           ) : (
+            // Message
             <div className="mt-4">
               <div className="flex items-center text-green-700 text-sm">
                 {customerIdMsg ? mark : ''} {customerIdMsg}
@@ -376,6 +379,7 @@ const BookingView = () => {
             </span>
           </label>
 
+          {/* Search Customer from dropdown*/}
           <div className={`flex flex-col ${booking.searchCustomer ? 'visible' : 'hidden'}`} >
             <input
               placeholder={'Search Customer'}
@@ -395,9 +399,8 @@ const BookingView = () => {
                 </ul>
             </div>
           </div>
-
-
-
+          
+          {/* Insert Booking Data */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Date */}
             <div className="flex flex-col">

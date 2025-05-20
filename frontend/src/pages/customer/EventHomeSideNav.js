@@ -87,6 +87,17 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
         </NavItem>
 
         <NavItem
+          icon="fas fa-utensils text-orange-400 group-hover:text-orange-300"
+          menuName="menu"
+          subItems={[
+            { page: 'plan-menulist', label: '🍽️ Select New Menu' },
+            { page: 'my-menu', label: '📋 Saved Menus' }
+          ]}
+        >
+          Menu Planning
+        </NavItem>
+
+        <NavItem
           icon="fas fa-concierge-bell text-green-400 group-hover:text-green-300"
           menuName="EventServices"
           subItems={[

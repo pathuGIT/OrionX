@@ -90,6 +90,9 @@ function CreateMenuListType() {
   };
 
   const handleDelete = async (id) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
+    if (!isConfirmed) return; 
+
     try {
       const deleteResponse = await deleteMenuListType(id);
       if (deleteResponse) {

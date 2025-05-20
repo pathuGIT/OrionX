@@ -27,7 +27,6 @@ const BookingsAnalyze = () => {
 
     return (
         <div className="p-6">
-            <h1 className="text-3xl font-bold mb-4">Bookings</h1>
             <StatusFilter currentStatus={status} onChange={setStatus} />
             <BookingTable bookings={bookings} onRowClick={handleRowClick} />
             {selectedBooking && (

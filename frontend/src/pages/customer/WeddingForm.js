@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createWedding } from "../services/EventService";
+import { createWedding } from "../../services/EventService";
 import {
   Clock,
   User,

@@ -4,6 +4,7 @@ import api from './Api';
 export const getMenus = async () => {
   try {
     const response = await api.get('/menuListType/getAll');
+    console.log("getMenus response:", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching menus:", error);
@@ -141,6 +142,7 @@ export const addCategory = async (category) => {
   }
 };
 
+//to display a category by id
 export const getCategoryById = async (id) => {
   try {
     const response = await api.get(`/categories/get/${id}`);
@@ -151,6 +153,7 @@ export const getCategoryById = async (id) => {
   }
 }; 
 
+//to delete a category 
 export const deleteCategory = async (id) => {
   try {
     const response = await api.delete(`/categories/delete/${id}`);
@@ -161,6 +164,7 @@ export const deleteCategory = async (id) => {
   }
 }; 
 
+//to update a category
 export const updateCategoryById = async (id, data) => {
   console.log(id,data);
   const name = {category_name:data}
@@ -197,6 +201,7 @@ export const addItem = async (item) => {
   }
 };
 
+//to diplay an item by id
 export const getItemById = async (id) => {
   try {
     const response = await api.get(`/items/get/${id}`);
@@ -208,7 +213,7 @@ export const getItemById = async (id) => {
 }; 
 
 
-
+//to delete an item 
 export const deleteItem = async (id) => {
   try {
     const response = await api.delete(`/items/delete/${id}`);
@@ -219,7 +224,7 @@ export const deleteItem = async (id) => {
   }
 }; 
 
-
+//to update an item
 export const updateItem = async (id, data) => {
   console.log(id, data);
   const name = { item_name: data }; 
@@ -260,7 +265,7 @@ export const addCategoryMenuType = async (categoryMenu) => {
   }
 };
 
-
+//to display a category menu type by id
 export const getCategoryMenuTypeById = async (id) => {
   try {
     const response = await api.get(`/categoryMenuTypes/get/${id}`);
@@ -271,6 +276,7 @@ export const getCategoryMenuTypeById = async (id) => {
   }
 }; 
 
+//to delete a category menu type
 export const deleteCategoryMenuType = async (id) => {
   try {
     const response = await api.delete(`/categoryMenuTypes/delete/${id}`);
@@ -281,7 +287,8 @@ export const deleteCategoryMenuType = async (id) => {
   }
 }; 
 
-export const updateCategoryMenuTypeById = async (id, data) => {
+//to update a catedory menu type by id
+export const updateCategoryMenuType = async (id, data) => {
   console.log(id,data);
   const name = {categoryMenuType_name:data}
   try {
@@ -349,6 +356,148 @@ export const updateItemCategoryMenuTypeById = async (id, data) => {
     return response.data;
   } catch (error) {
     console.error("Error updating item category menu type:", error);
+    throw error;
+  }
+};
+
+
+
+// // Get all menu types under a specific menu list type
+// export const getMenusByListType = async (listTypeId) => {
+//   try {
+//     const response = await api.get(`/menutypes/getByMenuListType/${listTypeId}`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching menu types by list type:", error);
+//     throw error;
+//   }
+// };
+////////////////////////////////////////////////////////////////////////////
+
+//to display all menulisttypes and add new menulisttypes through form
+export const CusgetMenuListType = async () => {
+  try {
+    const response = await api.get('/menuListType/getAll');
+    console.log("getMenus response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching menus:", error);
+    throw error;
+  }
+};
+
+//get menu list type by id
+export const CusgetMenuListTypeById = async (id) => {
+  try {
+    const response = await api.get(`/menuListType/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting menu list type:", error);
+    throw error;
+  }
+}; 
+
+//to display all menytypes and add new menu types through form
+export const CusgetMenuTypes = async () => {
+  try {
+    const response = await api.get('/menutypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching menu types:", error);
+    throw error;
+  }
+};
+
+
+//to display all categories and add new categories through form
+export const CusgetCategories = async () => {
+  try {
+    const response = await api.get('/categories/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+//to display all items and add new items through form
+export const CusgetItems = async () => {
+  try {
+    const response = await api.get('/items/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    throw error;
+  }
+};
+
+
+// to display all category menu types and add new category menu types through form
+export const CusgetCategoryMenuTypes = async () => {
+  try {
+    const response = await api.get('/categoryMenuTypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category menu types:", error);
+    throw error;
+  }
+};
+
+// to display all item category menu types 
+export const CusgetItemCategoryMenuTypes = async () => {
+  try {
+    const response = await api.get('/itemCategoryMenuTypes/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching item category menu types:", error);
+    throw error;
+  }
+}
+
+// To display all menu views
+export const getAllMenuViews = async () => {
+  try {
+    const response = await api.get('/advanceMenuView/getAll');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching menu views:", error);
+    throw error;
+  }
+};
+
+// Get a menu view by ID
+export const getMenuViewById = async (id) => {
+  try {
+    const response = await api.get(`/advanceMenuView/get/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting menu view by ID:", error);
+    throw error;
+  }
+};
+
+// Save customer menu item selection
+export const saveCustomerMenuSelection = async (booking_id, ICMT_Id) => {
+  console.log("Saving customer menu selection:", booking_id, ICMT_Id);
+  try {
+    const response = await api.post('/customerMenuSelection/', {
+      booking_id,
+      ICMT_Id,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error saving customer menu selection:", error);
+    throw error;
+  }
+};
+
+// Check if booking_id exists in customer menu selection
+export const checkBookingMenuSelection = async (booking_id) => {
+  try {
+    const response = await api.get(`/customerMenuSelection/check-booking/${booking_id}`);
+    return response.data.exists;
+  } catch (error) {
+    console.error("Error checking booking menu selection:", error);
     throw error;
   }
 };

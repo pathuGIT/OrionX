@@ -107,6 +107,18 @@ CREATE TABLE Bite (
     FOREIGN KEY (BarRequirementID) REFERENCES Bar(BarRequirementID)
 );
 
+ALTER TABLE bite 
+  ADD COLUMN menu_type_id VARCHAR(10),
+  ADD COLUMN custom_description TEXT;
+
+CREATE TABLE bite_menu (
+    item_id VARCHAR(10) PRIMARY KEY,
+    item_name VARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
+);
+
+
 -- Create BiteByGuest table
 
 CREATE TABLE BiteByGuest (
@@ -258,6 +270,15 @@ CREATE TABLE contract (
   FOREIGN KEY (booking_id) REFERENCES booking(booking_id)
 );
 
+create table Customer_Event_Service(
+customer_id VARCHAR(100) not null,
+event_service_id VARCHAR(100) not null,
+booking_id VARCHAR(255) NOT NULL,
+FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
+FOREIGN KEY (event_service_id) REFERENCES Event_Service(event_service_id) ON DELETE CASCADE,
+FOREIGN KEY (booking_id) REFERENCES booking(booking_id) ON DELETE CASCADE
+);
+
 -- Table: booking_pricing
 CREATE TABLE booking_pricing (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -372,7 +393,7 @@ BEGIN
     SELECT COALESCE(MAX(CAST(SUBSTRING(Employee_Assign_ID, 4) AS UNSIGNED)), 0) + 1 INTO max_id FROM Assigned_Employee;
     
     -- Format the new ID as 'EMP' followed by a zero-padded number (3 digits)
-    SET new_id = CONCAT('EMP', LPAD(max_id, 6, '0'));
+    SET new_id = CONCAT('EAE', LPAD(max_id, 6, '0'));
     SET NEW.Employee_Assign_ID = new_id;
 END //
 DELIMITER ;
@@ -432,6 +453,27 @@ BEGIN
     SET new_id = CONCAT('BITE', LPAD(max_id, 6, '0'));
     SET NEW.Bite_ID = new_id;
 END //
+DELIMITER ;
+
+-- Trigger to format Bite_menu
+DELIMITER //
+
+CREATE TRIGGER before_bite_menu_insert
+BEFORE INSERT ON bite_menu
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    -- Get the max numeric part of item_id
+    SELECT COALESCE(MAX(CAST(SUBSTRING(item_id, 4) AS UNSIGNED)), 0) + 1 INTO max_id
+    FROM bite_menu;
+
+    -- Create new ID with prefix 'BIT' and 6-digit padding
+    SET new_id = CONCAT('BIT', LPAD(max_id, 6, '0'));
+    SET NEW.item_id = new_id;
+END //
+
 DELIMITER ;
 
 
@@ -626,3 +668,22 @@ END //
 DELIMITER ;
 
 
+-- new trigger for Item_Category_Menu_Type
+DELIMITER //
+
+CREATE TRIGGER Before_Insert_Item_Category_Menu_Type
+BEFORE INSERT ON Item_Category_Menu_Type
+FOR EACH ROW
+BEGIN
+    DECLARE max_id INT;
+    DECLARE new_id VARCHAR(10);
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(ICMT_Id, 5) AS UNSIGNED)), 0) + 1 
+    INTO max_id 
+    FROM Item_Category_Menu_Type;
+
+    SET new_id = CONCAT('ICMT', LPAD(max_id, 3, '0'));
+    SET NEW.ICMT_Id = new_id;
+END //
+
+DELIMITER ;
