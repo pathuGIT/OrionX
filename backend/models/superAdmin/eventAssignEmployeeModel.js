@@ -190,7 +190,7 @@ LEFT JOIN (
                 eventDate: row.eventDate,
                 event: {
                     id: row.eventId,
-                    label: `${row.eventName} (Booking ${row.bookingId})`
+                    label: `${row.eventName} (Event ${row.eventId})`
                 },
                 employee: {
                     id: row.employeeId,
