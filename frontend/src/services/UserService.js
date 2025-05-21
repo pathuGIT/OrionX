@@ -264,12 +264,19 @@ getMonthlyDeductionEntriesByEmployeeAndDate: async (employeeId, date) => {
 };
 
 export const calculatePay = async (date) => {
-  const response = await api.post('/user/calculate', { calculation_date: date });
-  return response.data;
+    try {
+        const response = await api.post('/user/calculate', { calculation_date: date });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to calculate payroll');
+    }
 };
 
 export const getPayEntries = async (date) => {
-  const response = await api.get(`/user/entries/${date}`);
-  return response.data;
+    try {
+        const response = await api.get(`/user/entries/${date}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to load pay entries');
+    }
 };
-
