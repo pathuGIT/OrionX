@@ -3,7 +3,7 @@ import { assignSubAdmin, changeUserPassword, deactivateAdmin, findUserById, list
 
 export const getProfile = async (req, res) => {
   const user = await findUserById(req.params.id);
-  res.json({ name: user.name, email: user.email });
+  res.json({ name: user.name, email: user.email, status: user.status, role: user.role });
 };
 
 export const updateProfile = async (req, res) => {
