@@ -101,6 +101,22 @@ export const serviceChargeService = {
           error: error.message
         };
       }
+    },
+        getEmployeeCharges: async (employeeId) => {
+      try {
+        const response = await api.get(`/user/service-charges/employee/${employeeId}`);
+        return {
+          success: true,
+          data: response.data.data || [],
+          count: response.data.count || 0
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to fetch charges',
+          error: error.message
+        };
+      }
     }
   };
 

@@ -39,9 +39,9 @@ router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
 //router.get('/getAllServiceChargeData',handleServiceChargeOperations);
 //router.get('/getAllServiceChargeData',superAdmin,getAllServiceChargeData);
 
-router.post('/service-charges/calculate',superAdmin, serviceChargeController.calculateCharges);
-router.get('/service-charges',superAdmin, serviceChargeController.getAllCharges);
-router.get('/service-charges/employee/:employeeId',superAdmin, serviceChargeController.getEmployeeCharges);
+router.post('/service-charges/calculate', serviceChargeController.calculateCharges);
+router.get('/service-charges', serviceChargeController.getAllCharges);
+router.get('/service-charges/employee/:employeeId', serviceChargeController.getEmployeeCharges);
 
 router.post('/deductions',superAdmin, deductionController.createDeduction);
 router.get('/deduction-entries',superAdmin, deductionController.getAllDeductionEntries);

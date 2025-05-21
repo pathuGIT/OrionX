@@ -16,6 +16,7 @@ import {
   calculatePayModel,
   getPayEntriesModel,
 } from "../models/userModel.js";
+import pool from "../config/db.js";
 
 import { sendIdToUserMethod } from "../controllers/mailController.js";
 import {
@@ -242,19 +243,49 @@ export const getEmployeesByStatus = async (req, res) => {
 
 export const serviceChargeController = {
   calculateCharges: async (req, res) => {
+    const connection = await pool.getConnection();
     try {
-      const result = await ServiceChargeModel.calculateServiceCharges();
+      await connection.beginTransaction();
+      
+      // Validate existing bookings
+      const [validation] = await connection.query(
+        `SELECT COUNT(*) AS valid_events 
+         FROM booking 
+         WHERE status = 'done' 
+         AND total_price > 0`
+      );
+
+      if (validation[0].valid_events === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No valid events available for calculation"
+        });
+      }
+
+      // Execute calculation
+      const [result] = await connection.query("CALL CalculateServiceCharges()");
+      
+      // Get affected rows
+      const [affected] = await connection.query(
+        "SELECT ROW_COUNT() AS affectedRows"
+      );
+
+      await connection.commit();
+
       res.json({
         success: true,
-        message: result.message,
-        affectedRows: result.affectedRows
+        message: "Service charges calculated successfully",
+        affectedRows: affected[0].affectedRows
       });
     } catch (error) {
+      await connection.rollback();
       res.status(500).json({
         success: false,
         message: "Service charge calculation failed",
         error: error.message
       });
+    } finally {
+      connection.release();
     }
   },
 
@@ -262,17 +293,24 @@ export const serviceChargeController = {
     try {
       const charges = await ServiceChargeModel.getAllCharges();
       
-      if (!charges || charges.length === 0) {
+      if (!charges?.length) {
         return res.status(404).json({
           success: false,
           message: "No service charge records found"
         });
       }
 
+      // Transform data for response
+      const transformed = charges.map(charge => ({
+        ...charge,
+        service_charge_id: charge.service_charge_id.replace('EVN', 'EVI'),
+        event_budget: `LKR ${charge.event_budget.toLocaleString('en-US')}`
+      }));
+
       res.json({
         success: true,
-        count: charges.length,
-        data: charges
+        count: transformed.length,
+        data: transformed
       });
     } catch (error) {
       res.status(500).json({
@@ -286,9 +324,17 @@ export const serviceChargeController = {
   getEmployeeCharges: async (req, res) => {
     try {
       const { employeeId } = req.params;
+      
+      if (!/^EMP\d{6}$/.test(employeeId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid employee ID format"
+        });
+      }
+
       const charges = await ServiceChargeModel.getEmployeeCharges(employeeId);
       
-      if (!charges || charges.length === 0) {
+      if (!charges?.length) {
         return res.status(404).json({
           success: false,
           message: "No charges found for this employee"

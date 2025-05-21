@@ -195,15 +195,22 @@ export class ServiceChargeModel {
     try {
       await connection.beginTransaction();
       const [result] = await connection.query("CALL CalculateServiceCharges()");
+      
+      // Get actual affected rows from temporary table
+      const [affected] = await connection.query(
+        "SELECT ROW_COUNT() AS affectedRows"
+      );
+
       await connection.commit();
+      
       return {
         success: true,
-        message: "Service charges calculated successfully",
-        affectedRows: result.affectedRows,
+        message: "Service charges updated successfully",
+        affectedRows: affected[0].affectedRows
       };
     } catch (error) {
       await connection.rollback();
-      throw new Error(`Database error: ${error.message}`);
+      throw new Error(`Calculation failed: ${error.message}`);
     } finally {
       connection.release();
     }
@@ -213,26 +220,35 @@ export class ServiceChargeModel {
     const connection = await pool.getConnection();
     try {
       const [results] = await connection.query(`
-        SELECT DISTINCT
-          esc.service_charge_id,
-          e.employee_id,
-          e.name AS employee_name,
-          ae.User_Role AS employee_role,
-          esc.event_id,
-          esc.amount,
-          esc.calculation_date,
-          b.total_price AS event_budget,
-          c.name AS customer_name
-        FROM employee_service_charges esc
-        JOIN employee e ON esc.employee_id = e.employee_id
-        JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
-        JOIN event ev ON esc.event_id = ev.Event_ID
-        JOIN booking b ON ev.booking_id = b.booking_id
-        JOIN customer c ON b.customer_id = c.customer_id
+         SELECT 
+        esc.service_charge_id,
+        esc.employee_id,
+        e.name AS employee_name,
+        ae.User_Role AS employee_role,
+        esc.event_id,
+        esc.amount,
+        esc.calculation_date,
+        b.total_price AS event_budget,
+        c.name AS customer_name
+      FROM employee_service_charges esc
+      JOIN event_assigned_employee eae 
+        ON esc.event_id = eae.Event_ID
+      JOIN assigned_employee ae 
+        ON eae.Employee_Assign_ID = ae.Employee_Assign_ID 
+        AND ae.Employee_ID = esc.employee_id
+      JOIN employee e 
+        ON esc.employee_id = e.employee_id
+      JOIN event ev 
+        ON esc.event_id = ev.Event_ID
+      JOIN booking b 
+        ON ev.booking_id = b.booking_id
+      JOIN customer c 
+        ON b.customer_id = c.customer_id
+      ORDER BY esc.calculation_date DESC
       `);
       return results;
     } catch (error) {
-      throw new Error(`Database error: ${error.message}`);
+      throw new Error(`Query failed: ${error.message}`);
     } finally {
       connection.release();
     }
@@ -242,27 +258,30 @@ export class ServiceChargeModel {
     const connection = await pool.getConnection();
     try {
       const [results] = await connection.query(
-        `
-        SELECT DISTINCT
+        `SELECT 
           esc.service_charge_id,
           esc.event_id,
           esc.amount,
           esc.calculation_date,
-          e.name AS employee_name,
-          ae.User_Role AS employee_role,
-          b.total_price AS event_budget
-        FROM employee_service_charges esc
-        JOIN employee e ON esc.employee_id = e.employee_id
-        JOIN assigned_employee ae ON e.employee_id = ae.Employee_ID
-        JOIN event ev ON esc.event_id = ev.Event_ID
-        JOIN booking b ON ev.booking_id = b.booking_id
-        WHERE esc.employee_id = ?
-      `,
+          b.total_price AS event_budget,
+          c.name AS customer_name
+         FROM employee_service_charges esc
+         JOIN event ev ON esc.event_id = ev.Event_ID
+         JOIN booking b ON ev.booking_id = b.booking_id
+         JOIN customer c ON b.customer_id = c.customer_id
+         JOIN assigned_employee ae ON esc.employee_id = ae.Employee_ID
+           AND ae.Employee_Assign_ID = (
+             SELECT MAX(Employee_Assign_ID)
+             FROM assigned_employee
+             WHERE Employee_ID = esc.employee_id
+           )
+         WHERE esc.employee_id = ?
+         ORDER BY esc.calculation_date DESC`,
         [employeeId]
       );
       return results;
     } catch (error) {
-      throw new Error(`Database error: ${error.message}`);
+      throw new Error(`Query failed: ${error.message}`);
     } finally {
       connection.release();
     }

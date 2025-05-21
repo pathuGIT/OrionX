@@ -232,10 +232,11 @@ const ServiceChargeTable = () => {
                             rowSpan={eventGroup.entries.length}
                             className="px-4 py-3 text-sm text-gray-900 align-middle border-r"
                           >
-                            LKR {formatCurrency(eventGroup.event_budget)}
+                          {eventGroup.event_budget}
+
                           </td>
                         )}
-
+                        {console.log(row.event_budget)}
                         <td className="px-4 py-3 text-sm font-semibold text-green-600">
                           + LKR {formatCurrency(row.amount)}
                         </td>
