@@ -24,6 +24,9 @@ import {
   getCustomerByPhoneModel,
   addCustomerModel,
   getCusName,
+  getAllCustomersModel,
+  updateCustomerModel,
+  getBookingsByCustomerIdModel,
 } from "../models/customerModel.js";
 
 //add employees (employees add to system by admin)
@@ -111,18 +114,21 @@ export const getEmployee = async (req, res) => {
     } 
 }
 
+// Update the existing searchCustomer controller
 export const searchCustomer = async (req, res) => {
-    const search_term = req.query.q;
-    
-    try {
-        const customers = await searchCustomerByTerm(search_term);
-        if (!customers || customers.length === 0) return res.status(404).json({ message: 'Customer not found' });
-        res.status(200).json({ customers });
-        
-    } catch (error) {
-        res.status(500).json({ msg: 'Server error...', error });
+  try {
+    const searchTerm = req.query.q;
+    if (!searchTerm || searchTerm.trim() === '') {
+      return res.status(400).json({ error: 'Search term is required' });
     }
-}
+    
+    const results = await searchCustomerByTerm(searchTerm.trim());
+    res.json(results);
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Failed to perform search' });
+  }
+};
 
 // update employee details
 // export const updateEmployees = async (req, res) => {
@@ -637,4 +643,50 @@ export const getPayEntries = async (req, res) => {
   }
 };
 
+
+// Add new controller methods
+export const getAllCustomers = async (req, res) => {
+  try {
+    const customers = await getAllCustomersModel();
+    res.json(customers);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch customers' });
+  }
+};
+
+export const updateCustomer = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { name, email, phone, address, staus } = req.body;
+    
+    // Validate required fields
+    if (!name || !email || !phone) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const updateData = {
+      name,
+      email,
+      phone,
+      address: address || '',
+      staus: staus || 'active'
+    };
+
+    const updatedCustomer = await updateCustomerModel(customerId, updateData);
+    res.json(updatedCustomer);
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Failed to update customer' });
+  }
+};
+
+export const getCustomerBookings = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const bookings = await getBookingsByCustomerIdModel(customerId);
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+};
  

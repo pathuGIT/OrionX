@@ -18,7 +18,10 @@ import {
     deductionController,
     calculateAndSaveMonthlyDeduction,
     calculatePay,
-    getPayEntries
+    getPayEntries,
+    getAllCustomers,
+    updateCustomer,
+    getCustomerBookings
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -38,6 +41,11 @@ router.get('/getEmployeesByStatus', superAdmin,getEmployeesByStatus);
 router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
 //router.get('/getAllServiceChargeData',handleServiceChargeOperations);
 //router.get('/getAllServiceChargeData',superAdmin,getAllServiceChargeData);
+// Add new routes
+router.get('/getAllCustomers', superAdmin, getAllCustomers);
+router.put('/updateCustomer/:customerId', superAdmin, updateCustomer);
+router.get('/getCustomerBookings/:customerId', superAdmin, getCustomerBookings);
+
 
 router.post('/service-charges/calculate', serviceChargeController.calculateCharges);
 router.get('/service-charges', serviceChargeController.getAllCharges);
