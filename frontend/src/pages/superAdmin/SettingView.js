@@ -1,150 +1,9 @@
-// import React, { useEffect, useState } from 'react'
-// import axios from 'axios'
-// import { getProfile } from '../../services/settingService'
-
-// const SettingView = () => {
-//   const [profile, setProfile] = useState({ name: '', email: '', status: '', role: '' })
-//   const [admins, setAdmins] = useState([])
-//   const [employees, setEmployees] = useState([])
-//   const [showAdd, setShowAdd] = useState(false)
-//   const [selectedEmployee, setSelectedEmployee] = useState('')
-
-//   useEffect(() => async () => {
-//     const x = await getProfile(sessionStorage.getItem('id'));
-//     setProfile({ name: x.name, email: x.email, status: x.status, role: x.role })
-//   }, []);
-
-//   return (
-//     <div className="p-4 space-y-6 flex flex-col">
-//       {/* My Profile */}
-//       <div className="flex flex-row gap-4">
-//         <section className="bg-white p-4 rounded-lg shadow space-y-3">
-//           <h2 className="text-base font-semibold">My Profile</h2>
-//           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-//             <input
-//               type="text"
-//               className="border p-1 rounded text-xs"
-//               placeholder="Name"
-//               value={profile.name}
-//               onChange={e => setProfile({ ...profile, name: e.target.value })}
-//             />
-//             <input
-//               type="email"
-//               className="border p-1 rounded text-xs"
-//               placeholder="Email"
-//               value={profile.email}
-//               onChange={e => setProfile({ ...profile, email: e.target.value })}
-//             />
-//             <input
-//               type="text"
-//               className="border p-1 rounded text-xs"
-//               placeholder="Status"
-//               value={profile.status}
-//               onChange={e => setProfile({ ...profile, status: e.target.value })}
-//             />
-//             <input
-//               type="text"
-//               className="border p-1 rounded text-xs"
-//               placeholder="Role"
-//               value={profile.role}
-//               onChange={e => setProfile({ ...profile, role: e.target.value })}
-//             />
-//           </div>
-//           <button
-//             onClick={() => {}}
-//             className="mt-1 px-3 py-1 bg-blue-600 text-xs text-white rounded"
-//           >
-//             Save
-//           </button>
-//         </section>
-
-//         {/* Change Password */}
-//         <section className="bg-white p-4 rounded-lg shadow space-y-3">
-//           <h2 className="text-base font-semibold">Change Password</h2>
-//           <div className="space-y-2">
-//             <input type="password" className="border p-1 rounded text-xs" placeholder="Current Password" />
-//             <input type="password" className="border p-1 rounded text-xs" placeholder="New Password" />
-//             <input type="password" className="border p-1 rounded text-xs" placeholder="Confirm New" />
-//           </div>
-//           <button className="mt-1 px-3 py-1 bg-blue-600 text-xs text-white rounded">
-//             Update
-//           </button>
-//         </section>
-//       </div>
-
-//       {/* Manage Admins */}
-//       <section className="bg-white p-4 rounded-lg shadow space-y-3">
-//         <div className="flex items-center justify-between">
-//           <h2 className="text-base font-semibold">Manage Admins</h2>
-//           <button
-//             onClick={() => setShowAdd(true)}
-//             className="px-3 py-1 bg-green-600 text-xs text-white rounded"
-//           >
-//             Add Sub-Admin
-//           </button>
-//         </div>
-
-//         {showAdd && (
-//           <div className="mt-2 flex space-x-2 items-center">
-//             <select
-//               className="border p-1 rounded text-xs"
-//               value={selectedEmployee}
-//               onChange={e => setSelectedEmployee(e.target.value)}
-//             >
-//               <option value="">Select Employee</option>
-//               {employees.map(emp => (
-//                 <option key={emp.id} value={emp.id}>{emp.name}</option>
-//               ))}
-//             </select>
-//             <button
-//               onClick={() => {}}
-//               className="px-3 py-1 bg-blue-600 text-xs text-white rounded"
-//             >
-//               Assign Role
-//             </button>
-//             <button
-//               onClick={() => setShowAdd(false)}
-//               className="px-3 py-1 bg-gray-300 text-xs text-black rounded"
-//             >
-//               Cancel
-//             </button>
-//           </div>
-//         )}
-
-//         <table className="w-full text-left text-sm">
-//           <thead>
-//             <tr>
-//               <th className="border-b p-1">Name</th>
-//               <th className="border-b p-1">Email</th>
-//               <th className="border-b p-1">Role</th>
-//               <th className="border-b p-1">Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {admins.map(admin => (
-//               <tr key={admin.id}>
-//                 <td className="p-1">{admin.name}</td>
-//                 <td className="p-1">{admin.email}</td>
-//                 <td className="p-1">{admin.role}</td>
-//                 <td className="p-1 space-x-2">
-//                   <button className="text-xs text-red-600">Deactivate</button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </section>
-//     </div>
-//   )
-// }
-
-// export default SettingView
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { getProfile, getAdmins, getEmployees, assignRole, deactivateAdmin, updateProfile, changePassword } from '../../services/settingService'
 
 const SettingView = () => {
-  const [profile, setProfile] = useState({ name: '', email: '', status: '', role: '' })
+  const [profile, setProfile] = useState({ name: '', email: ''})
   const [admins, setAdmins] = useState([])
   const [employees, setEmployees] = useState([])
   const [showAdd, setShowAdd] = useState(false)
@@ -154,6 +13,9 @@ const SettingView = () => {
     newPassword: '',
     confirmPassword: ''
   })
+  const [showRoleModal, setShowRoleModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profilePassword, setProfilePassword] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -178,7 +40,140 @@ const SettingView = () => {
   const handleSubmitPassword = async (e) => {
     e.preventDefault()
     // Add password change logic
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert("Passwords do not match!")
+      return
+    }
+    try {
+      await changePassword(sessionStorage.getItem("id"),{current: passwordData.currentPassword, new: passwordData.newPassword})
+      alert("Password changed successfully!")
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to change password')
+    }
   }
+
+  // New handler for role assignment
+  const handleAssignRole = async (selectedRole, adminPassword) => {
+    try {
+      const adminId = sessionStorage.getItem('id')
+      await assignRole(selectedEmployee, selectedRole, adminPassword, adminId)
+      alert('Role successfully updated!')
+      // Refresh admin list
+      const adminsData = await getAdmins()
+      setAdmins(adminsData)
+      setShowRoleModal(false)
+      setShowAdd(false)
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to assign role')
+    }
+  }
+
+  // Move state inside modal
+  const RoleChangeModal = () => {
+    const [selectedRole, setSelectedRole] = useState('sub_admin')
+    const [adminPassword, setAdminPassword] = useState('')
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <h3 className="text-lg font-semibold mb-4">Confirm Role Change</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">New Role</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+              >
+                <option value="sub_admin">Sub Admin</option>
+                <option value="super_admin">Super Admin</option>
+                <option value="employee">Employee</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Confirm Your Password</label>
+              <input
+                type="password"
+                className="w-full p-2 border rounded"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowRoleModal(false)}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleAssignRole(selectedRole, adminPassword)}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Confirm Change
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Handler for profile update with password confirmation
+  const handleProfileUpdate = async () => {
+    setShowProfileModal(true)
+  }
+
+  const handleConfirmProfileUpdate = async () => {
+    try {
+      // Try to change password with current password to verify
+      await changePassword(sessionStorage.getItem('id'), {
+        current: profilePassword,
+        new: profilePassword // dummy, will not actually change
+      })
+      // If password is correct, update profile
+      await updateProfile(sessionStorage.getItem('id'), profile)
+      alert('Profile updated successfully!')
+      setShowProfileModal(false)
+      setProfilePassword('')
+    } catch (error) {
+      alert(error.response?.data?.error || 'Password incorrect or failed to update profile')
+    }
+  }
+
+  const ProfilePasswordModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-semibold mb-4">Confirm Profile Update</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Enter your password to confirm</label>
+            <input
+              type="password"
+              className="w-full p-2 border rounded"
+              value={profilePassword}
+              onChange={e => setProfilePassword(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={() => { setShowProfileModal(false); setProfilePassword(''); }}
+              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmProfileUpdate}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="p-6 space-y-8 max-w-6xl mx-auto">
@@ -213,7 +208,7 @@ const SettingView = () => {
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={profile.status}
-                  onChange={e => setProfile({ ...profile, status: e.target.value })}
+                  readOnly
                 />
               </div>
               <div>
@@ -227,7 +222,7 @@ const SettingView = () => {
               </div>
             </div>
             <button
-              onClick={() => updateProfile(sessionStorage.getItem('id'), profile)}
+              onClick={handleProfileUpdate}
               className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
             >
               Save Changes
@@ -295,32 +290,30 @@ const SettingView = () => {
           <div className="bg-gray-50 p-4 rounded-lg mb-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <select
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border rounded"
                 value={selectedEmployee}
                 onChange={e => setSelectedEmployee(e.target.value)}
               >
                 <option value="">Select Employee</option>
                 {employees.map(emp => (
-                  <option key={emp.id} value={emp.id}>{emp.name}</option>
+                  <option key={emp.user_id} value={emp.employee_id}>{emp.name} | {emp.email}</option>
                 ))}
               </select>
               <div className="flex gap-2">
                 <button
-                  onClick={() => assignRole(selectedEmployee)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                  onClick={() => setShowRoleModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
                   Assign Role
                 </button>
-                <button
-                  onClick={() => setShowAdd(false)}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md transition-colors"
-                >
-                  Cancel
-                </button>
+                {/* ... cancel button */}
               </div>
             </div>
           </div>
         )}
+
+        {showRoleModal && <RoleChangeModal />}
+        {showProfileModal && <ProfilePasswordModal />}
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -329,7 +322,7 @@ const SettingView = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> */}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -341,14 +334,6 @@ const SettingView = () => {
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       {admin.role}
                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <button
-                      onClick={() => deactivateAdmin(admin.id)}
-                      className="text-red-600 hover:text-red-900 font-medium"
-                    >
-                      Deactivate
-                    </button>
                   </td>
                 </tr>
               ))}

@@ -2,7 +2,7 @@ import pool from '../config/db.js';
 
 export const findUserById = async userId => {
   const [rows] = await pool.query(
-    `SELECT u.user_id, u.role, u.status, e.name, e.email
+    `SELECT u.user_id, u.role, u.status, e.name, e.email, u.password
      FROM systemuser u
      JOIN employee e ON u.employee_id = e.employee_id
      WHERE u.user_id = ?`, [userId]
@@ -49,3 +49,20 @@ export const assignSubAdmin = async employeeId => {
 export const deactivateAdmin = async userId => {
   await pool.query(`UPDATE systemuser SET status = 'inactive' WHERE user_id = ?`, [userId]);
 };
+
+export const updateUserRole = async (userId, role) => {
+  console.log("Updating user role:", { userId, role })
+  await pool.query(
+    `UPDATE systemuser SET role = ? WHERE employee_id = ?`,
+    [role, userId]
+  )
+  
+  const [user] = await pool.query(`
+    SELECT u.user_id, u.role, e.name, e.email 
+    FROM systemuser u
+    JOIN employee e ON u.employee_id = e.employee_id
+    WHERE u.user_id = ?
+  `, [userId])
+  
+  return user[0]
+}

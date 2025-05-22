@@ -5,8 +5,8 @@ export const getProfile = async (id) => {
   return response.data;
 };
 
-export const updateProfile = async (id) => {
-  const response = await api.put(`/setting/profile/${id}`);
+export const updateProfile = async (id, data) => {
+  const response = await api.put(`/setting/profile/${id}`, data);
   return response.data;
 };
 
@@ -25,12 +25,18 @@ export const getEmployees = async () => {
   return response.data;
 };
 
-export const assignRole = async (employeeId) => {
-  const response = await api.post(`/setting/admins`, { employeeId });
-  return response.data;
-};
+export const assignRole = async (employeeId, role, password, adminId) => {
+  const response = await api.put(`/setting/admins`, {
+    employeeId,
+    role,
+    password,
+    adminId
+  })
+  return response.data
+}
 
 export const deactivateAdmin = async (id) => {
   const response = await api.delete(`/setting/admins/${id}`);
   return response.data;
 };
+
