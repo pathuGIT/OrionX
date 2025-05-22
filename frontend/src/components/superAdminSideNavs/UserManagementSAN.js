@@ -22,9 +22,6 @@ const UserManagementSAN = ({ setRenderContent }) => {
       case 'addEmployees':
         setRenderContent(() => () => <AddEmployee />);
         break;
-      // case 'getEmployees':
-      //   setRenderContent(() => () => <GetEmployees />);
-      //   break;
       case 'updateEmployeesById':
         setRenderContent(() => () => <UpdateEmployees />);
         break;

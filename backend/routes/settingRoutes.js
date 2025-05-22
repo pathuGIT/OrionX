@@ -10,5 +10,4 @@ router.get('/admins', getAdmins);
 router.get('/employees', getEmployees);
 router.put('/admins', assignAdmin);
 router.delete('/admins/:id', deactivate);
-
 export default router;
