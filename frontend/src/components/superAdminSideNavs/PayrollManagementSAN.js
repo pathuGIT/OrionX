@@ -14,7 +14,8 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
         setRenderContent(() => () => <ServicesChargeCalc />);
         break;
       default:
-        setRenderContent(() => () => <p>Page </p>);
+        setRenderContent(() => () => <ServicesChargeCalc />);
+        setClickedItem("ServicesChargeCalculation");
     }
   }, [setRenderContent]);
 

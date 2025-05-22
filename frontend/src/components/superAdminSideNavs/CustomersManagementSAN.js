@@ -18,7 +18,8 @@ const CustomersManagementSAN = ({ setRenderContent }) => {
                 setRenderContent(() => () => <AddCustomer />);
                 break;
             default:
-                setRenderContent(() => () => <p>Page not found</p>);
+                setClickedItem('add-customer');
+                setRenderContent(() => () => <AddCustomer />);
         }
     };
     return (

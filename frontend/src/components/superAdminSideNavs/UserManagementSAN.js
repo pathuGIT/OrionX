@@ -28,8 +28,8 @@ const UserManagementSAN = ({ setRenderContent }) => {
         setRenderContent(() => () => <UpdateEmployees />);
         break;
       default:
-        setClickedItem('calender-view');
-        setRenderContent(() => () => <p>Page not found</p>);
+        setClickedItem('updateEmployeesById');
+        setRenderContent(() => () => <UpdateEmployees />);
     }
   };
 

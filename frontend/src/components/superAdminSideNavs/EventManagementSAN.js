@@ -17,7 +17,8 @@ const EventManagementSAN = ({ setRenderContent }) => {
           setRenderContent(() => () =><EventAssignment />);
           break;
       default:
-        setRenderContent(() => () => <p>Page not found</p>);
+        setRenderContent(() => () => <EventAssignment />);
+        setClickedItem('assignEmployees');
     }
   };
   return (
