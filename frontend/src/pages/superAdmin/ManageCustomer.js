@@ -75,7 +75,7 @@ const ManageCustomer = () => {
         <div className="p-6 max-w-7xl mx-auto">
             {isLoading && (
                 <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-500"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-t-transparent border-blue-500"></div>
                 </div>
             )}
 
