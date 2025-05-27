@@ -508,3 +508,17 @@ export const checkBookingMenuSelection = async (booking_id) => {
     throw error;
   }
 };
+
+////////////////////////////////////////////////////////////////////////////////////
+
+// Get summary by booking_id
+export const getSummaryByBookingId = async (booking_id) => {
+  try {
+    const response = await api.get(`/summary/${booking_id}`);
+    console.log("getSummaryByBookingId response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching summary:", error);
+    throw error;
+  }
+};

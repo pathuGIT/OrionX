@@ -14,6 +14,7 @@ import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
 import bookingRoutes from './routes/bookingRoutes.js';
 import advanceMenuViewRoute from './routes/advanceMenuViewRoute.js'
 import menuViewRoutes from './routes/menuViewRoutes.js';
+import summaryRoutes from './routes/summaryRoutes.js';
 
 const app = express();
 
@@ -36,10 +37,11 @@ app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 app.use('/api/customerMenuSelection', customerSelectionRoutes);
 // Menu Overview routes
 app.use('/api/advanceMenu', advanceMenuViewRoute);
-app.use('/api/advanceMenuView', menuViewRoutes); //meka tmi werdi ei
+app.use('/api/advanceMenuView', menuViewRoutes);
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
+app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
 
 
 
