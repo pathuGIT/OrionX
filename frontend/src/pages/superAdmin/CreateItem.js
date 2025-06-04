@@ -3,25 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { getItems, addItem, getItemById, deleteItem, updateItem } from '../../services/MenuService';
 
 function CreateItem({setRenderContent}) {
-  // State to hold current item input
   const [item, setItem] = useState({ item_id: '', item_name: '' });
-
-  // State to hold the list of all items
   const [items, setItems] = useState([]);
-
-  // Button name toggles between "Add Item" and "Update"
-  const [btnname, setBtnname] = useState('Add Item');
-
+  const [btnName, setBtnName] = useState('Add Item');
   const navigate = useNavigate();
 
-  // Fetch items and generate next item ID on component mount
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const fetchedItems = await getItems();
         setItems(fetchedItems);
 
-        // Generate next item ID (e.g., IT000002)
         const nextId = fetchedItems.length
           ? `IT${(fetchedItems.length + 1).toString().padStart(6, '0')}`
           : 'IT000001';
@@ -35,44 +27,35 @@ function CreateItem({setRenderContent}) {
     fetchItems();
   }, []);
 
-  // Check if item name already exists (case-insensitive)
   const handleValidation = () => {
     return items.some(
       (existingItem) => existingItem.item_name.toLowerCase() === item.item_name.toLowerCase()
     );
   };
 
-  // Handle add or update item
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if item name is not empty or only spaces
     if (!item.item_name.trim()) {
       alert('Item name cannot be empty or just spaces!');
       return;
     }
 
-    // Validate uniqueness
     if (handleValidation()) {
       alert('This item name already exists! Please enter a unique name.');
       return;
     }
 
     try {
-      if (btnname === 'Add Item') {
-        // Call service to add new item
+      if (btnName === 'Add Item') {
         await addItem(item);
         alert('Item added successfully!');
-
-        
       } else {
-        // Call service to update existing item
         await updateItem(item.item_id, item.item_name);
         alert('Item updated successfully!');
-        setBtnname('Add Item'); // Reset button label
+        setBtnName('Add Item');
       }
 
-      // Clear form and refresh items list
       setItem({ item_name: '' });
       const updatedItems = await getItems();
       setItems(updatedItems);
@@ -82,13 +65,11 @@ function CreateItem({setRenderContent}) {
     }
   };
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setItem((prevItem) => ({ ...prevItem, [name]: value }));
   };
 
-  // Populate form fields with selected item data for editing
   const handleEdit = async (id) => {
     try {
       const itemById = await getItemById(id);
@@ -97,15 +78,13 @@ function CreateItem({setRenderContent}) {
         return;
       }
 
-      // Set the item to be edited
       setItem({ item_id: id, item_name: itemById.item_name });
-      setBtnname('Update'); // Change button label to Update
+      setBtnName('Update');
     } catch (error) {
       console.error('Error fetching item by ID:', error);
     }
   };
 
-  // Delete an item after confirmation
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
     if (!isConfirmed) return;
@@ -123,65 +102,97 @@ function CreateItem({setRenderContent}) {
   };
 
   return (
-    <div className="flex justify-between items-start mt-10 px-10 gap-2">
-      {/* Left side: Form to add/update item */}
-      <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-sm font-semibold text-black mb-5">Create Item</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-900">Item Name</label>
-            <input
-              type="text"
-              name="item_name"
-              required
-              placeholder="Enter item name"
-              value={item.item_name}
-              onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-2 text-gray-900 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
-          </div>
-          <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">
-            {btnname}
-          </button>
-        </form>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Item Management</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Form Section */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Create Item</h2>
+              <p className="text-sm text-gray-500">Add or update menu items</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                <input
+                  type="text"
+                  name="item_name"
+                  required
+                  placeholder="Enter item name"
+                  value={item.item_name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+              </div>
 
-      {/* Right side: Table displaying existing items */}
-      <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-sm font-semibold text-black mb-5">Items</h2>
-        <table className="min-w-full border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-sm">ID</th>
-              <th className="border px-4 py-2 text-sm">Name</th>
-              <th colSpan={2}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((it, index) => (
-              <tr key={index} className="border">
-                <td className="border px-4 py-2 text-sm">{it.item_id}</td>
-                <td className="border px-4 py-2 text-sm">{it.item_name}</td>
-                <td>
-                  <button
-                    className="border px-3 py-1 bg-blue-500 text-sm"
-                    onClick={() => handleEdit(it.item_id)}
-                  >
-                    Edit
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className="border px-3 py-1 bg-red-500 text-sm"
-                    onClick={() => handleDelete(it.item_id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              <button
+                type="submit"
+                className={`w-full py-2 px-4 rounded-lg font-medium text-white transition duration-200 ${
+                  btnName === 'Add Item' 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {btnName}
+              </button>
+            </form>
+          </div>
+
+          {/* Table Section */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Items</h2>
+              <p className="text-sm text-gray-500">Current menu items</p>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {items.map((it, index) => (
+                    <tr key={index} className="hover:bg-gray-50 transition duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {it.item_id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {it.item_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        <button
+                          onClick={() => handleEdit(it.item_id)}
+                          className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition duration-200"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(it.item_id)}
+                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

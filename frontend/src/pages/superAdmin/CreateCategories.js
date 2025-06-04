@@ -4,25 +4,17 @@ import { getCategories, addCategory, getCategoryById, deleteCategory, updateCate
 import CreateItem from './CreateItem';
 
 function CreateCategory({setRenderContent}) {
-  // State to hold current category input
   const [category, setCategory] = useState({ category_id: '', category_name: '' });
-
-  // State to hold the list of all categories
   const [categories, setCategories] = useState([]);
-
-  // Button name (switches between 'Add Category' and 'Update')
   const [btnname, setBtnname] = useState('Add Category');
-
   const navigate = useNavigate();
 
-  // Fetch all categories on initial render and set default ID
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
         setCategories(fetchedCategories);
 
-        // Generate next category ID (e.g., C000002)
         const nextId = fetchedCategories.length
           ? `C${(fetchedCategories.length + 1).toString().padStart(6, '0')}`
           : 'C000001';
@@ -35,26 +27,22 @@ function CreateCategory({setRenderContent}) {
     fetchCategories();
   }, []);
 
-  // Check if category name already exists (case-insensitive)
   const handleValidation = () => {
     return categories.some(
       (item) => item.category_name.toLowerCase() === category.category_name.toLowerCase()
     );
   };
 
-  // Handle form submission for adding or updating category
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate input is not empty or whitespace
     if (!category.category_name.trim()) {
       alert('Category name cannot be empty or just spaces!');
       return;
     }
 
-    // Validate uniqueness
     if (handleValidation()) {
-      alert('This category name already exists! PlsetRenderContent(() => () => <CreateItem />);ease enter a unique name.');
+      alert('This category name already exists! Please enter a unique name.');
       return;
     }
 
@@ -62,17 +50,15 @@ function CreateCategory({setRenderContent}) {
       if (btnname === 'Add Category') {
         await addCategory(category);
         alert('Category added successfully!');
-        setCategory({ category_name: '' }); // Reset input after adding
-
-        setRenderContent(() => () => <CreateItem/>);
+        setCategory({ category_name: '' });
+        setRenderContent(() => () => <CreateItem />);
       } else if (btnname === 'Update') {
         await updateCategoryById(category.category_id, category.category_name);
         alert('Category updated successfully!');
-        setCategory({ category_name: '' }); // Reset input after updating
-        setBtnname('Add Category'); // Reset button name
+        setCategory({ category_name: '' });
+        setBtnname('Add Category');
       }
 
-      // Refresh category list after operation
       const updatedCategories = await getCategories();
       setCategories(updatedCategories);
     } catch (error) {
@@ -81,13 +67,11 @@ function CreateCategory({setRenderContent}) {
     }
   };
 
-  // Handle input field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCategory((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Populate form for editing a specific category
   const handleEdit = async (id) => {
     try {
       const fetchedCategory = await getCategoryById(id);
@@ -102,7 +86,6 @@ function CreateCategory({setRenderContent}) {
     }
   };
 
-  // Delete a category after confirmation
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu?');
     if (!isConfirmed) return;
@@ -111,8 +94,6 @@ function CreateCategory({setRenderContent}) {
       const deleteResponse = await deleteCategory(id);
       if (deleteResponse) {
         alert(deleteResponse.message);
-
-        // Refresh category list after deletion
         const updatedCategories = await getCategories();
         setCategories(updatedCategories);
       }
@@ -122,70 +103,98 @@ function CreateCategory({setRenderContent}) {
   };
 
   return (
-    <div className="flex justify-between items-start mt-10 px-10 gap-2">
-      
-      {/* Category Input Form */}
-      <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-sm font-semibold text-black mb-5">Create Category</h2>
-        <form onSubmit={handleSubmit}>
-          
-          {/* Category Name Input */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-900">Category Name</label>
-            <input
-              type="text"
-              name="category_name"
-              required
-              placeholder="Enter category name"
-              value={category.category_name}
-              onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-2 text-gray-900 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Category Management</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Form Section */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Create Category</h2>
+              <p className="text-sm text-gray-500">Add or update menu categories</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+                <input
+                  type="text"
+                  name="category_name"
+                  required
+                  placeholder="Enter category name"
+                  value={category.category_name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className={`w-full py-2 px-4 rounded-lg font-medium text-white transition duration-200 ${
+                  btnname === 'Add Category' 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {btnname}
+              </button>
+            </form>
           </div>
 
-          {/* Submit Button */}
-          <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">
-            {btnname}
-          </button>
-        </form>
+          {/* Table Section */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Categories</h2>
+              <p className="text-sm text-gray-500">Current menu categories</p>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {categories.map((cat, index) => (
+                    <tr key={index} className="hover:bg-gray-50 transition duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {cat.category_id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {cat.category_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        <button
+                          onClick={() => handleEdit(cat.category_id)}
+                          className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition duration-200"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cat.category_id)}
+                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Category List Table */}
-      <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-sm font-semibold text-black mb-5">Categories</h2>
-        <table className="min-w-full border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-sm">ID</th>
-              <th className="border px-4 py-2 text-sm">Name</th>
-              <th colSpan={2}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((cat, index) => (
-              <tr key={index} className="border">
-                <td className="border px-4 py-2 text-sm">{cat.category_id}</td>
-                <td className="border px-4 py-2 text-sm">{cat.category_name}</td>
-
-                {/* Edit Button */}
-                <td>
-                  <button className="border px-3 py-1 bg-blue-500 text-sm" onClick={() => handleEdit(cat.category_id)}>
-                    Edit
-                  </button>
-                </td>
-
-                {/* Delete Button */}
-                <td>
-                  <button className="border px-3 py-1 bg-red-500 text-sm" onClick={() => handleDelete(cat.category_id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
     </div>
   );
 }

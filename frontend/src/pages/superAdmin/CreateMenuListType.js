@@ -113,59 +113,97 @@ function CreateMenuListType({setRenderContent}) {
   };
 
   return (
-    <div className="flex justify-between items-start mt-10 px-10 gap-2">
-      {/* Left Side - Form */}
-      <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-sm font-semibold text-black mb-5">Create Menu</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-900">Menu List Name</label>
-            <input
-              type="text"
-              name="menu_list_name"
-              required
-              placeholder="Enter menu list name"
-              value={menu.menu_list_name}
-              onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-2 text-gray-900 border border-gray-300 focus:border-gray-500 focus:outline-none"
-            />
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Menu Management</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Form Section */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Create Menu</h2>
+              <p className="text-sm text-gray-500">Add or update menu list types</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Menu List Name</label>
+                <input
+                  type="text"
+                  name="menu_list_name"
+                  required
+                  placeholder="Enter menu list name"
+                  value={menu.menu_list_name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className={`w-full py-2 px-4 rounded-lg font-medium text-white transition duration-200 ${
+                  btnname === 'Add Menu' 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {btnname}
+              </button>
+            </form>
           </div>
-          <button type="submit" className="w-full bg-gray-500 text-white py-2 mt-4 rounded-lg hover:bg-gray-600">
-            {btnname}
-          </button>
-        </form>
-      </div>
 
-      {/* Right Side - Table */}
-      <div className="w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-sm font-semibold text-black mb-5">Menu List Types</h2>
-        <table className="min-w-full border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-sm">ID</th>
-              <th className="border px-4 py-2 text-sm">Name</th>
-              <th colSpan={2}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {menus.map((menuItem, index) => (
-              <tr key={index} className="border">
-                <td className="border px-4 py-2 text-sm">{menuItem.menu_list_type_id}</td>
-                <td className="border px-4 py-2 text-sm">{menuItem.menu_list_name}</td>
-                <td>
-                  <button className="border px-3 py-1 bg-blue-500 text-sm" onClick={() => handleEdit(menuItem.menu_list_type_id)}>
-                    Edit
-                  </button>
-                </td>
-                <td>
-                  <button className="border px-3 py-1 bg-red-500 text-sm" onClick={() => handleDelete(menuItem.menu_list_type_id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          {/* Table Section */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Menu List Types</h2>
+              <p className="text-sm text-gray-500">Manage existing menu types</p>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {menus.map((menuItem, index) => (
+                    <tr key={index} className="hover:bg-gray-50 transition duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {menuItem.menu_list_type_id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {menuItem.menu_list_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        <button
+                          onClick={() => handleEdit(menuItem.menu_list_type_id)}
+                          className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition duration-200"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(menuItem.menu_list_type_id)}
+                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
