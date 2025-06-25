@@ -9,7 +9,7 @@ import {
   EventServiceRoutes, saveSelectedServiceRoutes,
   tableArrangementRoutes, reservationRoutes,
   planBarRoutes, planBiteRoutes,
-  BarArrangeRoutes,AdminRoutes
+  BarArrangeRoutes,AdminRoutes,AdminEventRoutes
 } from './routes/eventRoutes.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
@@ -61,6 +61,7 @@ app.use('/api/Bar', planBarRoutes);
 app.use('/api/Bite', planBiteRoutes);
 app.use('/api/BarArrange', BarArrangeRoutes);
 app.use('/api/assignedEmployee', AdminRoutes);
+app.use('/api/AdminEvents', AdminEventRoutes);
 
 
 // Global error handler
