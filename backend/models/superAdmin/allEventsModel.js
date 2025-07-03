@@ -159,8 +159,20 @@ class AllEvent {
   const [events] = await db.query(`
     SELECT
       e.Event_ID,
+      e.Buffet_TimeFrom,
+      e.Buffet_TimeTo,
+      e.Additional_Time,
+      e.Function_durationFrom,
+      e.Function_durationTo,
+      e.Tea_table_Time,
+      e.Dress_Time,
+      e.booking_id,
       b.booking_date AS Event_Date,
       b.status,
+      b.time_slot,
+      b.number_of_guests,
+      b.additional_hours,
+      b.total_price,
       w.Groom_Name,
       w.Bride_Name,
       w.Groom_Contact_no,
@@ -168,6 +180,10 @@ class AllEvent {
       w.Poruwa_CeremonyFrom,
       w.Poruwa_CeremonyTo,
       w.Registration_Time,
+      w.Fountain,
+      w.ProsperityTable,
+      w.Groom_Address,
+      w.Bride_Address,
       c.Event_Name AS CustomEvent_Name,
       c.ContactPersonName,
       c.ContactPersonNumber
@@ -175,14 +191,14 @@ class AllEvent {
     LEFT JOIN Wedding w ON e.Event_ID = w.Event_ID
     LEFT JOIN CustomEvent c ON e.Event_ID = c.Event_ID
     LEFT JOIN Booking b ON e.booking_id = b.booking_id
-    WHERE b.status IN ('confirmed', 'done')
+    WHERE b.status IN ('confirmed', 'done','pending', 'cancelled')
   `);
 
   return events.map(event => {
     return {
       ...event,
       eventType: event.Groom_Name ? 'wedding' : 'custom',
-      details: event.Groom_Name 
+      details: event.Groom_Name
         ? {
             groomName: event.Groom_Name,
             brideName: event.Bride_Name,
@@ -190,7 +206,11 @@ class AllEvent {
             brideContact: event.Bride_Contact_no,
             poruwaCeremonyFrom: event.Poruwa_CeremonyFrom,
             poruwaCeremonyTo: event.Poruwa_CeremonyTo,
-            registrationTime: event.Registration_Time
+            registrationTime: event.Registration_Time,
+            fountain: event.Fountain,
+            prosperityTable: event.ProsperityTable,
+            groomAddress: event.Groom_Address,
+            brideAddress: event.Bride_Address
           }
         : {
             eventName: event.CustomEvent_Name,
