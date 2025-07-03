@@ -2,67 +2,67 @@
 import db from '../../config/db.js';
 
 class AllEvent {
-  // Create event with type-specific details
-  static async create(eventType, data) {
-    const connection = await db.getConnection();
-    try {
-      await connection.beginTransaction();
+  // // Create event with type-specific details
+  // static async create(eventType, data) {
+  //   const connection = await db.getConnection();
+  //   try {
+  //     await connection.beginTransaction();
 
-      // Create base event
-      const [eventResult] = await connection.query(
-        'INSERT INTO Event SET ?',
-        [{
-          Event_Type: eventType,
-          Event_Date: data.eventDate,
-          Status: 'active',
-          // Add other common fields
-        }]
-      );
-      const eventId = eventResult.insertId;
+  //     // Create base event
+  //     const [eventResult] = await connection.query(
+  //       'INSERT INTO Event SET ?',
+  //       [{
+  //         Event_Type: eventType,
+  //         Event_Date: data.eventDate,
+  //         Status: 'active',
+  //         // Add other common fields
+  //       }]
+  //     );
+  //     const eventId = eventResult.insertId;
 
-      // Create type-specific record
-      let typeTable, typeData;
-      switch(eventType) {
-        case 'wedding':
-          typeTable = 'Wedding';
-          typeData = {
-            Event_ID: eventId,
-            Groom_Name: data.groomName,
-            Bride_Name: data.brideName,
-            Groom_Contact: data.groomContact,
-            Bride_Contact: data.brideContact,
-            Poruwa_Time: data.poruwaTime
-          };
-          break;
-        case 'custom':
-          typeTable = 'CustomEvent';
-          typeData = {
-            Event_ID: eventId,
-            Event_Name: data.eventName,
-            Contact_Person: data.contactPerson,
-            Contact_Number: data.contactNumber,
-            Special_Requirements: data.specialRequirements
-          };
-          break;
-        default:
-          throw new Error('Invalid event type');
-      }
+  //     // Create type-specific record
+  //     let typeTable, typeData;
+  //     switch(eventType) {
+  //       case 'wedding':
+  //         typeTable = 'Wedding';
+  //         typeData = {
+  //           Event_ID: eventId,
+  //           Groom_Name: data.groomName,
+  //           Bride_Name: data.brideName,
+  //           Groom_Contact: data.groomContact,
+  //           Bride_Contact: data.brideContact,
+  //           Poruwa_Time: data.poruwaTime
+  //         };
+  //         break;
+  //       case 'custom':
+  //         typeTable = 'CustomEvent';
+  //         typeData = {
+  //           Event_ID: eventId,
+  //           Event_Name: data.eventName,
+  //           Contact_Person: data.contactPerson,
+  //           Contact_Number: data.contactNumber,
+  //           Special_Requirements: data.specialRequirements
+  //         };
+  //         break;
+  //       default:
+  //         throw new Error('Invalid event type');
+  //     }
 
-      const [typeResult] = await connection.query(
-        `INSERT INTO ${typeTable} SET ?`,
-        [typeData]
-      );
+  //     const [typeResult] = await connection.query(
+  //       `INSERT INTO ${typeTable} SET ?`,
+  //       [typeData]
+  //     );
 
-      await connection.commit();
-      return { eventId, typeId: typeResult.insertId };
+  //     await connection.commit();
+  //     return { eventId, typeId: typeResult.insertId };
 
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
-  }
+  //   } catch (error) {
+  //     await connection.rollback();
+  //     throw error;
+  //   } finally {
+  //     connection.release();
+  //   }
+  // }
 
   // Update event and type-specific details
   static async update(eventId, eventType, data) {
@@ -78,7 +78,7 @@ class AllEvent {
 
       // Update type-specific data
       let typeTable, typeData;
-      switch(eventType) {
+      switch (eventType) {
         case 'wedding':
           typeTable = 'Wedding';
           typeData = {
@@ -126,7 +126,7 @@ class AllEvent {
 
       // Delete type-specific record first
       let typeTable;
-      switch(eventType) {
+      switch (eventType) {
         case 'wedding': typeTable = 'Wedding'; break;
         case 'custom': typeTable = 'CustomEvent'; break;
         default: throw new Error('Invalid event type');
@@ -155,40 +155,51 @@ class AllEvent {
   }
 
   // Get all events with type-specific details
- static async getAll() {
-    const [events] = await db.query(`
-      SELECT 
-        e.*,
-        w.*,
-        c.*
-      FROM Event e
-      LEFT JOIN Wedding w ON e.Event_ID = w.Event_ID
-      LEFT JOIN CustomEvent c ON e.Event_ID = c.Event_ID
-    `);
+  static async getAll() {
+  const [events] = await db.query(`
+    SELECT
+      e.Event_ID,
+      b.booking_date AS Event_Date,
+      b.status,
+      w.Groom_Name,
+      w.Bride_Name,
+      w.Groom_Contact_no,
+      w.Bride_Contact_no,
+      w.Poruwa_CeremonyFrom,
+      w.Poruwa_CeremonyTo,
+      w.Registration_Time,
+      c.Event_Name AS CustomEvent_Name,
+      c.ContactPersonName,
+      c.ContactPersonNumber
+    FROM Event e
+    LEFT JOIN Wedding w ON e.Event_ID = w.Event_ID
+    LEFT JOIN CustomEvent c ON e.Event_ID = c.Event_ID
+    LEFT JOIN Booking b ON e.booking_id = b.booking_id
+    WHERE b.status IN ('confirmed', 'done')
+  `);
 
-    return events.map(event => {
-      const isWedding = !!event.Groom_Name;
-      const isCustom = !!event.Event_Name;
-
-      return {
-        ...event,
-        eventType: isWedding ? 'wedding' : isCustom ? 'custom' : 'unknown',
-        details: isWedding ? {
-          groomName: event.Groom_Name,
-          brideName: event.Bride_Name,
-          groomContact: event.Groom_Contact_no,
-          brideContact: event.Bride_Contact_no,
-          poruwaCeremonyFrom: event.Poruwa_CeremonyFrom,
-          poruwaCeremonyTo: event.Poruwa_CeremonyTo,
-          registrationTime: event.Registration_Time
-        } : {
-          eventName: event.Event_Name,
-          contactPersonName: event.ContactPersonName,
-          contactPersonNumber: event.ContactPersonNumber
-        }
-      };
-    });
-  }
+  return events.map(event => {
+    return {
+      ...event,
+      eventType: event.Groom_Name ? 'wedding' : 'custom',
+      details: event.Groom_Name 
+        ? {
+            groomName: event.Groom_Name,
+            brideName: event.Bride_Name,
+            groomContact: event.Groom_Contact_no,
+            brideContact: event.Bride_Contact_no,
+            poruwaCeremonyFrom: event.Poruwa_CeremonyFrom,
+            poruwaCeremonyTo: event.Poruwa_CeremonyTo,
+            registrationTime: event.Registration_Time
+          }
+        : {
+            eventName: event.CustomEvent_Name,
+            contactPersonName: event.ContactPersonName,
+            contactPersonNumber: event.ContactPersonNumber
+          }
+    };
+  });
+}
 
   // Get single event with details
   static async getById(eventId) {
@@ -204,7 +215,7 @@ class AllEvent {
     `, [eventId]);
 
     if (events.length === 0) return null;
-    
+
     const event = events[0];
     return {
       ...event,

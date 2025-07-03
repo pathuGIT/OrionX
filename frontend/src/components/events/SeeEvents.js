@@ -39,7 +39,7 @@ const SeeEvents = () => {
     month: ''
   });
 
-    // Add click handler for table rows
+  // Add click handler for table rows
   const handleRowClick = (event) => {
     setSelectedEvent(event);
   };
@@ -72,7 +72,7 @@ const SeeEvents = () => {
   const filteredEvents = events.filter(event => {
     const date = new Date(event.Event_Date);
     const searchTerm = filters.searchQuery.toLowerCase();
-    
+
     const matchesSearch = [
       event.Event_Name,
       event.details?.eventName,
@@ -109,9 +109,9 @@ const SeeEvents = () => {
         ...values,
         Event_ID: editEvent.Event_ID
       };
-      
+
       const updatedEvent = await updateEvent(editEvent.Event_ID, payload);
-      setEvents(prev => prev.map(event => 
+      setEvents(prev => prev.map(event =>
         event.Event_ID === updatedEvent.Event_ID ? updatedEvent : event
       ));
       setEditEvent(null);
@@ -135,6 +135,18 @@ const SeeEvents = () => {
     }
   };
 
+  const formatEventDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return isNaN(date.getTime())
+      ? 'N/A'
+      : date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric'
+      });
+  };
+
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-90">
@@ -156,11 +168,11 @@ const SeeEvents = () => {
       )}
 
 
-            {/* Add popup component */}
+      {/* Add popup component */}
       {selectedEvent && (
-        <GetAllEvents 
-          event={selectedEvent} 
-          onClose={closePopup} 
+        <GetAllEvents
+          event={selectedEvent}
+          onClose={closePopup}
         />
       )}
 
@@ -383,13 +395,13 @@ const SeeEvents = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-                 <tbody className="bg-white divide-y divide-gray-200">
-        {filteredEvents.map(event => (
-          <tr 
-            key={event.Event_ID} 
-            className="hover:bg-gray-50 transition-colors cursor-pointer"
-            onClick={() => handleRowClick(event)}
-          >
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredEvents.map(event => (
+                <tr
+                  key={event.Event_ID}
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => handleRowClick(event)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {event.eventType === 'wedding'
                       ? `${event.details?.groomName || 'N/A'} & ${event.details?.brideName || 'N/A'}`
@@ -401,11 +413,7 @@ const SeeEvents = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {new Date(event.Event_Date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: '2-digit',
-                      year: 'numeric'
-                    })}
+                    {formatEventDate(event.Event_Date)}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {event.eventType === 'wedding' ? (
