@@ -272,3 +272,123 @@ export const BarService = {
         }
     }
 };
+
+// Admin Services
+
+
+export const getAssignmentOptions = async () => {
+  try {
+    const response = await api.get('/assignedEmployee/getAssignmentOptions');
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch assignment options');
+  }
+};
+
+export const assignEmployeeToEvent = async (data) => {
+  try {
+    const response = await api.post('/assignedEmployee/assignToEvent', data);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Assignment failed');
+  }
+};
+
+export const getAssignments = async () => {
+  try {
+    const response = await api.get('/assignedEmployee/assignments');
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get assignments');
+  }
+};
+
+export const updateAssignment = async (assignmentId, data) => {
+  try {
+    const response = await api.put(`/assignedEmployee/assignments/${assignmentId}`, data);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Update failed');
+  }
+};
+
+export const deleteAssignment = async (assignmentId) => {
+  try {
+    await api.delete(`/assignedEmployee/assignments/${assignmentId}`);
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Delete failed');
+  }
+};
+
+
+//wedding admin
+ 
+//  export const getAllEvents = async () => {
+//     try {
+//       const response = await api.get('/AdminEvents/events');
+//       return response.data;
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Failed to fetch events');
+//     }
+//   };
+
+//    export const createEvent = async (eventType, data) => {
+//     try {
+//       const response = await api.post('/AdminEvents/events', { eventType, data });
+//       return response.data;
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Event creation failed');
+//     }
+//   };
+
+//    export const  updateEvent = async (eventId, eventType, data) => {
+//     try {
+//       const response = await api.put(`/AdminEvents/events/${eventId}`, { eventType, data });
+//       return response.data;
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Event update failed');
+//     }
+//   };
+
+//    export const deleteEvent = async (eventId, eventType) => {
+//     try {
+//       await api.delete(`/AdminEvents/events/${eventId}`, { data: { eventType } });
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Event deletion failed');
+//     }
+//   };
+
+   export const getEventById = async (eventId) => {
+    try {
+      const response = await api.get(`/AdminEvents/events/${eventId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to fetch event');
+    }
+  };
+
+  export const getAllEvents = async () => {
+  try {
+    const response = await api.get('/AdminEvents/events');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch events');
+  }
+};
+
+export const updateEvent = async (eventId, data) => {
+  try {
+    const response = await api.put(`/AdminEvents/events/${eventId}`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Event update failed');
+  }
+};
+
+export const deleteEvent = async (eventId) => {
+  try {
+    await api.delete(`/AdminEvents/events/${eventId}`);
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Event deletion failed');
+  }
+};

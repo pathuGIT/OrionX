@@ -266,7 +266,7 @@ add column TotalSoftDrinkPrice DECIMAL(10,2);
 
 
 CREATE TABLE  liquor_items (
-    Liquor_ID VARCHAR(10) AUTO_INCREMENT PRIMARY KEY,
+    Liquor_ID VARCHAR(10) PRIMARY KEY,
     item_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     usages VARCHAR(30), 
