@@ -437,7 +437,10 @@ const SeeEvents = () => {
                       ✏️
                     </button>
                     <button
-                      onClick={() => handleDelete(event.Event_ID)}
+                      onClick={(e) => {
+                        e.stopPropagation();  
+                        handleDelete(event.Event_ID);
+                      }}
                       className="text-red-600 hover:text-red-900"
                       title="Delete"
                     >

@@ -65,94 +65,125 @@ class AllEvent {
   // }
 
   // Update event and type-specific details
-  static async update(eventId, eventType, data) {
-    const connection = await db.getConnection();
-    try {
-      await connection.beginTransaction();
+ static async update(eventId, eventData) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
 
-      // Update base event
+    // Update base event
+    await connection.query(
+      `UPDATE Event SET 
+        Event_Name = ?,
+        Event_Date = ?
+       WHERE Event_ID = ?`,
+      [eventData.Event_Name, eventData.Event_Date, eventId]
+    );
+
+    // Update type-specific details
+    if (eventData.Event_Type === 'wedding') {
       await connection.query(
-        'UPDATE Event SET ? WHERE Event_ID = ?',
-        [{ Event_Date: data.eventDate }, eventId]
+        `UPDATE Wedding SET
+          Groom_Name = ?,
+          Bride_Name = ?,
+          Groom_Contact_no = ?,
+          Bride_Contact_no = ?,
+          Poruwa_CeremonyFrom = ?,
+          Poruwa_CeremonyTo = ?,
+          Registration_Time = ?,
+          Fountain = ?,
+          ProsperityTable = ?,
+          Groom_Address = ?,
+          Bride_Address = ?
+         WHERE Event_ID = ?`,
+        [
+          eventData.details.groomName,
+          eventData.details.brideName,
+          eventData.details.groomContact,
+          eventData.details.brideContact,
+          eventData.details.poruwaCeremonyFrom,
+          eventData.details.poruwaCeremonyTo,
+          eventData.details.registrationTime,
+          eventData.details.fountain,
+          eventData.details.prosperityTable,
+          eventData.details.groomAddress,
+          eventData.details.brideAddress,
+          eventId
+        ]
       );
-
-      // Update type-specific data
-      let typeTable, typeData;
-      switch (eventType) {
-        case 'wedding':
-          typeTable = 'Wedding';
-          typeData = {
-            Groom_Name: data.groomName,
-            Bride_Name: data.brideName,
-            Groom_Contact: data.groomContact,
-            Bride_Contact: data.brideContact,
-            Poruwa_Time: data.poruwaTime
-          };
-          break;
-        case 'custom':
-          typeTable = 'CustomEvent';
-          typeData = {
-            Event_Name: data.eventName,
-            Contact_Person: data.contactPerson,
-            Contact_Number: data.contactNumber,
-            Special_Requirements: data.specialRequirements
-          };
-          break;
-        default:
-          throw new Error('Invalid event type');
-      }
-
+    } else {
       await connection.query(
-        `UPDATE ${typeTable} SET ? WHERE Event_ID = ?`,
-        [typeData, eventId]
+        `UPDATE CustomEvent SET
+          Event_Name = ?,
+          ContactPersonName = ?,
+          ContactPersonNumber = ?
+         WHERE Event_ID = ?`,
+        [
+          eventData.details.eventName,
+          eventData.details.contactPersonName,
+          eventData.details.contactPersonNumber,
+          eventId
+        ]
       );
-
-      await connection.commit();
-      return true;
-
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
     }
+
+    await connection.commit();
+    return true;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
   }
+}
 
   // Delete event and type-specific details
-  static async delete(eventId, eventType) {
-    const connection = await db.getConnection();
-    try {
-      await connection.beginTransaction();
+  static async delete(eventId) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
 
-      // Delete type-specific record first
-      let typeTable;
-      switch (eventType) {
-        case 'wedding': typeTable = 'Wedding'; break;
-        case 'custom': typeTable = 'CustomEvent'; break;
-        default: throw new Error('Invalid event type');
-      }
+    // Determine event type
+    const [wedding] = await connection.query(
+      'SELECT 1 FROM Wedding WHERE Event_ID = ?',
+      [eventId]
+    );
+    
+    const [custom] = await connection.query(
+      'SELECT 1 FROM CustomEvent WHERE Event_ID = ?',
+      [eventId]
+    );
 
+    // Delete type-specific record
+    if (wedding.length > 0) {
       await connection.query(
-        `DELETE FROM ${typeTable} WHERE Event_ID = ?`,
+        `DELETE FROM Wedding WHERE Event_ID = ?`,
         [eventId]
       );
-
-      // Delete base event
+    } else if (custom.length > 0) {
       await connection.query(
-        'DELETE FROM Event WHERE Event_ID = ?',
+        `DELETE FROM CustomEvent WHERE Event_ID = ?`,
         [eventId]
       );
-
-      await connection.commit();
-      return true;
-
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
+    } else {
+      throw new Error('Event type could not be determined');
     }
+
+    // Delete base event
+    await connection.query(
+      'DELETE FROM Event WHERE Event_ID = ?',
+      [eventId]
+    );
+
+    await connection.commit();
+    return true;
+
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
   }
+}
 
   // Get all events with type-specific details
   static async getAll() {
