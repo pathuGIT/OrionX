@@ -398,7 +398,8 @@ export const uploadServiceImage = async (imageFile) => {
     const formData = new FormData();
     formData.append('image', imageFile);
     
-    const response = await api.post('/AdminEvents/upload', formData, {
+    // Change '/upload' to '/api/upload'
+    const response = await api.post('/AdminEvents/uploadServiceImage', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -406,7 +407,7 @@ export const uploadServiceImage = async (imageFile) => {
     
     return response.data.filePath;
   } catch (error) {
-    throw new Error('Image upload failed: ' + error.message);
+    throw new Error('Image upload failed: ' + (error.response?.data?.error || error.message));
   }
 };
 
@@ -416,17 +417,7 @@ export const getAdminEventServices = async () => {
     const response = await api.get('/AdminEvents/getAdminEventServices');
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to fetch services');
-  }
-};
-
-// Get single service by ID
-export const getEventServiceById = async (id) => {
-  try {
-    const response = await api.get(`/AdminEvents/getAdminEventServices/${id}`);
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to fetch service');
+    throw new Error(error.response?.data?.error || 'Failed to fetch services');
   }
 };
 
@@ -436,17 +427,17 @@ export const createAdminEventService = async (serviceData) => {
     const response = await api.post('/AdminEvents/createAdminEventService', serviceData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to create service');
+    throw new Error(error.response?.data?.error || 'Failed to create service');
   }
 };
 
 // Update existing event service
 export const updateAdminEventService = async (id, serviceData) => {
   try {
-    const response = await api.put(`/AdminEvents/createAdminEventService/${id}`, serviceData);
+    const response = await api.put(`/AdminEvents/updateAdminEventService/${id}`, serviceData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to update service');
+    throw new Error(error.response?.data?.error || 'Failed to update service');
   }
 };
 
@@ -455,6 +446,16 @@ export const deleteAdminEventService = async (id) => {
   try {
     await api.delete(`/AdminEvents/deleteAdminEventService/${id}`);
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to delete service');
+    throw new Error(error.response?.data?.error || 'Failed to delete service');
+  }
+};
+
+// Get service by ID
+export const getEventServiceById = async (id) => {
+  try {
+    const response = await api.get(`/AdminEvents/getAdminEventServices/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch service');
   }
 };

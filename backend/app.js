@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import userRouter from './routes/userRouter.js';
 import mailRouter from './routes/mailRouter.js';
@@ -22,6 +24,8 @@ import bookingRoutes from './routes/bookingRoutes.js';
 import menuViewRoutes from './routes/menuViewRoutes.js';
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(cors());
@@ -62,6 +66,7 @@ app.use('/api/Bite', planBiteRoutes);
 app.use('/api/BarArrange', BarArrangeRoutes);
 app.use('/api/assignedEmployee', AdminRoutes);
 app.use('/api/AdminEvents', AdminEventRoutes);
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 
 // Global error handler

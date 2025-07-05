@@ -20,7 +20,7 @@ const EventServiceForm = ({
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState('');
-  const [imageFile, setImageFile] = useState(null);
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
   // Load service data when in edit mode
   useEffect(() => {
@@ -49,16 +49,18 @@ const EventServiceForm = ({
   };
 
   const handleImageUpload = async (file) => {
-    if (!file) return;
-    
+    if (!file) {
+      setFormData(prev => ({ ...prev, imagePath: '' }));
+      return;
+    }
+
     setUploadingImage(true);
     try {
-      // Upload image to server
+      // Upload image to backend
       const filePath = await uploadServiceImage(file);
       
       // Update form data with new image path
       setFormData(prev => ({ ...prev, imagePath: filePath }));
-      setImageFile(null);
     } catch (err) {
       setError('Image upload failed: ' + err.message);
     } finally {
@@ -95,6 +97,12 @@ const EventServiceForm = ({
     }
   };
 
+  // Get full image URL for display
+  const getImageUrl = () => {
+    if (!formData.imagePath) return '';
+    return `${BASE_URL}${formData.imagePath}`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -106,7 +114,7 @@ const EventServiceForm = ({
             <button 
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
-              disabled={loading}
+              disabled={loading || uploadingImage}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -147,7 +155,7 @@ const EventServiceForm = ({
                 </label>
                 <ImageUpload 
                   onImageUpload={handleImageUpload}
-                  initialImage={formData.imagePath}
+                  initialImage={getImageUrl()}
                   disabled={uploadingImage}
                 />
                 {uploadingImage && (
@@ -162,13 +170,20 @@ const EventServiceForm = ({
                   <p className="text-sm text-gray-500 mb-1">Current Image:</p>
                   <div className="flex items-center space-x-3">
                     <img 
-                      src={formData.imagePath} 
+                      src={getImageUrl()} 
                       alt="Service preview" 
                       className="h-16 w-16 object-cover rounded border"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.parentNode.innerHTML = '<span class="text-red-500">Image failed to load</span>';
+                      }}
                     />
-                    <span className="text-sm text-gray-500">
-                      {formData.imagePath}
-                    </span>
+                    <div>
+                      <p className="text-sm text-gray-500">Stored on server</p>
+                      <p className="text-xs text-gray-400 truncate max-w-xs">
+                        {formData.imagePath}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}

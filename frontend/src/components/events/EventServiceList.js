@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getAdminEventServices, deleteAdminEventService } from '../../services/EventService';
-import EventServiceFormModal from './EventServiceForm';
+import EventServiceForm from './EventServiceForm';
 
 const EventServiceList = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  // Modal state
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
-  // Fetch services
   const fetchServices = async () => {
     setLoading(true);
     try {
@@ -30,21 +28,18 @@ const EventServiceList = () => {
     fetchServices();
   }, []);
 
-  // Handle create button click
   const handleCreate = () => {
     setModalMode('create');
     setSelectedServiceId(null);
     setShowModal(true);
   };
 
-  // Handle edit button click
   const handleEdit = (id) => {
     setModalMode('edit');
     setSelectedServiceId(id);
     setShowModal(true);
   };
 
-  // Handle delete
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this service?')) {
       try {
@@ -56,7 +51,6 @@ const EventServiceList = () => {
     }
   };
 
-  // Handle successful form submission
   const handleFormSuccess = () => {
     fetchServices();
     setShowModal(false);
@@ -82,9 +76,8 @@ const EventServiceList = () => {
         </div>
       )}
 
-      {/* Modal for create/edit */}
       {showModal && (
-        <EventServiceFormModal
+        <EventServiceForm
           mode={modalMode}
           serviceId={selectedServiceId}
           onClose={() => setShowModal(false)}
@@ -129,9 +122,13 @@ const EventServiceList = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     {service.image_path && (
                       <img 
-                        src={service.image_path} 
+                        src={`${BASE_URL}${service.image_path}`} 
                         alt={service.Event_Service_Name} 
                         className="h-12 w-12 object-cover rounded"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.parentNode.innerHTML = '<span class="text-red-500 text-xs">Image error</span>';
+                        }}
                       />
                     )}
                   </td>

@@ -32,7 +32,7 @@ import {
     getEventById
 } from '../controllers/superAdmin/allEventsController.js';
 
-import { getAllEventServices, createEventService, updateEventService, deleteEventService, getEventServiceById } from '../controllers/superAdmin/adminEventServiceController.js';
+import { getAllEventServices, createEventService, updateEventService, deleteEventService, getEventServiceById, uploadServiceImage } from '../controllers/superAdmin/adminEventServiceController.js';
 
 
 
@@ -106,6 +106,7 @@ AdminEventRoutes.post('/createAdminEventService', createEventService);
 AdminEventRoutes.put('/updateAdminEventService/:id', updateEventService);
 AdminEventRoutes.delete('/deleteAdminEventService/:id', deleteEventService);
 AdminEventRoutes.get('/getAdminEventServices/:id', getEventServiceById);
+AdminEventRoutes.post('/uploadServiceImage', uploadServiceImage);
 
 
 
