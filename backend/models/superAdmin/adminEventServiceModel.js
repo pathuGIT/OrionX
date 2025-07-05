@@ -1,0 +1,96 @@
+import db from '../../config/db.js';
+
+class adminEventService {
+    static async getAllEventServices() {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [events] = await connection.query('SELECT * FROM event_service');
+            return events;
+        } catch (error) {
+            console.error('Error fetching events:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+    static async createEventService(eventData) {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [result] = await connection.query(
+                'INSERT INTO event_service (Event_Service_Name, image_path) VALUES (?, ?)',
+                [eventData.eventServiceName, eventData.imagePath]
+            );
+            return { id: result.insertId, ...eventData };
+        } catch (error) {
+            console.error('Error creating event:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+
+    static async updateEventService(eventId, eventData) {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [result] = await connection.query(
+                'UPDATE event_service SET Event_Service_Name = ?, image_path = ? WHERE Event_Service_ID = ?',
+                [eventData.eventServiceName, eventData.imagePath, eventId]
+            );
+            if (result.affectedRows === 0) {
+                throw new Error(`Event not found: ${eventId}`);
+            }
+            return { id: eventId, ...eventData };
+        } catch (error) {
+            console.error('Error updating event:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+
+    static async deleteEventService(eventId) {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [result] = await connection.query(
+                'DELETE FROM event_service WHERE Event_Service_ID = ?',
+                [eventId]
+            );
+            if (result.affectedRows === 0) {
+                throw new Error('Event not found');
+            }
+            return { message: 'Event deleted successfully' };
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+
+    static async getEventServiceById(serviceId) {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [service] = await connection.query(
+                'SELECT * FROM event_service WHERE Event_Service_ID = ?',
+                [serviceId]
+            );
+            if (service.length === 0) {
+                throw new Error(`Service not found: ${serviceId}`);
+            }
+            return service[0];
+        } catch (error) {
+            console.error('Error fetching service by ID:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+}
+
+export default adminEventService;
+

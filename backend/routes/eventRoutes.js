@@ -32,6 +32,8 @@ import {
     getEventById
 } from '../controllers/superAdmin/allEventsController.js';
 
+import { getAllEventServices, createEventService, updateEventService, deleteEventService, getEventServiceById } from '../controllers/superAdmin/adminEventServiceController.js';
+
 
 
 
@@ -55,6 +57,7 @@ const BarArrangeRoutes = express.Router();
 // Admin routes 
 const AdminRoutes = express.Router();
 const AdminEventRoutes = express.Router();
+
 
 
 //app.js routes -ashen(don't delete this line)
@@ -97,6 +100,12 @@ AdminEventRoutes.get('/events', getAllEvents);
 AdminEventRoutes.get('/events/:id', getEventById);
 AdminEventRoutes.put('/events/:id', updateEvent);
 AdminEventRoutes.delete('/events/:id', deleteEvent);
+
+AdminEventRoutes.get('/getAdminEventServices', getAllEventServices);
+AdminEventRoutes.post('/createAdminEventService', createEventService);
+AdminEventRoutes.put('/updateAdminEventService/:id', updateEventService);
+AdminEventRoutes.delete('/deleteAdminEventService/:id', deleteEventService);
+AdminEventRoutes.get('/getAdminEventServices/:id', getEventServiceById);
 
 
 

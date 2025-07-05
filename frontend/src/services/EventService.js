@@ -392,3 +392,69 @@ export const deleteEvent = async (eventId) => {
     throw new Error(error.response?.data?.error || 'Event deletion failed');
   }
 };
+
+export const uploadServiceImage = async (imageFile) => {
+  try {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    
+    const response = await api.post('/AdminEvents/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    return response.data.filePath;
+  } catch (error) {
+    throw new Error('Image upload failed: ' + error.message);
+  }
+};
+
+// Get all event services
+export const getAdminEventServices = async () => {
+  try {
+    const response = await api.get('/AdminEvents/getAdminEventServices');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch services');
+  }
+};
+
+// Get single service by ID
+export const getEventServiceById = async (id) => {
+  try {
+    const response = await api.get(`/AdminEvents/getAdminEventServices/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch service');
+  }
+};
+
+// Create new event service
+export const createAdminEventService = async (serviceData) => {
+  try {
+    const response = await api.post('/AdminEvents/createAdminEventService', serviceData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to create service');
+  }
+};
+
+// Update existing event service
+export const updateAdminEventService = async (id, serviceData) => {
+  try {
+    const response = await api.put(`/AdminEvents/createAdminEventService/${id}`, serviceData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to update service');
+  }
+};
+
+// Delete event service
+export const deleteAdminEventService = async (id) => {
+  try {
+    await api.delete(`/AdminEvents/deleteAdminEventService/${id}`);
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete service');
+  }
+};
