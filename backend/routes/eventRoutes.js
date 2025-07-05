@@ -32,7 +32,9 @@ import {
     getEventById
 } from '../controllers/superAdmin/allEventsController.js';
 
+import { getAllEventServices, createEventService, updateEventService, deleteEventService, getEventServiceById, uploadServiceImage, getAllEventServicesSimple } from '../controllers/superAdmin/adminEventServiceController.js';
 
+import {getAllVendors , createVendor, updateVendor, deleteVendor, getVendorServices ,assignServicesToVendor, getVendorById  } from '../controllers/superAdmin/adminVendorController.js';
 
 
 
@@ -55,6 +57,7 @@ const BarArrangeRoutes = express.Router();
 // Admin routes 
 const AdminRoutes = express.Router();
 const AdminEventRoutes = express.Router();
+
 
 
 //app.js routes -ashen(don't delete this line)
@@ -97,6 +100,23 @@ AdminEventRoutes.get('/events', getAllEvents);
 AdminEventRoutes.get('/events/:id', getEventById);
 AdminEventRoutes.put('/events/:id', updateEvent);
 AdminEventRoutes.delete('/events/:id', deleteEvent);
+
+AdminEventRoutes.get('/getAdminEventServices', getAllEventServices);
+AdminEventRoutes.post('/createAdminEventService', createEventService);
+AdminEventRoutes.put('/updateAdminEventService/:id', updateEventService);
+AdminEventRoutes.delete('/deleteAdminEventService/:id', deleteEventService);
+AdminEventRoutes.get('/getAdminEventServices/:id', getEventServiceById);
+AdminEventRoutes.post('/uploadServiceImage', uploadServiceImage);
+
+AdminEventRoutes.get('/getAllVendors', getAllVendors);
+AdminEventRoutes.post('/createVendor', createVendor);
+AdminEventRoutes.put('/updateVendor/:id', updateVendor);
+AdminEventRoutes.delete('/deleteVendor/:id', deleteVendor);
+AdminEventRoutes.get('/getAllVendors/:id', getVendorById);
+AdminEventRoutes.get('/getVendorServices/:id', getVendorServices);
+AdminEventRoutes.post('/assignServicesToVendor/:id', assignServicesToVendor);
+AdminEventRoutes.get('/getAllEventServicesSimple', getAllEventServicesSimple);
+
 
 
 

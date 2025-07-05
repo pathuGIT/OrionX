@@ -82,7 +82,7 @@ class AssignedEmployee {
 
             await connection.query('COMMIT');
             // await connection.commit();
-            return { employeeAssignId, eventId};
+            return { employeeAssignId, eventId };
 
         } catch (error) {
             if (connection) await connection.rollback();
@@ -111,7 +111,7 @@ class AssignedEmployee {
 
             // Get all upcoming events
             const [events] = await db.query(`
-                SELECT 
+                SELECT
                     e.Event_ID AS id,
                     b.booking_date AS event_date,
                     e.Function_durationFrom AS startTime,
@@ -123,11 +123,11 @@ class AssignedEmployee {
                         ELSE e.Event_ID
                     END AS event_name
                 FROM event e
-                JOIN booking b ON e.booking_id = b.booking_id
+                LEFT JOIN booking b ON e.booking_id = b.booking_id
                 LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
                 LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
-                WHERE b.booking_date >= CURDATE()
-                ORDER BY b.booking_date DESC
+                ORDER BY b.booking_date DESC;
+
             `);
 
             return {

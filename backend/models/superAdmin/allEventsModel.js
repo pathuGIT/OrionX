@@ -65,19 +65,40 @@ class AllEvent {
   // }
 
   // Update event and type-specific details
- static async update(eventId, eventData) {
+static async update(eventId, eventData) {
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
 
-    // Update base event
-    await connection.query(
-      `UPDATE Event SET 
-        Event_Name = ?,
-        Event_Date = ?
-       WHERE Event_ID = ?`,
-      [eventData.Event_Name, eventData.Event_Date, eventId]
-    );
+    // Update base event - only date and name (for custom events)
+    let eventUpdateQuery = `
+      UPDATE Event SET 
+        Event_Date = ?,
+        ${eventData.Event_Type === 'custom' ? 'Event_name = ?,' : ''}
+        Buffet_TimeFrom = ?,
+        Buffet_TimeTo = ?,
+        Additional_Time = ?,
+        Function_durationFrom = ?,
+        Function_durationTo = ?,
+        Tea_table_Time = ?,
+        Dress_Time = ?
+      WHERE Event_ID = ?
+    `;
+    
+    let eventUpdateParams = [
+      eventData.Event_Date,
+      ...(eventData.Event_Type === 'custom' ? [eventData.Event_Name] : []),
+      eventData.Buffet_TimeFrom || null,
+      eventData.Buffet_TimeTo || null,
+      eventData.Additional_Time || null,
+      eventData.Function_durationFrom || null,
+      eventData.Function_durationTo || null,
+      eventData.Tea_table_Time || null,
+      eventData.Dress_Time || null,
+      eventId
+    ];
+
+    await connection.query(eventUpdateQuery, eventUpdateParams);
 
     // Update type-specific details
     if (eventData.Event_Type === 'wedding') {
@@ -118,7 +139,7 @@ class AllEvent {
           ContactPersonNumber = ?
          WHERE Event_ID = ?`,
         [
-          eventData.details.eventName,
+          eventData.Event_Name,  // Use main event name
           eventData.details.contactPersonName,
           eventData.details.contactPersonNumber,
           eventId
@@ -127,7 +148,17 @@ class AllEvent {
     }
 
     await connection.commit();
-    return true;
+    
+    // Return updated event data
+    const [updated] = await connection.query(
+      `SELECT * FROM Event 
+       LEFT JOIN Wedding ON Event.Event_ID = Wedding.Event_ID
+       LEFT JOIN CustomEvent ON Event.Event_ID = CustomEvent.Event_ID
+       LEFT JOIN Booking ON Event.booking_id = Booking.booking_id
+       WHERE Event.Event_ID = ?`,
+      [eventId]
+    );
+    return updated[0];
   } catch (error) {
     await connection.rollback();
     throw error;
