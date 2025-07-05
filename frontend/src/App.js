@@ -23,6 +23,9 @@ import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
 import UpdatePassword from './pages/UpdatePassword';
 import CustomerMenuListSelection from './components/CustomerMenuListSelection';
 import CustomerMenuTypeSelection from './components/CustomerMenuTypeSelection';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Service from './pages/Service';
 
 function App() {
   return (
@@ -33,7 +36,10 @@ function App() {
         <main> 
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/service" element={<Service />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
             <Route path="/eventHome/:bookingId/:customerID" element={<ProtectedRoute name="customer"><EventHome /></ProtectedRoute>} />
             {/* <Route path="/event-planning/:bookingId" element={<ProtectedRoute name="customer"><CustomerEventPlanning /></ProtectedRoute>} />
