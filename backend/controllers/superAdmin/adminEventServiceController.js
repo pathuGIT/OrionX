@@ -145,11 +145,23 @@ export const getAllEventServices = async (req, res) => {
   }
 };
 
+// Add this method to your existing controller
+export const getAllEventServicesSimple = async (req, res) => {
+    try {
+        const events = await adminEventService.getAllEventServicesSimple();
+        res.status(200).json(events);
+    } catch (error) {
+        console.error('Error fetching services:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 export default {
   uploadServiceImage,
   getAllEventServices,
   createEventService,
   updateEventService,
   deleteEventService,
-  getEventServiceById
+  getEventServiceById,
+  getAllEventServicesSimple
 };

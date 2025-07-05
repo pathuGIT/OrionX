@@ -50,44 +50,44 @@ class adminEventService {
             if (connection) connection.release();
         }
     }
- static async deleteEventService(eventId) {
-    let connection;
-    try {
-      connection = await db.getConnection();
-      
-      // First get the image path
-      const [service] = await connection.query(
-        'SELECT image_path FROM event_service WHERE Event_Service_ID = ?',
-        [eventId]
-      );
-      
-      if (service.length === 0) {
-        throw new Error('Event not found');
-      }
-      
-      const imagePath = service[0].image_path;
-      
-      // Delete the record
-      const [result] = await connection.query(
-        'DELETE FROM event_service WHERE Event_Service_ID = ?',
-        [eventId]
-      );
-      
-      if (result.affectedRows === 0) {
-        throw new Error('Event not found');
-      }
-      
-      return { 
-        message: 'Event deleted successfully',
-        imagePath // Return for potential cleanup
-      };
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      throw error;
-    } finally {
-      if (connection) connection.release();
+    static async deleteEventService(eventId) {
+        let connection;
+        try {
+            connection = await db.getConnection();
+
+            // First get the image path
+            const [service] = await connection.query(
+                'SELECT image_path FROM event_service WHERE Event_Service_ID = ?',
+                [eventId]
+            );
+
+            if (service.length === 0) {
+                throw new Error('Event not found');
+            }
+
+            const imagePath = service[0].image_path;
+
+            // Delete the record
+            const [result] = await connection.query(
+                'DELETE FROM event_service WHERE Event_Service_ID = ?',
+                [eventId]
+            );
+
+            if (result.affectedRows === 0) {
+                throw new Error('Event not found');
+            }
+
+            return {
+                message: 'Event deleted successfully',
+                imagePath // Return for potential cleanup
+            };
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
     }
-  }
 
     static async getEventServiceById(serviceId) {
         let connection;
@@ -108,6 +108,26 @@ class adminEventService {
             if (connection) connection.release();
         }
     }
+    // Add this method to your existing class
+    static async getAllEventServicesSimple() {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [events] = await connection.query(`
+            SELECT 
+                Event_Service_ID AS id,
+                Event_Service_Name AS name
+            FROM event_service
+        `);
+            return events;
+        } catch (error) {
+            console.error('Error fetching services:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+
 }
 
 export default adminEventService;

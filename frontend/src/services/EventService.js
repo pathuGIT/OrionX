@@ -464,3 +464,84 @@ export const getEventServiceById = async (id) => {
     throw new Error(error.response?.data?.error || 'Failed to fetch service');
   }
 };
+
+
+
+
+
+
+
+//  Admin Vendor Services
+export const getAdminVendors = async () => {
+    try {
+        const response = await api.get('/AdminEvents/getAllVendors');
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch vendors');
+    }
+};
+
+export const createAdminVendor = async (vendorData) => {
+    try {
+        const response = await api.post('/AdminEvents/createVendor', vendorData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to create vendor');
+    }
+};
+
+export const updateAdminVendor = async (id, vendorData) => {
+    try {
+        const response = await api.put(`/AdminEvents/updateVendor/${id}`, vendorData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to update vendor');
+    }
+};
+
+export const deleteAdminVendor = async (id) => {
+    try {
+        await api.delete(`/AdminEvents/deleteVendor/${id}`);
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to delete vendor');
+    }
+};
+
+export const getVendorById = async (id) => {
+    try {
+        const response = await api.get(`/AdminEvents/getAllVendors/${id}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch vendor');
+    }
+};
+
+export const getVendorServices = async (vendorId) => {
+    try {
+        // Use the correct backend route
+        const response = await api.get(`/AdminEvents/getVendorServices/${vendorId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch vendor services');
+    }
+};
+
+// Remove or update getAllEventServicesSimple if not implemented in backend
+export const getAllEventServicesSimple = async () => {
+    try {
+        // If this route does not exist, use a working route or implement it in backend
+        const response = await api.get('/AdminEvents/getAllEventServicesSimple');
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch event services');
+    }
+};
+
+export const assignServicesToVendor = async (vendorId, serviceIds) => {
+    try {
+        const response = await api.post(`/AdminEvents/assignServicesToVendor/${vendorId}`, { serviceIds });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to assign services to vendor');
+    }
+};
