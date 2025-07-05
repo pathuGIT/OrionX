@@ -4,25 +4,49 @@ import * as Yup from 'yup';
 import { getAllEvents, updateEvent, deleteEvent } from '../../services/EventService';
 import GetAllEvents from './GetAllEvents';
 
+
+const eventNameSchema = Yup.string().test(
+  'event-name',
+  'Event name is required for custom events',
+  function (value) {
+    const { Event_Type } = this.parent;
+    return Event_Type === 'custom' ? !!value : true;
+  }
+);
 const eventSchema = Yup.object().shape({
-  Event_Name: Yup.string().required('Event name is required'),
+  Event_Name: eventNameSchema,
   Event_Date: Yup.date().required('Event date is required'),
   Event_Type: Yup.string().required('Event type is required'),
-  details: Yup.object().when('Event_Type', {
-    is: 'wedding',
-    then: Yup.object().shape({
-      groomName: Yup.string().required('Groom name is required'),
-      brideName: Yup.string().required('Bride name is required'),
-      poruwaCeremonyFrom: Yup.string().required('Poruwa start time is required'),
-      poruwaCeremonyTo: Yup.string().required('Poruwa end time is required'),
-      groomContact: Yup.string().required('Groom contact is required')
-    }),
-    otherwise: Yup.object().shape({
-      eventName: Yup.string().required('Event name is required'),
-      contactPersonName: Yup.string().required('Contact person is required'),
-      contactPersonNumber: Yup.string().required('Contact number is required')
+  details: Yup.object()
+    .test('event-details', 'Details validation failed', function (details) {
+      const { Event_Type } = this.parent;
+
+      if (Event_Type === 'wedding') {
+        const weddingSchema = Yup.object().shape({
+          groomName: Yup.string().required('Groom name is required'),
+          brideName: Yup.string().required('Bride name is required'),
+          poruwaCeremonyFrom: Yup.string().required('Poruwa start time is required'),
+          poruwaCeremonyTo: Yup.string().required('Poruwa end time is required'),
+          groomContact: Yup.string().required('Groom contact is required'),
+          brideContact: Yup.string().required('Bride contact is required'),
+          registrationTime: Yup.string().required('Registration time is required'),
+          fountain: Yup.string().required('Fountain selection is required'),
+          prosperityTable: Yup.string().required('Prosperity table selection is required'),
+          groomAddress: Yup.string().required('Groom address is required'),
+          brideAddress: Yup.string().required('Bride address is required')
+        });
+
+        return weddingSchema.validate(details);
+      }
+      else {
+        const customSchema = Yup.object().shape({
+          contactPersonName: Yup.string().required('Contact person is required'),
+          contactPersonNumber: Yup.string().required('Contact number is required')
+        });
+
+        return customSchema.validate(details);
+      }
     })
-  })
 });
 
 const SeeEvents = () => {
@@ -105,20 +129,52 @@ const SeeEvents = () => {
 
   const handleUpdate = async (values) => {
     try {
+      // Prepare common time fields
+      const timeFields = {
+        Buffet_TimeFrom: values.details?.buffetTimeFrom || null,
+        Buffet_TimeTo: values.details?.buffetTimeTo || null,
+        Additional_Time: values.details?.additionalTime || null,
+        Function_durationFrom: values.details?.functionDurationFrom || null,
+        Function_durationTo: values.details?.functionDurationTo || null,
+        Tea_table_Time: values.details?.teaTableTime || null,
+        Dress_Time: values.details?.dressTime || null,
+      };
+
+      // For custom events, sync names
+      if (values.Event_Type === 'custom') {
+        values.details.eventName = values.Event_Name;
+      }
+
       const payload = {
         ...values,
+        ...timeFields,
         Event_ID: editEvent.Event_ID
       };
 
       const updatedEvent = await updateEvent(editEvent.Event_ID, payload);
+
+      // Update state with the new data
       setEvents(prev => prev.map(event =>
-        event.Event_ID === updatedEvent.Event_ID ? updatedEvent : event
+        event.Event_ID === updatedEvent.Event_ID ?
+          { ...event, ...updatedEvent } :
+          event
       ));
+
       setEditEvent(null);
       setSuccess('Event updated successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.message || 'Failed to update event');
+    }
+  };
+
+  const formatTimeForInput = (timeString) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    } catch {
+      return timeString;
     }
   };
 
@@ -193,32 +249,54 @@ const SeeEvents = () => {
             <Formik
               initialValues={{
                 Event_Name: editEvent.Event_Name || '',
-                Event_Date: new Date(editEvent.Event_Date).toISOString().split('T')[0],
+                Event_Date: editEvent.Event_Date
+                  ? new Date(editEvent.Event_Date).toISOString().split('T')[0]
+                  : '',
                 Event_Type: editEvent.eventType,
                 details: {
                   ...editEvent.details,
+                  // Wedding fields
                   groomName: editEvent.details?.groomName || '',
                   brideName: editEvent.details?.brideName || '',
+                  poruwaCeremonyFrom: formatTimeForInput(editEvent.details?.poruwaCeremonyFrom || ''),
+                  poruwaCeremonyTo: formatTimeForInput(editEvent.details?.poruwaCeremonyTo || ''),
+                  registrationTime: formatTimeForInput(editEvent.details?.registrationTime || ''),
+                  groomContact: editEvent.details?.groomContact || '',
+                  brideContact: editEvent.details?.brideContact || '',
+                  fountain: editEvent.details?.fountain || '',
+                  prosperityTable: editEvent.details?.prosperityTable || '',
+                  groomAddress: editEvent.details?.groomAddress || '',
+                  brideAddress: editEvent.details?.brideAddress || '',
+                  // Custom event fields
                   contactPersonName: editEvent.details?.contactPersonName || '',
                   contactPersonNumber: editEvent.details?.contactPersonNumber || '',
-                  poruwaCeremonyFrom: editEvent.details?.poruwaCeremonyFrom || '',
-                  poruwaCeremonyTo: editEvent.details?.poruwaCeremonyTo || '',
-                  groomContact: editEvent.details?.groomContact || ''
+                  eventName: editEvent.details?.eventName || editEvent.Event_Name || '',
+                  // Time fields
+                  buffetTimeFrom: formatTimeForInput(editEvent.Buffet_TimeFrom || ''),
+                  buffetTimeTo: formatTimeForInput(editEvent.Buffet_TimeTo || ''),
+                  additionalTime: formatTimeForInput(editEvent.Additional_Time || ''),
+                  functionDurationFrom: formatTimeForInput(editEvent.Function_durationFrom || ''),
+                  functionDurationTo: formatTimeForInput(editEvent.Function_durationTo || ''),
+                  teaTableTime: formatTimeForInput(editEvent.Tea_table_Time || ''),
+                  dressTime: formatTimeForInput(editEvent.Dress_Time || ''),
                 }
               }}
+              // ... rest remains same
               validationSchema={eventSchema}
               onSubmit={handleUpdate}
             >
               {({ values, isSubmitting }) => (
                 <Form className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium">Event Name</label>
-                    <Field
-                      name="Event_Name"
-                      className="w-full px-4 py-2 rounded-lg border border-gray-200"
-                    />
-                    <ErrorMessage name="Event_Name" component="div" className="text-red-500 text-sm" />
-                  </div>
+                  {values.Event_Type === 'custom' && (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium">Event Name</label>
+                      <Field
+                        name="Event_Name"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                      />
+                      <ErrorMessage name="Event_Name" component="div" className="text-red-500 text-sm" />
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <label className="block text-sm font-medium">Event Date</label>
@@ -284,6 +362,127 @@ const SeeEvents = () => {
                           className="w-full px-4 py-2 rounded-lg border border-gray-200"
                         />
                         <ErrorMessage name="details.groomContact" component="div" className="text-red-500 text-sm" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Bride Contact</label>
+                        <Field
+                          name="details.brideContact"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Registration Time</label>
+                        <Field
+                          name="details.registrationTime"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Fountain</label>
+                        <Field
+                          name="details.fountain"
+                          as="select"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        >
+                          <option value="">Select</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </Field>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Prosperity Table</label>
+                        <Field
+                          name="details.prosperityTable"
+                          as="select"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        >
+                          <option value="">Select</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </Field>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Groom Address</label>
+                        <Field
+                          name="details.groomAddress"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Bride Address</label>
+                        <Field
+                          name="details.brideAddress"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Buffet Start Time</label>
+                        <Field
+                          name="details.buffetTimeFrom"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Buffet End Time</label>
+                        <Field
+                          name="details.buffetTimeTo"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Additional Time</label>
+                        <Field
+                          name="details.additionalTime"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Function Start</label>
+                        <Field
+                          name="details.functionDurationFrom"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Function End</label>
+                        <Field
+                          name="details.functionDurationTo"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Tea Table Time</label>
+                        <Field
+                          name="details.teaTableTime"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium">Dress Time</label>
+                        <Field
+                          name="details.dressTime"
+                          type="time"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200"
+                        />
                       </div>
                     </>
                   ) : (
@@ -438,7 +637,7 @@ const SeeEvents = () => {
                     </button>
                     <button
                       onClick={(e) => {
-                        e.stopPropagation();  
+                        e.stopPropagation();
                         handleDelete(event.Event_ID);
                       }}
                       className="text-red-600 hover:text-red-900"
