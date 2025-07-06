@@ -28,6 +28,6 @@ router.put('/:id/damage-fee', updateDamageFee);
 router.put('/:id/menu-fee', updateMenuFee);
 router.put('/:id/guests', updateGuests);
 router.put('/:id/additional-hours', updateAdditionalHours);
-router.put('/booking/BiteSoftLiquor/:id', UpdateBookingPrice_BiteSoftLiquor);
+router.put('/BiteSoftLiquor/:id', UpdateBookingPrice_BiteSoftLiquor);
 
 export default router;

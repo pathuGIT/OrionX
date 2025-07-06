@@ -252,7 +252,7 @@ export const updateAdditionalHoursModel = async (bookingId, additionalHours) => 
 
 export const getBiteSoftLiquorFromEventModel = async (bookingId) => {
   const sql = `
-    select bar.TotalBitePrice, bar.TotalLiquorPrice, bar.TotalSoftDrinkPrice 
+    select bar.TotalBitePrice 
       from bar inner join event 
       on bar.BarRequirementID = event.BarRequirementID 
       where event.booking_id = ?;
@@ -260,15 +260,13 @@ export const getBiteSoftLiquorFromEventModel = async (bookingId) => {
   return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
 }
 
-export const UpdateBookingPrice_BiteSoftLiquorModel = async (bookingId, TotalBitePrice, TotalLiquorPrice, TotalSoftDrinkPrice) => {
+export const UpdateBookingPrice_BiteSoftLiquorModel = async (bookingId, TotalBitePrice) => {
   const sql = `
     UPDATE booking_pricing
-    SET bites_payment = COALESCE(bites_payment, 0) + ?, 
-        fountain_payment = COALESCE(fountain_payment, 0) + ?, 
-        other_payment = COALESCE(other_payment, 0) + ?, 
+    SET bites_payment = ?,  
         updated_at = NOW()
     WHERE booking_id = ?
   `;
-  const [result] = await pool.query(sql, [TotalBitePrice, TotalLiquorPrice, TotalSoftDrinkPrice, bookingId]);
+  const [result] = await pool.query(sql, [TotalBitePrice, bookingId]);
   return result; // <-- return the result object, not the array
 }

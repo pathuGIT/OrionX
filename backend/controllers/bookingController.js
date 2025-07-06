@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateBookingPricingModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -396,25 +396,26 @@ export const updateContract = async (req, res) => {
 export const UpdateBookingPrice_BiteSoftLiquor = async (req, res) => {
     try {
         const bookingId = req.params.id;
-        const resultObj = await getBiteSoftLiquorFromEventModel(bookingId);
-        if (!resultObj) {
-            return res.status(404).json({ success: false, message: "No Bite/Soft/Liquor pricing found for this bookingId." });
-        }
-        const {
-            TotalBitePrice = 0,
-            TotalLiquorPrice = 0,
-            TotalSoftDrinkPrice = 0
-        } = resultObj;
+        let TotalBitePrice = 0;
 
-        const result = await UpdateBookingPrice_BiteSoftLiquorModel(bookingId, TotalBitePrice, TotalLiquorPrice, TotalSoftDrinkPrice);
+        const resultObj = await getBiteSoftLiquorFromEventModel(bookingId);
+
+        if (!resultObj) {
+            TotalBitePrice = 0;
+        }
+        else{
+            TotalBitePrice = resultObj.TotalBitePrice;
+        }
+
+        const result = await UpdateBookingPrice_BiteSoftLiquorModel(bookingId, TotalBitePrice);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ success: false, message: "Pricing for BiteSoftLiquor not found for this bookingId." });
+            return res.status(404).json({ success: false, message: "Pricing for Bite not found for this bookingId." });
         }
-        res.status(200).json({ success: true, message: "BiteSoftLiquor updated successfully." });
+        res.status(200).json({ success: true, message: "Bite updated successfully." });
     } catch (error) {
-        console.error("Error updating BiteSoftLiquor:", error);
-        res.status(500).json({ success: false, message: "Failed to update BiteSoftLiquor." });
+        console.error("Error updating Bite:", error);
+        res.status(500).json({ success: false, message: "Failed to update Bite." });
     }
 };
 
