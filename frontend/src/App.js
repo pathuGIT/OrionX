@@ -17,6 +17,8 @@ import EventHome from './pages/customer/EventHome';
 import DisplayEvents from './pages/customer/DisplayEvents';
 //import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 // import DisplayEvents from './components/DisplayEvents';
+import EventServiceForm from './components/events/EventServiceForm';
+
 
 import ResetPassword from './pages/VerifyOtp';
 import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
@@ -42,8 +44,6 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
             <Route path="/eventHome/:bookingId/:customerID" element={<ProtectedRoute name="customer"><EventHome /></ProtectedRoute>} />
-            {/* <Route path="/event-planning/:bookingId" element={<ProtectedRoute name="customer"><CustomerEventPlanning /></ProtectedRoute>} />
-            <Route path="/display-Events/:customerID" element={<ProtectedRoute name="customer"><DisplayEvents /></ProtectedRoute>} /> */}
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
@@ -53,6 +53,9 @@ function App() {
             <Route path="/forgot-password" element={<ResetPassword />} />
             <Route path="/forgot-password/success" element={<ForgotPswdSuccess />} />
             <Route path="/forgot-password/update" element={<UpdatePassword />} />
+
+            <Route path="/event-services/create" element={<EventServiceForm />} />
+            <Route path="/event-services/edit/:id" element={<EventServiceForm />} />
 
             {/* sandli */}
 

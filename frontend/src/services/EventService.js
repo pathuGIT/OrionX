@@ -34,14 +34,19 @@ export const getPlannedEvents = async (customerID) => {
     }
 };
 
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+
 export const getEventServices = async () => {
     try {
         const response = await api.get('/EventService/getEventService');
-        console.log("API Response:", response.data); // Verify structure here
+        
+        // Map response to include full image URLs
         return response.data.data.map(service => ({
-            Event_Service_ID: service.id || service.serviceId,
-            Event_Service_Name: service.name || service.serviceName,
-            Event_Service_Image: service.imagePath || service.serviceImage
+            Event_Service_ID: service.id,
+            Event_Service_Name: service.name,
+            Event_Service_Image: service.imagePath 
+                ? `${BASE_URL}${service.imagePath}`
+                : null
         }));
     } catch (error) {
         console.error("Error:", error);
@@ -318,4 +323,225 @@ export const deleteAssignment = async (assignmentId) => {
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Delete failed');
   }
+};
+
+
+//wedding admin
+ 
+//  export const getAllEvents = async () => {
+//     try {
+//       const response = await api.get('/AdminEvents/events');
+//       return response.data;
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Failed to fetch events');
+//     }
+//   };
+
+//    export const createEvent = async (eventType, data) => {
+//     try {
+//       const response = await api.post('/AdminEvents/events', { eventType, data });
+//       return response.data;
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Event creation failed');
+//     }
+//   };
+
+//    export const  updateEvent = async (eventId, eventType, data) => {
+//     try {
+//       const response = await api.put(`/AdminEvents/events/${eventId}`, { eventType, data });
+//       return response.data;
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Event update failed');
+//     }
+//   };
+
+//    export const deleteEvent = async (eventId, eventType) => {
+//     try {
+//       await api.delete(`/AdminEvents/events/${eventId}`, { data: { eventType } });
+//     } catch (error) {
+//       throw new Error(error.response?.data?.error || 'Event deletion failed');
+//     }
+//   };
+
+   export const getEventById = async (eventId) => {
+    try {
+      const response = await api.get(`/AdminEvents/events/${eventId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to fetch event');
+    }
+  };
+
+  export const getAllEvents = async () => {
+  try {
+    const response = await api.get('/AdminEvents/events');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch events');
+  }
+};
+
+export const updateEvent = async (eventId, data) => {
+  try {
+    const response = await api.put(`/AdminEvents/events/${eventId}`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Event update failed');
+  }
+};
+
+export const deleteEvent = async (eventId) => {
+  try {
+    await api.delete(`/AdminEvents/events/${eventId}`);
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Event deletion failed');
+  }
+};
+
+export const uploadServiceImage = async (imageFile) => {
+  try {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    
+    // Change '/upload' to '/api/upload'
+    const response = await api.post('/AdminEvents/uploadServiceImage', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    return response.data.filePath;
+  } catch (error) {
+    throw new Error('Image upload failed: ' + (error.response?.data?.error || error.message));
+  }
+};
+
+// Get all event services
+export const getAdminEventServices = async () => {
+  try {
+    const response = await api.get('/AdminEvents/getAdminEventServices');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch services');
+  }
+};
+
+// Create new event service
+export const createAdminEventService = async (serviceData) => {
+  try {
+    const response = await api.post('/AdminEvents/createAdminEventService', serviceData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create service');
+  }
+};
+
+// Update existing event service
+export const updateAdminEventService = async (id, serviceData) => {
+  try {
+    const response = await api.put(`/AdminEvents/updateAdminEventService/${id}`, serviceData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update service');
+  }
+};
+
+// Delete event service
+export const deleteAdminEventService = async (id) => {
+  try {
+    await api.delete(`/AdminEvents/deleteAdminEventService/${id}`);
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete service');
+  }
+};
+
+// Get service by ID
+export const getEventServiceById = async (id) => {
+  try {
+    const response = await api.get(`/AdminEvents/getAdminEventServices/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch service');
+  }
+};
+
+
+
+
+
+
+
+//  Admin Vendor Services
+export const getAdminVendors = async () => {
+    try {
+        const response = await api.get('/AdminEvents/getAllVendors');
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch vendors');
+    }
+};
+
+export const createAdminVendor = async (vendorData) => {
+    try {
+        const response = await api.post('/AdminEvents/createVendor', vendorData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to create vendor');
+    }
+};
+
+export const updateAdminVendor = async (id, vendorData) => {
+    try {
+        const response = await api.put(`/AdminEvents/updateVendor/${id}`, vendorData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to update vendor');
+    }
+};
+
+export const deleteAdminVendor = async (id) => {
+    try {
+        await api.delete(`/AdminEvents/deleteVendor/${id}`);
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to delete vendor');
+    }
+};
+
+export const getVendorById = async (id) => {
+    try {
+        const response = await api.get(`/AdminEvents/getAllVendors/${id}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch vendor');
+    }
+};
+
+export const getVendorServices = async (vendorId) => {
+    try {
+        // Use the correct backend route
+        const response = await api.get(`/AdminEvents/getVendorServices/${vendorId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch vendor services');
+    }
+};
+
+// Remove or update getAllEventServicesSimple if not implemented in backend
+export const getAllEventServicesSimple = async () => {
+    try {
+        // If this route does not exist, use a working route or implement it in backend
+        const response = await api.get('/AdminEvents/getAllEventServicesSimple');
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch event services');
+    }
+};
+
+export const assignServicesToVendor = async (vendorId, serviceIds) => {
+    try {
+        const response = await api.post(`/AdminEvents/assignServicesToVendor/${vendorId}`, { serviceIds });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to assign services to vendor');
+    }
 };
