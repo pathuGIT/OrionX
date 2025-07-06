@@ -30,6 +30,7 @@ export const updateBookingStatus = async (id, status) => {
 }
 
 export const updateDamageFee = async (id, { damageFee, refundAmount, depositAmount, status }) => {
+  console.log("updateDamageFee called with:", id, damageFee, refundAmount, depositAmount, status);
   const res = await api.put(`/booking/${id}/damage-fee`, { damageFee, refundAmount, depositAmount, status });
   return res.data;
 }
