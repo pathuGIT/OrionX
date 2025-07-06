@@ -18,8 +18,8 @@ export const getBookings = async (status = 'all') => {
   return res.data;
 }
 
-export const searchBookingBy = async (status = 'all') => {
-  const res = await api.get(`/booking?status=${status}`);
+export const searchBookingBy = async (status) => {
+  const res = await api.get(`/booking/searchBooking?search=${status}`);
   return res.data;
 }
 

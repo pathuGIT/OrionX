@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getBookingDetails, getBookings, updateBookingPrice_BiteSoftLiquor, updateContract } from '../../services/BookngService';
+import { getBookingDetails, getBookings, searchBookingBy, updateBookingPrice_BiteSoftLiquor, updateContract } from '../../services/BookngService';
 import { StatusFilter } from '../../components/bookings/StatusFilter';
 import { BookingTable } from '../../components/bookings/BookingTable';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
@@ -14,11 +14,22 @@ const BookingsAnalyze = () => {
         fetchBookings();
     }, [status]);
 
+    useEffect(() => {
+        searchBooking();
+    }, [serchBy]);
+
     // Fetch bookings data called inside useEffect
     const fetchBookings = async () => {
         const data = await getBookings(status);
         setBookings(data.data);
     };
+
+    const searchBooking = async () => {
+        const data = await searchBookingBy(serchBy);
+        
+        console.log(data)
+        setBookings(data.data);
+    }
 
     const handleRowClick = (id) => {
         // Update bite & soft & Liquor drink price when a row is clicked 

@@ -180,6 +180,22 @@ export const getAllBookings = (status) => {
   return pool.query(sql, params).then(([rows]) => rows);
 }
 
+export const searchAllBookings = (item) => {
+  console.log("Status:", item);
+  let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
+    p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
+    FROM booking b
+    LEFT JOIN contract c ON b.booking_id = c.booking_id
+    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+  const params = [];
+  if (item && item !== 'all') {
+    sql += ` WHERE b.booking_id = ? || b.customer_id = ? `;
+    params.push(item,item,item,item);
+  }
+  sql += ` ORDER BY b.booking_date DESC`;
+  return pool.query(sql, params).then(([rows]) => rows);
+}
+
 export const getBookingByIdAdvance = (bookingId) => {
   const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.* FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
