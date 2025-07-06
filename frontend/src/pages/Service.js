@@ -138,7 +138,7 @@ const Service = () => {
                     ))}
                   </ul>
                   
-                  <a 
+                  {/* <a 
                     href="#" 
                     className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800 transition duration-300"
                   >
@@ -146,7 +146,7 @@ const Service = () => {
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                  </a>
+                  </a> */}
                 </div>
               </div>
             ))}

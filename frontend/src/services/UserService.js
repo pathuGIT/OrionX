@@ -290,6 +290,7 @@ export const calculatePay = async (date) => {
 
 export const getPayEntries = async (date) => {
     try {
+      console.log("Fetching pay entries for date:", date);
         const response = await api.get(`/user/entries/${date}`);
         return response.data;
     } catch (error) {
