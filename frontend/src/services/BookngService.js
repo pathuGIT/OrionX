@@ -18,6 +18,12 @@ export const getBookings = async (status = 'all') => {
   return res.data;
 }
 
+export const searchBookingBy = async (status = 'all') => {
+  const res = await api.get(`/booking?status=${status}`);
+  return res.data;
+}
+
+
 export const getBookingDetails = async (id) => {
   const res = await api.get(`/booking/${id}`);
   console.log("xxxxxxxxxxx", res.data);
