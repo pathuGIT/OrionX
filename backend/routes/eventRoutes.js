@@ -36,7 +36,7 @@ import { getAllEventServices, createEventService, updateEventService, deleteEven
 
 import {getAllVendors , createVendor, updateVendor, deleteVendor, getVendorServices ,assignServicesToVendor, getVendorById  } from '../controllers/superAdmin/adminVendorController.js';
 
-
+import { getAllCustomerEventServices, getCustomerEventServiceById, createCustomerEventService, updateCustomerEventService, deleteCustomerEventService, getAllCustomers, getAllBookings, getAllEventServicesCustomer } from '../controllers/superAdmin/customerEventServiceController.js';
 
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
@@ -118,7 +118,13 @@ AdminEventRoutes.post('/assignServicesToVendor/:id', assignServicesToVendor);
 AdminEventRoutes.get('/getAllEventServicesSimple', getAllEventServicesSimple);
 
 
-
-
+AdminEventRoutes.get('/customer-event-services', getAllCustomerEventServices);
+AdminEventRoutes.get('/customer-event-services/:id', getCustomerEventServiceById);
+AdminEventRoutes.post('/customer-event-services', createCustomerEventService);
+AdminEventRoutes.put('/customer-event-services/:id', updateCustomerEventService);
+AdminEventRoutes.delete('/customer-event-services/:id', deleteCustomerEventService);
+AdminEventRoutes.get('/getAllCustomers', getAllCustomers);
+AdminEventRoutes.get('/getAllBookings', getAllBookings);
+AdminEventRoutes.get('/getAllEventServicesCustomer', getAllEventServicesCustomer);
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes };
