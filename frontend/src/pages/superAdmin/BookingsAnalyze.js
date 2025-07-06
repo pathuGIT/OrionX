@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getBookingDetails, getBookings, updateContract } from '../../services/BookngService';
+import { getBookingDetails, getBookings, updateBookingPrice_BiteSoftLiquor, updateContract } from '../../services/BookngService';
 import { StatusFilter } from '../../components/bookings/StatusFilter';
 import { BookingTable } from '../../components/bookings/BookingTable';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
@@ -21,6 +21,10 @@ const BookingsAnalyze = () => {
     };
 
     const handleRowClick = (id) => {
+        // Update bite & soft & Liquor drink price when a row is clicked 
+        updateBookingPrice_BiteSoftLiquor(id)
+            .then(() => console.log("Bites, soft drink, and liquor prices updated"))
+            .catch((error) => console.error("Error updating prices:", error));
         getBookingDetails(id).then((data) => setSelectedBooking(data.data));
     };
 

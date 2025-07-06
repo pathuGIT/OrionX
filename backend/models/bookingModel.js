@@ -249,3 +249,24 @@ export const updateAdditionalHoursModel = async (bookingId, additionalHours) => 
     [additionalHours, bookingId]
   );
 }
+
+export const getBiteSoftLiquorFromEventModel = async (bookingId) => {
+  const sql = `
+    select bar.TotalBitePrice 
+      from bar inner join event 
+      on bar.BarRequirementID = event.BarRequirementID 
+      where event.booking_id = ?;
+  `;
+  return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
+
+export const UpdateBookingPrice_BiteSoftLiquorModel = async (bookingId, TotalBitePrice) => {
+  const sql = `
+    UPDATE booking_pricing
+    SET bites_payment = ?,  
+        updated_at = NOW()
+    WHERE booking_id = ?
+  `;
+  const [result] = await pool.query(sql, [TotalBitePrice, bookingId]);
+  return result; // <-- return the result object, not the array
+}

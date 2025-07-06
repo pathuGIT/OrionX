@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateBookingPricingModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -393,40 +393,31 @@ export const updateContract = async (req, res) => {
 };
 
 // Update booking pricing information
-// export const updatePricing = async (req, res) => {
-//     try {
-//         const bookingId = req.params.id;
-//         const {
-//             menuPriceTotal,
-//             hallCharge,
-//             extraHourFee,
-//             bitesPayment,
-//             fountainPayment,
-//             otherPayment,
-//             overallTotal,
-//             forfeitedDeposit,
-//         } = req.body;
+export const UpdateBookingPrice_BiteSoftLiquor = async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        let TotalBitePrice = 0;
 
-//         const result = await updatePricingModel(bookingId, {
-//             menuPriceTotal,
-//             hallCharge,
-//             extraHourFee,
-//             bitesPayment,
-//             fountainPayment,
-//             otherPayment,
-//             overallTotal,
-//             forfeitedDeposit,
-//         });
+        const resultObj = await getBiteSoftLiquorFromEventModel(bookingId);
 
-//         if (result.affectedRows === 0) {
-//             return res.status(404).json({ success: false, message: "Pricing not found or not updated." });
-//         }
-//         res.status(200).json({ success: true, message: "Pricing updated successfully." });
-//     } catch (error) {
-//         console.error("Error updating pricing:", error);
-//         res.status(500).json({ success: false, message: "Failed to update pricing." });
-//     }
-// };
+        if (!resultObj) {
+            TotalBitePrice = 0;
+        }
+        else{
+            TotalBitePrice = resultObj.TotalBitePrice;
+        }
+
+        const result = await UpdateBookingPrice_BiteSoftLiquorModel(bookingId, TotalBitePrice);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Pricing for Bite not found for this bookingId." });
+        }
+        res.status(200).json({ success: true, message: "Bite updated successfully." });
+    } catch (error) {
+        console.error("Error updating Bite:", error);
+        res.status(500).json({ success: false, message: "Failed to update Bite." });
+    }
+};
 
 export const updateBookingVenue = async (req, res) => {
     //const [booking, setBooking] = useState(null);
