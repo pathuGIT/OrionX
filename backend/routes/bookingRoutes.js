@@ -1,6 +1,6 @@
 import express from 'express';
 import { superAdmin } from '../middleware/Super_admin.js';
-import { addVenue, checkVenuIdInBooking, createBooking, deleteVenueById, getAllVenue, getBooking, getBookingDetails, getBookings, getVenueById, updateAdditionalHours, updateBookingStatus, updateBookingVenue, updateContract, updateDamageFee, updateGuests, updateMenuFee, updateVenueById } from '../controllers/bookingController.js';
+import { addVenue, checkVenuIdInBooking, createBooking, deleteVenueById, getAllVenue, getBooking, getBookingDetails, getBookings, getVenueById, updateAdditionalHours, UpdateBookingPrice_BiteSoftLiquor, updateBookingStatus, updateBookingVenue, updateContract, updateDamageFee, updateGuests, updateMenuFee, updateVenueById } from '../controllers/bookingController.js';
 
 
 const router = express.Router();
@@ -28,5 +28,6 @@ router.put('/:id/damage-fee', updateDamageFee);
 router.put('/:id/menu-fee', updateMenuFee);
 router.put('/:id/guests', updateGuests);
 router.put('/:id/additional-hours', updateAdditionalHours);
+router.put('/booking/BiteSoftLiquor/:id', UpdateBookingPrice_BiteSoftLiquor);
 
 export default router;

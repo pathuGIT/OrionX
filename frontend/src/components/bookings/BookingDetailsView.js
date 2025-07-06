@@ -336,10 +336,10 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                             <div className="border grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <DetailRow label="Menu Price Total (Rs)" value={b.menu_price_total} />
                                 <DetailRow label="Hall Charge (Rs)" value={b.hall_charge} />
-                                <DetailRow label="Extra Hour Fee (Rs)" value={b.extra_hour_fee} />
-                                <DetailRow label="Bites Payment (Rs)" value={b.bites_payment} />
-                                <DetailRow label="Fountain Payment (Rs)" value={b.fountain_payment} />
-                                <DetailRow label="Other Payment (Rs)" value={b.other_payment} />
+                                <DetailRow label="Extra Hour Price (Rs)" value={b.extra_hour_fee} />
+                                <DetailRow label="Bites Price (Rs)" value={b.bites_payment} />
+                                <DetailRow label="Liquor Price (Rs)" value={b.fountain_payment} />
+                                <DetailRow label="Soft Drink Price (Rs)" value={b.other_payment} />
                                 <DetailRow label="Overall Total (Rs)" value={b.overall_total} />
                                 <DetailRow label="Forfeited Deposit (Rs)" value={b.forfeited_deposit} />
                             </div>

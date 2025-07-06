@@ -45,8 +45,8 @@ export const updateContract = async (id, contractData) => {
   return res.data;
 }
 
-export const updatePricing = async (id, pricingData) => {
-  const res = await api.put(`/booking/${id}/pricing`, pricingData);
+export const updateBookingPrice_BiteSoftLiquor = async (id) => {
+  const res = await api.put(`/booking/BiteSoftLiquor/${id}`);
   return res.data;
 }
 
