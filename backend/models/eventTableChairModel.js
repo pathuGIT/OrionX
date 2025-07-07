@@ -28,7 +28,21 @@ export class EventLinkModel {
     //     }
     // }
 
-static async getArrangementsByBooking(bookingid) {
+    static async getAllDesigns() {
+        let connection;
+        try {
+            connection = await db.getConnection();
+            const [designs] = await connection.query('SELECT * FROM tables_and_chairs');
+            return designs;
+        } catch (error) {
+            console.error('Error fetching table designs:', error);
+            throw error;
+        } finally {
+            if (connection) connection.release();
+        }
+    }
+
+    static async getArrangementsByBooking(bookingid) {
         const connection = await db.getConnection();
         try {
             const [results] = await connection.query(`
@@ -52,7 +66,7 @@ static async getArrangementsByBooking(bookingid) {
 
             // Group reservations per arrangement
             const arrangementsMap = new Map();
-            
+
             results.forEach(row => {
                 if (!arrangementsMap.has(row.Arrangement_ID)) {
                     arrangementsMap.set(row.Arrangement_ID, {

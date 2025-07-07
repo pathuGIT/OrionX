@@ -10,7 +10,7 @@ import { getEventServices } from '../controllers/eventServiceController.js';
 import { saveSelectedServices } from '../controllers/saveSelectedServiceController.js';
 import { createArrangement } from '../controllers/arrangementController.js';
 import { createReservation } from '../controllers/arrangementController.js';
-import { getArrangementsByBooking } from '../controllers/arrangementController.js';
+import { getArrangementsByBooking, getAllTableswithDesigns } from '../controllers/arrangementController.js';
 import { createPlanBarEvent } from '../controllers/planBarController.js';
 import { getPlanBarEvent } from '../controllers/planBarController.js';
 import { deletePlanBarEvent } from '../controllers/planBarController.js';
@@ -75,6 +75,9 @@ saveSelectedServiceRoutes.post('/saveServices', customer, saveSelectedServices);
 tableArrangementRoutes.post('/createTableArrangement/:bookingid', customer, createArrangement);
 reservationRoutes.post('/createReservation/:bookingid', customer, createReservation);
 tableArrangementRoutes.get('/getTableArrangement/:bookingid', customer, getArrangementsByBooking);
+tableArrangementRoutes.get('/get-table-designs', getAllTableswithDesigns);
+
+
 planBarRoutes.post('/planBar/:bookingid', customer, createPlanBarEvent);//did
 planBarRoutes.get('/getPlanBar/:bookingid', customer, getPlanBarEvent);
 planBarRoutes.delete('/deletePlanBar/:bookingid', customer, deletePlanBarEvent);
