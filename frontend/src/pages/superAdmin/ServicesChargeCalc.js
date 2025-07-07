@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { serviceChargeService } from "../../services/UserService";
 
+
 const ServiceChargeTable = () => {
   const [charges, setCharges] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [totalDistributed, setTotalDistributed] = useState(0);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); 
 
   const loadData = async () => {
     try {
