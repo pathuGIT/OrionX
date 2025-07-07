@@ -93,12 +93,12 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isPagesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Create Menu List Types</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('createMenuTypes')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Create Menu Types</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('createCategory')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Create Categories</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Create Items</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Category Menu Type Mapping</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateItemCategoryMenuType')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Item,Category & MenuType Map</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Menu List Setup</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createMenuTypes')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Define Menu Types</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createCategory')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Manage Food Categories</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Add Food Items</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Link Categories to Menu Types</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateItemCategoryMenuType')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Map Items with Categories & Menu Types</a></li>
             </ul>
           </li>
 
@@ -114,9 +114,9 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isSalesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" onClick={() => handleRenderContent('CustomerMenuSummary')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Order Summary</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Correct Customer Menu</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Team</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CustomerMenuSummary')} class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">View Catering Orders</a></li>
+              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
+              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Staff</a></li>
             </ul>
           </li>
 
@@ -133,7 +133,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
             </button>
             <ul class={`${isToolsDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
               <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Suggested Menu Generator</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Menu Offers</a></li>
+              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Manage Menu Discounts</a></li>
             </ul>
           </li>
 
