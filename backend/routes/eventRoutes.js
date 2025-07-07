@@ -36,7 +36,11 @@ import { getAllEventServices, createEventService, updateEventService, deleteEven
 
 import {getAllVendors , createVendor, updateVendor, deleteVendor, getVendorServices ,assignServicesToVendor, getVendorById  } from '../controllers/superAdmin/adminVendorController.js';
 
+import { getAllCustomerEventServices, getCustomerEventServiceById, createCustomerEventService, updateCustomerEventService, deleteCustomerEventService, getAllCustomers, getAllBookings, getAllEventServicesCustomer } from '../controllers/superAdmin/customerEventServiceController.js';
 
+import { createAdminArrangement, getAllArrangements, getArrangementById, updateArrangement, deleteArrangement } from '../controllers/superAdmin/adminTableChairArrangementController.js';
+
+import { createTableDesign, getAllTableDesigns, getTableDesignById, updateTableDesign, deleteTableDesign } from '../controllers/superAdmin/tableDesignController.js';
 
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
@@ -118,7 +122,27 @@ AdminEventRoutes.post('/assignServicesToVendor/:id', assignServicesToVendor);
 AdminEventRoutes.get('/getAllEventServicesSimple', getAllEventServicesSimple);
 
 
+AdminEventRoutes.get('/customer-event-services', getAllCustomerEventServices);
+AdminEventRoutes.get('/customer-event-services/:id', getCustomerEventServiceById);
+AdminEventRoutes.post('/customer-event-services', createCustomerEventService);
+AdminEventRoutes.put('/customer-event-services/:id', updateCustomerEventService);
+AdminEventRoutes.delete('/customer-event-services/:id', deleteCustomerEventService);
+AdminEventRoutes.get('/getAllCustomers', getAllCustomers);
+AdminEventRoutes.get('/getAllBookings', getAllBookings);
+AdminEventRoutes.get('/getAllEventServicesCustomer', getAllEventServicesCustomer);
 
 
+AdminEventRoutes.post('/createadminTableChair', createAdminArrangement);
+AdminEventRoutes.get('/getadminTableChair', getAllArrangements);
+AdminEventRoutes.get('/getadminTableChair/:id', getArrangementById);
+AdminEventRoutes.put('/updateadminTableChair/:id', updateArrangement);
+AdminEventRoutes.delete('/deleteadminTableChair/:id', deleteArrangement);
+
+
+AdminEventRoutes.post('/create-table-designs', createTableDesign);
+AdminEventRoutes.get('/get-table-designs', getAllTableDesigns);
+AdminEventRoutes.get('/get-table-designs/:id', getTableDesignById);
+AdminEventRoutes.put('/update-table-designs/:id', updateTableDesign);
+AdminEventRoutes.delete('/delete-table-designs/:id', deleteTableDesign);
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes };
