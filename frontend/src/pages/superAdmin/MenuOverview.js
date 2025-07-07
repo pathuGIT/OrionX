@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getMenuOverview } from '../../services/MenuService';
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
+import { ChevronDownIcon, ChevronUpIcon } from  '@heroicons/react/20/solid';
 
 const MenuOverview = () => {
   const [menuData, setMenuData] = useState([]);

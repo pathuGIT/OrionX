@@ -29,7 +29,7 @@ function CreateItemCategoryMenuType() {
           getCategoryMenuTypes(),
           getItems()
         ]);
-        
+
         setItemCategoryMenuTypes(icmts);
         setCategoryMenuTypes(cmts);
         setItems(its);
@@ -63,8 +63,10 @@ function CreateItemCategoryMenuType() {
     }
   };
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("1 Change detected:", name, value);
     setItemCategoryMenu(prev => ({ ...prev, [name]: value }));
   };
 
@@ -94,9 +96,9 @@ function CreateItemCategoryMenuType() {
     }
   };
 
-  const getItemName = (itemId) => 
+  const getItemName = (itemId) =>
     items.find(i => i.item_id === itemId)?.item_name || itemId;
-  
+
   const getCMTName = (cmtId) => {
     const cmt = categoryMenuTypes.find(c => c.category_menu_type_id === cmtId);
     return cmt ? `${cmt.menu_type_name} - ${cmt.category_name}` : cmtId;
@@ -106,7 +108,7 @@ function CreateItemCategoryMenuType() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Item Category Menu Type Management</h1>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Form Section */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden p-6">
@@ -114,7 +116,7 @@ function CreateItemCategoryMenuType() {
               <h2 className="text-lg font-semibold text-gray-800">Create Item Category Menu Type</h2>
               <p className="text-sm text-gray-500">Link items with category menu types</p>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Item</label>
@@ -135,7 +137,7 @@ function CreateItemCategoryMenuType() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category Menu Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Item</label>
                 <select
                   name="category_menu_type_id"
                   required
@@ -145,8 +147,8 @@ function CreateItemCategoryMenuType() {
                 >
                   <option value="">Select Category Menu Type</option>
                   {categoryMenuTypes.map(cmt => (
-                    <option key={cmt.category_menu_type_id} value={cmt.category_menu_type_id}>
-                      {`${cmt.menu_type_name} - ${cmt.category_name}`}
+                    <option key={cmt.category_menu_type_Id} value={cmt.category_menu_type_Id}>
+                      {cmt.menu_type_name + ` -- ` + cmt.category_name}
                     </option>
                   ))}
                 </select>
@@ -154,11 +156,10 @@ function CreateItemCategoryMenuType() {
 
               <button
                 type="submit"
-                className={`w-full py-2 px-4 rounded-lg font-medium text-white transition duration-200 ${
-                  btnName === 'Add Item Category Menu Type' 
-                    ? 'bg-blue-600 hover:bg-blue-700' 
-                    : 'bg-green-600 hover:bg-green-700'
-                }`}
+                className={`w-full py-2 px-4 rounded-lg font-medium text-white transition duration-200 ${btnName === 'Add Item Category Menu Type'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-green-600 hover:bg-green-700'
+                  }`}
               >
                 {btnName}
               </button>
@@ -171,7 +172,7 @@ function CreateItemCategoryMenuType() {
               <h2 className="text-lg font-semibold text-gray-800">Existing Mappings</h2>
               <p className="text-sm text-gray-500">Current item to category menu type associations</p>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -192,9 +193,9 @@ function CreateItemCategoryMenuType() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {itemCategoryMenuTypes.map(icmt => (
-                    <tr key={icmt.icmt_id} className="hover:bg-gray-50 transition duration-150">
+                    <tr key={icmt.ICMT_Id} className="hover:bg-gray-50 transition duration-150">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {icmt.icmt_id}
+                        {icmt.ICMT_Id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {getCMTName(icmt.category_menu_type_id)}
@@ -204,13 +205,13 @@ function CreateItemCategoryMenuType() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <button
-                          onClick={() => handleEdit(icmt.icmt_id)}
+                          onClick={() => handleEdit(icmt.ICMT_Id)}
                           className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition duration-200"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDelete(icmt.icmt_id)}
+                          onClick={() => handleDelete(icmt.ICMT_Id)}
                           className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200"
                         >
                           Delete
