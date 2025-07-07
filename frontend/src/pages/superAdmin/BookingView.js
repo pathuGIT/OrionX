@@ -166,7 +166,8 @@ const BookingView = () => {
     }));
     try {
       const response = await searchCustomer((value.trim())); // use trimmed input value
-      setSerachlist(response.customers);
+      console.log("ss res; ", response)
+      setSerachlist(response);
     } catch (error) {
 
       console.error("Error searching customer:", error);

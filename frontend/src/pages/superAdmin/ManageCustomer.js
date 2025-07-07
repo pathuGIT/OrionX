@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAllCustomers, getCustomerBookings, searchCustomer, updateCustomer } from '../../services/CustomerServise';
+import BookingDetailsView from '../../components/bookings/BookingDetailsView';
 
 const ManageCustomer = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -9,10 +10,18 @@ const ManageCustomer = () => {
     const [bookings, setBookings] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showBookingsModal, setShowBookingsModal] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
 
     useEffect(() => {
         loadCustomers();
     }, []);
+
+    const handleDateClick = (booking_id) => {
+        console.log("xxx", booking_id)
+        if (booking_id) {
+            setSelectedBooking(booking_id);
+        }
+    };
 
     const loadCustomers = async () => {
         setIsLoading(true);
@@ -241,6 +250,12 @@ const ManageCustomer = () => {
             {/* Bookings Modal */}
             {showBookingsModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                    {selectedBooking && (
+                        <BookingDetailsView
+                            bookingId={selectedBooking}
+                            onClose={() => setSelectedBooking(null)}
+                        />
+                    )}
                     <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
                         <h3 className="text-lg font-semibold mb-4">Customer Bookings</h3>
                         <div className="overflow-x-auto">
@@ -256,7 +271,7 @@ const ManageCustomer = () => {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {bookings.map(booking => (
-                                        <tr key={booking.booking_id}>
+                                        <tr key={booking.booking_id} onClick={() => handleDateClick(booking.booking_id)} className='cursor-pointer hover:bg-slate-200'>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">{booking.booking_id}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 {new Date(booking.booking_date).toLocaleDateString()}

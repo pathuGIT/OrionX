@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -253,9 +253,22 @@ export async function getBooking(req, res) {
 /////////////// Advance booking view controllers
 
 export const getBookings = async (req, res) => {
+    console.log("aaa")
     try {
         const status = req.query.status || "all";
         const bookings = await getAllBookings(status);
+        res.status(200).json({ success: true, data: bookings });
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch bookings." });
+    }
+};
+
+export const searchBookings = async (req, res) => {
+    try {
+        const item = req.query.search;
+        console.log("aaaaaaaaaaa", item)
+        const bookings = await searchAllBookings(item);
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         console.error("Error fetching bookings:", error);
