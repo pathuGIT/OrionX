@@ -42,15 +42,21 @@ const ChairArrangement = () => {
         const arrangements = await getArrangementsByBooking(decryptedBookingId);
         if (arrangements?.length > 0) {
           const mainArrangement = arrangements[0];
+          
+          // Extract colors from Colors object if exists, otherwise use direct properties
+          const colors = mainArrangement.Colors || {
+            Top: mainArrangement.Top_Cloth_Color,
+            Table: mainArrangement.Table_Cloth_Color,
+            Bow: mainArrangement.Bow_Color,
+            Chair: mainArrangement.Chair_Cover_Color
+          };
+          
           setExistingData({
-            headPax: mainArrangement.Head_Table_Pax || 10,
-            topClothColor: mainArrangement.Top_Cloth_Color || 'white',
-            tableClothColor: mainArrangement.Table_Cloth_Color || 'black',
-            bowColor: mainArrangement.Bow_Color || 'red',
-            chairCoverColor: mainArrangement.Chair_Cover_Color || 'black',
-            lastUpdated: new Date(
-              mainArrangement.UpdatedAt || Date.now()
-            ).toLocaleDateString(),
+            headPax: mainArrangement.Head_Table_Pax,
+            topClothColor: colors.Top,
+            tableClothColor: colors.Table,
+            bowColor: colors.Bow,
+            chairCoverColor: colors.Chair,
             reservations: mainArrangement.Reservations || []
           });
         }
@@ -79,14 +85,21 @@ const ChairArrangement = () => {
       // Refresh existing data
       const updatedData = await getArrangementsByBooking(decryptedBookingId);
       if (updatedData?.length > 0) {
+        const mainArrangement = updatedData[0];
+        const colors = mainArrangement.Colors || {
+          Top: mainArrangement.Top_Cloth_Color,
+          Table: mainArrangement.Table_Cloth_Color,
+          Bow: mainArrangement.Bow_Color,
+          Chair: mainArrangement.Chair_Cover_Color
+        };
+        
         setExistingData({
-          headPax: updatedData[0].Head_Table_Pax,
-          topClothColor: updatedData[0].Top_Cloth_Color,
-          tableClothColor: updatedData[0].Table_Cloth_Color,
-          bowColor: updatedData[0].Bow_Color,
-          chairCoverColor: updatedData[0].Chair_Cover_Color,
-          lastUpdated: new Date().toLocaleDateString(),
-          reservations: updatedData[0].Reservations || []
+          headPax: mainArrangement.Head_Table_Pax,
+          topClothColor: colors.Top,
+          tableClothColor: colors.Table,
+          bowColor: colors.Bow,
+          chairCoverColor: colors.Chair,
+          reservations: mainArrangement.Reservations || []
         });
       }
     } catch (err) {
@@ -94,15 +107,14 @@ const ChairArrangement = () => {
     }
   };
 
-  // Accept values as a parameter
-  const applyDesign = (design, setValues, values) => {
-    setValues({
-      headPax: values.headPax,
+  const applyDesign = (design, setValues) => {
+    setValues(prevValues => ({
+      ...prevValues,
       topClothColor: design.Top_Cloth_Color,
       tableClothColor: design.Table_Cloth_Color,
       bowColor: design.Bow_Color,
       chairCoverColor: design.Chair_Cover_Color
-    });
+    }));
   };
 
   const StatusIndicator = ({ type, message }) => (
@@ -151,10 +163,10 @@ const ChairArrangement = () => {
           <Formik
             initialValues={existingData || {
               headPax: 10,
-              topClothColor: 'Red',
-              tableClothColor: 'Green',
-              bowColor: 'Black',
-              chairCoverColor: 'Black'
+              topClothColor: 'white',
+              tableClothColor: 'black',
+              bowColor: 'red',
+              chairCoverColor: 'black'
             }}
             enableReinitialize
             validationSchema={arrangementSchema}
@@ -186,14 +198,14 @@ const ChairArrangement = () => {
                             ? 'ring-2 ring-indigo-500 border-indigo-300 bg-indigo-50'
                             : 'border-gray-200'
                         }`}
-                        onClick={() => applyDesign(design, setValues, values)}
+                        onClick={() => applyDesign(design, setValues)}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-medium text-gray-800">Design #{design.my_row_id}</h4>
                           <button 
                             type="button"
                             className="text-sm text-indigo-600 hover:text-indigo-800"
-                            onClick={() => applyDesign(design, setValues, values)}
+                            onClick={() => applyDesign(design, setValues)}
                           >
                             Apply
                           </button>
@@ -270,11 +282,11 @@ const ChairArrangement = () => {
 
                     {/* Color Fields */}
                     {[
-                      { label: 'Top Cloth', name: 'topClothColor', value: values.topClothColor },
-                      { label: 'Table Cloth', name: 'tableClothColor', value: values.tableClothColor },
-                      { label: 'Bow', name: 'bowColor', value: values.bowColor },
-                      { label: 'Chair Cover', name: 'chairCoverColor', value: values.chairCoverColor },
-                    ].map(({ label, name, value }) => (
+                      { label: 'Top Cloth', name: 'topClothColor' },
+                      { label: 'Table Cloth', name: 'tableClothColor' },
+                      { label: 'Bow', name: 'bowColor' },
+                      { label: 'Chair Cover', name: 'chairCoverColor' },
+                    ].map(({ label, name }) => (
                       <div key={name} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
                           {label} Color
@@ -282,17 +294,15 @@ const ChairArrangement = () => {
                         <div className="flex items-center">
                           <Field
                             name={name}
-                            className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white"
-                            value={value || ''}
-                            readOnly
-                            disabled
+                            className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                            placeholder={`Enter ${label.toLowerCase()} color`}
                           />
                           <div 
-                            className="ml-3 w-10 h-10 rounded-lg border border-gray-300"
-                            style={{ backgroundColor: value || '#fff' }}
+                            className="ml-3 w-10 h-10 rounded-lg border border-gray-300" 
+                            style={{ backgroundColor: values[name] || '#fff' }}
                           ></div>
                         </div>
-                        {/* No ErrorMessage for readonly fields */}
+                        <ErrorMessage name={name} component="div" className="text-red-500 text-sm" />
                       </div>
                     ))}
                   </div>
