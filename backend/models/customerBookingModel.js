@@ -4,7 +4,7 @@ class customerBookingModel {
     static async getCustomerBooking(customerID) {
         try {
             const [result] = await db.query(
-                `SELECT booking_id, customer_id, booking_date FROM booking WHERE customer_id = ?`, 
+                `SELECT booking_id, customer_id, booking_date FROM booking WHERE customer_id = ? AND (status = 'confirmed' OR status = 'done')`, 
                 [customerID] 
             );
             return result;

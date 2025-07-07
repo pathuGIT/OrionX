@@ -77,6 +77,16 @@ export const createArrangement = async (req, res) => {
     }
 };
 
+export const getAllTableswithDesigns = async (req, res) => {
+    try {
+        const designs = await EventLinkModel.getAllDesigns();
+        res.status(200).json(designs);
+    } catch (error) {
+        console.error('Error fetching designs:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 // Get all arrangements by booking ID
 export const getArrangementsByBooking = async (req, res) => {
     try {

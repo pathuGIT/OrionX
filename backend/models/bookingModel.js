@@ -180,6 +180,22 @@ export const getAllBookings = (status) => {
   return pool.query(sql, params).then(([rows]) => rows);
 }
 
+export const searchAllBookings = (item) => {
+  console.log("Status:", item);
+  let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
+    p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
+    FROM booking b
+    LEFT JOIN contract c ON b.booking_id = c.booking_id
+    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+  const params = [];
+  if (item && item !== 'all') {
+    sql += ` WHERE b.booking_id = ? || b.customer_id = ? `;
+    params.push(item,item,item,item);
+  }
+  sql += ` ORDER BY b.booking_date DESC`;
+  return pool.query(sql, params).then(([rows]) => rows);
+}
+
 export const getBookingByIdAdvance = (bookingId) => {
   const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.* FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
@@ -248,4 +264,25 @@ export const updateAdditionalHoursModel = async (bookingId, additionalHours) => 
     `UPDATE booking SET additional_hours = ?, updated_at = NOW() WHERE booking_id = ?`,
     [additionalHours, bookingId]
   );
+}
+
+export const getBiteSoftLiquorFromEventModel = async (bookingId) => {
+  const sql = `
+    select bar.TotalBitePrice 
+      from bar inner join event 
+      on bar.BarRequirementID = event.BarRequirementID 
+      where event.booking_id = ?;
+  `;
+  return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
+
+export const UpdateBookingPrice_BiteSoftLiquorModel = async (bookingId, TotalBitePrice) => {
+  const sql = `
+    UPDATE booking_pricing
+    SET bites_payment = ?,  
+        updated_at = NOW()
+    WHERE booking_id = ?
+  `;
+  const [result] = await pool.query(sql, [TotalBitePrice, bookingId]);
+  return result; // <-- return the result object, not the array
 }

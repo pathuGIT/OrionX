@@ -18,6 +18,12 @@ export const getBookings = async (status = 'all') => {
   return res.data;
 }
 
+export const searchBookingBy = async (status) => {
+  const res = await api.get(`/booking/searchBooking?search=${status}`);
+  return res.data;
+}
+
+
 export const getBookingDetails = async (id) => {
   const res = await api.get(`/booking/${id}`);
   console.log("xxxxxxxxxxx", res.data);
@@ -30,6 +36,7 @@ export const updateBookingStatus = async (id, status) => {
 }
 
 export const updateDamageFee = async (id, { damageFee, refundAmount, depositAmount, status }) => {
+  console.log("updateDamageFee called with:", id, damageFee, refundAmount, depositAmount, status);
   const res = await api.put(`/booking/${id}/damage-fee`, { damageFee, refundAmount, depositAmount, status });
   return res.data;
 }
@@ -45,8 +52,8 @@ export const updateContract = async (id, contractData) => {
   return res.data;
 }
 
-export const updatePricing = async (id, pricingData) => {
-  const res = await api.put(`/booking/${id}/pricing`, pricingData);
+export const updateBookingPrice_BiteSoftLiquor = async (id) => {
+  const res = await api.put(`/booking/BiteSoftLiquor/${id}`);
   return res.data;
 }
 
