@@ -18,6 +18,7 @@ const BookingManagementSAN = ({ setRenderContent }) => {
         handleRenderContent('null')
     }, [])
 
+    
     const handleRenderContent = (display) => {
         switch (display) {
             case 'calender-view':
@@ -45,7 +46,8 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                 setRenderContent(() => () => <SearchView />);
                 break;
             default:
-                setRenderContent(() => () => <p>Page not found</p>);
+                setClickedItem('calender-view');
+                setRenderContent(() => () => <CalenderView />);
         }
     };
     return (

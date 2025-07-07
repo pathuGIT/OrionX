@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getMenuOverview } from '../../services/MenuService';
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
+import { ChevronDownIcon, ChevronUpIcon } from  '@heroicons/react/20/solid';
 
 const MenuOverview = () => {
   const [menuData, setMenuData] = useState([]);
@@ -38,7 +38,7 @@ const MenuOverview = () => {
                     onClick={() => toggleType(type.id)}
                   >
                     <span className="text-md font-medium">{type.name}</span>
-                    <span className="text-gray-600">${type.price}</span>
+                    <span className="text-gray-600">LKR - {type.price}</span>
                   </button>
                   {expandedType === type.id && (
                     <div className="mt-2 pl-4">

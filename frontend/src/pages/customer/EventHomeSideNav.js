@@ -125,11 +125,11 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
           menuName="BarPlan"
           subItems={[
             { page: 'Select-bar-Times', label: '⏰ Bar Times' },
-            { page: 'setect-bites', label: '🍹 Bites & Drinks' },
-            { page: 'see-bar-arrangements', label: '📋 Bar Arrangements' }
+            { page: 'setect-bites', label: '🍹 Bites ' },
+            { page: 'select-bar-arrangements', label: '📋 Plan Bar' }
           ]}
         >
-          Plan Bar
+          Bar Arrangements
         </NavItem>
 
         <div className="border-t border-gray-700 my-3 opacity-50"></div>

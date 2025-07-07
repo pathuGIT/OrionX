@@ -107,8 +107,18 @@ function CreateItemCategoryMenuType({setRenderContent}) {
     return cmt ? `${cmt.menu_type_name || cmt.name} - ${cmt.category_name}` : `Category ${cmtId}`;
   };
 
+  // Filtered Data
+  const filteredItemCategoryMenuTypes = itemCategoryMenuTypes.filter(icmt => {
+    const cmt = categoryMenuTypes.find(c => c.category_menu_type_Id == icmt.category_menu_type_id);
+    if (!cmt) return false;
+
+    const menuMatch = menuTypeFilter ? cmt.menu_type_name === menuTypeFilter : true;
+    const categoryMatch = categoryFilter ? cmt.category_name === categoryFilter : true;
+
+    return menuMatch && categoryMatch;
+  });
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
@@ -255,8 +265,13 @@ function CreateItemCategoryMenuType({setRenderContent}) {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {getItemName(icmt.item_id)}
+                      <td className="py-3 px-6">
+                        <div className="flex items-center">
+                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
+                            Item
+                          </span>
+                          {getItemName(icmt.item_id)}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <button
@@ -295,10 +310,25 @@ function CreateItemCategoryMenuType({setRenderContent}) {
                   </tr>
                 </tbody>
               </table>
+
+              {itemCategoryMenuTypes.length === 0 && (
+                <div className="text-center py-16">
+                  <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl w-20 h-20 mx-auto flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-medium text-gray-700 mb-2">No associations found</h3>
+                  <p className="text-gray-500 max-w-md mx-auto">
+                    Create your first item-category association using the form
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
-      </div>
+      )}
+
     </div>
   );
 }
