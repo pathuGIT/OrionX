@@ -151,10 +151,10 @@ const ChairArrangement = () => {
           <Formik
             initialValues={existingData || {
               headPax: 10,
-              topClothColor: 'white',
-              tableClothColor: 'black',
-              bowColor: 'red',
-              chairCoverColor: 'black'
+              topClothColor: 'Red',
+              tableClothColor: 'Green',
+              bowColor: 'Black',
+              chairCoverColor: 'Black'
             }}
             enableReinitialize
             validationSchema={arrangementSchema}
@@ -270,11 +270,11 @@ const ChairArrangement = () => {
 
                     {/* Color Fields */}
                     {[
-                      { label: 'Top Cloth', name: 'topClothColor' },
-                      { label: 'Table Cloth', name: 'tableClothColor' },
-                      { label: 'Bow', name: 'bowColor' },
-                      { label: 'Chair Cover', name: 'chairCoverColor' },
-                    ].map(({ label, name }) => (
+                      { label: 'Top Cloth', name: 'topClothColor', value: values.topClothColor },
+                      { label: 'Table Cloth', name: 'tableClothColor', value: values.tableClothColor },
+                      { label: 'Bow', name: 'bowColor', value: values.bowColor },
+                      { label: 'Chair Cover', name: 'chairCoverColor', value: values.chairCoverColor },
+                    ].map(({ label, name, value }) => (
                       <div key={name} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
                           {label} Color
@@ -282,15 +282,17 @@ const ChairArrangement = () => {
                         <div className="flex items-center">
                           <Field
                             name={name}
-                            className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
-                            placeholder={`Enter ${label.toLowerCase()} color`}
+                            className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white"
+                            value={value || ''}
+                            readOnly
+                            disabled
                           />
                           <div 
-                            className="ml-3 w-10 h-10 rounded-lg border border-gray-300" 
-                            style={{ backgroundColor: values[name] }}
+                            className="ml-3 w-10 h-10 rounded-lg border border-gray-300"
+                            style={{ backgroundColor: value || '#fff' }}
                           ></div>
                         </div>
-                        <ErrorMessage name={name} component="div" className="text-red-500 text-sm" />
+                        {/* No ErrorMessage for readonly fields */}
                       </div>
                     ))}
                   </div>
