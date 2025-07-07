@@ -84,3 +84,61 @@ export const getCusName = async (id) => {
     );
   return result[0].name;
 };
+
+// Add to models/customerModel.js
+export const getAllCustomersModel = async () => {
+  const [rows] = await pool.query(
+    `SELECT customer_id, name, email, phone, address, create_date, staus 
+     FROM customer 
+     WHERE role = 'customer'`
+  );
+  return rows;
+};
+
+export const updateCustomerModel = async (customerId, updateData) => {
+  const { name, email, phone, address, staus } = updateData;
+  
+  // Validate input parameters
+  if (!customerId || !name || !email || !phone) {
+    throw new Error('Missing required fields');
+  }
+
+  await pool.query(
+    `UPDATE customer 
+     SET name = ?, email = ?, phone = ?, address = ?, staus = ?
+     WHERE customer_id = ?`,
+    [name, email, phone, address || '', staus || 'active', customerId]
+  );
+  
+  return getCustomersByCusIdModel(customerId);
+};
+
+// Add to models/bookingModel.js (create if not exists)
+export const getBookingsByCustomerIdModel = async (customerId) => {
+  const [rows] = await pool.query(
+    `SELECT b.booking_id, b.booking_date, b.status, b.total_price, 
+            b.number_of_guests, v.venue_name
+     FROM booking b
+     JOIN venue v ON b.venue_id = v.venue_id
+     WHERE b.customer_id = ?`,
+    [customerId]
+  );
+  return rows;
+};
+
+export const searchCustomerByTerm = async (searchTerm) => {
+  const query = `
+    SELECT customer_id, name, email, phone, address, create_date, staus 
+    FROM customer 
+    WHERE role = 'customer'
+      AND (name LIKE ? 
+           OR email LIKE ? 
+           OR customer_id LIKE ?)
+  `;
+  
+  const searchValue = `%${searchTerm}%`;
+  const [results] = await pool.query(query, 
+    [searchValue, searchValue, searchValue]
+  );
+  return results;
+};

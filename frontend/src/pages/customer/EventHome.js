@@ -9,8 +9,10 @@ import TableReservation from './TableReservation';
 import ChairArrangement from './ChairArrangement';
 import ArrangementDetailsPage from './ArrangementDetailsPage';
 import PlanBarForm from './PlanBarForm';
+import PlanBiteForm from './PlanBiteForm';
 
 import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+import BarManagement from './BarManagement';
 
 // import ProfileNavbar from '../components/ProfileNavbar';
 
@@ -58,9 +60,9 @@ const EventHome = () => {
       case 'Select-bar-Times':
         return <PlanBarForm bookingId={bookingId} />;
       case 'setect-bites':
-        return ;
-      case 'see-bar-arrangements':
-        return ;
+        return <PlanBiteForm bookingId={bookingId} />;
+      case 'select-bar-arrangements':
+        return <BarManagement bookingId={bookingId} />;
       case 'plan-menulist':
         return <CustomerMenuListSelection/>;
       case 'dashboard':

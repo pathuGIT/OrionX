@@ -15,6 +15,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isSalesDropdownOpen, setIsSalesDropdownOpen] = useState(false);
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
+  const [clickedItem, setClickedItem] = useState(null);
 
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
   const toggleDropdown = dropdown => {
@@ -34,18 +35,23 @@ const MenuManagementSAN = ({ setRenderContent }) => {
     console.log(display)
     switch (display) {
       case 'createMenuListTypes':
-        setRenderContent(() => () => <CreateMenuListType setRenderContent={setRenderContent} />);
+        setClickedItem('createMenuListTypes');
+        setRenderContent(() => () => <CreateMenuListType />);
         break;
       case 'createMenuTypes':
-        setRenderContent(() => () => <CreateMenuType setRenderContent={setRenderContent}/>);
+        setClickedItem('createMenuTypes');
+        setRenderContent(() => () => <CreateMenuType />);
         break;
       case 'createCategory':
-        setRenderContent(() => () => <CreateCategory setRenderContent={setRenderContent}/>);
+        setClickedItem('createCategory');
+        setRenderContent(() => () => <CreateCategory />);
         break;
       case 'CreateItem':
-        setRenderContent(() => () => <CreateItem setRenderContent={setRenderContent}/>);
+        setClickedItem('CreateItem');
+        setRenderContent(() => () => <CreateItem />);
         break;
       case 'CreateCategoryMenuType':
+        setClickedItem('CreateCategoryMenuType');
         setRenderContent(() => () => <CreateCategoryMenuType />);
         break;
       case 'MenuOverview':
