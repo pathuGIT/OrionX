@@ -747,3 +747,188 @@ export const deleteTableDesign = async (id) => {
     throw new Error(error.response?.data?.error || 'Failed to delete table design');
   }
 };
+
+
+// Bar Times CRUD
+export const createBarTime = async (barData) => {
+  try {
+    const response = await api.post('/AdminEvents/bar-times', barData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create bar time');
+  }
+};
+
+export const getAllBarTimes = async () => {
+  try {
+    const response = await api.get('/AdminEvents/bar-times');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch bar times');
+  }
+};
+
+export const getBarTimeById = async (id) => {
+  try {
+    const response = await api.get(`/AdminEvents/bar-times/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch bar time');
+  }
+};
+
+export const updateBarTime = async (id, barData) => {
+  try {
+    const response = await api.put(`/AdminEvents/bar-times/${id}`, barData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update bar time');
+  }
+};
+
+export const deleteBarTime = async (id) => {
+  try {
+    const response = await api.delete(`/AdminEvents/bar-times/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete bar time');
+  }
+};
+
+// Bite Menu CRUD
+export const createBite = async (biteData) => {
+  try {
+    const response = await api.post('/AdminEvents/bite-menu', biteData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create bite item');
+  }
+};
+
+export const getAllBites = async () => {
+  try {
+    const response = await api.get('/AdminEvents/bite-menu');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch bite items');
+  }
+};
+
+export const getBitesByBar = async (barId) => {
+  try {
+    const response = await api.get(`/AdminEvents/bite-menu/bar/${barId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch bites by bar');
+  }
+};
+
+export const updateBite = async (id, biteData) => {
+  try {
+    const response = await api.put(`/AdminEvents/bite-menu/${id}`, biteData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update bite item');
+  }
+};
+
+export const deleteBite = async (id) => {
+  try {
+    const response = await api.delete(`/AdminEvents/bite-menu/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete bite item');
+  }
+};
+
+// Liquor Items CRUD
+export const createLiquorItem = async (liquorData) => {
+  try {
+    const response = await api.post('/AdminEvents/liquor-items', liquorData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create liquor item');
+  }
+};
+
+export const getAllLiquorItems = async () => {
+  try {
+    const response = await api.get('/AdminEvents/liquor-items');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch liquor items');
+  }
+};
+
+export const getLiquorByBar = async (barId) => {
+  try {
+    const response = await api.get(`/AdminEvents/liquor-items/bar/${barId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch liquor by bar');
+  }
+};
+
+export const updateLiquorItem = async (id, liquorData) => {
+  try {
+    const response = await api.put(`/AdminEvents/liquor-items/${id}`, liquorData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update liquor item');
+  }
+};
+
+export const deleteLiquorItem = async (id) => {
+  try {
+    const response = await api.delete(`/AdminEvents/liquor-items/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete liquor item');
+  }
+};
+
+// Soft Drink Items CRUD
+export const createSoftDrinkItem = async (softDrinkData) => {
+  try {
+    const response = await api.post('/AdminEvents/soft-drink-items', softDrinkData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create soft drink item');
+  }
+};
+
+export const getAllSoftDrinkItems = async () => {
+  try {
+    const response = await api.get('/AdminEvents/soft-drink-items');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch soft drink items');
+  }
+};
+
+export const getSoftDrinksByBar = async (barId) => {
+  try {
+    const response = await api.get(`/AdminEvents/soft-drink-items/bar/${barId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch soft drinks by bar');
+  }
+};
+
+export const updateSoftDrinkItem = async (id, softDrinkData) => {
+  try {
+    const response = await api.put(`/AdminEvents/soft-drink-items/${id}`, softDrinkData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update soft drink item');
+  }
+};
+
+export const deleteSoftDrinkItem = async (id) => {
+  try {
+    const response = await api.delete(`/AdminEvents/soft-drink-items/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete soft drink item');
+  }
+};

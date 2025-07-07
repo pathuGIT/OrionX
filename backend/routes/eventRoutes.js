@@ -42,6 +42,8 @@ import { createAdminArrangement, getAllArrangements, getArrangementById, updateA
 
 import { createTableDesign, getAllTableDesigns, getTableDesignById, updateTableDesign, deleteTableDesign } from '../controllers/superAdmin/tableDesignController.js';
 
+import { adminBarManagementController } from '../controllers/superAdmin/adminBarManagementController.js';
+
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
 const weddingRoutes = express.Router();
@@ -147,5 +149,37 @@ AdminEventRoutes.get('/get-table-designs', getAllTableDesigns);
 AdminEventRoutes.get('/get-table-designs/:id', getTableDesignById);
 AdminEventRoutes.put('/update-table-designs/:id', updateTableDesign);
 AdminEventRoutes.delete('/delete-table-designs/:id', deleteTableDesign);
+
+
+// Bar Times CRUD
+AdminEventRoutes.post('/bar-times', adminBarManagementController.createBar);
+AdminEventRoutes.get('/bar-times', adminBarManagementController.getAllBars);
+AdminEventRoutes.get('/bar-times/:id', adminBarManagementController.getBarById);
+AdminEventRoutes.put('/bar-times/:id', adminBarManagementController.updateBar);
+AdminEventRoutes.delete('/bar-times/:id', adminBarManagementController.deleteBar);
+
+// Bite Menu CRUD
+AdminEventRoutes.post('/bite-menu', adminBarManagementController.createBite);
+AdminEventRoutes.get('/bite-menu', adminBarManagementController.getAllBites);
+AdminEventRoutes.get('/bite-menu/bar/:barId', adminBarManagementController.getBitesByBar);
+AdminEventRoutes.put('/bite-menu/:id', adminBarManagementController.updateBite);
+AdminEventRoutes.delete('/bite-menu/:id', adminBarManagementController.deleteBite);
+
+// Liquor Items (Alcohol) CRUD
+AdminEventRoutes.post('/liquor-items', adminBarManagementController.createLiquorItem);
+AdminEventRoutes.get('/liquor-items', adminBarManagementController.getAllLiquorItems);
+AdminEventRoutes.get('/liquor-items/bar/:barId', adminBarManagementController.getLiquorByBar);
+AdminEventRoutes.put('/liquor-items/:id', adminBarManagementController.updateLiquorItem);
+AdminEventRoutes.delete('/liquor-items/:id', adminBarManagementController.deleteLiquorItem);
+
+// Soft Drink Items CRUD
+AdminEventRoutes.post('/soft-drink-items', adminBarManagementController.createSoftDrinkItem);
+AdminEventRoutes.get('/soft-drink-items', adminBarManagementController.getAllSoftDrinkItems);
+AdminEventRoutes.get('/soft-drink-items/bar/:barId', adminBarManagementController.getSoftDrinksByBar);
+AdminEventRoutes.put('/soft-drink-items/:id', adminBarManagementController.updateSoftDrinkItem);
+AdminEventRoutes.delete('/soft-drink-items/:id', adminBarManagementController.deleteSoftDrinkItem);
+
+
+
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes };
