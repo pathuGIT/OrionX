@@ -38,6 +38,10 @@ import {getAllVendors , createVendor, updateVendor, deleteVendor, getVendorServi
 
 import { getAllCustomerEventServices, getCustomerEventServiceById, createCustomerEventService, updateCustomerEventService, deleteCustomerEventService, getAllCustomers, getAllBookings, getAllEventServicesCustomer } from '../controllers/superAdmin/customerEventServiceController.js';
 
+import { createAdminArrangement, getAllArrangements, getArrangementById, updateArrangement, deleteArrangement } from '../controllers/superAdmin/adminTableChairArrangementController.js';
+
+import { createTableDesign, getAllTableDesigns, getTableDesignById, updateTableDesign, deleteTableDesign } from '../controllers/superAdmin/tableDesignController.js';
+
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
 const weddingRoutes = express.Router();
@@ -126,5 +130,19 @@ AdminEventRoutes.delete('/customer-event-services/:id', deleteCustomerEventServi
 AdminEventRoutes.get('/getAllCustomers', getAllCustomers);
 AdminEventRoutes.get('/getAllBookings', getAllBookings);
 AdminEventRoutes.get('/getAllEventServicesCustomer', getAllEventServicesCustomer);
+
+
+AdminEventRoutes.post('/createadminTableChair', createAdminArrangement);
+AdminEventRoutes.get('/getadminTableChair', getAllArrangements);
+AdminEventRoutes.get('/getadminTableChair/:id', getArrangementById);
+AdminEventRoutes.put('/updateadminTableChair/:id', updateArrangement);
+AdminEventRoutes.delete('/deleteadminTableChair/:id', deleteArrangement);
+
+
+AdminEventRoutes.post('/create-table-designs', createTableDesign);
+AdminEventRoutes.get('/get-table-designs', getAllTableDesigns);
+AdminEventRoutes.get('/get-table-designs/:id', getTableDesignById);
+AdminEventRoutes.put('/update-table-designs/:id', updateTableDesign);
+AdminEventRoutes.delete('/delete-table-designs/:id', deleteTableDesign);
 
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes };

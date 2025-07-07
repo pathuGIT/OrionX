@@ -623,3 +623,120 @@ export const getAllEventServicesCustomer = async () => {
         throw new Error(error.response?.data?.error || 'Failed to fetch event services');
     }
 };
+
+
+// Get all arrangements
+
+export const getAllArrangements = async () => {
+  try {
+    const response = await api.get('/AdminEvents/getadminTableChair');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch arrangements');
+  }
+};
+
+// Get a single arrangement by ID
+export const getArrangementById = async (id) => {
+  try {
+    const response = await api.get(`/AdminEvents/getadminTableChair/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch arrangement');
+  }
+};
+
+// Create a new arrangement with reservations
+export const createArrangement = async (arrangementData) => {
+  try {
+    const response = await api.post('/AdminEvents/createadminTableChair', arrangementData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create arrangement');
+  }
+};
+
+// Update an existing arrangement
+export const updateArrangement = async (id, arrangementData) => {
+  try {
+    const response = await api.put(`/AdminEvents/updateadminTableChair/${id}`, arrangementData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update arrangement');
+  }
+};
+
+// Delete an arrangement
+export const deleteArrangement = async (id) => {
+  try {
+    const response = await api.delete(`/AdminEvents/deleteadminTableChair/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete arrangement');
+  }
+};
+
+// Get all table reservations (if needed separately)
+export const getAllTableReservations = async () => {
+  try {
+    const response = await api.get('/AdminEvents/reservations');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch reservations');
+  }
+};
+
+// Create a table reservation (if needed separately)
+export const createTableReservation = async (reservationData) => {
+  try {
+    const response = await api.post('/AdminEvents/reservations', reservationData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create reservation');
+  }
+};
+
+export const getAllTableDesigns = async () => {
+  try {
+    const response = await api.get('/AdminEvents/get-table-designs');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch table designs');
+  }
+};
+
+export const getTableDesignById = async (id) => {
+  try {
+    const response = await api.get(`/AdminEvents/get-table-designs/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch table design');
+  }
+};
+
+export const createTableDesign = async (designData) => {
+  try {
+    const response = await api.post('/AdminEvents/create-table-designs', designData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create table design');
+  }
+};
+
+export const updateTableDesign = async (id, designData) => {
+  try {
+    const response = await api.put(`/AdminEvents/update-table-designs/${id}`, designData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to update table design');
+  }
+};
+
+export const deleteTableDesign = async (id) => {
+  try {
+    const response = await api.delete(`/AdminEvents/delete-table-designs/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to delete table design');
+  }
+};
