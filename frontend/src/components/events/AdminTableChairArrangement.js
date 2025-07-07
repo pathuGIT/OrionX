@@ -424,9 +424,9 @@ function AdminTableChairArrangement() {
                     name="Top_Cloth_Color"
                     value={formData.Top_Cloth_Color}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed"
                     required
-                    placeholder="e.g., Gold"
+                    disabled
                   />
                 </div>
                 
@@ -440,9 +440,9 @@ function AdminTableChairArrangement() {
                     name="Table_Cloth_Color"
                     value={formData.Table_Cloth_Color}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed"
                     required
-                    placeholder="e.g., White"
+                    disabled
                   />
                 </div>
                 
@@ -456,9 +456,9 @@ function AdminTableChairArrangement() {
                     name="Bow_Color"
                     value={formData.Bow_Color}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed"
                     required
-                    placeholder="e.g., Red"
+                    disabled
                   />
                 </div>
                 
@@ -472,9 +472,9 @@ function AdminTableChairArrangement() {
                     name="Chair_Cover_Color"
                     value={formData.Chair_Cover_Color}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed"
                     required
-                    placeholder="e.g., Black"
+                    disabled
                   />
                 </div>
               </div>
