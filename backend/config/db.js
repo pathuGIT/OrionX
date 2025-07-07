@@ -6,7 +6,7 @@ dotenv.config();
 let pool;
 
 try {
-  pool = await mysql.createPool({
+  pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
@@ -15,13 +15,35 @@ try {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    ssl: { rejectUnauthorized: true }
-    
+    connectTimeout: 10000, // 10-second connection timeout
+    ssl: {
+      rejectUnauthorized: true,
+      minVersion: 'TLSv1.2' // Azure requires TLS 1.2
+    }
   });
 
-  console.log('Connected to Azure MySQL successfully!');
+  // Test connection immediately
+  const testConn = await pool.getConnection();
+  await testConn.ping();
+  testConn.release();
+  
+  console.log('🔌 Connected to Azure MySQL successfully!');
+
+  // Add keep-alive every 4 minutes (240000ms)
+  setInterval(async () => {
+    try {
+      const keepAliveConn = await pool.getConnection();
+      await keepAliveConn.query('SELECT 1');
+      keepAliveConn.release();
+      console.log('🫀 Database keep-alive successful');
+    } catch (keepAliveErr) {
+      console.error('❌ Database keep-alive failed:', keepAliveErr.message);
+    }
+  }, 240000);
+
 } catch (error) {
-  console.error('Azure MySQL connection failed:', error);
+  console.error('❌ Azure MySQL connection FAILED:', error.message);
+  process.exit(1); // Exit process on DB connection failure
 }
 
 export default pool;

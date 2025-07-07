@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { serviceChargeService } from "../../services/UserService";
 
+
 const ServiceChargeTable = () => {
   const [charges, setCharges] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [totalDistributed, setTotalDistributed] = useState(0);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); 
 
   const loadData = async () => {
     try {
@@ -232,10 +233,11 @@ const ServiceChargeTable = () => {
                             rowSpan={eventGroup.entries.length}
                             className="px-4 py-3 text-sm text-gray-900 align-middle border-r"
                           >
-                            LKR {formatCurrency(eventGroup.event_budget)}
+                          {eventGroup.event_budget}
+
                           </td>
                         )}
-
+                        {console.log(row.event_budget)}
                         <td className="px-4 py-3 text-sm font-semibold text-green-600">
                           + LKR {formatCurrency(row.amount)}
                         </td>

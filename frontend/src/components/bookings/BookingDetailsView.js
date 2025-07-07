@@ -4,8 +4,8 @@ import BookingService, { getBookingDetails, updateAdditionalHours, updateBooking
 import VenueDropdown from './VenueDropdown';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
 
-// Reusable detail row
-function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCanselbtn }) {
+// Reusable detail row component
+function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn }) {
     const [edit, setEdit] = useState(false);
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
@@ -17,137 +17,199 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
             getAllVenues().then((data) => setVenues(data));
         }
         if (label === "Status") {
-            setVenues([{
-                'venue_id': 1,
-                'venue_name': "pending"
-            }, {
-                'venue_id': 2,
-                'venue_name': "confirmed"
-            }]);
+            setVenues([
+                { 'venue_id': 1, 'venue_name': "pending" },
+                { 'venue_id': 2, 'venue_name': "confirmed" },
+                { 'venue_id': 3, 'venue_name': "cancelled" }
+            ]);
         }
-
     }, [label]);
 
+    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours") {
+        return (
+            <div className="relative p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition-all duration-200 group">
+                {/* Display label and value when not editing */}
+                {!edit && (
+                    <>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
+                                <span className="block text-base font-medium text-gray-800 mt-1">{value}</span>
+                            </div>
+                            <button
+                                className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors duration-200"
+                                title="Edit"
+                                onClick={() => { 
+                                    setEdit(true); 
+                                    setCancelBtn(true); 
+                                    setSelectedVenue({ additionalHours: value, number_of_guests:value, damageFee:value });
+                                }}
+                            >
+                                <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </>
+                )}
 
-    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours") return (
-        <div className="flex flex-col border relative group">
-            {/* Display label and value when not editing */}
-            {!edit && (
-                <>
-                    <span className="text-gray-500 text-sm">{label}</span>
-                    <span className="text-gray-800 text-sm font-medium">{value}</span>
-                    <button
-                        className="absolute top-2 right-2 px-2 py-1 text-xs  text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Edit Venue"
-                        onClick={() => {setEdit(true); setCanselbtn(true)}}
-                    >
-                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
-                        </svg>
+                {/* Editing mode */}
+                {edit && (
+                    <div className="space-y-3">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
 
-                    </button>
-                </>
-            )}
-            {/* Editing mode: show dropdown and confirm button */}
-            {edit && (
-                <div className="flex flex-col gap-2">
-                    <span className="text-gray-500 text-sm">{label}</span>
+                        {(label === "Venue ID" || label === "Status") && (
+                            <select
+                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                                value={selectedVenue}
+                                onChange={e => setSelectedVenue(e.target.value)}
+                            >
+                                <option value="">Select {label}</option>
+                                {venues.map(v => (
+                                    <option key={v.venue_id} value={v.venue_id}>{v.venue_name + " || " + v.time_slot}</option>
+                                ))}
+                            </select>
+                        )}
 
-                    {(label === "Venue ID" || label === "Status") && (
-                        <select className="border rounded p-1" value={selectedVenue} onChange={e => setSelectedVenue(e.target.value)}>
-                            <option value="">Select Venue</option>
-                            {venues.map(v => (
-                                <option key={v.venue_id} value={v.venue_id}>{v.venue_name || v.venue_id}</option>
-                            ))}
-                        </select>
-                    )}
-                    {label === "Damage Fee (Rs)" && (
-                        <input
-                            type="number"
-                            className="border rounded p-1"
-                            value={selectedVenue.damageFee}
-                            onChange={e => setSelectedVenue({ "damageFee": e.target.value, "refundAmount": "", "depositAmount": "", "status": "" })}
-                        />
-                    )}
-                    {label === "Guests" && (
-                        <input
-                            type="number"
-                            className="border rounded p-1"
-                            value={selectedVenue.number_of_guests}
-                            onChange={e => setSelectedVenue({ "number_of_guests": e.target.value })}
-                        />
-                    )}
-                    {label === "Additional Hours" && (
-                        <input
-                            type="number"
-                            className="border rounded p-1"
-                            value={selectedVenue.additionalHours}
-                            onChange={e => setSelectedVenue({ "additionalHours": e.target.value })}
-                        />
-                    )}
-                    <div className="flex gap-2 mt-1">
-                        <button
-                            className="px-2 py-1 bg-green-500 text-white rounded"
-                            disabled={saving || !selectedVenue || selectedVenue === value}
-                            onClick={async () => {
-                                setSaving(true);
-                                try {
-                                    if (label === "Venue ID") {
-                                        await updateBookingVenue(bookingId, selectedVenue);
-                                        setRefresh(true);
+                        {label === "Damage Fee (Rs)" && (
+                            <input
+                                type="number"
+                                className="border rounded p-1"
+                                value={selectedVenue.damageFee}
+                                onChange={e => setSelectedVenue({ "damageFee": e.target.value, "refundAmount": "", "depositAmount": "", "status": "" })}
+                            />
+                        )}
+
+                        {label === "Guests" && (
+                            <input
+                                type="number"
+                                className="border rounded p-1"
+                                value={selectedVenue.number_of_guests ?? ""}
+                                onChange={e => setSelectedVenue({ "number_of_guests": e.target.value })}
+                            />
+                        )}
+
+                        {label === "Additional Hours" && (
+                            <input
+                                type="number"
+                                className="border rounded p-1"
+                                value={selectedVenue.additionalHours}
+                                onChange={e => setSelectedVenue({ "additionalHours": e.target.value })}
+                            />
+                        )}
+
+                        <div className="flex gap-2 mt-2">
+                            <button
+                                className={`flex-1 py-1.5 px-3 rounded-md font-medium transition-all duration-200 ${saving || !selectedVenue || selectedVenue === value
+                                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                    : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                                    }`}
+                                disabled={saving || !selectedVenue || selectedVenue === value}
+                                onClick={async () => {
+                                    setSaving(true);
+                                    try {
+                                        if (label === "Venue ID") {
+                                            await updateBookingVenue(bookingId, selectedVenue);
+                                        } else if (label === "Status") {
+                                            await updateBookingStatus(bookingId, selectedVenue);
+                                        } else if (label === "Damage Fee (Rs)") {
+                                            await updateDamageFee(bookingId, selectedVenue);
+                                        } else if (label === "Guests") {
+                                            await updateBookingGuest(bookingId, selectedVenue);
+                                        } else if (label === "Additional Hours") {
+                                            await updateAdditionalHours(bookingId, selectedVenue);
+                                        }
+                                        setRefresh(!refresh);
                                         setEdit(false);
-                                    } else if (label === "Status") {
-                                        await updateBookingStatus(bookingId, selectedVenue);
-                                        setRefresh(true);
-                                        setEdit(false);
-                                    } else if (label === "Damage Fee (Rs)") {
-                                        await updateDamageFee(bookingId, selectedVenue);
-                                        setRefresh(true);
-                                        setEdit(false);
-                                    } else if (label === "Guests") {
-                                        await updateBookingGuest(bookingId, selectedVenue)
-                                        setRefresh(true);
-                                        setEdit(false);
-                                    } else if (label === "Additional Hours") {
-                                        await updateAdditionalHours(bookingId, selectedVenue);
-                                        setRefresh(true);
-                                        setEdit(false);
+                                    } catch (err) {
+                                        console.log(err);
+                                        const msg =
+                                            err?.response?.data?.message ||
+                                            err?.response?.data?.msg ||
+                                            err?.message ||
+                                            'Failed to update';
+                                        alert(`Error: ${msg}`);
                                     }
-                                } catch (err) {
-                                    console.log(err);
-                                    const msg =
-                                        err?.response?.data?.message ||
-                                        err?.response?.data?.msg ||
-                                        err?.message ||
-                                        'Failed to update';
-                                    alert(`Error: ${msg}`);
-                                }
-                                setSaving(false);
-                                setCanselbtn(false);
-                            }}
-                        >
-                            {saving ? 'Saving...' : 'Confirm'}
-                        </button>
-                        <button
-                            className="px-2 py-1 bg-gray-300 rounded"
-                            onClick={() => { setEdit(false); setSelectedVenue(value); setCanselbtn(false); }}
-                            disabled={saving}
-                        >
-                            Cancel
-                        </button>
+                                    setSaving(false);
+                                    setCancelBtn(false);
+                                }}
+                            >
+                                {saving ? (
+                                    <span className="flex items-center justify-center">
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Saving...
+                                    </span>
+                                ) : 'Confirm'}
+                            </button>
+                            <button
+                                className="flex-1 py-1.5 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md font-medium transition-all duration-200"
+                                onClick={() => { setEdit(false); setSelectedVenue(value); setCancelBtn(false); }}
+                                disabled={saving}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
-    );
+                )}
+            </div>
+        );
+    }
 
     return (
-        <div className="flex flex-col ">
-            <span className="text-gray-500 text-sm">{label}</span>
-            <span className="text-gray-800 text-sm font-medium">{value || '-'}</span>
+        <div className="p-3 bg-white rounded-lg border border-gray-200">
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
+            <span className="block text-base font-medium text-gray-800 mt-1">{value || '-'}</span>
         </div>
     );
 }
+
+// Loading skeleton component
+const LoadingSkeleton = () => (
+    <div className="animate-pulse space-y-6">
+        <div className="h-8 bg-gray-200 rounded w-64"></div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-40"></div>
+                <div className="grid grid-cols-2 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="p-4 bg-gray-100 rounded-lg">
+                            <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                            <div className="h-6 bg-gray-300 rounded w-32"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-40"></div>
+                <div className="grid grid-cols-2 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="p-4 bg-gray-100 rounded-lg">
+                            <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                            <div className="h-6 bg-gray-300 rounded w-32"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <div className="space-y-4">
+            <div className="h-6 bg-gray-200 rounded w-40"></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[...Array(8)].map((_, i) => (
+                    <div key={i} className="p-4 bg-gray-100 rounded-lg">
+                        <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                        <div className="h-6 bg-gray-300 rounded w-32"></div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
 
 // Main component to fetch and display booking details
 export default function BookingDetailsView({ bookingId, onClose }) {
@@ -155,14 +217,13 @@ export default function BookingDetailsView({ bookingId, onClose }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refresh, setRefresh] = useState(false);
-    const [textBuffer, setTextBuffer] = useState(null);
-    const [cancelbtn, setCanselbtn] = useState(false);
+    const [cancelBtn, setCancelBtn] = useState(false);
 
     useEffect(() => {
         async function fetchBooking() {
             try {
-                const res = await getBookingDetails(bookingId)
-                // Wait 3 seconds before setting booking and loading
+                setLoading(true);
+                const res = await getBookingDetails(bookingId);
                 setTimeout(() => {
                     setBooking(res.data);
                     setLoading(false);
@@ -176,102 +237,53 @@ export default function BookingDetailsView({ bookingId, onClose }) {
         fetchBooking();
     }, [bookingId, refresh]);
 
-    //if (loading) return <div className="p-6">Loading...</div>;
     if (error) return <div className="p-6 text-red-600">{error}</div>;
 
     const b = booking;
-    // Format ISO dates to readable
-    const formatDate = (iso) => new Date(iso).toLocaleDateString();
-
-    // Handler to update venue in booking state
-    const handleVenueUpdated = (newVenueId) => {
-        setBooking(prev => ({ ...prev, venue_id: newVenueId }));
-    };
+    const formatDate = (iso) => new Date(iso).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
 
     return (
-        <div className=" w-full fixed m-auto bg-black left-0 top-0 right-0 bottom-0 bg-opacity-10 flex justify-center p-16 overflow-y-auto z-50">
-            <div className="flex flex-col align-middle justify-center bg-white rounded-lg p-6 w-3/4">
-                <h1 class="flex items-end ml-12 text-xl font-extrabold dark:text-white mb-3">Advance<span class="bg-blue-100 text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-200 dark:text-blue-800 ms-2"> View</span></h1>
-                {/* Booking Information */}
-                {(loading ? <div className='flex flex-row justify-center gap gap-5'>
-                    {/* Loading... */}
-
-                    <div className='flex flex-col gap-4'>
-                        <div role="status" class="max-w-sm p-4 border border-gray-100 rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700">
-
-                            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            <div class="flex items-center mt-4">
-                                <div>
-                                    <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                                    <div class="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                            </div>
-                            <span class="sr-only">Loading...</span>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                            <h1 className="text-2xl font-bold text-gray-800">Booking Details</h1>
+                            <span className="px-2.5 py-0.5 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full">
+                                ID: {bookingId}
+                            </span>
                         </div>
-                        <div role="status" class="max-w-sm p-4 border border-gray-100 rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700">
-
-                            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            <div class="flex items-center mt-4">
-                                <div>
-                                    <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                                    <div class="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                            </div>
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-
-                    <div role="status" class=" max-w-md p-4 border border-gray-100 space-y-4 divide-y divide-gray-200 rounded-sm shadow-sm animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
-                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                        </div>
-                        <div class="flex items-center justify-between pt-4">
-                            <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
-                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                        </div>
-                        <div class="flex items-center justify-between pt-4">
-                            <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
-                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                        </div>
-                        <div class="flex items-center justify-between pt-4">
-                            <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
-                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                        </div>
-                        <div class="flex items-center justify-between pt-4">
-                            <div>
-                                <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-80 mb-2.5"></div>
-                                <div class="min-w-96 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                        </div>
-                        <span class="sr-only">Loading...</span>
+                        <button
+                            onClick={onClose}
+                            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${cancelBtn ? 'invisible' : 'visible'}`}
+                        >
+                            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
-                    : <div className='flex flex-row justify-center gap gap-10 border'>
-                        <div className='flex flex-col'>
-                            <section>
-                                <h2 className="text-base font-semibold text-gray-800 mb-2">Booking Information</h2>
-                                <div className="border grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Main Content */}
+                <div className="p-6">
+                    {loading ? (
+                        <LoadingSkeleton />
+                    ) : (
+                        <div className="space-y-8">
+                            {/* Booking Information */}
+                            <section className="bg-gray-50 p-5 rounded-xl">
+                                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <svg className="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                    </svg>
+                                    Booking Information
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <DetailRow label="Booking ID" value={b.booking_id} />
                                     <DetailRow label="Date" value={formatDate(b.booking_date)} />
                                     <DetailRow label="Time Slot" value={b.time_slot} />
@@ -280,14 +292,14 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.status}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
-                                        setCanselbtn ={setCanselbtn}
+                                        setCancelBtn={setCancelBtn}
                                     />
                                     <DetailRow
                                         label="Venue ID"
                                         value={b.venue_id}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
-                                        setCanselbtn ={setCanselbtn}
+                                        setCancelBtn={setCancelBtn}
                                     />
                                     <DetailRow label="Customer ID" value={b.customer_id} />
                                     <DetailRow
@@ -295,23 +307,27 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.number_of_guests}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
-                                        setCanselbtn ={setCanselbtn}
+                                        setCancelBtn={setCancelBtn}
                                     />
                                     <DetailRow
                                         label="Additional Hours"
-                                        value={b.additional_hours}
+                                        value={b.additional_hours === null ? 0 : b.additional_hours}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
-                                        refresh={refresh}
-                                        setCanselbtn ={setCanselbtn}
+                                        setCancelBtn={setCancelBtn}
                                     />
                                 </div>
                             </section>
 
                             {/* Contract Information */}
-                            <section className='mt-5 border'>
-                                <h2 className="text-base font-semibold text-gray-800 mb-2">Contract Information</h2>
-                                <div className="border grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <section className="bg-gray-50 p-5 rounded-xl">
+                                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <svg className="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd"></path>
+                                    </svg>
+                                    Contract Information
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <DetailRow label="Contract ID" value={b.contract_id} />
                                     <DetailRow label="Deposit Amount (Rs)" value={b.deposit_amount} />
                                     <DetailRow
@@ -319,39 +335,52 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         value={b.damage_fee}
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
-                                        setCanselbtn ={setCanselbtn}
+                                        setCancelBtn={setCancelBtn}
                                     />
                                     <DetailRow label="Refund Amount (Rs)" value={b.refund_amount} />
                                     <DetailRow label="Contract Status" value={b.contract_status} />
                                 </div>
                             </section>
-                        </div>`
 
-                        {/* Pricing Information */}
-                        <section>
-                            <h2 className="text-base font-semibold text-gray-800 mb-2">Pricing Information</h2>
-                            <div className="border grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <DetailRow label="Menu Price Total (Rs)" value={b.menu_price_total} />
-                                <DetailRow label="Hall Charge (Rs)" value={b.hall_charge} />
-                                <DetailRow label="Extra Hour Fee (Rs)" value={b.extra_hour_fee} />
-                                <DetailRow label="Bites Payment (Rs)" value={b.bites_payment} />
-                                <DetailRow label="Fountain Payment (Rs)" value={b.fountain_payment} />
-                                <DetailRow label="Other Payment (Rs)" value={b.other_payment} />
-                                <DetailRow label="Overall Total (Rs)" value={b.overall_total} />
-                                <DetailRow label="Forfeited Deposit (Rs)" value={b.forfeited_deposit} />
-                            </div>
-                        </section>
-                    </div>)}
-                <div className="flex justify-end mt-4">
-                    <button
-                        onClick={onClose}
-                        className={`px-4 py-2 bg-gray-200 rounded-lg mr-2 ${cancelbtn ? 'hidden' : 'visible'}`}
-                    >
-                        Cancel
-                    </button>
+                            {/* Pricing Information */}
+                            <section className="bg-gray-200 p-5 rounded-xl">
+                                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <svg className="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"></path>
+                                    </svg>
+                                    Pricing Information
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <DetailRow label="Menu Price Total (Rs)" value={b.menu_price_total} />
+                                    <DetailRow label="Hall Charge (Rs)" value={b.hall_charge} />
+                                    <DetailRow label="Extra Hour Price (Rs)" value={b.extra_hour_fee} />
+                                    <DetailRow label="Bites Price (Rs)" value={b.bites_payment} />
+                                    <DetailRow label="Liquor Price (Rs)" value={b.fountain_payment} />
+                                    <DetailRow label="Other Price (Rs)" value={b.other_payment} />
+                                    <DetailRow label="Overall Total (Rs)" value={b.overall_total} />
+                                    <DetailRow label="Forfeited Deposit (Rs)" value={b.forfeited_deposit} />
+                                </div>
+                            </section>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 z-10">
+                    <div className="flex justify-end">
+                        <button
+                            onClick={onClose}
+                            className={`px-5 py-2.5 font-medium rounded-lg transition-all duration-200 ${cancelBtn
+                                ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                                : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                                }`}
+                        >
+                            {cancelBtn ? 'Cancel Edits' : 'Close Details'}
+                        </button>
+                    </div>
                 </div>
             </div>
-
         </div>
     );
 }
