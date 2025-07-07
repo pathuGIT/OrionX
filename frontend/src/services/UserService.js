@@ -101,6 +101,22 @@ export const serviceChargeService = {
           error: error.message
         };
       }
+    },
+        getEmployeeCharges: async (employeeId) => {
+      try {
+        const response = await api.get(`/user/service-charges/employee/${employeeId}`);
+        return {
+          success: true,
+          data: response.data.data || [],
+          count: response.data.count || 0
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to fetch charges',
+          error: error.message
+        };
+      }
     }
   };
 
@@ -263,3 +279,21 @@ getMonthlyDeductionEntriesByEmployeeAndDate: async (employeeId, date) => {
 }
 };
 
+export const calculatePay = async (date) => {
+    try {
+        const response = await api.post('/user/calculate', { calculation_date: date });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to calculate payroll');
+    }
+};
+
+export const getPayEntries = async (date) => {
+    try {
+        console.log("Fetching pay entries for date:", date);
+        const response = await api.get(`/user/entries/${date}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to load pay entries');
+    }
+};

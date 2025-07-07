@@ -42,7 +42,7 @@ function UpdateEmployees() {
       }
       const response = await getEmployeesByStatus(filterStatus);
       console.log("Fetched employees (object):", response.employees);
-      setEmployees(response.employees); // Ensure it's wrapped in an array if needed
+      setEmployees(response.employees); 
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
@@ -141,7 +141,7 @@ function UpdateEmployees() {
         alert("Please select an employee and a status.");
         return;
       }
-      console.log("aa", selectedStatus);
+
       await updateEmployeesStatus(selectedEmployee.employee_id, selectedStatus);
       alert("Employee status updated successfully");
 

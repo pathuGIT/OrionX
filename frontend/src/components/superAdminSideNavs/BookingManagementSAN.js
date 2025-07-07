@@ -46,7 +46,8 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                 setRenderContent(() => () => <SearchView />);
                 break;
             default:
-                setRenderContent(() => () => <p>Page not found</p>);
+                setClickedItem('calender-view');
+                setRenderContent(() => () => <CalenderView />);
         }
     };
     return (

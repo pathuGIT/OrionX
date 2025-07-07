@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateBookingPricingModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -253,9 +253,22 @@ export async function getBooking(req, res) {
 /////////////// Advance booking view controllers
 
 export const getBookings = async (req, res) => {
+    console.log("aaa")
     try {
         const status = req.query.status || "all";
         const bookings = await getAllBookings(status);
+        res.status(200).json({ success: true, data: bookings });
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch bookings." });
+    }
+};
+
+export const searchBookings = async (req, res) => {
+    try {
+        const item = req.query.search;
+        console.log("aaaaaaaaaaa", item)
+        const bookings = await searchAllBookings(item);
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -296,13 +309,31 @@ export const updateBookingStatus = async (req, res) => {
             // change contract
             await updateDamageFeeModel(bookingId, 0, 0, 50000, 'pending');
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            const currBooking = await getBookingById(bookingId);
+            console.log("currBooking", currBooking)
+            const venue = await getVenueBytId(currBooking.venue_id);
+            if (!venue) return res.status(404).json({ error: 'Venue not found' });
+
+            // Calculate hall charge
+            let hallCharge = 0.00;
+            if (currBooking.number_of_guests >= venue.min_capacity && currBooking.number_of_guests <= venue.max_capacity) {
+                hallCharge = venue.price;
+            } else if (currBooking.number_of_guests > venue.max_capacity) {
+                hallCharge = 0;
+            } else if (currBooking.number_of_guests < venue.min_capacity) {
+                hallCharge = venue.price;
+            }
+
+            // 3. Calculate extra hour fee
+            const extraHourFee = currBooking.additional_hours * parseFloat(venue.additional_hour_fee || 0);
 
             // change booking_pricing forfeited_deposit
             const currentBookingPrice = await getBookingPricingById(bookingId);
             const newBookingPrice = {
                 menuPriceTotal: currentBookingPrice.menu_price_total,
-                hallCharge: currentBookingPrice.hall_charge,
-                extraHourFee: currentBookingPrice.extra_hour_fee,
+                hallCharge: hallCharge, // Updated hall charge
+                extraHourFee: extraHourFee, // Updated extra hour fee
                 bitesPayment: currentBookingPrice.bites_payment,
                 fountainPayment: currentBookingPrice.fountain_payment,
                 otherPayment: currentBookingPrice.other_payment,
@@ -322,6 +353,25 @@ export const updateBookingStatus = async (req, res) => {
                 bitesPayment: currentBookingPrice.bites_payment,
                 fountainPayment: currentBookingPrice.fountain_payment,
                 otherPayment: currentBookingPrice.other_payment,
+                forfeitedDeposit: 0
+            };
+            await updatePricingModel(bookingId, newBookingPrice);
+        }
+
+        if (status === "3") {
+            // change contract
+            await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
+
+
+            // change booking_pricing forfeited_deposit
+            const currentBookingPrice = await getBookingPricingById(bookingId);
+            const newBookingPrice = {
+                menuPriceTotal: 0,
+                hallCharge: 0,
+                extraHourFee: 0,
+                bitesPayment: 0,
+                fountainPayment: 0,
+                otherPayment: 0,
                 forfeitedDeposit: 0
             };
             await updatePricingModel(bookingId, newBookingPrice);
@@ -356,40 +406,31 @@ export const updateContract = async (req, res) => {
 };
 
 // Update booking pricing information
-// export const updatePricing = async (req, res) => {
-//     try {
-//         const bookingId = req.params.id;
-//         const {
-//             menuPriceTotal,
-//             hallCharge,
-//             extraHourFee,
-//             bitesPayment,
-//             fountainPayment,
-//             otherPayment,
-//             overallTotal,
-//             forfeitedDeposit,
-//         } = req.body;
+export const UpdateBookingPrice_BiteSoftLiquor = async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        let TotalBitePrice = 0;
 
-//         const result = await updatePricingModel(bookingId, {
-//             menuPriceTotal,
-//             hallCharge,
-//             extraHourFee,
-//             bitesPayment,
-//             fountainPayment,
-//             otherPayment,
-//             overallTotal,
-//             forfeitedDeposit,
-//         });
+        const resultObj = await getBiteSoftLiquorFromEventModel(bookingId);
 
-//         if (result.affectedRows === 0) {
-//             return res.status(404).json({ success: false, message: "Pricing not found or not updated." });
-//         }
-//         res.status(200).json({ success: true, message: "Pricing updated successfully." });
-//     } catch (error) {
-//         console.error("Error updating pricing:", error);
-//         res.status(500).json({ success: false, message: "Failed to update pricing." });
-//     }
-// };
+        if (!resultObj) {
+            TotalBitePrice = 0;
+        }
+        else{
+            TotalBitePrice = resultObj.TotalBitePrice;
+        }
+
+        const result = await UpdateBookingPrice_BiteSoftLiquorModel(bookingId, TotalBitePrice);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Pricing for Bite not found for this bookingId." });
+        }
+        res.status(200).json({ success: true, message: "Bite updated successfully." });
+    } catch (error) {
+        console.error("Error updating Bite:", error);
+        res.status(500).json({ success: false, message: "Failed to update Bite." });
+    }
+};
 
 export const updateBookingVenue = async (req, res) => {
     //const [booking, setBooking] = useState(null);
@@ -536,10 +577,10 @@ export const updateGuests = async (req, res) => {
     try {
         // get current booking
         const currBooking = await getBookingById(bookingId);
-        
+
         // update current booking guest
         await updateGuestsModel(bookingId, number_of_guests);
-        console.log(bookingId,number_of_guests)
+        console.log(bookingId, number_of_guests)
 
         // get current venue 
         const venue = await getVenueBytId(currBooking.venue_id);
@@ -582,7 +623,7 @@ export const updateAdditionalHours = async (req, res) => {
 
     try {
         await updateAdditionalHoursModel(bookingId, additionalHours);
-        
+
         const currBooking = await getBookingById(bookingId);
         // get current venue 
         const venue = await getVenueBytId(currBooking.venue_id);
