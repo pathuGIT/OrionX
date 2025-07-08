@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMenuTypes, addMenuType, getMenus, deleteMenuType, updateMenuTypeById, getMenuTypeById } from '../../services/MenuService';
 import CreateCategory from './CreateCategories';
 
@@ -8,12 +8,14 @@ function CreateMenuType({setRenderContent}) {
   const [menuListTypes, setMenuListTypes] = useState([]);
   const [btnname, setBtnname] = useState('Add Menu Type');
   const [isAdding, setIsAdding] = useState(false);
+  const topRef = useRef(null);
 
   useEffect(() => {
     const fetchMenuTypes = async () => {
       try {
         const fetchedMenuTypes = await getMenuTypes();
-        setMenuTypes(fetchedMenuTypes);
+        // Reverse the array to show newest first
+        setMenuTypes(fetchedMenuTypes.reverse());
         const nextId = fetchedMenuTypes.length ? `MT${(fetchedMenuTypes.length + 1).toString().padStart(6, '0')}` : 'MT000001';
         setMenuType((prev) => ({ ...prev, menu_type_id: nextId }));
       } catch (error) {
@@ -67,7 +69,8 @@ function CreateMenuType({setRenderContent}) {
         setMenuType({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
 
         const updatedMenuTypes = await getMenuTypes();
-        setMenuTypes(updatedMenuTypes);
+        // Reverse the array to show newest first
+        setMenuTypes(updatedMenuTypes.reverse());
         setIsAdding(false);
         setRenderContent(() => <CreateCategory/>);
       } else if (btnname === 'Update') {
@@ -75,9 +78,15 @@ function CreateMenuType({setRenderContent}) {
         alert('Menu Type updated successfully!');
 
         const updatedMenuTypes = await getMenuTypes();
-        setMenuTypes(updatedMenuTypes);
+        // Reverse the array to show newest first
+        setMenuTypes(updatedMenuTypes.reverse());
         setBtnname('Add Menu Type');
         setIsAdding(false);
+      }
+
+      // Scroll to top after adding/updating
+      if (topRef.current) {
+        topRef.current.scrollIntoView({ behavior: 'smooth' });
       }
     } catch (error) {
       console.error('Error:', error);
@@ -111,6 +120,11 @@ function CreateMenuType({setRenderContent}) {
       });
       setBtnname('Update');
       setIsAdding(true);
+
+      // Scroll to form when editing
+      if (topRef.current) {
+        topRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (error) {
       console.error('Error fetching menu type by ID:', error);
       alert('An error occurred while fetching the menu type.');
@@ -125,7 +139,8 @@ function CreateMenuType({setRenderContent}) {
       if (response) {
         alert(response.message);
         const updatedMenuTypes = await getMenuTypes();
-        setMenuTypes(updatedMenuTypes);
+        // Reverse the array to show newest first
+        setMenuTypes(updatedMenuTypes.reverse());
       }
     } catch (error) {
       console.error('Error deleting menu type:', error);
@@ -134,7 +149,7 @@ function CreateMenuType({setRenderContent}) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6" ref={topRef}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
@@ -150,7 +165,12 @@ function CreateMenuType({setRenderContent}) {
           </div>
           {!isAdding && (
             <button
-              onClick={() => setIsAdding(true)}
+              onClick={() => {
+                setIsAdding(true);
+                if (topRef.current) {
+                  topRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -259,7 +279,12 @@ function CreateMenuType({setRenderContent}) {
               <h3 className="mt-4 text-lg font-medium text-gray-900">No menu types available</h3>
               <p className="mt-1 text-sm text-gray-500">Get started by adding your first menu type</p>
               <button
-                onClick={() => setIsAdding(true)}
+                onClick={() => {
+                  setIsAdding(true);
+                  if (topRef.current) {
+                    topRef.current.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-200"
               >
                 Add Menu Type
@@ -322,7 +347,12 @@ function CreateMenuType({setRenderContent}) {
                   <tr>
                     <td colSpan="4" className="px-6 py-4 text-center">
                       <button
-                        onClick={() => setIsAdding(true)}
+                        onClick={() => {
+                          setIsAdding(true);
+                          if (topRef.current) {
+                            topRef.current.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
                         className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center justify-center w-full py-2"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
