@@ -44,6 +44,8 @@ import { createTableDesign, getAllTableDesigns, getTableDesignById, updateTableD
 
 import { adminBarManagementController } from '../controllers/superAdmin/adminBarManagementController.js';
 
+import { getEventProgress } from '../controllers/customerDashboardController.js';
+
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
 const weddingRoutes = express.Router();
@@ -57,6 +59,8 @@ const reservationRoutes = express.Router();
 const planBarRoutes = express.Router();
 const planBiteRoutes = express.Router();
 const BarArrangeRoutes = express.Router();
+
+const progressRoutes = express.Router();
 
 
 
@@ -180,6 +184,6 @@ AdminEventRoutes.put('/soft-drink-items/:id', adminBarManagementController.updat
 AdminEventRoutes.delete('/soft-drink-items/:id', adminBarManagementController.deleteSoftDrinkItem);
 
 
+progressRoutes.get('/customerDashboard/:bookingId', customer, getEventProgress);
 
-
-export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes };
+export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes, progressRoutes };

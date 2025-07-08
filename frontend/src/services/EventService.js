@@ -932,3 +932,14 @@ export const deleteSoftDrinkItem = async (id) => {
     throw new Error(error.response?.data?.error || 'Failed to delete soft drink item');
   }
 };
+
+
+export const getEventProgress = async (bookingId) => {
+    try {
+        const response = await api.get(`/progress/customerDashboard/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching event progress:", error);
+        throw error;
+    }
+};
