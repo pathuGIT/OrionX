@@ -28,6 +28,7 @@ import CustomerMenuTypeSelection from './components/CustomerMenuTypeSelection';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Service from './pages/Service';
+import BookingPrint from './components/bookings/BookingPrint';
 
 function App() {
   return (
@@ -59,6 +60,8 @@ function App() {
 
             <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
             <Route path="/menu-types/:menuListTypeId" element={<CustomerMenuTypeSelection />} />
+            
+            <Route path="/bookingPrint/:id" element={<BookingPrint />} />
 
           </Routes>
         </main>

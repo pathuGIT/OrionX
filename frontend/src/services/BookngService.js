@@ -29,6 +29,11 @@ export const getBookingDetails = async (id) => {
   return res.data;
 }
 
+export const getPrintBookingDetails = async (id) => {
+  const res = await api.get(`/booking/printBookingDetails/${id}`);
+  return res.data;
+}
+
 export const updateBookingStatus = async (id, status) => {
   const res = await api.put(`/booking/${id}/status`, { status });
   return res.data;
