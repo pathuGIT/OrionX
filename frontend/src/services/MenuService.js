@@ -484,7 +484,6 @@ export const getMenuViewById = async (id) => {
 
 // Save customer menu item selection
 export const saveCustomerMenuSelection = async (booking_id, ICMT_Id) => {
-  console.log("Saving customer menu selection:", booking_id, ICMT_Id);
   try {
     const response = await api.post('/customerMenuSelection/', {
       booking_id,

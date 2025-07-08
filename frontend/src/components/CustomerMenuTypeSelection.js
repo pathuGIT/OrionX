@@ -288,7 +288,7 @@ const CustomerMenuTypeSelection = () => {
                 if (bookingId && menuPrice) {
                   await updateMenuFee(bookingId, { menueFee: menuPrice });
                 }
-                alert("Selections and menu price saved to backend!");
+                alert("Your Selections have been saved!");
               } catch (err) {
                 alert("Failed to save selections.");
                 console.error(err);
