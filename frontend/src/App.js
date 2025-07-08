@@ -15,8 +15,6 @@ import CustomerRegistration from './pages/CustomerRegistration';
 import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import EventHome from './pages/customer/EventHome';
 import DisplayEvents from './pages/customer/DisplayEvents';
-//import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
-// import DisplayEvents from './components/DisplayEvents';
 import EventServiceForm from './components/events/EventServiceForm';
 
 
@@ -57,10 +55,9 @@ function App() {
             <Route path="/event-services/create" element={<EventServiceForm />} />
             <Route path="/event-services/edit/:id" element={<EventServiceForm />} />
 
-            {/* sandli */}
-
             <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
             <Route path="/menu-types/:menuListTypeId" element={<CustomerMenuTypeSelection />} />
+            
 
           </Routes>
         </main>

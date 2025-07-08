@@ -59,7 +59,7 @@ const CustomerMenuListSelection = ({setActivePage}) => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Heading */}
       <h1 className="text-4xl font-bold mb-10 text-center text-gray-800">
-        Select a Menu List Type
+        Menus We Offer
       </h1>
 
       {/* Grid of menu list types */}

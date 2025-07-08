@@ -29,7 +29,6 @@ export const getSelections = async (req, res) => {
 // Create a new selection
 export const createSelection = async (req, res) => {
   const { booking_id, ICMT_Id } = req.body;
-  console.log("sasa::",req.body)
   try {
     if (!booking_id || !ICMT_Id) {
       return res.status(400).json({ error: "All fields are required" });
