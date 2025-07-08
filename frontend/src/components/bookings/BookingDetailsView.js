@@ -286,7 +286,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <DetailRow label="Booking ID" value={b.booking_id} />
                                     <DetailRow label="Date" value={formatDate(b.booking_date)} />
-                                    <DetailRow label="Time Slot" value={b.time_slot} />
+                                    <DetailRow label="Time Slot" value={b.venu_time_slot} />
                                     <DetailRow
                                         label="Status"
                                         value={b.status}

@@ -166,11 +166,19 @@ export const checkBookingExists = (date, slot, venueId) => {
 
 export const getAllBookings = (status) => {
   console.log("Status:", status);
+  // let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
+  //   p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
+  //   FROM booking b
+  //   LEFT JOIN contract c ON b.booking_id = c.booking_id
+  //   LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
-    p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
+    p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total, v.time_slot as venue_time_slot, v.venue_name, v.Location, v.price as venu_price, v.additional_hour_fee as venue_additional_hour_fee, v.opened_time_period as venue_opened_time_period 
     FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
-    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id
+Left join venue v ON v.venue_id = b.venue_id`;
+
   const params = [];
   if (status && status !== 'all') {
     sql += ` WHERE b.status = ?`;
@@ -197,9 +205,10 @@ export const searchAllBookings = (item) => {
 }
 
 export const getBookingByIdAdvance = (bookingId) => {
-  const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.* FROM booking b
+  const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.*, v.time_slot as venu_time_slot FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
     LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id
+    LEFT JOIN venue v ON v.venue_id = b.venue_id
     WHERE b.booking_id = ?`;
   return pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
 }
