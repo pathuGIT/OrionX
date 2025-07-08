@@ -26,7 +26,11 @@ export const searchBookingBy = async (status) => {
 
 export const getBookingDetails = async (id) => {
   const res = await api.get(`/booking/${id}`);
-  console.log("xxxxxxxxxxx", res.data);
+  return res.data;
+}
+
+export const getPrintBookingDetails = async (id) => {
+  const res = await api.get(`/booking/printBookingDetails/${id}`);
   return res.data;
 }
 

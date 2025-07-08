@@ -14,6 +14,7 @@ export const getSelectionById = async (booking_id, ICMT_Id) => {
 };
 
 export const createSelection = async (booking_id, ICMT_Id) => {
+    console.log("Creating selection for booking_id:", booking_id, "ICMT_Id:", ICMT_Id);
     const [result] = await db.query(
         "INSERT INTO customer_menu_item_selection (customer_id, ICMT_Id) VALUES (?, ?)",
         [booking_id, ICMT_Id]

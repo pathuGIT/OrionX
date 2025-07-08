@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import BookingService, { getBookingDetails, updateAdditionalHours, updateBookingGuest, updateBookingStatus, updateBookingVenue, updateDamageFee } from '../../services/BookngService';
+import BookingService, { getBookingDetails, getPrintBookingDetails, updateAdditionalHours, updateBookingGuest, updateBookingStatus, updateBookingVenue, updateDamageFee } from '../../services/BookngService';
 import VenueDropdown from './VenueDropdown';
+import BookingPrintView from './BookingPrintView';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
+import { useNavigate } from 'react-router-dom';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Reusable detail row component
 function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn }) {
@@ -39,10 +43,10 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                             <button
                                 className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors duration-200"
                                 title="Edit"
-                                onClick={() => { 
-                                    setEdit(true); 
-                                    setCancelBtn(true); 
-                                    setSelectedVenue({ additionalHours: value, number_of_guests:value, damageFee:value });
+                                onClick={() => {
+                                    setEdit(true);
+                                    setCancelBtn(true);
+                                    setSelectedVenue({ additionalHours: value, number_of_guests: value, damageFee: value });
                                 }}
                             >
                                 <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -218,7 +222,13 @@ export default function BookingDetailsView({ bookingId, onClose }) {
     const [error, setError] = useState(null);
     const [refresh, setRefresh] = useState(false);
     const [cancelBtn, setCancelBtn] = useState(false);
+    const [view, setView] = useState('details'); // 'details' or 'print'
+    const [printData, setPrintData] = useState(null);
+    const [printLoading, setPrintLoading] = useState(false);
+    const [printError, setPrintError] = useState(null);
+    const printRef = React.useRef(null);
 
+    const navigate = useNavigate();
     useEffect(() => {
         async function fetchBooking() {
             try {
@@ -237,6 +247,50 @@ export default function BookingDetailsView({ bookingId, onClose }) {
         fetchBooking();
     }, [bookingId, refresh]);
 
+    const handlePrintView = async () => {
+        try {
+            setPrintLoading(true);
+            const res = await getPrintBookingDetails(bookingId);
+            setPrintData(res.data);
+            setView('print');
+        } catch (err) {
+            setPrintError('Failed to load print data');
+            console.error(err);
+        } finally {
+            setPrintLoading(false);
+        }
+    };
+
+    const handleDownloadPdf = async () => {
+        const element = printRef.current;
+        if (!element) {
+            return;
+        }
+
+        const canvas = await html2canvas(element, {
+            scale: 2,
+        });
+        const data = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: "a4",
+        });
+
+        const imgProperties = pdf.getImageProperties(data);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+
+        const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+        pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("examplepdf.pdf");
+    };
+
+    const handleFullPage = () => {
+        navigate(`/bookingPrint/${bookingId}`);
+    }
+
     if (error) return <div className="p-6 text-red-600">{error}</div>;
 
     const b = booking;
@@ -253,14 +307,17 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-3">
-                            <h1 className="text-2xl font-bold text-gray-800">Booking Details</h1>
+                            <h1 className="text-2xl font-bold text-gray-800">
+                                {view === 'print' ? 'Booking Summary for Print' : 'Booking Details'}
+                            </h1>
                             <span className="px-2.5 py-0.5 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full">
                                 ID: {bookingId}
                             </span>
                         </div>
                         <button
                             onClick={onClose}
-                            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${cancelBtn ? 'invisible' : 'visible'}`}
+                            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${(view === 'details' && cancelBtn) || view === 'print' ? 'invisible' : 'visible'
+                                }`}
                         >
                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -269,9 +326,22 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                     </div>
                 </div>
 
+
                 {/* Main Content */}
                 <div className="p-6">
-                    {loading ? (
+                    {view === 'print' ? (
+                        printLoading ? (
+                            <div className="p-6 text-center">Loading print data...</div>
+                        ) : printError ? (
+                            <div className="p-6 text-red-600">{printError}</div>
+                        ) : (
+                            <BookingPrintView
+                                bookingId={bookingId}
+                                onBack={() => setView('details')}
+                                printRef={printRef}
+                            />
+                        )
+                    ) : loading ? (
                         <LoadingSkeleton />
                     ) : (
                         <div className="space-y-8">
@@ -286,7 +356,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <DetailRow label="Booking ID" value={b.booking_id} />
                                     <DetailRow label="Date" value={formatDate(b.booking_date)} />
-                                    <DetailRow label="Time Slot" value={b.time_slot} />
+                                    <DetailRow label="Time Slot" value={b.venu_time_slot} />
                                     <DetailRow
                                         label="Status"
                                         value={b.status}
@@ -368,18 +438,31 @@ export default function BookingDetailsView({ bookingId, onClose }) {
 
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 z-10">
-                    <div className="flex justify-end">
-                        <button
-                            onClick={onClose}
-                            className={`px-5 py-2.5 font-medium rounded-lg transition-all duration-200 ${cancelBtn
-                                ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                                : "bg-indigo-600 hover:bg-indigo-700 text-white"
-                                }`}
-                        >
-                            {cancelBtn ? 'Cancel Edits' : 'Close Details'}
-                        </button>
+                    <div className="flex justify-end space-x-3">
+                        {view === 'print' ? (
+                            <>
+                                <button
+                                    onClick={() => setView('details')}
+                                    className="px-5 py-2.5 font-medium rounded-lg hover:bg-gray-300 text-gray-700 transition-all duration-200"
+                                >
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12l4-4m-4 4 4 4" />
+                                    </svg>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={handlePrintView}
+                                    className="px-5 py-2.5 font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
+                                >
+                                    Invoice
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
+
             </div>
         </div>
     );
