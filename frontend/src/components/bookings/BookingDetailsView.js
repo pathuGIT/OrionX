@@ -5,6 +5,8 @@ import VenueDropdown from './VenueDropdown';
 import BookingPrintView from './BookingPrintView';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
 import { useNavigate } from 'react-router-dom';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Reusable detail row component
 function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn }) {
@@ -224,6 +226,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
     const [printData, setPrintData] = useState(null);
     const [printLoading, setPrintLoading] = useState(false);
     const [printError, setPrintError] = useState(null);
+    const printRef = React.useRef(null);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -258,8 +261,30 @@ export default function BookingDetailsView({ bookingId, onClose }) {
         }
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handleDownloadPdf = async () => {
+        const element = printRef.current;
+        if (!element) {
+            return;
+        }
+
+        const canvas = await html2canvas(element, {
+            scale: 2,
+        });
+        const data = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: "a4",
+        });
+
+        const imgProperties = pdf.getImageProperties(data);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+
+        const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+        pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("examplepdf.pdf");
     };
 
     const handleFullPage = () => {
@@ -313,6 +338,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                             <BookingPrintView
                                 bookingId={bookingId}
                                 onBack={() => setView('details')}
+                                printRef={printRef}
                             />
                         )
                     ) : loading ? (
@@ -423,41 +449,14 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12l4-4m-4 4 4 4" />
                                     </svg>
                                 </button>
-                                <button
-                                    onClick={handlePrint}
-                                    className="px-5 py-2.5 font-medium rounded-lg  hover:bg-green-700 text-white transition-all duration-200"
-                                >
-                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path fill-rule="evenodd" d="M8 3a2 2 0 0 0-2 2v3h12V5a2 2 0 0 0-2-2H8Zm-3 7a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1v-4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v4h1a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2H5Zm4 11a1 1 0 0 1-1-1v-4h8v4a1 1 0 0 1-1 1H9Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                                <button
-                                    onClick={handleFullPage}
-                                    className="px-5 py-2.5 font-medium rounded-lg  hover:bg-green-700 text-white transition-all duration-200"
-                                >
-                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path fill-rule="evenodd" d="M11.403 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6.403a3.01 3.01 0 0 1-1.743-1.612l-3.025 3.025A3 3 0 1 1 9.99 9.768l3.025-3.025A3.01 3.01 0 0 1 11.403 5Z" clip-rule="evenodd" />
-                                        <path fill-rule="evenodd" d="M13.232 4a1 1 0 0 1 1-1H20a1 1 0 0 1 1 1v5.768a1 1 0 1 1-2 0V6.414l-6.182 6.182a1 1 0 0 1-1.414-1.414L17.586 5h-3.354a1 1 0 0 1-1-1Z" clip-rule="evenodd" />
-                                    </svg>
-
-                                </button>
                             </>
                         ) : (
                             <>
-                                {/* <button
-                                    //onClick={onClose}
-                                    className={`px-5 py-2.5 font-medium rounded-lg transition-all duration-200 ${cancelBtn
-                                            ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
-                                        }`}
-                                > */}
-                                {/* {cancelBtn ? 'Cancel Edits' : 'Close Details'}
-                                </button> */}
                                 <button
                                     onClick={handlePrintView}
                                     className="px-5 py-2.5 font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
                                 >
-                                    Advance View
+                                    Invoice
                                 </button>
                             </>
                         )}

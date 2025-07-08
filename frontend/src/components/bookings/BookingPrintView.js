@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { getPrintBookingDetails } from '../../services/BookngService';
-
+import { FiPrinter } from 'react-icons/fi';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const formatDate = (isoString) => {
   if (!isoString) return '-';
   const date = new Date(isoString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   });
 };
 
@@ -21,10 +23,17 @@ const formatCurrency = (value) => {
   });
 };
 
+const formatInteger = (value) => {
+  if (value === null || value === undefined) return '0';
+  const num = parseFloat(value);
+  return isNaN(num) ? value : num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+};
+
 export default function BookingPrintView({ bookingId, onBack }) {
   const [printData, setPrintData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const printRef = React.useRef(null);
 
   useEffect(() => {
     async function fetchPrintData() {
@@ -41,180 +50,143 @@ export default function BookingPrintView({ bookingId, onBack }) {
     fetchPrintData();
   }, [bookingId]);
 
+  const handleDownloadPdf = async () => {
+    const element = printRef.current;
+    if (!element) {
+      return;
+    }
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+    });
+    const data = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: "a4",
+    });
+
+    const imgProperties = pdf.getImageProperties(data);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+
+    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+    pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("examplepdf.pdf");
+  };
+
   if (loading) return <div className="p-6 text-center">Loading print data...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
   if (!printData) return <div className="p-6">No data available</div>;
 
-  const { 
-    booking_id, booking_date, b_time_slot, b_status, 
+  const {
+    booking_id, booking_date, b_time_slot, b_status,
     venue_name, venue_id, Location, min_capacity, max_capacity,
     name, email, address, phone, customer_id,
     deposit_amount, damage_fee, refund_amount, contract_status,
     b_total_price, b_number_of_guests, b_additional_hours,
-    menu_price_total, hall_charge, extra_hour_fee, 
+    menu_price_total, hall_charge, extra_hour_fee,
     bites_payment, fountain_payment, other_payment,
     overall_total, forfeited_deposit
   } = printData;
 
   return (
     <div className="p-6 bg-white">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2">Booking Summary</h1>
-          <p className="text-gray-600">Booking ID: {booking_id}</p>
-          <p className="text-gray-500 text-sm">System Generated Document</p>
+      <div className="max-w-4xl mx-auto border border-gray-200 p-8 rounded-lg shadow-lg print:shadow-none print:border-0 print:max-w-full"
+      >
+        {/* Print Header */}
+        <div className="print:hidden flex justify-between items-center mb-6">
+          <button
+            onClick={handleDownloadPdf}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
+            <FiPrinter className="text-lg" />
+            Print Invoice
+          </button>
         </div>
 
-        {/* Information Sections */}
-        <div className="space-y-6">
-          {/* Booking Info */}
-          <div className="border-b pb-4">
-            <h2 className="text-lg font-semibold mb-3">Booking Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500">Booking Date</span>
-                <p className="font-medium">{formatDate(booking_date)}</p>
+        {/* Invoice Content */}
+        <div className="pt-5 pl-8 pr-8 pb-5" ref={printRef}>
+          <h1 className="text-2xl font-bold mb-5">Booking Invoice</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Customer Details */}
+            <div>
+              <h2 className="text-lg font-semibold border-b pb-2 mb-2">Customer Details</h2>
+              <div className="space-y-1">
+                <p><span className="font-medium">Name:</span> {name}</p>
+                <p><span className="font-medium">Email:</span> {email}</p>
+                <p><span className="font-medium">Phone:</span> {phone}</p>
+                <p><span className="font-medium">Address:</span> {address}</p>
+                <p><span className="font-medium">Customer ID:</span> {customer_id}</p>
               </div>
-              <div>
-                <span className="text-sm text-gray-500">Time Slot</span>
-                <p className="font-medium">{b_time_slot}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Status</span>
-                <p className="font-medium">{b_status}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Total Price</span>
-                <p className="font-medium">Rs. {formatCurrency(b_total_price)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Number of Guests</span>
-                <p className="font-medium">{b_number_of_guests}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Additional Hours</span>
-                <p className="font-medium">{b_additional_hours}</p>
+            </div>
+
+            {/* Booking Details */}
+            <div className='ml-20'>
+              <h2 className="text-lg font-semibold border-b pb-2 mb-2">Booking Details</h2>
+              <div className="space-y-1">
+                <p><span className="font-medium">Booking ID:</span> {booking_id}</p>
+                <p><span className="font-medium">Status:</span> {b_status}</p>
+                <p><span className="font-medium">Date:</span> {formatDate(booking_date)}</p>
+                <p><span className="font-medium">Time Slot:</span> {b_time_slot}</p>
+                <p><span className="font-medium">Guests:</span> {b_number_of_guests}</p>
+                <p><span className="font-medium">Additional Hours:</span> {b_additional_hours}</p>
               </div>
             </div>
           </div>
 
-          {/* Venue Info */}
-          <div className="border-b pb-4">
-            <h2 className="text-lg font-semibold mb-3">Venue Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500">Venue ID</span>
-                <p className="font-medium">{venue_id}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Venue Name</span>
-                <p className="font-medium">{venue_name}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Location</span>
-                <p className="font-medium">{Location}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Capacity</span>
-                <p className="font-medium">{min_capacity} - {max_capacity} guests</p>
-              </div>
+          {/* Venue Details */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold border-b pb-2 mb-2">Venue Details</h2>
+            <div className="space-y-1">
+              <p><span className="font-medium">Venue:</span> {venue_name} ({venue_id})</p>
+              <p><span className="font-medium">Location:</span> {Location}</p>
+              <p><span className="font-medium">Capacity:</span> {min_capacity} - {max_capacity} guests</p>
             </div>
           </div>
 
-          {/* Customer Info */}
-          <div className="border-b pb-4">
-            <h2 className="text-lg font-semibold mb-3">Customer Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500">Customer ID</span>
-                <p className="font-medium">{customer_id}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Name</span>
-                <p className="font-medium">{name}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Email</span>
-                <p className="font-medium">{email}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Phone</span>
-                <p className="font-medium">{phone}</p>
-              </div>
-              <div className="md:col-span-2">
-                <span className="text-sm text-gray-500">Address</span>
-                <p className="font-medium">{address}</p>
-              </div>
-            </div>
+          {/* Charges Table */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold border-b pb-2 mb-2">Charges</h2>
+            <table className="w-full">
+              <tbody>
+                {[
+                  ['Hall Charge', hall_charge],
+                  ['Menu Price Total', menu_price_total],
+                  ['Extra Hour Fee', extra_hour_fee],
+                  ['Bites Payment', bites_payment],
+                  ['Fountain Payment', fountain_payment],
+                  ['Other Payment', other_payment],
+                  ['Deposit Amount', deposit_amount],
+                  ['Damage Fee', damage_fee],
+                  ['Refund Amount', refund_amount],
+                  ['Forfeited Deposit', forfeited_deposit],
+                ].map(([label, value], index) => (
+                  <tr key={index} className="border-b">
+                    <td className="py-2">{label}</td>
+                    <td className="py-2 text-right">Rs. {formatInteger(value)}</td>
+                  </tr>
+                ))}
+                <tr className="border-t-2 border-black font-bold">
+                  <td className="py-2">Overall Total</td>
+                  <td className="py-2 text-right">Rs. {formatInteger(overall_total)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          {/* Contract Info */}
-          <div className="border-b pb-4">
-            <h2 className="text-lg font-semibold mb-3">Contract Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500">Deposit Amount</span>
-                <p className="font-medium">Rs. {formatCurrency(deposit_amount)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Damage Fee</span>
-                <p className="font-medium">Rs. {formatCurrency(damage_fee)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Refund Amount</span>
-                <p className="font-medium">Rs. {formatCurrency(refund_amount)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Contract Status</span>
-                <p className="font-medium">{contract_status}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Pricing Info */}
+          {/* Contract Status */}
           <div>
-            <h2 className="text-lg font-semibold mb-3">Pricing Breakdown</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500">Menu Price Total</span>
-                <p className="font-medium">Rs. {formatCurrency(menu_price_total)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Hall Charge</span>
-                <p className="font-medium">Rs. {formatCurrency(hall_charge)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Extra Hour Fee</span>
-                <p className="font-medium">Rs. {formatCurrency(extra_hour_fee)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Bites Payment</span>
-                <p className="font-medium">Rs. {formatCurrency(bites_payment)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Liquor Price</span>
-                <p className="font-medium">Rs. {formatCurrency(fountain_payment)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Other Payment</span>
-                <p className="font-medium">Rs. {formatCurrency(other_payment)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Overall Total</span>
-                <p className="font-medium">Rs. {formatCurrency(overall_total)}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Forfeited Deposit</span>
-                <p className="font-medium">Rs. {formatCurrency(forfeited_deposit)}</p>
-              </div>
-            </div>
+            <h2 className="text-lg font-semibold border-b pb-2 mb-2">Contract Status</h2>
+            <p>{contract_status}</p>
           </div>
-        </div>
 
-        {/* Footer Note */}
-        <div className="mt-8 text-center text-sm text-gray-500 border-t pt-4">
-          This is a system generated document for administrative purposes.
+          {/* Print-only footer */}
+          <div className="block print:block mt-16 pt-4 border-t text-sm text-center text-gray-500">
+            Generated on {new Date().toLocaleDateString()} | Booking ID: {booking_id}
+          </div>
+
         </div>
       </div>
     </div>
