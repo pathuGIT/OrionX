@@ -105,7 +105,7 @@ class AssignedEmployee {
                     e.service_charge_precentage AS chargePercentage
                 FROM employee e
                 INNER JOIN systemuser s ON e.employee_id = s.employee_id
-                WHERE s.status = 'active'
+                WHERE s.status = 'active' 
                 ORDER BY e.name
             `);
 
@@ -126,6 +126,7 @@ class AssignedEmployee {
                 LEFT JOIN booking b ON e.booking_id = b.booking_id
                 LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
                 LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+                where b.status = 'done'
                 ORDER BY b.booking_date DESC;
 
             `);

@@ -20,12 +20,41 @@ class Bar {
   }
 
   static async findAll() {
-    const [rows] = await db.query('SELECT * FROM bar');
+    const [rows] = await db.query(`SELECT 
+        b.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM bar b
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID`);
     return rows;
   }
 
   static async findById(id) {
-    const [rows] = await db.execute('SELECT * FROM bar WHERE BarRequirementID = ?', [id]);
+    const [rows] = await db.execute(`SELECT 
+        b.*,
+        c.name AS customerName,
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM bar b
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+      WHERE b.BarRequirementID = ?`, [id]);
     return rows[0];
   }
 
@@ -74,12 +103,44 @@ class Bite {
   }
 
   static async findAll() {
-    const [rows] = await db.query('SELECT * FROM bite');
+    const [rows] = await db.query(`SELECT 
+        bi.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM bite bi
+      JOIN bar b ON bi.BarRequirementID = b.BarRequirementID
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID`);
     return rows;
   }
 
   static async findByBar(barId) {
-    const [rows] = await db.execute('SELECT * FROM bite WHERE BarRequirementID = ?', [barId]);
+    const [rows] = await db.execute(`SELECT 
+        bi.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM bite bi
+      JOIN bar b ON bi.BarRequirementID = b.BarRequirementID
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+      
+      WHERE BarRequirementID = ?`, [barId]);
     return rows;
   }
 
@@ -124,12 +185,44 @@ class LiquorItem {
   }
 
   static async findAll() {
-    const [rows] = await db.query('SELECT * FROM liquor_items');
+    const [rows] = await db.query(`SELECT 
+        li.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM liquor_items li
+      JOIN bar b ON li.BarRequirementID = b.BarRequirementID
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID`);
     return rows;
   }
 
   static async findByBar(barId) {
-    const [rows] = await db.execute('SELECT * FROM liquor_items WHERE BarRequirementID = ?', [barId]);
+    const [rows] = await db.execute(`
+      SELECT 
+        li.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM liquor_items li
+      JOIN bar b ON li.BarRequirementID = b.BarRequirementID
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+      WHERE BarRequirementID = ?`, [barId]);
     return rows;
   }
 
@@ -178,12 +271,45 @@ class SoftDrinkItem {
   }
 
   static async findAll() {
-    const [rows] = await db.query('SELECT * FROM soft_drink_items');
+    const [rows] = await db.query(`
+      SELECT 
+        sdi.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM soft_drink_items sdi
+      JOIN bar b ON sdi.BarRequirementID = b.BarRequirementID
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID`);
     return rows;
   }
 
   static async findByBar(barId) {
-    const [rows] = await db.execute('SELECT * FROM soft_drink_items WHERE BarRequirementID = ?', [barId]);
+    const [rows] = await db.execute(`
+      SELECT 
+        sdi.*, 
+        c.name AS customerName, 
+        bk.booking_date AS eventDate,
+        CASE
+            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+            ELSE 'Event Details Not Specified'
+        END AS eventName
+      FROM soft_drink_items sdi
+      JOIN bar b ON sdi.BarRequirementID = b.BarRequirementID
+      JOIN event e ON b.BarRequirementID = e.BarRequirementID
+      JOIN booking bk ON e.booking_id = bk.booking_id
+      JOIN customer c ON bk.customer_id = c.customer_id
+      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+      WHERE BarRequirementID = ?`, [barId]);
     return rows;
   }
 

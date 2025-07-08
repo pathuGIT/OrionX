@@ -1,86 +1,64 @@
-import React, { useState, useEffect } from 'react';
-// import ProfileNavbar from '../components/ProfileNavbar';
+import React, { useState } from 'react';
+import ProfileNavbar from '../components/ProfileNavbar';
 import ProfileSideNav from '../components/ProfileSideNav';
 import CustomerBookings from './customer/CustomerBooking';
+import { FaCalendarCheck, FaTasks, FaRegClock } from 'react-icons/fa';
 
+const Card = ({ title, value, icon, color }) => (
+    <div className={`p-6 rounded-lg shadow-lg transform hover:-translate-y-2 transition-transform duration-300 ${color}`}>
+        <div className="flex items-center">
+            <div className="mr-4 text-white text-3xl">{icon}</div>
+            <div>
+                <p className="text-white font-semibold">{title}</p>
+                <h3 className="text-2xl font-bold text-white">{value}</h3>
+            </div>
+        </div>
+    </div>
+);
 
 const Profile = () => {
-  const [activePage, setActivePage] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [activePage, setActivePage] = useState('dashboard');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const closeSidebar = () => {
-    if (window.innerWidth < 768) {
-      setSidebarOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
+    const renderContent = () => {
+        switch (activePage) {
+            case 'plan-event':
+                return <CustomerBookings />;
+            case 'dashboard':
+            default:
+                return (
+                    <div>
+                        <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard Overview</h1>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <Card title="Upcoming Events" value="2" icon={<FaCalendarCheck />} color="bg-gradient-to-r from-blue-500 to-blue-400" />
+                            <Card title="Pending Tasks" value="5" icon={<FaTasks />} color="bg-gradient-to-r from-green-500 to-green-400" />
+                            <Card title="Hours Logged" value="42" icon={<FaRegClock />} color="bg-gradient-to-r from-red-500 to-red-400" />
+                        </div>
+                    </div>
+                );
+        }
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <ProfileNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-  const renderContent = () => {
-    switch (activePage) {
-      case 'plan-event':
-        return <CustomerBookings />;
-      case 'dashboard':
-      default:
-        return (
-          <div>
-            <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <div className="flex items-center">
-                  <i className="fas fa-calendar-check text-blue-500 text-2xl mr-4"></i>
-                  <div>
-                    <p className="text-gray-500">Upcoming Events</p>
-                    <h3 className="text-xl font-bold">2</h3>
-                  </div>
-                </div>
-              </div>
+            <div className="flex">
+                <ProfileSideNav
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                    isOpen={sidebarOpen}
+                    setIsOpen={setSidebarOpen}
+                />
+
+                <main className="flex-1 p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                    <div className="bg-white shadow-md rounded-xl p-6">
+                        {renderContent()}
+                    </div>
+                </main>
             </div>
-          </div>
-        );
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* <ProfileNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} /> */}
-
-      <div className="flex">
-        {/* Overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-        )}
-
-        <ProfileSideNav
-          setActivePage={setActivePage}
-          closeSidebar={closeSidebar}
-          className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } md:translate-x-0`}
-        />
-
-        <main className={`flex-1 p-6 overflow-y-auto transition-all duration-300 ${sidebarOpen ? 'md:ml-3' : 'ml-0'}`}>
-          <div className="bg-white shadow-md rounded-lg p-6">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default Profile;
