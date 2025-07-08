@@ -17,7 +17,7 @@ const CustomerBookings = () => {
         if (!customerID && user) customerID = user.id;
 
         if (!customerID) {
-            setError("Customer ID not found in session.");
+            setError("Customer ID not found. Please log in again.");
             setLoading(false);
             return;
         }
@@ -28,15 +28,15 @@ const CustomerBookings = () => {
                 setLoading(false);
             })
             .catch(error => {
-                setError("Failed to load bookings. Please try again.");
+                setError("Failed to load your bookings. Please try again later.");
                 setLoading(false);
             });
     }, [user]);
 
     const formatDate = (isoDate) => {
+        if (!isoDate) return "Date not available";
         const date = new Date(isoDate);
         return date.toLocaleDateString('en-US', {
-            weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -50,7 +50,7 @@ const CustomerBookings = () => {
     );
 
     if (error) return (
-        <div className="flex flex-col items-center justify-center h-64 text-red-500">
+        <div className="flex flex-col items-center justify-center h-64 text-red-500 bg-red-50 rounded-lg p-6">
             <AlertCircle className="w-12 h-12 mb-4" />
             <p className="text-xl font-medium">{error}</p>
         </div>
@@ -58,56 +58,60 @@ const CustomerBookings = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h2 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 My Bookings
             </h2>
-            
+
             {bookings.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 bg-white rounded-xl shadow-md">
                     <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-xl text-gray-600">No bookings found. Start by creating a new booking!</p>
+                    <p className="text-xl text-gray-600">You have no upcoming events.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {bookings.map((booking) => (
-                        <div key={booking.booking_id} className="group relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                            <div className="p-6 space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="bg-blue-100 p-2 rounded-full">
-                                        <Calendar className="w-6 h-6 text-blue-500" />
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {/* We get the 'index' from map to number the bookings */}
+                    {bookings.map((booking, index) => (
+                        <div 
+                            key={booking.booking_id} 
+                            className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col"
+                        >
+                            <div className="p-6 flex-grow">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="flex-shrink-0 bg-gradient-to-tr from-blue-500 to-purple-500 p-3 rounded-full text-white">
+                                        <Calendar className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-xl font-semibold text-gray-800">Booking #{booking.booking_id}</h3>
+                                    {/* Display booking number using the index */}
+                                    <h3 className="text-2xl font-bold text-gray-800">
+                                        Booking {index + 1}
+                                    </h3>
                                 </div>
 
-                                <div className="space-y-2 pl-2">
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <User className="w-5 h-5 text-gray-400" />
-                                        <span>Customer ID: {booking.customer_id}</span>
+                                <div className="space-y-3 border-l-2 border-blue-100 pl-4 ml-5">
+                                    <div className="flex items-center gap-3 text-gray-700">
+                                        <User className="w-5 h-5 text-blue-400" />
+                                        {/* Display customer name. Provide a fallback in case it's null. */}
+                                        <span className="font-medium">Customer : {booking.customer_name || 'Valued Customer'}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Calendar className="w-5 h-5 text-gray-400" />
-                                        <span>{formatDate(booking.booking_date)}</span>
+                                    <div className="flex items-center gap-3 text-gray-700">
+                                        <Calendar className="w-5 h-5 text-blue-400" />
+                                        <span className="font-medium">Event Date : {formatDate(booking.booking_date)}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="border-t p-4 bg-gray-50">
-                                <button 
+                            <div className="border-t-2 border-gray-100 p-4 bg-gray-50 rounded-b-xl">
+                                <button
                                     onClick={() => {
-                                        localStorage.setItem('bookingId', booking.booking_id); //save booking id on local
+                                        localStorage.setItem('bookingId', booking.booking_id);
                                         const encryptedId = encryptBookingId(booking.booking_id);
                                         const encryptedCustomerId = encryptCustId(booking.customer_id);
                                         navigate(`/eventHome/${encryptedId}/${encryptedCustomerId}`);
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-blue-600 hover:to-purple-700 transform hover:-translate-y-1 transition-all duration-300"
                                 >
                                     Plan Your Event
-                                    <ArrowRight className="w-4 h-4" />
+                                    <ArrowRight className="w-5 h-5" />
                                 </button>
-                            </div>
-
-                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl blur-lg filter opacity-20"></div>
                             </div>
                         </div>
                     ))}
