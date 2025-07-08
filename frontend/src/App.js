@@ -57,8 +57,6 @@ function App() {
             <Route path="/event-services/create" element={<EventServiceForm />} />
             <Route path="/event-services/edit/:id" element={<EventServiceForm />} />
 
-            {/* sandli */}
-
             <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
             <Route path="/menu-types/:menuListTypeId" element={<CustomerMenuTypeSelection />} />
 
