@@ -35,26 +35,22 @@ class CustomerDashboardModel {
                         WHERE booking_id = ?`
             },
             {
-                key: 'tableArrangement',
+               key: 'tableArrangement',
                 title: 'Arrange Seating & Tables',
-                query: eventType === 'wedding' 
-                    ? `SELECT 1 FROM wedding w
-                       JOIN event e ON w.Event_ID = e.Event_ID
-                       WHERE e.booking_id = ? AND 
-                             (w.Fountain IS NOT NULL OR w.ProsperityTable IS NOT NULL)`
-                    : `SELECT 1 FROM customevent c
-                       JOIN event e ON c.Event_ID = e.Event_ID
-                       WHERE e.booking_id = ?`
+                // CORRECTED QUERY: This now correctly checks the event_table_chair table.
+                query: `SELECT 1 FROM event e
+                        JOIN event_table_chair etc ON e.Event_ID = etc.Event_ID
+                        WHERE e.booking_id = ?`
             },
             {
                 key: 'barSelection',
                 title: 'Finalize Bar & Drink Selection',
+                // CORRECTED QUERY: This now checks if LiquorTimeFrom and LiquorTimeTo are set.
                 query: `SELECT 1 FROM event e
                         JOIN bar br ON e.BarRequirementID = br.BarRequirementID
-                        WHERE e.booking_id = ? AND
-                              (br.TotalLiquorPrice > 0 OR 
-                               br.TotalSoftDrinkPrice > 0 OR
-                               EXISTS (SELECT 1 FROM bite WHERE BarRequirementID = br.BarRequirementID))`
+                        WHERE e.booking_id = ? AND 
+                              br.LiquorTimeFrom IS NOT NULL AND 
+                              br.LiquorTimeTo IS NOT NULL`
             }
         ];
 
