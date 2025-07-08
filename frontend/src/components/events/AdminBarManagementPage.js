@@ -149,50 +149,98 @@ const AdminBarManagementPage = () => {
     const currentConfig = tableConfig[activeTab];
 
     // --- Render ---
-    return (
-        <div className="bg-gray-100 p-8 min-h-screen">
-            <header className="mb-6">
-                <h1 className="text-4xl font-bold text-gray-800">Bar Service Management</h1>
+   return (
+        <div className="bg-gray-100 p-4 sm:p-6 md:p-8 min-h-screen">
+            <header className="mb-4 sm:mb-6">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">Bar Service Management</h1>
             </header>
             
-            <div className="flex space-x-2 mb-6 border-b">
-                {Object.keys(tableConfig).map(tabKey => (
-                     <button key={tabKey} onClick={() => setActiveTab(tabKey)}
-                        className={`py-2 px-4 text-sm font-medium transition-all ${activeTab === tabKey ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-blue-600'}`}
-                     >
-                       {tabKey.replace('_', ' ').toUpperCase()}
-                     </button>
-                ))}
+            {/* Tabs - Horizontal scroll on mobile */}
+            <div className="mb-4 sm:mb-6">
+                <div className="flex overflow-x-auto pb-1 -mb-px hide-scrollbar">
+                    {Object.keys(tableConfig).map(tabKey => (
+                        <button 
+                            key={tabKey} 
+                            onClick={() => setActiveTab(tabKey)}
+                            className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                                activeTab === tabKey 
+                                    ? 'border-b-2 border-blue-600 text-blue-600' 
+                                    : 'text-gray-500 hover:text-blue-600'
+                            }`}
+                        >
+                            {tabKey.replace('_', ' ').toUpperCase()}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <input type="text" placeholder="Filter by Event Name..." value={eventNameFilter} onChange={e => setEventNameFilter(e.target.value)} className="w-full p-2 border rounded-md shadow-sm" />
-                <input type="text" placeholder="Filter by Customer Name..." value={customerNameFilter} onChange={e => setCustomerNameFilter(e.target.value)} className="w-full p-2 border rounded-md shadow-sm" />
+            {/* Filters - Stack vertically on mobile */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
+                <input 
+                    type="text" 
+                    placeholder="Filter by Event..." 
+                    value={eventNameFilter} 
+                    onChange={e => setEventNameFilter(e.target.value)} 
+                    className="flex-grow p-2 border rounded-md shadow-sm text-sm sm:text-base"
+                />
+                <input 
+                    type="text" 
+                    placeholder="Filter by Customer..." 
+                    value={customerNameFilter} 
+                    onChange={e => setCustomerNameFilter(e.target.value)} 
+                    className="flex-grow p-2 border rounded-md shadow-sm text-sm sm:text-base"
+                />
             </div>
 
+            {/* Table Container */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 {loading && <div className="text-center p-6">Loading...</div>}
                 {error && <div className="text-center p-6 text-red-500">{error}</div>}
+                
                 {!loading && !error && (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm">
+                        <table className="min-w-full text-xs sm:text-sm">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    {currentConfig.headers.map(header => <th key={header} className="p-3 text-left font-semibold text-gray-600">{header}</th>)}
-                                    <th className="p-3 text-right font-semibold text-gray-600">ACTIONS</th>
+                                    {currentConfig.headers.map(header => (
+                                        <th 
+                                            key={header} 
+                                            className="p-2 sm:p-3 text-left font-semibold text-gray-600 whitespace-nowrap"
+                                        >
+                                            {header}
+                                        </th>
+                                    ))}
+                                    <th className="p-2 sm:p-3 text-right font-semibold text-gray-600">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
                                 {filteredRecords.map((record, index) => (
                                     <tr key={index} className="hover:bg-gray-50">
                                         {currentConfig.columns.map(colKey => (
-                                            <td key={colKey} className="p-3 whitespace-nowrap">
-                                                {colKey.includes('Price') ? formatCurrency(record[colKey]) : colKey.includes('Date') ? formatDate(record[colKey]) : record[colKey]}
+                                            <td 
+                                                key={colKey} 
+                                                className="p-2 sm:p-3 whitespace-nowrap"
+                                            >
+                                                {colKey.includes('Price') 
+                                                    ? formatCurrency(record[colKey]) 
+                                                    : colKey.includes('Date') 
+                                                        ? formatDate(record[colKey]) 
+                                                        : record[colKey]}
                                             </td>
                                         ))}
-                                        <td className="p-3 text-right space-x-3 whitespace-nowrap">
-                                            <button onClick={() => handleUpdateClick(record)} className="font-medium text-blue-600 hover:text-blue-800">Update</button>
-                                            <button onClick={() => handleDeleteClick(record)} className="font-medium text-red-600 hover:text-red-800">Delete</button>
+                                        <td className="p-2 sm:p-3 text-right space-x-2 whitespace-nowrap">
+                                            <button 
+                                                onClick={() => handleUpdateClick(record)} 
+                                                className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-800"
+                                            >
+                                                Update
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteClick(record)} 
+                                                className="text-xs sm:text-sm font-medium text-red-600 hover:text-red-800"
+                                            >
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -202,34 +250,59 @@ const AdminBarManagementPage = () => {
                 )}
             </div>
             
-            {/* Update Modal */}
+            {/* Responsive Update Modal */}
             {isModalOpen && (
-                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
-                        <h2 className="text-2xl font-bold mb-4">Update Record</h2>
-                        <form onSubmit={handleUpdateSubmit}>
-                            <div className="space-y-4">
-                                {Object.entries(currentRecord).map(([key, value]) => (
-                                    <div key={key}>
-                                        <label className="block text-sm font-medium text-gray-700 capitalize">{key.replace(/_/g, ' ')}</label>
-                                        <input
-                                            type="text"
-                                            name={key}
-                                            defaultValue={value ?? ''}
-                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                            readOnly={key.includes('ID') || key.includes('Name') || key.includes('Date')} // Make IDs and descriptive names read-only
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-6 flex justify-end space-x-3">
-                                <button type="button" onClick={handleModalClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
-                            </div>
-                        </form>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div className="p-4 sm:p-6">
+                            <h2 className="text-xl sm:text-2xl font-bold mb-4">Update Record</h2>
+                            <form onSubmit={handleUpdateSubmit}>
+                                <div className="space-y-3">
+                                    {Object.entries(currentRecord).map(([key, value]) => (
+                                        <div key={key}>
+                                            <label className="block text-sm font-medium text-gray-700 capitalize">
+                                                {key.replace(/_/g, ' ')}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name={key}
+                                                defaultValue={value ?? ''}
+                                                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                                                readOnly={key.includes('ID') || key.includes('Name') || key.includes('Date')}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-6 flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
+                                    <button 
+                                        type="button" 
+                                        onClick={handleModalClose} 
+                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-sm sm:text-base flex-1"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm sm:text-base flex-1"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                 </div>
+                </div>
             )}
+
+            <style jsx>{`
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </div>
     );
 };
