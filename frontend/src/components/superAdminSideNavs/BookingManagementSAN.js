@@ -5,7 +5,6 @@ import BookingView from '../../pages/superAdmin/BookingView';
 import VenueView from '../../pages/superAdmin/VenueView';
 import BookingHistoryView from '../../pages/superAdmin/BookingsAnalyze';
 import InvoiceView from '../../pages/superAdmin/InvoiceView';
-import SearchView from '../../pages/superAdmin/SearchView';
 import BookingsView from '../../pages/superAdmin/BookingsAnalyze';
 import BookingsAnalyze from '../../pages/superAdmin/BookingsAnalyze';
 
@@ -40,10 +39,6 @@ const BookingManagementSAN = ({ setRenderContent }) => {
             case 'invoice-view':
                 setClickedItem('invoice-view');
                 setRenderContent(() => () => <InvoiceView />);
-                break;
-            case 'search-view':
-                setClickedItem('search-view');
-                setRenderContent(() => () => <SearchView />);
                 break;
             default:
                 setClickedItem('calender-view');
@@ -99,14 +94,6 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                                 <path fill-rule="evenodd" d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Zm2 0V2h7a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9h5a2 2 0 0 0 2-2Zm2-2a1 1 0 1 0 0 2h3a1 1 0 1 0 0-2h-3Zm0 3a1 1 0 1 0 0 2h3a1 1 0 1 0 0-2h-3Zm-6 4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-6Zm8 1v1h-2v-1h2Zm0 3h-2v1h2v-1Zm-4-3v1H9v-1h2Zm0 3H9v1h2v-1Z" clip-rule="evenodd" />
                             </svg>
                             <span class="ml-3">Invoices</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => handleRenderContent('search-view')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'search-view' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
-                            <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
-                            </svg>
-                            <span class="ml-3">Search / Filter</span>
                         </a>
                     </li>
 

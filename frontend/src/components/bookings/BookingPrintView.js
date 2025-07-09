@@ -185,7 +185,7 @@ export default function BookingPrintView({ bookingId, onBack }) {
                   // ['Deposit Amount', deposit_amount],
                   ['Damage Fee', damage_fee],
                   // ['Refund Amount', refund_amount],
-                  ['Forfeited Deposit', forfeited_deposit],
+                  // ['Forfeited Deposit', forfeited_deposit],
                 ].map(([label, value], index) => (
                   <tr key={index} className={`border-b ${label === 'Refund Amount' ? 'line-through' : ''}`}>
                     <td className={`py-2 `}>{label}</td>
@@ -194,7 +194,7 @@ export default function BookingPrintView({ bookingId, onBack }) {
                 ))}
                 <tr className="border-t-2 border-black font-bold">
                   <td className="py-2">Overall Total</td>
-                  <td className="py-2 text-right">Rs. {formatInteger(overall_total)}</td>
+                  <td className="py-2 text-right underline">Rs. {formatInteger(overall_total)}</td>
                 </tr>
               </tbody>
             </table>
