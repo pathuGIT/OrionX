@@ -11,45 +11,81 @@ export function generateEventReport(reportData) {
             doc.on('end', () => resolve(Buffer.concat(buffers)));
             doc.on('error', reject);
 
-            // Determine event type
             const isWedding = reportData.Groom_Name && reportData.Bride_Name;
             const isCustomEvent = reportData.custom_event_name;
             const eventType = isWedding ? 'Wedding' : isCustomEvent ? 'Custom Event' : 'Event';
 
-            // --- Reusable Helpers ---
+            // Header
             const drawHeader = (title) => {
-                doc.font('Helvetica-Bold').fontSize(18).text('ORIONX', { align: 'center' });
-                doc.fontSize(12).text(title, { align: 'center' });
-                doc.moveDown(2);
+                doc.font('Helvetica-Bold').fontSize(20).fillColor('#000')
+                    .text('ORIONX', { align: 'center' });
+                doc.moveDown(0.3);
+                doc.font('Helvetica').fontSize(12).fillColor('gray')
+                    .text(title, { align: 'center' });
+                doc.moveDown(1);
+                drawLine();
             };
 
-            const writeSectionHeader = (text) =>
-                doc.font('Helvetica-Bold').fontSize(11).text(text, { underline: true }).moveDown(0.7);
+            const drawLine = () => {
+                doc.moveTo(40, doc.y).lineTo(555, doc.y)
+                    .strokeColor('#ccc').lineWidth(0.5).stroke();
+                doc.moveDown();
+            };
 
+            const writeSectionHeader = (text) => {
+                doc.moveDown(1);
+                const x = 45;
+                doc.font('Helvetica-Bold')
+                    .fontSize(12)
+                    .fillColor('#000')
+                    .text(text.toUpperCase(), x, doc.y, { underline: true });
+                drawLine();
+            };
+
+            // Updated layout with increased spacing
             const writeTwoColumnField = (label1, value1, label2, value2) => {
                 const y = doc.y;
-                doc.font('Helvetica-Bold').fontSize(10).text(label1, 45, y);
-                doc.font('Helvetica').text(value1 || 'N/A', 170, y, { width: 150 });
+                const valueOffset = 180; // Increased spacing
+                const valueOffset2 = 450;
+
+                doc.font('Helvetica-Bold').fontSize(10).fillColor('#000').text(label1, 45, y);
+                doc.font('Helvetica').text(value1 || 'N/A', valueOffset, y);
+
                 if (label2) {
                     doc.font('Helvetica-Bold').text(label2, 320, y);
-                    doc.font('Helvetica').text(value2 || 'N/A', 420, y, { width: 150 });
+                    doc.font('Helvetica').text(value2 || 'N/A', valueOffset2, y);
                 }
                 doc.moveDown(1.5);
             };
 
-            const writeCheckbox = (label, isChecked) => {
-                doc.font('Helvetica').fontSize(10).text(`${isChecked ? '☑' : '☐'} ${label}`);
+            const writeBulletItems = (items) => {
+                const x = 55;
+                items.forEach(item => {
+                    doc.font('Helvetica').fontSize(10).text(`• ${item}`, x, doc.y);
+                });
+                doc.moveDown();
             };
 
-            // --- Page 1: Main Details ---
+            const writeItems = (title, items) => {
+                if (items?.length > 0) {
+                    writeSectionHeader(title);
+                    const x = 55;
+                    items.forEach(item => {
+                        doc.font('Helvetica').fontSize(10)
+                            .text(`• ${item.name} x ${item.quantity}`, x, doc.y);
+                    });
+                    doc.moveDown();
+                }
+            };
+
+            // --- PAGE 1 ---
             drawHeader('Final Function Sheet');
 
-            // Booking Details
             writeTwoColumnField(
                 'Date:',
                 new Date(reportData.booking_date).toLocaleDateString(),
                 'Pax:',
-                reportData.number_of_guests.toString()
+                reportData.number_of_guests?.toString()
             );
 
             writeTwoColumnField(
@@ -59,7 +95,6 @@ export function generateEventReport(reportData) {
                 eventType
             );
 
-            // Event-specific details
             if (isWedding) {
                 writeTwoColumnField('Groom:', reportData.Groom_Name, 'Contact:', reportData.Groom_Contact_no);
                 writeTwoColumnField('Bride:', reportData.Bride_Name, 'Contact:', reportData.Bride_Contact_no);
@@ -68,51 +103,33 @@ export function generateEventReport(reportData) {
                 writeTwoColumnField('Contact Person:', reportData.ContactPersonName, 'Contact:', reportData.ContactPersonNumber);
             }
 
-            // Customer Info
             writeTwoColumnField('Customer:', reportData.customer_name);
             doc.moveDown();
 
             // Coordinators
             writeSectionHeader('COORDINATORS');
-            if (reportData.coordinators) {
-                doc.font('Helvetica').fontSize(10).text(reportData.coordinators);
-            } else {
-                doc.font('Helvetica').fontSize(10).text('No coordinators assigned');
-            }
+            doc.font('Helvetica').fontSize(10)
+                .text(reportData.coordinators || 'No coordinators assigned', 45, doc.y);
             doc.moveDown();
 
-            // Time Allocations
+            // Timings
             writeSectionHeader('TIMINGS');
-            writeTwoColumnField(
-                'Function Duration:',
-                `${reportData.Function_durationFrom} - ${reportData.Function_durationTo}`
-            );
-
-            writeTwoColumnField(
-                'Buffet Time:',
-                `${reportData.Buffet_TimeFrom} - ${reportData.Buffet_TimeTo}`
-            );
+            writeTwoColumnField('Function Duration:', `${reportData.Function_durationFrom} - ${reportData.Function_durationTo}`);
+            writeTwoColumnField('Buffet Time:', `${reportData.Buffet_TimeFrom} - ${reportData.Buffet_TimeTo}`);
 
             if (isWedding) {
-                writeTwoColumnField(
-                    'Poruwa Ceremony:',
-                    `${reportData.Poruwa_CeremonyFrom} - ${reportData.Poruwa_CeremonyTo}`
-                );
-                writeTwoColumnField(
-                    'Registration Time:',
-                    reportData.Registration_Time
-                );
+                writeTwoColumnField('Poruwa Ceremony:', `${reportData.Poruwa_CeremonyFrom} - ${reportData.Poruwa_CeremonyTo}`);
+                writeTwoColumnField('Registration Time:', reportData.Registration_Time);
             }
 
             writeTwoColumnField('Dress Time:', reportData.Dress_Time);
             writeTwoColumnField('Tea Time:', reportData.Tea_table_Time);
             doc.moveDown();
 
-            // --- Page 2: Arrangements & Menu ---
+            // --- PAGE 2 ---
             doc.addPage();
             drawHeader('Arrangements & Menu');
 
-            // Table Arrangements
             if (reportData.Head_Table_Pax) {
                 writeSectionHeader('TABLE ARRANGEMENT');
                 writeTwoColumnField('Head Table Pax:', reportData.Head_Table_Pax.toString());
@@ -121,62 +138,40 @@ export function generateEventReport(reportData) {
                 writeTwoColumnField('Chair Cover:', reportData.Chair_Cover_Color);
                 writeTwoColumnField('Bow Color:', reportData.Bow_Color);
             }
-            doc.moveDown();
 
-            // Bar Details
             if (reportData.BarPax) {
                 writeSectionHeader('BAR DETAILS');
                 writeTwoColumnField('Bar Pax:', reportData.BarPax.toString());
-                writeTwoColumnField('Liquor Time:',
-                    `${reportData.LiquorTimeFrom} - ${reportData.LiquorTimeTo}`
-                );
+                writeTwoColumnField('Liquor Time:', `${reportData.LiquorTimeFrom} - ${reportData.LiquorTimeTo}`);
             }
-            doc.moveDown();
 
-            // Services
             if (reportData.selected_services) {
                 writeSectionHeader('SERVICES');
-                doc.font('Helvetica').fontSize(10)
-                    .text(reportData.selected_services.split(', ').map(s => `• ${s}`).join('\n'));
-            }
-            doc.moveDown();
-
-            // Bites and Drinks
-            const writeItems = (title, items) => {
-                if (items && items.length > 0) {
-                    writeSectionHeader(title);
-                    items.forEach(item =>
-                        doc.font('Helvetica').fontSize(10)
-                            .text(`• ${item.name} x ${item.quantity}`)
-                    );
-                    doc.moveDown();
-                }
-            };
-
-            if (reportData.selected_bites) {
-                writeItems('BITES', reportData.selected_bites);
+                writeBulletItems(reportData.selected_services.split(', '));
             }
 
-            if (reportData.soft_drink_items) {
-                writeItems('SOFT DRINKS', reportData.soft_drink_items);
+            writeItems('BITES', reportData.selected_bites);
+            writeItems('SOFT DRINKS', reportData.soft_drink_items);
+
+            // --- SIGNATURE SECTION ---
+            if (doc.y > doc.page.height - 180) {
+                doc.addPage();
             }
-
-            // --- Signature Section ---
-            const signatureY = doc.page.height - 100;
-            doc.y = signatureY;
-
-            doc.font('Helvetica').fontSize(10)
-                .text('I hereby confirm the above details are accurate:', { align: 'center' });
 
             doc.moveDown(3);
-            doc.font('Helvetica')
-                .text('_________________________', 100, doc.y)
-                .text('Customer Signature', 130, doc.y + 20);
+            doc.font('Helvetica').fontSize(10)
+                .text('I hereby inform the above information is true & correct.', 45, doc.y);
+            doc.moveDown(4);
 
-            doc.text('_________________________', 350, doc.y)
-                .text('Staff Signature', 380, doc.y + 20);
+            const sigLineY = doc.y;
+            const sigTextY = sigLineY + 15;
 
-            // Finalize PDF
+            doc.font('Helvetica').text('_________________________', 70, sigLineY);
+            doc.font('Helvetica-Bold').text('Signature of the Guest', 80, sigTextY);
+
+            doc.font('Helvetica').text('_________________________', 330, sigLineY);
+            doc.font('Helvetica-Bold').text('Meeting by', 350, sigTextY);
+
             doc.end();
         } catch (error) {
             reject(error);
