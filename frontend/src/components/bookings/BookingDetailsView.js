@@ -426,10 +426,10 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                     <DetailRow label="Hall Charge (Rs)" value={b.hall_charge} />
                                     <DetailRow label="Extra Hour Price (Rs)" value={b.extra_hour_fee} />
                                     <DetailRow label="Bites Price (Rs)" value={b.bites_payment} />
-                                    <DetailRow label="Liquor Price (Rs)" value={b.fountain_payment} />
+                                    {/* <DetailRow label="Liquor Price (Rs)" value={b.fountain_payment} /> */}
                                     <DetailRow label="Other Price (Rs)" value={b.other_payment} />
-                                    <DetailRow label="Overall Total (Rs)" value={b.overall_total} />
                                     <DetailRow label="Forfeited Deposit (Rs)" value={b.forfeited_deposit} />
+                                    <DetailRow label="Overall Total (Rs)" value={b.overall_total} />
                                 </div>
                             </section>
                         </div>
