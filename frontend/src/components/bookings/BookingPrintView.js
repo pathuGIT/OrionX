@@ -91,6 +91,30 @@ export default function BookingPrintView({ bookingId, onBack }) {
     overall_total, forfeited_deposit
   } = printData;
 
+  const refundMsg = () => {
+    // Use 'status' instead of 'contract_status' to match database
+    switch (contract_status) {
+      case 'pending':
+        return (
+          <>
+            <span>Deposit held pending event completion and inspection.</span>
+          </>
+        );
+      case 'refunded':
+        return (
+          <>
+            <span>Contract fulfilled. Security deposit refunded after final inspection.</span>
+          </>
+        );
+      case 'forfeited':
+        return <span>Contract terminated. Security deposit forfeited (Rs. {formatInteger(forfeited_deposit)}) retained as per agreement.</span>;
+      case 'canceled':
+        return <span>Contract canceled per customer request.</span>;
+      default:
+        return <span>Contract status pending resolution.</span>;
+    }
+  }
+
   return (
     <div className="p-6 bg-white">
       <div className="max-w-4xl mx-auto border border-gray-200 p-8 rounded-lg shadow-lg print:shadow-none print:border-0 print:max-w-full"
@@ -127,7 +151,7 @@ export default function BookingPrintView({ bookingId, onBack }) {
               <h2 className="text-lg font-semibold border-b pb-2 mb-2">Booking Details</h2>
               <div className="space-y-1">
                 <p><span className="font-medium">Booking ID:</span> {booking_id}</p>
-                <p><span className="font-medium">Status:</span> {b_status}</p>
+                <p className="underline"><span className="font-medium">Status:</span> {b_status}</p>
                 <p><span className="font-medium">Date:</span> {formatDate(booking_date)}</p>
                 <p><span className="font-medium">Time Slot:</span> {b_time_slot}</p>
                 <p><span className="font-medium">Guests:</span> {b_number_of_guests}</p>
@@ -156,15 +180,15 @@ export default function BookingPrintView({ bookingId, onBack }) {
                   ['Menu Price Total', menu_price_total],
                   ['Extra Hour Fee', extra_hour_fee],
                   ['Bites Payment', bites_payment],
-                  ['Fountain Payment', fountain_payment],
+                  // ['Fountain Payment', fountain_payment],
                   ['Other Payment', other_payment],
-                  ['Deposit Amount', deposit_amount],
+                  // ['Deposit Amount', deposit_amount],
                   ['Damage Fee', damage_fee],
-                  ['Refund Amount', refund_amount],
+                  // ['Refund Amount', refund_amount],
                   ['Forfeited Deposit', forfeited_deposit],
                 ].map(([label, value], index) => (
-                  <tr key={index} className="border-b">
-                    <td className="py-2">{label}</td>
+                  <tr key={index} className={`border-b ${label === 'Refund Amount' ? 'line-through' : ''}`}>
+                    <td className={`py-2 `}>{label}</td>
                     <td className="py-2 text-right">Rs. {formatInteger(value)}</td>
                   </tr>
                 ))}
@@ -179,7 +203,18 @@ export default function BookingPrintView({ bookingId, onBack }) {
           {/* Contract Status */}
           <div>
             <h2 className="text-lg font-semibold border-b pb-2 mb-2">Contract Status</h2>
-            <p>{contract_status}</p>
+
+            <div className="mb-2">
+              <span className="font-medium">Deposit Amount:</span> {formatCurrency(deposit_amount)}
+            </div>
+            <div className="mb-2">
+              <span className="font-medium">Damage Fee:</span> {formatCurrency(damage_fee)}
+            </div>
+            <div className="mb-2">
+              <span className="font-medium">Refund Amount:</span> {formatCurrency(refund_amount)}
+            </div>
+            <hr />
+            <p>{refundMsg()}</p>
           </div>
 
           {/* Print-only footer */}
@@ -191,4 +226,5 @@ export default function BookingPrintView({ bookingId, onBack }) {
       </div>
     </div>
   );
+
 }
