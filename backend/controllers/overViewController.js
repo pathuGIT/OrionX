@@ -1,5 +1,6 @@
 import {
   fetchKpis,
+  fetchRecentBookings,
   fetchRevenueTrend
 } from '../models/overViewModel.js';
 
@@ -20,3 +21,11 @@ export async function getRevenueTrend(req, res, next) {
     next(err);
   }
 }
+export const getRecentBookings = async (req, res, next) => {
+  try {
+    const bookings = await fetchRecentBookings();
+    res.json(bookings);
+  } catch (err) {
+    next(err);
+  }
+};

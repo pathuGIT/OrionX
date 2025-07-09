@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings, printBookingDetails } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -267,7 +267,6 @@ export const getBookings = async (req, res) => {
 export const searchBookings = async (req, res) => {
     try {
         const item = req.query.search;
-        console.log("aaaaaaaaaaa", item)
         const bookings = await searchAllBookings(item);
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {
@@ -275,6 +274,20 @@ export const searchBookings = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to fetch bookings." });
     }
 };
+
+export const printBookingDetailsCtrl = async(req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const bookingDetails = await printBookingDetails(bookingId);
+        if (!bookingDetails) {
+            return res.status(404).json({ success: false, message: "Booking not found." });
+        }
+        res.status(200).json({ success: true, data: bookingDetails });
+    } catch (error) {
+        console.error("Error fetching print-booking details:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch print-booking details." });
+    }
+}
 
 // Get details of a single booking
 export const getBookingDetails = async (req, res) => {

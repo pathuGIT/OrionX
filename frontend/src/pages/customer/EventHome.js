@@ -16,6 +16,7 @@ import PlanBiteForm from './PlanBiteForm';
 import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
 import BarManagement from './BarManagement';
 import EventNavbar from './EventNavbar'; // New component
+import CustomerEventDashboard from './CustomerEventDashboard';
 
 // A new, reusable card component for the dashboard
 const DashboardCard = ({ title, value, icon, color }) => (
@@ -50,16 +51,7 @@ const EventHome = () => {
             case 'plan-menulist': return <CustomerMenuListSelection />;
             case 'dashboard':
             default:
-                return (
-                    <div>
-                        <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Event Dashboard</h1>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <DashboardCard title="Active Bookings" value="2" icon={<FaCalendarCheck />} color="bg-gradient-to-r from-blue-500 to-indigo-500" />
-                            <DashboardCard title="Pending Events" value="1" icon={<FaClock />} color="bg-gradient-to-r from-yellow-500 to-orange-500" />
-                            <DashboardCard title="Tasks Due" value="4" icon={<FaTasks />} color="bg-gradient-to-r from-green-500 to-teal-500" />
-                        </div>
-                    </div>
-                );
+                return <CustomerEventDashboard setActivePage={setActivePage} />;
         }
     };
 

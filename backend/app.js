@@ -11,7 +11,7 @@ import {
   EventServiceRoutes, saveSelectedServiceRoutes,
   tableArrangementRoutes, reservationRoutes,
   planBarRoutes, planBiteRoutes,
-  BarArrangeRoutes,AdminRoutes,AdminEventRoutes
+  BarArrangeRoutes,AdminRoutes,AdminEventRoutes,progressRoutes,pdfRoutes
 } from './routes/eventRoutes.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
@@ -21,7 +21,9 @@ import itemRoutes from "./routes/itemRoutes.js";
 import ItemCategoryMenuTypeRoutes from "./routes/ItemCategoryMenuTypeRoutes.js";
 import customerSelectionRoutes from "./routes/CustomerMenuSelectionRoutes.js";
 import bookingRoutes from './routes/bookingRoutes.js';
+import advanceMenuViewRoute from './routes/advanceMenuViewRoute.js'
 import menuViewRoutes from './routes/menuViewRoutes.js';
+import summaryRoutes from './routes/summaryRoutes.js';
 import overviewRout from './routes/overviewRoutes.js';
 import settingRoute from './routes/settingRoutes.js';
 
@@ -46,10 +48,15 @@ app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 app.use('/api/customerMenuSelection', customerSelectionRoutes);
-app.use('/api/advanceMenuView', menuViewRoutes); //meka tmi werdi ei
+// Menu Overview routes
+app.use('/api/advanceMenu', advanceMenuViewRoute);
+app.use('/api/advanceMenuView', menuViewRoutes);
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
+app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
+
+
 app.use('/api/overview', overviewRout);
 app.use('/api/setting', settingRoute);
 
@@ -68,7 +75,9 @@ app.use('/api/Bite', planBiteRoutes);
 app.use('/api/BarArrange', BarArrangeRoutes);
 app.use('/api/assignedEmployee', AdminRoutes);
 app.use('/api/AdminEvents', AdminEventRoutes);
+app.use('/api/progress',progressRoutes)
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/api/pdf', pdfRoutes);
 
 
 // Global error handler

@@ -932,3 +932,46 @@ export const deleteSoftDrinkItem = async (id) => {
     throw new Error(error.response?.data?.error || 'Failed to delete soft drink item');
   }
 };
+
+
+export const getEventProgress = async (bookingId) => {
+    try {
+        const response = await api.get(`/progress/customerDashboard/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching event progress:", error);
+        throw error;
+    }
+};
+
+export const downloadReportAPI = async (bookingId) => {
+    try {
+        const response = await api.get(`/pdf/events/${bookingId}`, {
+            responseType: 'blob',
+            validateStatus: (status) => status < 500 // Accept all status codes < 500
+        });
+
+        // Handle non-200 responses
+        if (response.status !== 200) {
+            let errorMessage = 'Failed to download report';
+            
+            // Try to parse error message if not a blob
+            if (response.data instanceof Blob) {
+                const text = await response.data.text();
+                try {
+                    const errorData = JSON.parse(text);
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = text || errorMessage;
+                }
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Error downloading report:", error.message);
+        throw error;
+    }
+};

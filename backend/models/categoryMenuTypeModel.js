@@ -2,7 +2,7 @@ import db from "../config/db.js";
 
 export const getAllCategoryMenuTypes = async () => {
     //const [rows] = await db.query("SELECT * FROM Category_Menu_Type where ");
-    const [rows] = await db.query("SELECT b.menu_type_name, c.category_name, a.item_limit FROM Category_Menu_Type a, menu_type b, category c where a.menu_type_id = b.menu_type_id and a.category_id = c.category_id");
+    const [rows] = await db.query("SELECT a.category_menu_type_Id, b.menu_type_name, c.category_name, a.item_limit FROM Category_Menu_Type a, menu_type b, category c where a.menu_type_id = b.menu_type_id and a.category_id = c.category_id");
     return rows;
 };
 
