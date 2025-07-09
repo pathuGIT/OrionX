@@ -11,7 +11,7 @@ import {
   EventServiceRoutes, saveSelectedServiceRoutes,
   tableArrangementRoutes, reservationRoutes,
   planBarRoutes, planBiteRoutes,
-  BarArrangeRoutes,AdminRoutes,AdminEventRoutes,progressRoutes
+  BarArrangeRoutes,AdminRoutes,AdminEventRoutes,progressRoutes,pdfRoutes
 } from './routes/eventRoutes.js';
 import menuListTypeRoutes from './routes/menuListTypeRoutes.js';
 import menuTypeRoutes from "./routes/menuTypeRoutes.js";
@@ -77,6 +77,7 @@ app.use('/api/assignedEmployee', AdminRoutes);
 app.use('/api/AdminEvents', AdminEventRoutes);
 app.use('/api/progress',progressRoutes)
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/api/pdf', pdfRoutes);
 
 
 // Global error handler
