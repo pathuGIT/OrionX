@@ -1,24 +1,68 @@
+// eventPDFReportModel.js
 import db from '../config/db.js';
 
 class ReportModel {
     static async getReportData(bookingId) {
         const query = `
             SELECT
-                b.booking_id, b.booking_date, b.number_of_guests, b.total_price,
-                c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone,
-                e.Event_ID, e.Event_name, e.Event_Type, e.Buffet_TimeFrom, e.Function_durationFrom, e.Function_durationTo,
-                w.Groom_Name, w.Bride_Name,
-                ce.ContactPersonName AS custom_event_contact,
-                tca.Head_Table_Pax, tca.Top_Cloth_Color, tca.Table_Cloth_Color, tca.Bow_Color, tca.Chair_Cover_Color,
+                -- Booking & Customer
+                b.booking_id, b.booking_date, b.number_of_guests, b.time_slot,
+                c.name AS customer_name,
+                
+                -- Event
+                e.Event_ID, e.Buffet_TimeFrom, e.Buffet_TimeTo, 
+                e.Function_durationFrom, e.Function_durationTo, 
+                e.Additional_Time, e.Dress_Time, e.Tea_table_Time,
+
+                -- Wedding Specifics
+                w.Groom_Name, w.Bride_Name, w.Groom_Contact_no, w.Bride_Contact_no, 
+                w.Registration_Time, w.Poruwa_CeremonyFrom, w.Poruwa_CeremonyTo, 
+                w.ProsperityTable, w.Fountain,
+                
+                -- Custom Event Specifics
+                ce.Event_Name AS custom_event_name, 
+                ce.ContactPersonName, ce.ContactPersonNumber,
+
+                -- Table Arrangements
+                tca.Head_Table_Pax, tca.Top_Cloth_Color, 
+                tca.Table_Cloth_Color, tca.Bow_Color, tca.Chair_Cover_Color,
+                
+                -- Bar Details
                 bar.LiquorTimeFrom, bar.LiquorTimeTo, bar.BarPax,
-                (SELECT GROUP_CONCAT(es.Event_Service_Name SEPARATOR ', ') 
-                 FROM customer_event_service ces
-                 JOIN event_service es ON ces.event_service_id = es.event_service_id
-                 WHERE ces.booking_id = b.booking_id) AS selected_services,
-                (SELECT GROUP_CONCAT(li.item_name, ' (Qty: ', li.quantity, ')' SEPARATOR '; ') 
-                 FROM liquor_items li WHERE li.BarRequirementID = e.BarRequirementID) AS liquor_items,
-                (SELECT GROUP_CONCAT(sdi.Soft_Drink_name, ' (Qty: ', sdi.quantity, ')' SEPARATOR '; ') 
-                 FROM soft_drink_items sdi WHERE sdi.BarRequirementID = e.BarRequirementID) AS soft_drink_items
+                
+                -- Coordinators
+                (SELECT GROUP_CONCAT(co.Cordinator_Name SEPARATOR ', ')
+                 FROM event_cordinator ec
+                 JOIN cordinator co ON ec.Cordinator_Name = co.Cordinator_Name
+                 WHERE ec.Event_ID = e.Event_ID) AS coordinators,
+
+                -- Selected Services
+                    (SELECT GROUP_CONCAT(es.Event_Service_Name SEPARATOR ', ') 
+                FROM customer_event_service ces
+                JOIN event_service es ON ces.event_service_id = es.Event_Service_ID
+                WHERE ces.booking_id = b.booking_id) AS selected_services,
+                 
+                -- Selected Bites
+                (SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'name', mt.menu_type_name, 
+                        'quantity', bite.Quantity
+                    )
+                 )
+                 FROM bite
+                 JOIN menu_type mt ON bite.menu_type_id = mt.menu_type_id
+                 WHERE bite.BarRequirementID = bar.BarRequirementID) AS selected_bites,
+
+                -- Soft Drinks
+                (SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'name', sdi.Soft_Drink_name, 
+                        'quantity', sdi.quantity
+                    )
+                 )
+                 FROM soft_drink_items sdi 
+                 WHERE sdi.BarRequirementID = bar.BarRequirementID) AS soft_drink_items
+
             FROM booking b
             JOIN customer c ON b.customer_id = c.customer_id
             LEFT JOIN event e ON b.booking_id = e.booking_id

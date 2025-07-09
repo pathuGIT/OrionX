@@ -17,22 +17,13 @@ export const downloadEventReport = async (req, res) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
-        const pdfStream = generateEventReport(reportData);
-        
-        // Handle stream errors
-        pdfStream.on('error', (err) => {
-            console.error('PDF stream error:', err);
-            if (!res.headersSent) {
-                res.status(500).json({ message: 'Error generating PDF stream.' });
-            }
-        });
-
-        pdfStream.pipe(res);
+        // CORRECTED: Pass reportData to generate PDF buffer
+        const pdfBuffer = await generateEventReport(reportData);
+        res.send(pdfBuffer);
 
     } catch (error) {
         console.error('Failed to generate report:', error);
         
-        // Only send response if headers haven't been sent
         if (!res.headersSent) {
             res.status(500).json({ 
                 message: 'Error generating PDF report.',
