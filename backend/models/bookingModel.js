@@ -92,6 +92,12 @@ export const getVenueBytId = async (venueId) => {
   return rows[0];
 }
 
+export const getSelectedMenuPrice = async (bookingId) => {
+  const [rows] = await pool.query('select x.price from view_item_category_menu_type x inner join customer_menu_item_selection z on x.ICMT_Id = z.ICMT_Id where booking_id = ? limit 1;', [bookingId]);
+  console.log("mek thmi menu price:: ", rows[0])
+  return rows[0];
+}
+
 export const insertBooking = async (booking) => {
   const sql = `
     INSERT INTO booking
