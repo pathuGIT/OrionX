@@ -7,7 +7,9 @@ import CreateItem from '../../pages/superAdmin/CreateItem';
 import CreateCategoryMenuType from '../../pages/superAdmin/CreateCategoryMenuType';
 import MenuOverview from '../../pages/superAdmin/MenuOverview';
 import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategoryMenuType';
-import CustomerMenuSummaryReport from '../../pages/superAdmin/CustomerMenuSummary'; 
+// import CustomerMenuSummaryReport from '../../pages/superAdmin/CustomerMenuSummary'; 
+import AdminCorrectMenuSelections from '../../pages/superAdmin/AdminCorrectMenuSelections';
+import AdminMenuOrdersPage from '../../pages/superAdmin/AdminViewMenuOrders';
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -62,8 +64,14 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         setClickedItem('CreateItemCategoryMenuType');
         setRenderContent(() => () => <CreateItemCategoryMenuType />);
         break;
-      case 'CustomerMenuSummary':
-        setRenderContent(() => () => <CustomerMenuSummaryReport />);
+      // case 'CustomerMenuSummary':
+      //   setRenderContent(() => () => <CustomerMenuSummaryReport />);
+      //   break;
+      case 'AdminCorrectMenuSelections' :
+        setRenderContent(() => () => <AdminCorrectMenuSelections />);
+        break;
+      case 'AdminMenuOrdersPage':
+        setRenderContent(() => () => <AdminMenuOrdersPage />);
         break;
       default:
         setRenderContent(() => () => <MenuOverview/>);
@@ -122,8 +130,8 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isSalesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" onClick={() => handleRenderContent('CustomerMenuSummary')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>View Catering Orders</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('AdminMenuOrdersPage')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>View Catering Orders</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('AdminCorrectMenuSelections')}  class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
               <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Staff</a></li>
             </ul>
           </li>
@@ -174,5 +182,6 @@ const MenuManagementSAN = ({ setRenderContent }) => {
     </div>
   );
 }
+
 
 export default MenuManagementSAN;

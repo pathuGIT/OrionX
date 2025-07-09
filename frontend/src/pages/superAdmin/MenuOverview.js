@@ -29,12 +29,17 @@ const MenuOverview = () => {
   }
 
   return (
+    <div
+      className="flex-grow overflow-y-auto border rounded-lg shadow-md bg-white p-4"
+      style={{ maxHeight: '80vh' }}
+    >
     <div className="p-6 max-w-4xl mx-auto bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Our Catering Menu</h1>
       
+
       {/* Hero section with catering image */}
       <div className="mb-8 rounded-lg overflow-hidden shadow-md">
-        <div className="relative h-48 bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center">
+        <div className="relative h-28 bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center">
           <div className="absolute inset-0 bg-black opacity-30"></div>
           <div className="relative z-10 text-center px-4">
             <h2 className="text-3xl font-bold text-white mb-2">Exquisite Catering Services</h2>
@@ -145,6 +150,7 @@ const MenuOverview = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

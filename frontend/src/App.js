@@ -25,6 +25,9 @@ import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
 import UpdatePassword from './pages/UpdatePassword';
 import CustomerMenuListSelection from './components/CustomerMenuListSelection';
 import CustomerMenuTypeSelection from './components/CustomerMenuTypeSelection';
+import AdminMenuOrdersPage from './pages/superAdmin/AdminViewMenuOrders';
+import AdminCorrectMenuSelections from './pages/superAdmin/AdminCorrectMenuSelections';
+
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Service from './pages/Service';
@@ -61,6 +64,11 @@ function App() {
 
             <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
             <Route path="/menu-types/:menuListTypeId" element={<CustomerMenuTypeSelection />} />
+            <Route path="/admin-menu-orders" element={<AdminMenuOrdersPage />} />
+            <Route path="/admin-correct-menu-selections" element={<AdminCorrectMenuSelections />} />
+
+            {/* Customer Event Planning */}
+        
 
           </Routes>
         </main>

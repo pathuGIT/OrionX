@@ -521,3 +521,142 @@ export const getSummaryByBookingId = async (booking_id) => {
     throw error;
   }
 };
+
+/////////////////////////////////////////
+//admin correct menu selections
+////////////////////////////////////////////////
+
+export const getAllStructuredMenuSelections = async () => {
+  try {
+    const response = await api.get('/AdminCorrectMenus/structured');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all structured menu selections:", error);
+    throw error;
+  }
+};
+
+/**
+ * Gets structured menu selections by booking ID
+ * @param {string} booking_id - The booking ID
+ * @returns {Promise<Array>} Array of structured menu selections for the booking
+ */
+export const getStructuredSelectionsByBookingId = async (booking_id) => {
+  try {
+    const response = await api.get(`/AdminCorrectMenus/structured/booking/${booking_id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching structured menu selections by booking ID:", error);
+    throw error;
+  }
+};
+
+/**
+ * Gets structured menu selections by customer ID
+ * @param {string} customer_id - The customer ID
+ * @returns {Promise<Array>} Array of structured menu selections for the customer
+ */
+export const getStructuredSelectionsByCustomerId = async (customer_id) => {
+  try {
+    const response = await api.get(`/AdminCorrectMenus/structured/customer/${customer_id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching structured menu selections by customer ID:", error);
+    throw error;
+  }
+};
+
+/**
+ * Creates a new menu selection
+ * @param {Object} selectionData - The menu selection data
+ * @param {string} selectionData.booking_id - The booking ID
+ * @param {string} selectionData.ICMT_Id - The menu item ID
+ * @returns {Promise<Object>} The created menu selection
+ */
+export const createMenuSelection = async (selectionData) => {
+  try {
+    const response = await api.post('/AdminCorrectMenus/', selectionData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating menu selection:", error);
+    throw error;
+  }
+};
+
+/**
+ * Updates an existing menu selection
+ * @param {string} booking_id - The booking ID
+ * @param {string} oldICMT_Id - The old menu item ID
+ * @param {Object} updateData - The update data
+ * @returns {Promise<Object>} The updated menu selection
+ */
+export const updateMenuSelection = async (booking_id, oldICMT_Id, updateData) => {
+  try {
+    const response = await api.put(`/AdminCorrectMenus/${booking_id}/${oldICMT_Id}`, updateData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating menu selection:", error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes a menu selection
+ * @param {string} booking_id - The booking ID
+ * @param {string} ICMT_Id - The menu item ID
+ * @returns {Promise<Object>} The deletion result
+ */
+export const deleteMenuSelection = async (booking_id, ICMT_Id) => {
+  try {
+    const response = await api.delete(`/AdminCorrectMenus/${booking_id}/${ICMT_Id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting menu selection:", error);
+    throw error;
+  }
+};
+
+/**
+ * Checks if a booking has menu selections
+ * @param {string} booking_id - The booking ID to check
+ * @returns {Promise<boolean>} True if booking exists in selections, false otherwise
+ */
+export const checkBookingMenuSelections = async (booking_id) => {
+  try {
+    const selections = await getStructuredSelectionsByBookingId(booking_id);
+    return selections.length > 0;
+  } catch (error) {
+    console.error("Error checking booking menu selection:", error);
+    throw error;
+  }
+};
+
+/**
+ * Saves a customer menu item selection
+ * @param {string} booking_id - The booking ID
+ * @param {string} ICMT_Id - The menu item ID
+ * @returns {Promise<Object>} The saved menu selection
+ */
+export const saveCustomersMenuSelection = async (booking_id, ICMT_Id) => {
+  console.log("Saving customer menu selection:", booking_id, ICMT_Id);
+  try {
+    const response = await api.post('/AdminCorrectMenus/', {
+      booking_id,
+      ICMT_Id,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error saving customer menu selection:", error);
+    throw error;
+  }
+};
+
+export const updateMenuStructure = async (payload) => {
+  try {
+    const response = await api.put('/AdminCorrectMenus/structure', payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating menu structure:", error);
+    throw error;
+  }
+};
