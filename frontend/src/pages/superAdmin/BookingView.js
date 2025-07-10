@@ -1,13 +1,12 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
-import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid';
+import React, { useState, useEffect } from 'react';
 import { addCustomer, searchCustomer } from '../../services/CustomerServise';
 import BookingService from '../../services/BookngService';
 import { getAllVenues } from '../../services/VenueService';
 import VenueDropdown from '../../components/bookings/VenueDropdown';
 
 const BookingView = () => {
-  const [customer, setCustomer] = useState({ name: '', email: '', address: '', phone: '' });
+  // State declarations
+  const [customer, setCustomer] = useState({ name: '', email: '', address: '', phone: '', nic: '' });
   const [customerSuccess, setCustomerSuccess] = useState(false);
   const [bookSuccess, setBookSuccess] = useState(false);
   const [searchresult, setSearchresult] = useState(false);
@@ -21,7 +20,10 @@ const BookingView = () => {
   const [venues, setVenues] = useState([]);
   const [serachlist, setSerachlist] = useState([]);
   const [result, setResult] = useState(null);
+  const [activeTab, setActiveTab] = useState('new'); // 'new' or 'existing'
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
+  // Fetch venues on mount
   useEffect(() => {
     fetchVenues();
   }, []);
@@ -35,6 +37,7 @@ const BookingView = () => {
     }
   };
 
+  // Validation logic
   const validateField = (name, value) => {
     let error = { msg: '', color: '' };
     switch (name) {
@@ -94,9 +97,12 @@ const BookingView = () => {
       setCusres(newId);
       setCustomerSuccess(true);
       setAddedCustomer(customer);
-      setCustomer({ name: '', email: '', address: '', phone: '' });
+      setCustomer({ name: '', email: '', address: '', phone: '', nic: '' });
       setErrmsg({ msg: res.message || 'Customer added!', color: 'text-green-600' });
-      setCustomerIdMsg( res.message);
+      setCustomerIdMsg(res.message);
+      // Set this customer as the selected one for booking
+      setSelectedCustomer({ ...customer, customer_id: newId });
+      //setActiveTab('existing');
     } catch (err) {
       console.error(err);
       if (err.response?.data?.message) {
@@ -117,368 +123,446 @@ const BookingView = () => {
     venueId: '',
     extraHours: 0,
     payDeposit: false,
-    searchCustomer: false,
   });
+
   const [search, setSearch] = useState({
     property: ''
   });
 
-  // Sync booking.customerId when cusres changes
+  // Sync booking.customerId when selectedCustomer changes
   useEffect(() => {
-    if (cusres) {
-      setBooking(b => ({ ...b, customerId: cusres }));
+    if (selectedCustomer) {
+      setBooking(b => ({ ...b, customerId: selectedCustomer.customer_id }));
     }
-  }, [cusres]);
+  }, [selectedCustomer]);
 
   const handleBookingChange = (e) => {
-    const { id, name, value, type, checked } = e.target;
+    const { name, value, type, checked } = e.target;
     setBooking(frm => ({
       ...frm,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    if (booking.searchCustomer == false && type === 'checkbox' && id === 'searchId') { // if err occur check this {new}
-      console.log("Search customer is enabled");
-      setCustomerSuccess(true)
-      console.log("add butn: ", customerSuccess)
-    }else if (booking.searchCustomer == true && type === 'checkbox' && id === 'searchId'){
-      console.log("Search customer is disbled");
-      console.log(cusres)
-      setBooking(b => ({ ...b, customerId: cusres }));
-      setCustomerSuccess(false)
-      console.log("add butn: ", customerSuccess)
+  };
 
+  const handleSearch = async (e) => {
+    const value = e.target.value;
+    setSearch({ property: value });
+    
+    if (value.length > 2) {
+      try {
+        const response = await searchCustomer(value.trim());
+        setSerachlist(response);
+        setSearchresult(true);
+      } catch (error) {
+        console.error("Error searching customer:", error);
+        setSearchresult(false);
+      }
+    } else {
+      setSearchresult(false);
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchresult(false)
-    setSearch({ property: e.target.value });
-    const id = e.target.value;
-    setBooking(b => ({ ...b, customerId: id }));
-  }
-
-  const handleSearchChange = async (e) => {
-    setSearchresult(true)
-    const { name, value } = e.target;
-    setSearch(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-    try {
-      const response = await searchCustomer((value.trim())); // use trimmed input value
-      console.log("ss res; ", response)
-      setSerachlist(response);
-    } catch (error) {
-
-      console.error("Error searching customer:", error);
-    }
+  const selectCustomer = (customer) => {
+    setSelectedCustomer(customer);
+    setSearch({ property: customer.name });
+    setSearchresult(false);
   };
-
 
   const submitBooking = async (e) => {
     e.preventDefault();
-    setBtnBookingText("Adding...")
+    
+    if (!booking.customerId) {
+      setBErrmsg({ msg: 'Please select a customer first', color: 'text-red-600' });
+      return;
+    }
+    
+    setBtnBookingText("Adding...");
     try {
-      if (booking.customerId) {
-        
-        // testing customer_id
-        console.log("Cusres customer id:", cusres);
-        console.log("search customer_id:",booking.customerId);
-        console.log("as", booking);
-
-
-        const res = await BookingService.createBooking(booking);
-        setBookSuccess(true);
-        setResult(`Successfully booking created: ${res.booking_id}`);
-        setBErrmsg({ msg: '', color: 'text-red-600' });
-      } else {
-        setBErrmsg({ msg: 'Customer ID is required to create a booking. Create a new customer first!!', color: 'text-red-600' });
-      }
+      const res = await BookingService.createBooking(booking);
+      setBookSuccess(true);
+      setResult(`Successfully created booking: ${res.booking_id}`);
+      setBErrmsg({ msg: '', color: 'text-red-600' });
+      
+      // Reset form after successful booking
+      setBooking({
+        date: '',
+        slot: 'day',
+        customerId: selectedCustomer.customer_id, // Keep same customer
+        guests: 150,
+        venueId: '',
+        extraHours: 0,
+        payDeposit: false,
+      });
     } catch (err) {
       setResult('Error creating booking');
       console.error(err);
       if (err.response?.data?.message) {
         setBErrmsg({ msg: err.response.data.message, color: 'text-red-600' });
       } else {
-        setBErrmsg({ msg: 'Every fields must be filled.', color: 'text-red-600' }); 
+        setBErrmsg({ msg: 'All fields must be filled.', color: 'text-red-600' }); 
       }
     } finally {
       setBtnBookingText("Add Booking");
     }
   };
 
-  const inputClass ='bg-white border border-gray-300 text-gray-900 placeholder-gray-500 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none';
-  const mark = (
-    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  // CSS Classes
+  const inputClass = 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5';
+  const labelClass = 'block mb-2 text-sm font-medium text-gray-900';
+  const cardClass = 'bg-white rounded-lg shadow p-6 mb-6';
+  const tabClass = (isActive) => 
+    `px-4 py-2 text-sm font-medium rounded-t-lg ${isActive 
+      ? 'bg-white text-blue-600 border-b-2 border-blue-600' 
+      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`;
+  
+  const SuccessIcon = () => (
+    <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );
+
   return (
-    <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
-      {/* Customer Form */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-6">Customer Information</h3>
-        <p
-          className={`${errmsg.color} text-center mb-4 ${errmsg.color === 'text-green-600' ? 'hidden' : 'visible'
-            }`}
-        >
-          {errmsg.msg}
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Name */}
-          <div className="flex flex-col">
-            <label htmlFor="name" className="text-gray-700 text-sm mb-1">Full Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={customer.name}
-              onChange={handleCustomerChange}
-              placeholder={addedCustomer?.name || 'e.g. Shahan Aththalage'}
-              className={inputClass}
-            />
-          </div>
-          {/* Email */}
-          <div className="flex flex-col">
-            <label htmlFor="email" className="text-gray-700 text-sm mb-1">Email Address</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={customer.email}
-              onChange={handleCustomerChange}
-              placeholder={addedCustomer?.email || 'e.g. example@gmail.com'}
-              className={inputClass}
-            />
-          </div>
-          {/* Phone */}
-          <div className="flex flex-col">
-            <label htmlFor="phone" className="text-gray-700 text-sm mb-1">Phone Number</label>
-            <input
-              id="phone"
-              name="phone"
-              type="text"
-              value={customer.phone}
-              onChange={handleCustomerChange}
-              placeholder={addedCustomer?.phone || 'e.g. 0712345678'}
-              className={inputClass}
-            />
-          </div>
-          
-          <div className="flex flex-col">
-            <label htmlFor="nic" className="text-gray-700 text-sm mb-1">NIC Number</label>
-            <input
-              id="nic"
-              name="nic"
-              type="number"
-              value={customer.nic}
-              onChange={handleCustomerChange}
-              placeholder={addedCustomer?.nic || 'e.g. 1234567891'}
-              className={inputClass}
-            />
-          </div>
-          {/* Address */}
-          <div className="flex flex-col md:col-span-2">
-            <label htmlFor="address" className="text-gray-700 text-sm mb-1">Address</label>
-            <input
-              id="address"
-              name="address"
-              type="text"
-              value={customer.address}
-              onChange={handleCustomerChange}
-              placeholder={
-                addedCustomer?.address || 'e.g. No: xx, Saddathissa Road, Galle'
-              }
-              className={inputClass}
-            />
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto">
+        
+        {/* Customer Selection Tabs */}
+        <div className="mb-6">
+          <div className="flex border-b border-gray-200">
+            <button 
+              className={tabClass(activeTab === 'new')} 
+              onClick={() => setActiveTab('new')}
+            >
+              New Customer
+            </button>
+            <button 
+              className={tabClass(activeTab === 'existing')} 
+              onClick={() => setActiveTab('existing')}
+            >
+              Existing Customer
+            </button>
           </div>
         </div>
-        {/* Customer Submit Btn & Msg   */}
-        <div className="mt-6">
-          {/* Submit btn */}
-          {!customerSuccess && addedCustomer == null? (
-            <button
-              onClick={submitCustomer}
-              className="bg-zinc-300 border hover:bg-slate-50 hover:border-black text-black font-medium py-2 px-6 rounded-md"
-            >
-              {btnText}
-            </button>
-          ) : (
-            // Message
-            <div className="mt-4">
-              <div className="flex items-center text-green-700 text-sm">
-                {customerIdMsg ? mark : ''} {customerIdMsg}
-                <p></p>
+        
+        {/* Customer Form */}
+        <div className={cardClass}>
+          {activeTab === 'new' ? (
+            <>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">New Customer Information</h3>
+              
+              {errmsg.msg && (
+                <div className={`mb-4 p-3 rounded-lg ${errmsg.color === 'text-red-600' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+                  {errmsg.msg}
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Name */}
+                <div>
+                  <label htmlFor="name" className={labelClass}>Full Name</label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={customer.name}
+                    onChange={handleCustomerChange}
+                    placeholder="e.g. John Smith"
+                    className={inputClass}
+                  />
+                </div>
+                
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className={labelClass}>Email Address</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={customer.email}
+                    onChange={handleCustomerChange}
+                    placeholder="e.g. john@example.com"
+                    className={inputClass}
+                  />
+                </div>
+                
+                {/* Phone */}
+                <div>
+                  <label htmlFor="phone" className={labelClass}>Phone Number</label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="text"
+                    value={customer.phone}
+                    onChange={handleCustomerChange}
+                    placeholder="e.g. 0712345678"
+                    className={inputClass}
+                  />
+                </div>
+                
+                {/* NIC */}
+                <div>
+                  <label htmlFor="nic" className={labelClass}>NIC Number</label>
+                  <input
+                    id="nic"
+                    name="nic"
+                    type="number"
+                    value={customer.nic}
+                    onChange={handleCustomerChange}
+                    placeholder="e.g. 1234567891"
+                    className={inputClass}
+                  />
+                </div>
+                
+                {/* Address */}
+                <div className="md:col-span-2">
+                  <label htmlFor="address" className={labelClass}>Address</label>
+                  <input
+                    id="address"
+                    name="address"
+                    type="text"
+                    value={customer.address}
+                    onChange={handleCustomerChange}
+                    placeholder="e.g. No: 123, Main Street, Colombo"
+                    className={inputClass}
+                  />
+                </div>
               </div>
-            </div>
+              
+              <div className="mt-6">
+                {!customerSuccess ? (
+                  <button
+                    onClick={submitCustomer}
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg flex items-center justify-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    {btnText}
+                  </button>
+                ) : (
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-green-700">
+                    <SuccessIcon /> {customerIdMsg}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Existing Customer</h3>
+              
+              <div className="mb-4">
+                <label htmlFor="customer-search" className={labelClass}>Search Customer</label>
+                <div className="relative">
+                  <input
+                    id="customer-search"
+                    name="property"
+                    type="text"
+                    value={search.property}
+                    onChange={handleSearch}
+                    placeholder="Search by name, email, phone or NIC"
+                    className={inputClass}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {searchresult && serachlist.length > 0 && (
+                  <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto">
+                    <ul className="py-1">
+                      {serachlist.map((item) => (
+                        <li 
+                          key={item.customer_id} 
+                          className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${selectedCustomer?.customer_id === item.customer_id ? 'bg-blue-50' : ''}`}
+                          onClick={() => selectCustomer(item)}
+                        >
+                          <div className="font-medium">{item.name}</div>
+                          <div className="text-sm text-gray-600">{item.email} | {item.phone}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              
+              {selectedCustomer && (
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                  <div className="font-medium text-blue-800">Selected Customer</div>
+                  <div className="mt-1">
+                    <div><span className="font-medium">Name:</span> {selectedCustomer.name}</div>
+                    <div><span className="font-medium">Phone:</span> {selectedCustomer.phone}</div>
+                    <div><span className="font-medium">Email:</span> {selectedCustomer.email}</div>
+                  </div>
+                </div>
+              )}
+              
+              {!selectedCustomer && (
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-600 text-center">
+                  Search and select a customer to create a booking
+                </div>
+              )}
+            </>
           )}
         </div>
-
-        {/* Booking form */}
-        <h3 className="text-lg font-semibold text-gray-800 mb-6 mt-10">Booking Information</h3>
-        <p className={`${bErrmsg.color} text-center mb-4 ${bErrmsg.color === 'text-green-600' ? 'hidden' : 'visible'}`}>
-          {bErrmsg.msg}
-        </p>
-
-        <form onSubmit={submitBooking} className="space-y-4">
-          {/* display Search box if needed */}
-          <label className="flex items-center mt-4">
-            <input
-              id= 'searchId'
-              name="searchCustomer"
-              type="checkbox"
-              checked={booking.searchCustomer}
-              onChange={handleBookingChange}
-              className="h-5 w-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-            <span className="ml-3 text-gray-700 text-sm">
-              Add booking for already registered customers.
-            </span>
-          </label>
-
-          {/* Search Customer from dropdown*/}
-          <div className={`flex flex-col ${booking.searchCustomer ? 'visible' : 'hidden'}`} >
-            <input
-              placeholder={'Search Customer'}
-              name="property"
-              type="text"
-              value={search.property}
-              onChange={handleSearchChange}
-              className={inputClass}
-            />
-            <div id="dropdown" class={`z-10 ${searchresult ? 'visible' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700`}>
-                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
-                  {serachlist.map((item)=>(
-                    <li key={item.customer_id}>
-                      <button type="button" value={item.customer_id} onClick={handleSearch} class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{item.name}</button>
-                    </li>
-                  ))}
-                </ul>
-            </div>
-          </div>
+        
+        {/* Booking Form */}
+        <div className={cardClass}>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Booking Information</h3>
           
-          {/* Insert Booking Data */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Date */}
-            <div className="flex flex-col">
-              <label htmlFor="booking_date" className="text-gray-700 text-sm mb-1">
-                Booking Date
-              </label>
-              <input
-                id="booking_date"
-                name="date"
-                type="date"
-                required
-                value={booking.date}
-                onChange={handleBookingChange}
-                className={inputClass}
-              />
+          {bErrmsg.msg && (
+            <div className={`mb-4 p-3 rounded-lg ${bErrmsg.color === 'text-red-600' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+              {bErrmsg.msg}
             </div>
-
-            {/* Slot */}
-            <div className="flex flex-col">
-              <label htmlFor="slot" className="text-gray-700 text-sm mb-1">
-                Time Slot
-              </label>
-              <select
-                id="slot"
-                name="slot"
-                required
-                value={booking.slot}
-                onChange={handleBookingChange}
-                className={inputClass}
-              >
-                <option value="day">Day</option>
-                <option value="night">Night</option>
-              </select>
-            </div>
-
-            {/* Venue Dropdown */}
-            <VenueDropdown venues={venues} booking={booking} setBooking={setBooking} />
-
-            {/* Guests */}
-            <div className="flex flex-col">
-              <label htmlFor="number_of_guests" className="text-gray-700 text-sm mb-1">
-                Number of Guests
-              </label>
-              <input
-                id="number_of_guests"
-                name="guests"
-                type="number"
-                required
-                value={booking.guests}
-                onChange={handleBookingChange}
-                className={inputClass}
-              />
-            </div>
-
-            {/* Extra Hours */}
-            <div className="flex flex-col">
-              <label htmlFor="additional_hours" className="text-gray-700 text-sm mb-1">
-                Additional Hours
-              </label>
-              <input
-                id="additional_hours"
-                name="extraHours"
-                type="number"
-                min={0}
-                value={booking.extraHours}
-                onChange={handleBookingChange}
-                className="w-32 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Deposit */}
-          <label className="flex items-center mt-4">
-            <input
-              id="pay_deposit"
-              name="payDeposit"
-              type="checkbox"
-              checked={booking.payDeposit}
-              onChange={handleBookingChange}
-              className="h-5 w-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-            <span className="ml-3 text-gray-700 text-sm">
-              Pay Key Money Deposit (Rs. 50,000)
-            </span>
-          </label>
-
-          <div className="mt-6">
-            {!bookSuccess ? (
-              <button
-                type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md"
-              >
-                {btnBookingText}
-              </button>
-            ) : (
-              <div className="mt-4">
-                <div className="flex items-center text-green-600 text-sm">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Successfully added booking.
+          )}
+          
+          <form onSubmit={submitBooking} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Date */}
+              <div>
+                <label htmlFor="booking_date" className={labelClass}>
+                  Booking Date
+                </label>
+                <div className="relative">
+                  <input
+                    id="booking_date"
+                    name="date"
+                    type="date"
+                    required
+                    value={booking.date}
+                    onChange={handleBookingChange}
+                    className={inputClass}
+                  />
                 </div>
-                <div className="mt-1 text-sm text-green-700">{result}</div>
               </div>
-            )}
+              
+              {/* Slot */}
+              <div>
+                <label htmlFor="slot" className={labelClass}>
+                  Time Slot
+                </label>
+                <select
+                  id="slot"
+                  name="slot"
+                  required
+                  value={booking.slot}
+                  onChange={handleBookingChange}
+                  className={inputClass}
+                >
+                  <option value="day">Day</option>
+                  <option value="night">Night</option>
+                </select>
+              </div>
+              
+              {/* Venue Dropdown */}
+              <VenueDropdown venues={venues} booking={booking} setBooking={setBooking} />
+              
+              {/* Guests */}
+              <div>
+                <label htmlFor="number_of_guests" className={labelClass}>
+                  Number of Guests
+                </label>
+                <input
+                  id="number_of_guests"
+                  name="guests"
+                  type="number"
+                  required
+                  value={booking.guests}
+                  onChange={handleBookingChange}
+                  className={inputClass}
+                />
+              </div>
+              
+              {/* Extra Hours */}
+              <div>
+                <label htmlFor="additional_hours" className={labelClass}>
+                  Additional Hours
+                </label>
+                <input
+                  id="additional_hours"
+                  name="extraHours"
+                  type="number"
+                  min={0}
+                  value={booking.extraHours}
+                  onChange={handleBookingChange}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            
+            {/* Deposit */}
+            <div className="flex items-start pt-2">
+              <div className="flex items-center h-5">
+                <input
+                  id="pay_deposit"
+                  name="payDeposit"
+                  type="checkbox"
+                  checked={booking.payDeposit}
+                  onChange={handleBookingChange}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label htmlFor="pay_deposit" className="font-medium text-gray-700">
+                  Pay Key Money Deposit (Rs. 50,000)
+                </label>
+                <p className="text-gray-500">Secures the booking with a deposit</p>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              {!bookSuccess ? (
+                <button
+                  type="submit"
+                  disabled={!selectedCustomer}
+                  className={`w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-6 rounded-lg flex items-center justify-center ${
+                    !selectedCustomer ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {btnBookingText}
+                </button>
+              ) : (
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center text-green-700">
+                    <SuccessIcon />
+                    <span className="font-medium">Successfully added booking!</span>
+                  </div>
+                  <div className="mt-2 text-green-700 pl-7">{result}</div>
+                </div>
+              )}
+            </div>
+          </form>
+        </div>
+        
+        {/* Status Bar */}
+        <div className="bg-white rounded-lg shadow p-6 text-center">
+          <div className="flex flex-col sm:flex-row justify-around items-center">
+            <div className="mb-4 sm:mb-0">
+              <div className="text-sm text-gray-500">Selected Customer</div>
+              <div className="font-medium">
+                {selectedCustomer ? selectedCustomer.name : 'None selected'}
+              </div>
+            </div>
+            <div className="mb-4 sm:mb-0">
+              <div className="text-sm text-gray-500">Customer ID</div>
+              <div className="font-medium">
+                {selectedCustomer ? selectedCustomer.customer_id : 'N/A'}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">Booking Status</div>
+              <div className={`font-medium ${bookSuccess ? 'text-green-600' : 'text-gray-700'}`}>
+                {bookSuccess ? 'Booking Created' : 'Ready to book'}
+              </div>
+            </div>
           </div>
-
-        </form>
-        {/* {result && <p className="mt-4 text-center">{result}</p>} */}
+        </div>
       </div>
     </div>
   );
 };
 
 export default BookingView;
-
-

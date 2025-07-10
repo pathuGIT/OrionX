@@ -168,7 +168,7 @@ function UpdateEmployees() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg border border-red-500 mt-5">
+    <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg border mt-5">
       <p className="text-xl font-semibold mb-4">Update Employees</p>
 
       {/* Search Bar */}
