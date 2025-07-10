@@ -4,13 +4,16 @@ import {
   calculatePay,
   getPayEntries,
   deductionService,
+  notifyPayroll
 } from "../../services/UserService";
 
 const Pay = () => {
   const [selectedDate, setSelectedDate] = useState(moment());
   const [payData, setPayData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [notifying, setNotifying] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [emailStatus, setEmailStatus] = useState({});
 
   // Format currency values
   const formatCurrency = (value) => {
@@ -41,6 +44,9 @@ const Pay = () => {
             key: item.employee_id,
           }))
         );
+        
+        // Reset email status when data changes
+        setEmailStatus({});
       } catch (error) {
         showNotification(error.message || "Failed to load pay data", true);
       } finally {
@@ -49,6 +55,10 @@ const Pay = () => {
     },
     [selectedDate, showNotification]
   );
+
+
+
+  
 
   // Calculate payroll handler
   const handleCalculate = async () => {
@@ -75,10 +85,118 @@ const Pay = () => {
     }
   };
 
+  // Notification handler for salary emails
+  const handleNotify = async () => {
+    try {
+      setNotifying(true);
+      const formattedDate = selectedDate.format("YYYY-MM-DD");
+      
+      // Track email status for each employee
+      const statusUpdates = {};
+      payData.forEach(item => {
+        statusUpdates[item.employee_id] = 'pending';
+      });
+      setEmailStatus(statusUpdates);
+      
+      // Send notifications
+      const result = await notifyPayroll(formattedDate);
+      
+      if (result.data.success) {
+        showNotification(result.message || "Salary notifications sent successfully!");
+        
+        // Update status based on API response
+        if (result.data?.results) {
+          const newStatus = {};
+          result.data.results.forEach(item => {
+            newStatus[item.employee_id] = item.status;
+          });
+          setEmailStatus(newStatus);
+        }
+      } else {
+        showNotification(result.message || "Failed to send notifications", true);
+      }
+    } catch (error) {
+      showNotification(error.message || "An unexpected error occurred", true);
+    } finally {
+      setNotifying(false);
+    }
+  };
+
+ const handleSendIndividualEmail = async (employeeId) => {
+  try {
+    setEmailStatus(prev => ({ ...prev, [employeeId]: 'sending' }));
+    
+    const employee = payData.find(item => item.employee_id === employeeId);
+    const formattedDate = selectedDate.format("YYYY-MM-DD");
+    
+    const result = await notifyPayroll(formattedDate, employeeId);
+
+    // Fix: check for result.data.success
+    if (result.data && result.data.success) {
+      showNotification(`Email sent to ${employee.name}`);
+      setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
+    } else {
+      showNotification(`Failed to send email to ${employee.name}`, true);
+      setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
+    }
+  } catch (error) {
+    showNotification(`Error: ${error.message}`, true);
+    setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
+  }
+};
   // Load data on mount and date change
   useEffect(() => {
     loadPayData();
   }, [loadPayData]);
+
+  // Email status indicators
+  const renderEmailStatus = (employeeId) => {
+    const status = emailStatus[employeeId];
+    
+    switch(status) {
+      case 'sent':
+        return (
+          <span className="text-green-600 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            Sent
+          </span>
+        );
+      case 'failed':
+        return (
+          <span className="text-red-600 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            Failed
+          </span>
+        );
+      case 'sending':
+        return (
+          <span className="text-blue-600 flex items-center">
+            <svg className="animate-spin h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Sending
+          </span>
+        );
+      default:
+        return (
+          <button
+            onClick={() => handleSendIndividualEmail(employeeId)}
+            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+            </svg>
+            Send
+          </button>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
@@ -109,58 +227,109 @@ const Pay = () => {
               />
             </div>
 
-            <button
-              onClick={handleCalculate}
-              disabled={loading}
-              className={`w-full sm:w-auto px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-                loading
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              }`}
-            >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleCalculate}
+                disabled={loading || notifying}
+                className={`w-full sm:w-auto px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                  loading || notifying
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
                       stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span>Calculate Payroll</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleNotify}
+                disabled={loading || notifying || payData.length === 0}
+                className={`w-full sm:w-auto px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                  loading || notifying || payData.length === 0
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                }`}
+              >
+                {notifying ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
                       fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>Calculate Payroll</span>
-                </>
-              )}
-            </button>
+                    >
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    <span>Notify All Employees</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -187,6 +356,9 @@ const Pay = () => {
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                     Net Salary
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                    Email Status
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                     Date
@@ -220,17 +392,19 @@ const Pay = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
                       {formatCurrency(item.net_salary)}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {renderEmailStatus(item.employee_id)}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {moment(item.calculation_date).format("DD MMM YYYY")}
                     </td>
                   </tr>
                 ))}
               </tbody>
-
               <tfoot className="bg-gray-50">
                 <tr>
                   <td
-                    colSpan="7"
+                    colSpan="8"
                     className="px-6 py-4 text-right text-sm font-semibold text-gray-900"
                   >
                     Total Net Payroll:{" "}
@@ -272,7 +446,7 @@ const Pay = () => {
         </div>
 
         {/* Loading Overlay */}
-        {loading && (
+        {(loading || notifying) && (
           <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
             <div className="bg-white p-8 rounded-xl shadow-lg flex items-center gap-4">
               <svg
@@ -295,7 +469,9 @@ const Pay = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span className="text-gray-700">Processing payroll...</span>
+              <span className="text-gray-700">
+                {loading ? "Processing payroll..." : "Sending notifications..."}
+              </span>
             </div>
           </div>
         )}
