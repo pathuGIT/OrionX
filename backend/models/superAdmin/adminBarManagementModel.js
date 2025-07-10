@@ -141,21 +141,23 @@ class Bite {
 
   static async findAll() {
     const [rows] = await db.query(`SELECT 
-        bi.*, 
-        c.name AS customerName, 
-        bk.booking_date AS eventDate,
-        CASE
-            WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
-            WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
-            ELSE 'Event Details Not Specified'
-        END AS eventName
-      FROM bite bi
-      JOIN bar b ON bi.BarRequirementID = b.BarRequirementID
-      JOIN event e ON b.BarRequirementID = e.BarRequirementID
-      JOIN booking bk ON e.booking_id = bk.booking_id
-      JOIN customer c ON bk.customer_id = c.customer_id
-      LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
-      LEFT JOIN wedding w ON e.Event_ID = w.Event_ID`);
+      bi.*, 
+      mt.menu_type_name,
+      c.name AS customerName, 
+      bk.booking_date AS eventDate,
+      CASE
+          WHEN ce.Event_ID IS NOT NULL THEN ce.Event_Name
+          WHEN w.Event_ID IS NOT NULL THEN 'Wedding'
+          ELSE 'Event Details Not Specified'
+      END AS eventName
+    FROM bite bi
+    JOIN menu_type mt ON bi.menu_type_id = mt.menu_type_id
+    JOIN bar b ON bi.BarRequirementID = b.BarRequirementID
+    JOIN event e ON b.BarRequirementID = e.BarRequirementID
+    JOIN booking bk ON e.booking_id = bk.booking_id
+    JOIN customer c ON bk.customer_id = c.customer_id
+    LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+    LEFT JOIN wedding w ON e.Event_ID = w.Event_ID`);
     return rows;
   }
 
@@ -181,22 +183,18 @@ class Bite {
     return rows;
   }
 
-  static async update(id, biteData) {
-    const [result] = await db.execute(
-      `UPDATE bite SET 
-        Quantity = ?, 
-        menu_type_id = ?, 
-        BarRequirementID = ? 
-       WHERE id = ?`,
-      [
-        biteData.Quantity,
-        biteData.menu_type_id,
-        biteData.BarRequirementID,
-        id
-      ]
-    );
-    return result;
-  }
+ static async update(id, biteData) {
+  const [result] = await db.execute(
+    `UPDATE bite SET 
+      Quantity = ?
+     WHERE id = ?`,
+    [
+      biteData.Quantity,
+      id
+    ]
+  );
+  return result;
+}
 
   static async delete(id) {
     const [result] = await db.execute('DELETE FROM bite WHERE id = ?', [id]);
@@ -269,14 +267,12 @@ class LiquorItem {
         item_name = ?, 
         quantity = ?, 
         usages = ?, 
-        BarRequirementID = ?, 
         LiquorPrice = ? 
-       WHERE Liquor_ID = ?`,
+       WHERE BarRequirementID = ?`,
       [
         liquorData.item_name,
         liquorData.quantity,
         liquorData.usages,
-        liquorData.BarRequirementID,
         liquorData.LiquorPrice,
         id
       ]
@@ -285,7 +281,7 @@ class LiquorItem {
   }
 
   static async delete(id) {
-    const [result] = await db.execute('DELETE FROM liquor_items WHERE Liquor_ID = ?', [id]);
+    const [result] = await db.execute('DELETE FROM liquor_items WHERE BarRequirementID = ?', [id]);
     return result;
   }
 }
@@ -372,7 +368,7 @@ class SoftDrinkItem {
   }
 
   static async delete(id) {
-    const [result] = await db.execute('DELETE FROM soft_drink_items WHERE Soft_Drink_id = ?', [id]);
+    const [result] = await db.execute('DELETE FROM soft_drink_items WHERE BarRequirementID = ?', [id]);
     return result;
   }
 }
