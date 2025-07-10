@@ -504,3 +504,48 @@ export const getPayEntriesModel = async (date) => {
   );
   return rows;
 };
+
+
+// Email Services
+export const sendSalaryEmail = async (name, email, netSalary, month, deductions) => {
+  const subject = `Your Salary Statement - ${month}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2c3e50;">Dear ${name},</h2>
+      <p>Your salary for <strong>${month}</strong> has been processed:</p>
+      
+      <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #27ae60;">Salary Details</h3>
+        <p><strong>Net Salary:</strong> LKR ${netSalary.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Total Deductions:</strong> LKR ${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Payment Date:</strong> ${new Date().toLocaleDateString()}</p>
+      </div>
+      
+      <p>If you have any questions about your salary, please contact the HR department.</p>
+      
+      <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <small>This is an automated message. Please do not reply directly to this email.</small>
+      </p>
+      
+      <p>Best regards,<br>The Payroll Team<br>Deandra Management</p>
+    </div>
+  `;
+
+  try {
+    await sendEmail(email, subject, html);
+    return true;
+  } catch (error) {
+    console.error("Failed to send email:", error);
+    return false;
+  }
+};
+export const getPayEntryByEmployeeAndDateModel = async (employeeId, date) => {
+  const [rows] = await pool.query(
+    `SELECT * 
+     FROM employee_salary_calculation 
+     WHERE employee_id = ? AND calculation_date = ?`,
+    [employeeId, date]
+  );
+  return rows[0];
+};

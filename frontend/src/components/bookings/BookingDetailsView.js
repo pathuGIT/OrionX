@@ -9,12 +9,11 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 // Reusable detail row component
-function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn }) {
+function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn, color }) {
     const [edit, setEdit] = useState(false);
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
     const [saving, setSaving] = useState(false);
-    const [textBuffer, setTextBuffer] = useState(value);
 
     useEffect(() => {
         if (label === "Venue ID") {
@@ -163,9 +162,9 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
     }
 
     return (
-        <div className="p-3 bg-white rounded-lg border border-gray-200">
+        <div className={`p-3 bg-slate-50 rounded-lg border border-gray-200`}>
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
-            <span className="block text-base font-medium text-gray-800 mt-1">{value || '-'}</span>
+            <span className={`block text-base font-medium ${color} mt-1`}>{value || '-'}</span>
         </div>
     );
 }
@@ -426,10 +425,10 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                     <DetailRow label="Hall Charge (Rs)" value={b.hall_charge} />
                                     <DetailRow label="Extra Hour Price (Rs)" value={b.extra_hour_fee} />
                                     <DetailRow label="Bites Price (Rs)" value={b.bites_payment} />
-                                    <DetailRow label="Liquor Price (Rs)" value={b.fountain_payment} />
+                                    {/* <DetailRow label="Liquor Price (Rs)" value={b.fountain_payment} /> */}
                                     <DetailRow label="Other Price (Rs)" value={b.other_payment} />
-                                    <DetailRow label="Overall Total (Rs)" value={b.overall_total} />
                                     <DetailRow label="Forfeited Deposit (Rs)" value={b.forfeited_deposit} />
+                                    <DetailRow label="Overall Total (Rs)" value={b.overall_total} color={b.overall_total > 0 ? 'underline' : ''} />
                                 </div>
                             </section>
                         </div>
@@ -443,7 +442,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                             <>
                                 <button
                                     onClick={() => setView('details')}
-                                    className="px-5 py-2.5 font-medium rounded-lg hover:bg-gray-300 text-gray-700 transition-all duration-200"
+                                    className="px-5 py-2.5 font-medium rounded-lg hover:bg-gray-300 text-gray-700 transition-all duration-200 "
                                 >
                                     <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12l4-4m-4 4 4 4" />

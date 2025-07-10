@@ -4,8 +4,8 @@ import { getSummaryByBookingId } from "../../services/MenuService";
 import { Loader2, AlertCircle } from "lucide-react";
 
 const CustomerMenuSummaryReport = () => {
-  const { bookingId } = useParams(); // Assume bookingId comes from URL
-  const [summary, setSummary] = useState([]);
+  const { bookingId } = useParams();
+  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,7 +16,7 @@ const CustomerMenuSummaryReport = () => {
         setSummary(data);
       } catch (err) {
         console.error(err);
-        setError("Failed to fetch summary data.");
+        setError("Failed to fetch summary data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -41,35 +41,100 @@ const CustomerMenuSummaryReport = () => {
     );
   }
 
-  if (summary.length === 0) {
+  if (!summary) {
     return (
-      <p className="text-center text-gray-600 py-10">No summary available.</p>
+      <p className="text-center text-gray-600 py-10">No summary available for this booking.</p>
     );
   }
 
   return (
     <div className="min-h-screen bg-white bg-opacity-40 backdrop-blur-sm px-4 py-8">
-      <div className="p-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-900 drop-shadow-md">
+      <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-md">
+        <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">
           Your Menu Summary
         </h2>
+        
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+          <h3 className="text-xl font-semibold text-blue-800 mb-2">Booking Details</h3>
+          <p className="text-gray-700">
+            <span className="font-medium">Booking ID:</span> {bookingId}
+          </p>
+          {summary.date && (
+            <p className="text-gray-700">
+              <span className="font-medium">Date:</span> {new Date(summary.date).toLocaleDateString()}
+            </p>
+          )}
+        </div>
 
         <div className="space-y-6">
-          {/* Render each category */}
-          {summary.map((category, idx) => (
-            <div key={idx} className="border rounded shadow bg-blue-50 p-4">
-              <h3 className="text-xl font-semibold text-blue-800 mb-2">
-                Category: {category.category_name} — Total Items: {category.total_items}
-              </h3>
+          {summary.menuItems?.length > 0 ? (
+            <>
+              <h3 className="text-xl font-semibold text-blue-800">Selected Menu Items</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {summary.menuItems.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                          {item.specialInstructions && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Notes: {item.specialInstructions}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.quantity}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          ${item.price?.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          ${(item.quantity * item.price)?.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-              {/* Items are a comma-separated string, split it into array */}
-              <ul className="list-disc list-inside text-sm text-gray-700">
-                {category.items.split(", ").map((itemName, i) => (
-                  <li key={i}>{itemName}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+              <div className="flex justify-end mt-6">
+                <div className="bg-blue-50 p-4 rounded-lg w-64">
+                  <h4 className="text-lg font-semibold text-blue-800 mb-2">Order Summary</h4>
+                  <div className="flex justify-between mb-1">
+                    <span>Subtotal:</span>
+                    <span>${summary.subtotal?.toFixed(2)}</span>
+                  </div>
+                  {summary.tax && (
+                    <div className="flex justify-between mb-1">
+                      <span>Tax:</span>
+                      <span>${summary.tax?.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {summary.discount && (
+                    <div className="flex justify-between mb-1 text-green-600">
+                      <span>Discount:</span>
+                      <span>-${summary.discount?.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t border-gray-200">
+                    <span>Total:</span>
+                    <span>${summary.total?.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="text-center text-gray-600 py-10">No menu items selected for this booking.</p>
+          )}
         </div>
       </div>
     </div>
