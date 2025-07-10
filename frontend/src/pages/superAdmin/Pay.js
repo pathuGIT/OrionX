@@ -101,7 +101,7 @@ const Pay = () => {
       // Send notifications
       const result = await notifyPayroll(formattedDate);
       
-      if (result.success) {
+      if (result.data.success) {
         showNotification(result.message || "Salary notifications sent successfully!");
         
         // Update status based on API response
@@ -122,31 +122,28 @@ const Pay = () => {
     }
   };
 
-  // Send individual email
-  const handleSendIndividualEmail = async (employeeId) => {
-    try {
-      setEmailStatus(prev => ({ ...prev, [employeeId]: 'sending' }));
-      
-      const employee = payData.find(item => item.employee_id === employeeId);
-      const formattedDate = selectedDate.format("YYYY-MM-DD");
-      
-      const result = await notifyPayroll(formattedDate, employeeId);
-      
-      if (result.success) {
+ const handleSendIndividualEmail = async (employeeId) => {
+  try {
+    setEmailStatus(prev => ({ ...prev, [employeeId]: 'sending' }));
+    
+    const employee = payData.find(item => item.employee_id === employeeId);
+    const formattedDate = selectedDate.format("YYYY-MM-DD");
+    
+    const result = await notifyPayroll(formattedDate, employeeId);
 
-        console.log("Notify Payroll Result:", result);
-        showNotification(`Email sent to ${employee.name}`);
-        setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
-      } else {
-        showNotification(`Failed to send email to ${employee.name}`, true);
-        setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
-      }
-    } catch (error) {
-      showNotification(`Error: ${error.message}`, true);
+    // Fix: check for result.data.success
+    if (result.data && result.data.success) {
+      showNotification(`Email sent to ${employee.name}`);
+      setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
+    } else {
+      showNotification(`Failed to send email to ${employee.name}`, true);
       setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
     }
-  };
-
+  } catch (error) {
+    showNotification(`Error: ${error.message}`, true);
+    setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
+  }
+};
   // Load data on mount and date change
   useEffect(() => {
     loadPayData();
