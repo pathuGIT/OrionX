@@ -222,8 +222,8 @@ export default function CalenderView() {
                         handleBookingClick(booking);
                       }}
                     >
-                      <div className="font-semibold truncate">{booking.customer_name?.split(' ')[0] || 'Customer'}</div>
-                      <div className="text-gray-600 truncate">{booking.venue_name?.split(' ')[0] || 'Venue'}</div>
+                      <div className="font-semibold truncate p-2">{booking.customer_id?.split(' ')[0] || 'Customer'}</div>
+                      {/* <div className="text-gray-600 truncate">{booking.venue_id?.split(' ')[0] || 'Venue'}</div> */}
                     </div>
                   ))}
                   {dayBookings.length > 2 && (
@@ -244,71 +244,6 @@ export default function CalenderView() {
         />
       )}
 
-      {/* Date Bookings Modal */}
-      {/* {selectedDate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-bold text-gray-800">
-                  {format(selectedDate, 'MMM dd, yyyy')}
-                </h3>
-                <button 
-                  onClick={() => setSelectedDate(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
-                {getDateBookings(selectedDate).map(booking => (
-                  <div 
-                    key={booking.booking_id}
-                    className={`p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${STATUS_COLORS[booking.status]}`}
-                    onClick={() => handleBookingClick(booking)}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-bold text-gray-800 text-sm">{booking.customer_name}</h4>
-                        <p className="text-gray-600 text-xs">{booking.venue_name}</p>
-                      </div>
-                      <span className="bg-white px-2 py-1 rounded-full text-xs capitalize border">
-                        {booking.status}
-                      </span>
-                    </div>
-                    
-                    <div className="mt-2 text-xs grid grid-cols-2 gap-1">
-                      <div>
-                        <span className="text-gray-500">Time: </span>
-                        {format(new Date(booking.booking_date), 'hh:mm a')}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Guests: </span>
-                        {booking.number_of_guests}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Contact: </span>
-                        {booking.customer_phone}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Amount: </span>
-                        ${booking.total_amount}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {getDateBookings(selectedDate).length === 0 && (
-                <div className="text-center py-4 text-gray-500 text-sm">
-                  No bookings for this date
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }
