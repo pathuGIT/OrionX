@@ -21,7 +21,10 @@ import {
     getPayEntries,
     getAllCustomers,
     updateCustomer,
-    getCustomerBookings
+    getCustomerBookings,
+    notifyEmployeesPayroll,
+    notifySingleEmployeePayroll,
+    sendIdToEmp
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -65,6 +68,10 @@ router.get('/monthly/entries/:employee_id/:date',superAdmin, deductionController
 
 router.post('/calculate', calculatePay);
 router.get('/entries/:date',getPayEntries);
+
+router.post('/payroll/notify',  notifyEmployeesPayroll);
+router.post('/send-id-to-emp', sendIdToEmp);
+router.post('/payroll/notify-employee', notifySingleEmployeePayroll);
  
 
 
