@@ -56,10 +56,6 @@ const Pay = () => {
     [selectedDate, showNotification]
   );
 
-
-
-  
-
   // Calculate payroll handler
   const handleCalculate = async () => {
     try {
@@ -131,7 +127,6 @@ const Pay = () => {
     
     const result = await notifyPayroll(formattedDate, employeeId);
 
-    // Fix: check for result.data.success
     if (result.data && result.data.success) {
       showNotification(`Email sent to ${employee.name}`);
       setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
@@ -144,6 +139,7 @@ const Pay = () => {
     setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
   }
 };
+
   // Load data on mount and date change
   useEffect(() => {
     loadPayData();
@@ -196,6 +192,17 @@ const Pay = () => {
           </button>
         );
     }
+  };
+
+  // Fixed function to correctly calculate net salary
+  const calculateCorrectNetSalary = (item) => {
+    // Convert all values to numbers to ensure proper calculations
+    const basicSalary = Number(item.basic_salary) || 0;
+    const serviceCharge = Number(item.total_service_charge) || 0;
+    const deductions = Number(item.total_deduction) || 0;
+    
+    // Return the correctly calculated net salary
+    return basicSalary + serviceCharge - deductions;
   };
 
   return (
@@ -390,7 +397,7 @@ const Pay = () => {
                       {formatCurrency(item.total_deduction)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                      {formatCurrency(item.net_salary)}
+                      {formatCurrency(calculateCorrectNetSalary(item))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       {renderEmailStatus(item.employee_id)}
@@ -410,7 +417,7 @@ const Pay = () => {
                     Total Net Payroll:{" "}
                     {formatCurrency(
                       payData.reduce(
-                        (sum, item) => sum + (Number(item.net_salary) || 0),
+                        (sum, item) => sum + calculateCorrectNetSalary(item),
                         0
                       )
                     )}
