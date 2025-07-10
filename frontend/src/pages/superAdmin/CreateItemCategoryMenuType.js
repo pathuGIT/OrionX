@@ -66,7 +66,7 @@ function CreateItemCategoryMenuType() {
 
       // Scroll to top after adding/updating
       if (topRef.current) {
-        topRef.current.scrollIntoView({ behavior: 'smooth' });
+        topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
       alert("Operation failed!");
@@ -92,7 +92,7 @@ function CreateItemCategoryMenuType() {
       
       // Scroll to form when editing
       if (topRef.current) {
-        topRef.current.scrollIntoView({ behavior: 'smooth' });
+        topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
       console.error("Error fetching for edit:", error);
@@ -134,7 +134,11 @@ function CreateItemCategoryMenuType() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6" ref={topRef}>
+    <div
+  className="min-h-screen bg-gray-50 p-6 overflow-y-auto"
+  style={{ maxHeight: '80vh' }}
+  ref={topRef}
+>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
@@ -153,7 +157,7 @@ function CreateItemCategoryMenuType() {
               onClick={() => {
                 setIsAdding(true);
                 if (topRef.current) {
-                  topRef.current.scrollIntoView({ behavior: 'smooth' });
+                  topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center"
@@ -277,7 +281,7 @@ function CreateItemCategoryMenuType() {
                 onClick={() => {
                   setIsAdding(true);
                   if (topRef.current) {
-                    topRef.current.scrollIntoView({ behavior: 'smooth' });
+                    topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
                 className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-200"
@@ -290,9 +294,9 @@ function CreateItemCategoryMenuType() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ID
-                    </th>
+                    </th> */}
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Category Type
                     </th>
@@ -307,9 +311,9 @@ function CreateItemCategoryMenuType() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredItemCategoryMenuTypes.map(icmt => (
                     <tr key={icmt.ICMT_Id} className="hover:bg-gray-50 transition duration-150">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      {/* <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">#{icmt.ICMT_Id}</div>
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{getCMTName(icmt.category_menu_type_id)}</div>
                       </td>
@@ -338,7 +342,7 @@ function CreateItemCategoryMenuType() {
                         onClick={() => {
                           setIsAdding(true);
                           if (topRef.current) {
-                            topRef.current.scrollIntoView({ behavior: 'smooth' });
+                            topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                           }
                         }}
                         className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center justify-center w-full py-2"
