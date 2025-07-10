@@ -54,7 +54,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
               onClick={() => handleRenderContent("ServicesChargeCalculation")}
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
                 clickedItem === "ServicesChargeCalculation" 
-                  ? "bg-gray-100 dark:bg-gray-700" 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100'
                   : ""
               }`}
             >
@@ -68,7 +68,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
                 <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
               </svg>
-              <span className="ml-3">ServicesCharge</span>
+              <span className="ml-3">Service Charge Management</span>
             </button>
           </li>
 
@@ -77,7 +77,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
               onClick={() => handleRenderContentdeduction("deductionManagement")}
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
                 clickedItem === "deductionManagement" 
-                  ? "bg-gray-100 dark:bg-gray-700" 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100'
                   : ""
               }`}
             >
@@ -98,7 +98,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
                   d="M11 9h6m-6 3h6m-6 3h6M6.996 9h.01m-.01 3h.01m-.01 3h.01M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
                 />
               </svg>
-              <span className="ml-3">Deduction</span>
+              <span className="ml-3">Salary Deduction Records </span>
             </button>
           </li>
 
@@ -107,12 +107,12 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
               onClick={() => handleRenderContentPay("PayManagement")}
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
                 clickedItem === "PayManagement" 
-                  ? "bg-gray-100 dark:bg-gray-700" 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100'
                   : ""
               }`}
             >
               <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
+                className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -128,7 +128,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
                   d="M10 3v4a1 1 0 0 1-1 1H5m8-2h3m-3 3h3m-4 3v6m4-3H8M19 4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1ZM8 12v6h8v-6H8Z"
                 />
               </svg>
-              <span className="ml-3">Pay</span>
+              <span className="ml-3">Employee Payment Processing</span>
             </button>
           </li>
 

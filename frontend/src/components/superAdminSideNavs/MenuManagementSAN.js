@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Logout } from '../../components/Logout'
-// import GetMenus from '../../pages/superAdmin/GetMenus';
 import CreateMenuListType from '../../pages/superAdmin/CreateMenuListType';
 import CreateMenuType from '../../pages/superAdmin/CreateMenuType';
 import CreateCategory from '../../pages/superAdmin/CreateCategories';
 import CreateItem from '../../pages/superAdmin/CreateItem';
 import CreateCategoryMenuType from '../../pages/superAdmin/CreateCategoryMenuType';
+import MenuOverview from '../../pages/superAdmin/MenuOverview';
+import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategoryMenuType';
+// import CustomerMenuSummaryReport from '../../pages/superAdmin/CustomerMenuSummary'; 
+import AdminCorrectMenuSelections from '../../pages/superAdmin/AdminCorrectMenuSelections';
+import AdminMenuOrdersPage from '../../pages/superAdmin/AdminViewMenuOrders';
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -13,6 +17,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSalesDropdownOpen, setIsSalesDropdownOpen] = useState(false);
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
   const [clickedItem, setClickedItem] = useState(null);
+  const [activeTab, setActiveTab] = useState('MenuOverview'); // Track active tab
 
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
   const toggleDropdown = dropdown => {
@@ -24,11 +29,12 @@ const MenuManagementSAN = ({ setRenderContent }) => {
   const [selected, setSelected] = useState('');
 
   useEffect(() => {
-    handleRenderContent('null')
+    handleRenderContent('MenuOverview')
   }, [])
 
   const handleRenderContent = (display) => {
     setSelected(display);
+    setActiveTab(display); // Set the active tab when clicked
     console.log(display)
     switch (display) {
       case 'createMenuListTypes':
@@ -51,10 +57,27 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         setClickedItem('CreateCategoryMenuType');
         setRenderContent(() => () => <CreateCategoryMenuType />);
         break;
+      case 'MenuOverview':
+        setRenderContent(() => () => <MenuOverview />);
+        break;
+      case 'CreateItemCategoryMenuType':
+        setClickedItem('CreateItemCategoryMenuType');
+        setRenderContent(() => () => <CreateItemCategoryMenuType />);
+        break;
+      // case 'CustomerMenuSummary':
+      //   setRenderContent(() => () => <CustomerMenuSummaryReport />);
+      //   break;
+      case 'AdminCorrectMenuSelections' :
+        setRenderContent(() => () => <AdminCorrectMenuSelections />);
+        break;
+      case 'AdminMenuOrdersPage':
+        setRenderContent(() => () => <AdminMenuOrdersPage />);
+        break;
       default:
-        setRenderContent(() => () => <p>Page not found</p>);
+        setRenderContent(() => () => <MenuOverview/>);
     }
   };
+  
   return (
     <div className=''>
       <ul class="flex flex-col py-4 ">
@@ -65,8 +88,8 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         </button>
         <ul class="space-y-2">
           <li>
-            <a href="#" class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group `}>
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <a href="#" onClick={() => handleRenderContent('MenuOverview')} class={`flex items-center p-2 text-base font-normal rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${activeTab === 'MenuOverview' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900'} ${clickedItem === 'booking-view' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
+              <svg aria-hidden="true" class={`w-6 h-6 transition duration-75 ${activeTab === 'MenuOverview' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-400 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
               </svg>
@@ -76,9 +99,8 @@ const MenuManagementSAN = ({ setRenderContent }) => {
 
           {/* Pages Dropdown */}
           <li>
-            <button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" onClick={() => toggleDropdown('pages')}>
-
-              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <button type="button" class={`flex items-center p-2 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab.startsWith('create') ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`} onClick={() => toggleDropdown('pages')}>
+              <svg class={`w-6 h-6 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white ${activeTab.startsWith('create') ? 'text-blue-600 dark:text-blue-300' : 'text-gray-400 dark:text-gray-400'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 5v14m14 0V8h2M3 8h6m0-2v8.5858c0 .8909 1.0771 1.3371 1.7071.7071l.5858-.5858c.3905-.3905 1.0237-.3905 1.4142 0l.5858.5858c.3905.3905 1.0237.3905 1.4142 0l.5858-.5858c.3905-.3905 1.0237-.3905 1.4142 0l.5858.5858c.63.63 1.7071.1838 1.7071-.7071V6c0-.55228-.4477-1-1-1h-8c-.55229 0-1 .44772-1 1Z" />
               </svg>
               <span class="flex-1 ml-3 text-left whitespace-nowrap">Menu Management</span>
@@ -87,18 +109,19 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isPagesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class={`flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ${clickedItem === 'createMenuListTypes' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>Create Menu List Types</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('createMenuTypes')} class={`flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ${clickedItem === 'createMenuTypes' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>Create Menu Types</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('createCategory')} class={`flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ${clickedItem === 'createCategory' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>Create Categories</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class={`flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ${clickedItem === 'CreateItem' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>Create Items</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ${clickedItem === 'CreateCategoryMenuType' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>Category Menu Type Mapping</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuListTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'} `}>Menu List Setup</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createMenuTypes')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Define Menu Types</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createCategory')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createCategory' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Manage Food categories</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItem' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Add Food Items</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Link Categories to Menu Types</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('CreateItemCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItemCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Map Items with Categories & Menu Types</a></li>
             </ul>
           </li>
 
           {/* Sales Dropdown */}
           <li>
-            <button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" onClick={() => toggleDropdown('sales')}>
-              <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" class={`flex items-center p-2 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`} onClick={() => toggleDropdown('sales')}>
+              <svg aria-hidden="true" class={`flex-shrink-0 w-6 h-6 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white ${activeTab === 'CustomerMenuSummary' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-400 dark:text-gray-400'}`} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd"></path>
               </svg>
               <span class="flex-1 ml-3 text-left whitespace-nowrap">Catering Operations</span>
@@ -107,9 +130,9 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isSalesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Order Summary</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Correct Customer Menu</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Team</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('AdminMenuOrdersPage')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>View Catering Orders</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('AdminCorrectMenuSelections')}  class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
+              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Staff</a></li>
             </ul>
           </li>
 
@@ -126,7 +149,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
             </button>
             <ul class={`${isToolsDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
               <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Suggested Menu Generator</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Menu Offers</a></li>
+              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Manage Menu Discounts</a></li>
             </ul>
           </li>
 
@@ -160,4 +183,5 @@ const MenuManagementSAN = ({ setRenderContent }) => {
   );
 }
 
-export default MenuManagementSAN
+
+export default MenuManagementSAN;

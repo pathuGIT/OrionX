@@ -97,7 +97,7 @@ const Pay = () => {
       // Send notifications
       const result = await notifyPayroll(formattedDate);
       
-      if (result.data.success) {
+      if (result.data.success) {
         showNotification(result.message || "Salary notifications sent successfully!");
         
         // Update status based on API response

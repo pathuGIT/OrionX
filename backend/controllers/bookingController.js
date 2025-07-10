@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings, printBookingDetails, getSelectedMenuPrice } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -253,7 +253,6 @@ export async function getBooking(req, res) {
 /////////////// Advance booking view controllers
 
 export const getBookings = async (req, res) => {
-    console.log("aaa")
     try {
         const status = req.query.status || "all";
         const bookings = await getAllBookings(status);
@@ -267,7 +266,7 @@ export const getBookings = async (req, res) => {
 export const searchBookings = async (req, res) => {
     try {
         const item = req.query.search;
-        console.log("aaaaaaaaaaa", item)
+        console.log(";;;", item);
         const bookings = await searchAllBookings(item);
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {
@@ -275,6 +274,20 @@ export const searchBookings = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to fetch bookings." });
     }
 };
+
+export const printBookingDetailsCtrl = async(req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const bookingDetails = await printBookingDetails(bookingId);
+        if (!bookingDetails) {
+            return res.status(404).json({ success: false, message: "Booking not found." });
+        }
+        res.status(200).json({ success: true, data: bookingDetails });
+    } catch (error) {
+        console.error("Error fetching print-booking details:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch print-booking details." });
+    }
+}
 
 // Get details of a single booking
 export const getBookingDetails = async (req, res) => {
@@ -585,6 +598,9 @@ export const updateGuests = async (req, res) => {
         // get current venue 
         const venue = await getVenueBytId(currBooking.venue_id);
 
+        // get selected venue price for booking_id
+        const selectedMenuPrice = await getSelectedMenuPrice(bookingId);
+
         let hallCharge = 0.00;
         if (number_of_guests >= venue.min_capacity && number_of_guests <= venue.max_capacity) {
             hallCharge = venue.price;
@@ -597,10 +613,15 @@ export const updateGuests = async (req, res) => {
         // Calculate extra hour fee if needed
         const extraHourFee = (currBooking.additional_hours || 0) * parseFloat(venue.additional_hour_fee || 0);
 
+        // Calculate menu price * guests
+        const currBooking2 = await getBookingById(bookingId);
+        console.log("currBooking.number_of_guests:", currBooking2.number_of_guests, "selectedMenuPrice.price:", selectedMenuPrice.price);
+        const newMenuPriceTotal = currBooking2.number_of_guests * selectedMenuPrice.price || 0; // Assuming this is the total menu price for the booking
+
         // get curr booking pricing
         const currentBookingPrice = await getBookingPricingById(bookingId);
         const newBookingPrice = {
-            menuPriceTotal: currentBookingPrice.menu_price_total,
+            menuPriceTotal: newMenuPriceTotal,
             hallCharge: hallCharge,
             extraHourFee: extraHourFee,
             bitesPayment: currentBookingPrice.bites_payment,

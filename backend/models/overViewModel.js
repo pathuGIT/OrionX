@@ -50,3 +50,25 @@ export async function fetchRevenueTrend() {
   // rows: [ { month: '2025-05', total_price: 90000 }, … ]
   return rows;
 }
+
+export async function fetchRecentBookings() {
+  // revenue grouped by YYYY-MM
+  const [rows] = await db.query(
+        `SELECT 
+        b.booking_id, 
+        c.name, 
+        b.booking_date, 
+        b.total_price, 
+        b.status 
+    FROM 
+        booking b 
+    INNER JOIN 
+        customer c 
+        ON b.customer_id = c.customer_id 
+    WHERE 
+        b.status = 'confirmed'
+        AND b.updated_at BETWEEN NOW() - INTERVAL 5 DAY AND NOW()
+        AND b.booking_date >= CURDATE() Limit 3`
+  );
+  return rows;
+}

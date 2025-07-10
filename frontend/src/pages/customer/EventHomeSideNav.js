@@ -1,150 +1,142 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Logout } from '../../components/Logout';
+import {
+    FaChartPie, FaCalendarPlus, FaUtensils, FaConciergeBell,
+    FaChair, FaCocktail, FaChevronDown, FaChevronUp, FaTimes
+} from 'react-icons/fa';
 
-const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
-  const [openMenu, setOpenMenu] = useState(null);
-  const [isHoverSupported, setIsHoverSupported] = useState(false);
+// The NavItem no longer manages its own state. It's controlled by the parent.
+const NavItem = ({ name, icon, children, subItems, openMenu, setOpenMenu, setActivePage, closeSidebar }) => {
+    // This item is open if its name matches the parent's openMenu state.
+    const isOpen = openMenu === name;
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(hover: hover)');
-    const updateHoverSupport = (e) => setIsHoverSupported(e.matches);
-    setIsHoverSupported(mediaQuery.matches);
-    mediaQuery.addEventListener('change', updateHoverSupport);
-    return () => mediaQuery.removeEventListener('change', updateHoverSupport);
-  }, []);
+    const handleToggle = () => {
+        // If it's already open, close it. Otherwise, open it.
+        setOpenMenu(isOpen ? null : name);
+    };
 
-  const toggleMenu = (menu) => {
-    setOpenMenu(openMenu === menu ? null : menu);
-  };
-
-  const NavItem = ({ children, icon, menuName, pageName, subItems }) => (
-    <div
-      className="relative group"
-      onMouseEnter={isHoverSupported ? () => setOpenMenu(menuName) : undefined}
-      onMouseLeave={isHoverSupported ? () => setOpenMenu(null) : undefined}
-    >
-      <button 
-        onClick={!isHoverSupported ? () => toggleMenu(menuName) : undefined}
-        className="w-full flex items-center justify-between px-4 py-3 text-gray-100 hover:bg-gray-700 rounded-lg transition-all duration-200 hover:translate-x-2"
-      >
-        <div className="flex items-center">
-          <i className={`${icon} mr-3 text-lg`}></i>
-          <span className="font-medium">{children}</span>
-        </div>
-        {subItems && (
-          <i className={`fas ${openMenu === menuName ? 'fa-chevron-up' : 'fa-chevron-down'} text-sm text-gray-400`}></i>
-        )}
-      </button>
-      
-      {subItems && openMenu === menuName && (
-        <div className="ml-4 mt-1 space-y-1 bg-gray-700/50 rounded-lg p-2 animate-slideIn">
-          {subItems.map((item, index) => (
+    return (
+        <div>
             <button
-              key={index}
-              onClick={() => {
-                setActivePage(item.page);
-                closeSidebar();
-              }}
-              className="block px-4 py-2.5 text-gray-200 hover:bg-gray-600 w-full text-left rounded-md transition-colors duration-150"
+                onClick={handleToggle}
+                className="w-full flex items-center justify-between px-4 py-3 text-gray-200 hover:bg-gray-700 rounded-lg transition-all duration-200"
             >
-              {item.label}
+                <div className="flex items-center">
+                    <div className="mr-4 text-lg">{icon}</div>
+                    <span className="font-medium">{children}</span>
+                </div>
+                {subItems && (isOpen ? <FaChevronUp /> : <FaChevronDown />)}
             </button>
-          ))}
+            {isOpen && subItems && (
+                <div className="ml-6 mt-2 space-y-1 border-l-2 border-gray-600 pl-4">
+                    {subItems.map((item, index) => (
+                        <button
+                            key={index}
+                            onClick={() => {
+                                setActivePage(item.page);
+                                closeSidebar();
+                            }}
+                            className="block w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-600 rounded-md transition-colors duration-150"
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
+};
 
-  return (
-    <aside className="w-64 bg-gradient-to-b from-gray-800 to-gray-900 h-full fixed left-0 top-0 md:relative md:translate-x-0 transform transition-transform duration-300 ease-in-out shadow-xl">
-      <div className="flex items-center justify-between h-20 px-6 bg-gradient-to-r from-indigo-600 to-purple-600">
-        <span className="text-white text-xl font-bold tracking-wide">Event Management</span>
-      </div>
-      
-      <nav className="mt-5 overflow-y-auto h-[calc(100vh-5rem)] px-4 space-y-1">
-        <button
-          onClick={() => {
-            setActivePage('dashboard');
-            closeSidebar();
-          }}
-          className="w-full flex items-center px-4 py-3 text-gray-100 hover:bg-gray-700 rounded-lg transition-all duration-200 group hover:translate-x-2"
-        >
-          <i className="fas fa-chart-pie mr-3 text-purple-400 group-hover:text-purple-300 text-lg"></i>
-          <span className="font-medium">Dashboard</span>
-        </button>
+const EventHomeSideNav = ({ setActivePage, isOpen, setIsOpen }) => {
+    // State is "lifted up" to this parent component.
+    // It holds the name of the currently open menu, e.g., 'events' or 'menu'.
+    const [openMenu, setOpenMenu] = useState(null);
 
-        <div className="border-t border-gray-700 my-3 opacity-50"></div>
+    const closeSidebar = () => {
+        if (window.innerWidth < 768) {
+            setIsOpen(false);
+        }
+    };
 
-        <NavItem
-          icon="fas fa-calendar-plus text-blue-400 group-hover:text-blue-300"
-          menuName="events"
-          subItems={[
+    // Data for the navigation items
+    const navItemsData = [
+        { name: 'events', icon: <FaCalendarPlus className="text-blue-400" />, title: 'Plan Events', subItems: [
             { page: 'plan-event', label: '✨ Plan New Event' },
             { page: 'view-events', label: '📅 View Events' }
-          ]}
-        >
-          Plan Events
-        </NavItem>
-
-        <NavItem
-          icon="fas fa-utensils text-orange-400 group-hover:text-orange-300"
-          menuName="menu"
-          subItems={[
+        ]},
+        { name: 'menu', icon: <FaUtensils className="text-orange-400" />, title: 'Menu Planning', subItems: [
             { page: 'plan-menulist', label: '🍽️ Select New Menu' },
             { page: 'my-menu', label: '📋 Saved Menus' }
-          ]}
-        >
-          Menu Planning
-        </NavItem>
-
-        <NavItem
-          icon="fas fa-concierge-bell text-green-400 group-hover:text-green-300"
-          menuName="EventServices"
-          subItems={[
+        ]},
+        { name: 'services', icon: <FaConciergeBell className="text-green-400" />, title: 'Event Services', subItems: [
             { page: 'Select-Services', label: '🛍️ Select Services' },
             { page: 'view-Vendors', label: '👥 See Vendors' }
-          ]}
-        >
-          Event Services
-        </NavItem>
-
-        <NavItem
-          icon="fas fa-chair text-yellow-400 group-hover:text-yellow-300"
-          menuName="TableManage"
-          subItems={[
+        ]},
+        { name: 'tables', icon: <FaChair className="text-yellow-400" />, title: 'Arrange Tables', subItems: [
             { page: 'Select-Tables', label: '🎨 Select Designs' },
             { page: 'Reserve-Tables', label: '💺 Book Tables' },
             { page: 'see-arrangements', label: '👀 See Arrangements' }
-          ]}
-        >
-          Arrange Tables
-        </NavItem>
-
-        <NavItem
-          icon="fas fa-cocktail text-pink-400 group-hover:text-pink-300"
-          menuName="BarPlan"
-          subItems={[
+        ]},
+        { name: 'bar', icon: <FaCocktail className="text-pink-400" />, title: 'Bar Arrangements', subItems: [
             { page: 'Select-bar-Times', label: '⏰ Bar Times' },
             { page: 'setect-bites', label: '🍹 Bites ' },
             { page: 'select-bar-arrangements', label: '📋 Plan Bar' }
-          ]}
-        >
-          Bar Arrangements
-        </NavItem>
+        ]}
+    ];
 
-        <div className="border-t border-gray-700 my-3 opacity-50"></div>
+    return (
+        <>
+            <div
+                className={`fixed inset-0 bg-black bg-opacity-60 z-30 md:hidden ${isOpen ? 'block' : 'hidden'}`}
+                onClick={() => setIsOpen(false)}
+            ></div>
+            <aside
+                className={`bg-gray-800 text-white w-64 min-h-screen fixed top-0 left-0 z-40 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shadow-lg`}
+            >
+                <div className="flex items-center justify-between p-4 bg-gray-900">
+                    <span className="text-xl font-bold">Event Menu</span>
+                    <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-300 hover:text-white">
+                        <FaTimes size={24} />
+                    </button>
+                </div>
 
-        <div className="mt-8">
-          <div className="px-4 py-3 text-gray-100 hover:bg-red-600/20 rounded-lg transition-colors duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <i className="fas fa-sign-out-alt mr-3 text-red-400 group-hover:text-red-300"></i>
-              <Logout className="font-medium" />
-            </div>
-          </div>
-        </div>
-      </nav>
-    </aside>
-  );
+                <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-4rem)]">
+                    <button
+                        onClick={() => {
+                            setActivePage('dashboard');
+                            closeSidebar();
+                        }}
+                        className="w-full flex items-center px-4 py-3 text-gray-200 hover:bg-gray-700 rounded-lg transition-all duration-200"
+                    >
+                        <FaChartPie className="mr-4 text-lg text-purple-400" />
+                        <span className="font-medium">Dashboard</span>
+                    </button>
+                    <div className="border-t border-gray-700 my-2"></div>
+                    
+                    {/* Map through the data and pass the state down to each NavItem */}
+                    {navItemsData.map(item => (
+                        <NavItem
+                            key={item.name}
+                            name={item.name}
+                            icon={item.icon}
+                            subItems={item.subItems}
+                            openMenu={openMenu}
+                            setOpenMenu={setOpenMenu}
+                            setActivePage={setActivePage}
+                            closeSidebar={closeSidebar}
+                        >
+                            {item.title}
+                        </NavItem>
+                    ))}
+
+                    <div className="border-t border-gray-700 my-2"></div>
+                    <div className="px-4 py-3 text-gray-300 hover:bg-red-800/50 rounded-lg cursor-pointer">
+                        <Logout />
+                    </div>
+                </nav>
+            </aside>
+        </>
+    );
 };
 
 export default EventHomeSideNav;

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAllMenuViews, saveCustomerMenuSelection, checkBookingMenuSelection } from "../services/MenuService";
-import { updateMenuFee } from "../services/BookngService"; // <-- Add this import
-import { Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { updateMenuFee } from "../services/BookngService";
+import { Loader2, AlertCircle, ChevronDown, ChevronUp, Check, CheckCircle, XCircle } from "lucide-react";
 
 const CustomerMenuTypeSelection = () => {
-  // Extract menuListTypeId from URL parameters
   const { menuListTypeId } = useParams();
 
   // State declarations
@@ -13,17 +12,24 @@ const CustomerMenuTypeSelection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedMenuTypeId, setExpandedMenuTypeId] = useState(null);
-  const [selections, setSelections] = useState({}); // Store selected items
+  const [selections, setSelections] = useState({});
   const [menuPrice, setMenuPrice] = useState(null);
   const [hideSave, setHideSave] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [notification, setNotification] = useState(null);
+
+  // Show notification and auto-hide after 3 seconds
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   // Fetch menu views when component loads
   useEffect(() => {
     const fetchMenuViews = async () => {
       try {
         const data = await getAllMenuViews();
-
-        // Filter menu types by selected menu list type (e.g., Wedding, Party)
         const filtered = data.filter(
           (view) =>
             view.menu_list_type_id?.trim().toLowerCase() ===
@@ -32,7 +38,7 @@ const CustomerMenuTypeSelection = () => {
         setMenuViews(filtered);
       } catch (err) {
         console.error(err);
-        setError("Failed to load menu types.");
+        setError("Failed to load menu types. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -41,17 +47,19 @@ const CustomerMenuTypeSelection = () => {
     fetchMenuViews();
   }, [menuListTypeId]);
 
-  // Check on mount if the booking already has selections and hide the Save button if so.
+  // Check if booking already has selections
   useEffect(() => {
-    // Check if booking already has menu selections
-    console.log("Checking booking selections...");
     const checkBooking = async () => {
       const bookingId = localStorage.getItem("bookingId");
       if (bookingId) {
         try {
           const exists = await checkBookingMenuSelection(bookingId);
           setHideSave(exists);
+          if (exists) {
+            showNotification("You've already made your menu selections!");
+          }
         } catch (e) {
+          console.error("Error checking booking:", e);
           setHideSave(false);
         }
       }
@@ -59,7 +67,6 @@ const CustomerMenuTypeSelection = () => {
     checkBooking();
   }, [menuListTypeId]);
 
-  // Update: handle selection with item_limit enforcement
   const handleSelect = (menuTypeId, categoryId, ICMT_Id, isSingleChoice) => {
     setSelections((prev) => {
       const prevMenu = prev[menuTypeId] || {};
@@ -67,15 +74,11 @@ const CustomerMenuTypeSelection = () => {
 
       let updatedCategory;
       if (isSingleChoice) {
-        // Only one can be selected (radio)
         updatedCategory = [ICMT_Id];
       } else {
-        // Multiple can be selected (checkbox)
         if (prevCategory.includes(ICMT_Id)) {
-          // Deselect if already selected
           updatedCategory = prevCategory.filter((id) => id !== ICMT_Id);
         } else {
-          // Add if under limit
           const categoryLimit = (
             menuViews.find(
               (v) =>
@@ -86,7 +89,6 @@ const CustomerMenuTypeSelection = () => {
           if (prevCategory.length < categoryLimit) {
             updatedCategory = [...prevCategory, ICMT_Id];
           } else {
-            // At limit, do not add more
             updatedCategory = prevCategory;
           }
         }
@@ -102,25 +104,90 @@ const CustomerMenuTypeSelection = () => {
     });
   };
 
-  // Show loading spinner
-  if (loading) {
-    return (
-      <div className="flex justify-center py-10">
-        <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
-      </div>
-    );
-  }
+  const handleSaveSelections = async () => {
+    setSaveLoading(true);
+    setSaveError(null);
 
-  // Show error message if fetch fails
-  if (error) {
-    return (
-      <div className="text-red-600 flex items-center gap-2 px-4 py-4">
-        <AlertCircle /> {error}
-      </div>
-    );
-  }
+    try {
+      // Validate selections
+      if (!expandedMenuTypeId) {
+        throw new Error("Please expand and select a menu type first.");
+      }
 
-  // Group menuViews by menu_type_id and organize by categories
+      const menu = groupedMenu().find(m => m.menu_type_id === expandedMenuTypeId);
+      if (!menu) {
+        throw new Error("Invalid menu selection. Please try again.");
+      }
+
+      const selectedMenuSelections = selections[expandedMenuTypeId] || {};
+      let allValid = true;
+      let missingCategory = "";
+      
+      for (const category of Object.values(menu.categories)) {
+        const selected = selectedMenuSelections[category.category_id] || [];
+        if (selected.length !== category.item_limit) {
+          allValid = false;
+          missingCategory = category.category_name;
+          break;
+        }
+      }
+      
+      if (!allValid) {
+        throw new Error(`Please select ${missingCategory ? missingCategory : 'required'} items`);
+      }
+
+      const ICMT_Ids = [];
+      Object.values(selectedMenuSelections).forEach((ids) => {
+        ICMT_Ids.push(...ids);
+      });
+
+      const bookingId = localStorage.getItem("bookingId");
+      if (!bookingId) {
+        throw new Error("Booking session expired. Please start a new booking.");
+      }
+
+      console.log("psosos::", ICMT_Ids)
+      // Save selections
+      await Promise.all(
+        ICMT_Ids.map(ICMT_Id => 
+          saveCustomerMenuSelection(bookingId, ICMT_Id)
+        )
+      );
+
+      // Update menu fee if needed
+      if (menuPrice) {
+        await updateMenuFee(bookingId, { menueFee: menuPrice });
+      }
+
+      setHideSave(true);
+      showNotification("Your menu selections have been saved successfully!");
+    } catch (error) {
+      console.error("Save error:", error);
+      let errorMessage = "Failed to save selections.";
+      
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.response.data?.message || errorMessage;
+        }
+      } else if (error.request) {
+        // Request was made but no response
+        errorMessage = "Network error. Please check your connection.";
+      } else {
+        // Other errors
+        errorMessage = error.message || errorMessage;
+      }
+      
+      setSaveError(errorMessage);
+      showNotification(errorMessage, 'error');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  // Group menuViews by menu_type_id
   const groupedMenu = () => {
     const map = new Map();
 
@@ -145,7 +212,6 @@ const CustomerMenuTypeSelection = () => {
         };
       }
 
-      // Push items to appropriate category
       menu.categories[item.category_id].items.push({
         item_id: item.item_id,
         item_name: item.item_name,
@@ -156,38 +222,84 @@ const CustomerMenuTypeSelection = () => {
     return Array.from(map.values());
   };
 
-  return (
-    <div>
-      <div className="min-h-screen bg-white bg-opacity-40 backdrop-blur-sm px-4 py-8">
-        <div className="p-6 max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-blue-900 drop-shadow-md">
-            Select a Menu Type
-          </h2>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
+      </div>
+    );
+  }
 
-          {/* Display each grouped menu type */}
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded flex items-center gap-2">
+          <AlertCircle className="h-5 w-5" />
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {/* Notification Component */}
+      {notification && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center ${
+          notification.type === 'success' 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-red-100 text-red-800 border border-red-200'
+        }`}>
+          {notification.type === 'success' ? (
+            <CheckCircle className="h-5 w-5 mr-2" />
+          ) : (
+            <XCircle className="h-5 w-5 mr-2" />
+          )}
+          <span>{notification.message}</span>
+        </div>
+      )}
+
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-8">
+        <div className="p-6 max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold mb-8 text-center text-blue-900">
+            Select Your Perfect Menu
+          </h2>
+          <p className="text-center text-blue-600 mb-8">
+            Choose from our delicious options below
+          </p>
+
           {groupedMenu().map((menu) => {
             const isOpen = expandedMenuTypeId === menu.menu_type_id;
 
             return (
-              <div key={menu.menu_type_id} className="border rounded mb-4 shadow bg-blue-100/60 backdrop-blur-sm">
-                {/* Expand/collapse menu type */}
+              <div 
+                key={menu.menu_type_id} 
+                className={`border rounded-lg mb-6 shadow-lg transition-all duration-300 ${isOpen ? 'border-blue-300 bg-white' : 'border-gray-200 bg-white hover:bg-blue-50'}`}
+              >
                 <button
-                  onClick={() =>{
+                  onClick={() => {
                     setExpandedMenuTypeId(isOpen ? null : menu.menu_type_id);
                     setMenuPrice(menu.price);
-                  }
-                  }
-                  className="w-full flex justify-between items-center px-4 py-3 bg-blue-200 hover:bg-blue-300 text-lg font-semibold transition-colors"
+                  }}
+                  className={`w-full flex justify-between items-center px-6 py-4 text-left transition-colors ${isOpen ? 'bg-blue-600 text-white' : 'bg-white text-blue-900 hover:bg-blue-100'}`}
                 >
-                  <span>
-                    {menu.menu_type_name} — Rs.{menu.price}
-                  </span>
-                  {isOpen ? <ChevronUp /> : <ChevronDown />}
+                  <div>
+                    <h3 className="text-xl font-bold">{menu.menu_type_name}</h3>
+                    <p className={`${isOpen ? 'text-blue-100' : 'text-blue-600'} mt-1`}>
+                      Rs. {menu.price.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center">
+                    {isOpen ? (
+                      <ChevronUp className="h-6 w-6" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6" />
+                    )}
+                  </div>
                 </button>
 
-                {/* Show category selection when expanded */}
                 {isOpen && (
-                  <div className="px-6 py-4 bg-blue-50/80 rounded-b space-y-6 transition-all">
+                  <div className="px-6 py-4 space-y-6 animate-fadeIn">
                     {Object.values(menu.categories).map((category) => {
                       const isSingleChoice = category.item_limit === 1;
                       const selectedItems = selections[menu.menu_type_id]?.[category.category_id] || [];
@@ -195,36 +307,49 @@ const CustomerMenuTypeSelection = () => {
                       return (
                         <div
                           key={category.category_id}
-                          className="bg-blue-100 p-4 rounded shadow-sm"
+                          className="bg-blue-50 p-5 rounded-lg shadow-sm border border-blue-100"
                         >
-                          <h3 className="text-base font-semibold mb-2 text-blue-800">
-                            {category.category_name} (Choose {category.item_limit})
-                          </h3>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg font-semibold text-blue-800">
+                              {category.category_name}
+                            </h3>
+                            <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              Choose {category.item_limit}
+                            </span>
+                          </div>
 
-                          {/* List items for selection */}
-                          <ul className="space-y-2">
+                          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {category.items.map((item) => (
                               <li
                                 key={item.item_id}
-                                className="flex items-center gap-3 p-2 bg-white rounded hover:bg-blue-100 transition"
+                                className={`p-3 rounded-lg transition-all cursor-pointer ${
+                                  selectedItems.includes(item.ICMT_Id)
+                                    ? 'bg-blue-100 border-2 border-blue-400'
+                                    : 'bg-white hover:bg-blue-50 border border-gray-200'
+                                }`}
+                                onClick={() =>
+                                  handleSelect(
+                                    menu.menu_type_id,
+                                    category.category_id,
+                                    item.ICMT_Id,
+                                    isSingleChoice
+                                  )
+                                }
                               >
-                                <input
-                                  type={isSingleChoice ? "radio" : "checkbox"}
-                                  name={`${menu.menu_type_id}_${category.category_id}`}
-                                  checked={selectedItems.includes(item.ICMT_Id)}
-                                  onChange={() =>
-                                    handleSelect(
-                                      menu.menu_type_id,
-                                      category.category_id,
-                                      item.ICMT_Id,
-                                      isSingleChoice
-                                    )
-                                  }
-                                  className="accent-blue-600 "
-                                />
-                                <label className="cursor-pointer text-blue-900 font-medium text-xs">
-                                  {item.item_name}
-                                </label>
+                                <div className="flex items-center gap-3">
+                                  <div className={`flex-shrink-0 h-5 w-5 rounded flex items-center justify-center ${
+                                    selectedItems.includes(item.ICMT_Id)
+                                      ? 'bg-blue-600 text-white'
+                                      : 'border border-gray-300 bg-white'
+                                  }`}>
+                                    {selectedItems.includes(item.ICMT_Id) && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </div>
+                                  <label className="cursor-pointer text-gray-800 font-medium">
+                                    {item.item_name}
+                                  </label>
+                                </div>
                               </li>
                             ))}
                           </ul>
@@ -238,67 +363,40 @@ const CustomerMenuTypeSelection = () => {
           })}
         </div>
         
-        {/* Add Save button below the menu selection */}
         {!hideSave && (
-        <div className="flex justify-center mt-8">
-          <button
-            className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-8 rounded shadow transition"
-            onClick={async () => {
-              // Validation
-              if (!expandedMenuTypeId) {
-                alert("Please select and expand a menu type.");
-                return;
-              }
-              const menu = groupedMenu().find(m => m.menu_type_id === expandedMenuTypeId);
-              if (!menu) {
-                alert("Please select a menu type.");
-                return;
-              }
-              const selectedMenuSelections = selections[expandedMenuTypeId] || {};
-              let allValid = true;
-              let missingCategory = "";
-              for (const category of Object.values(menu.categories)) {
-                const selected = selectedMenuSelections[category.category_id] || [];
-                if (selected.length !== category.item_limit) {
-                  allValid = false;
-                  missingCategory = category.category_name;
-                  break;
-                }
-              }
-              if (!allValid) {
-                alert(`Please select required number of items for category: ${missingCategory}`);
-                return;
-              }
-
-              // Flatten all ICMT_Ids from selections for the selected menu type only
-              //const customer_id = sessionStorage.getItem("id");
-              
-              const ICMT_Ids = [];
-              Object.values(selectedMenuSelections).forEach((ids) => {
-                ICMT_Ids.push(...ids);
-              });
-
-              try {
-                // Save each selection
-                for (const ICMT_Id of ICMT_Ids) {
-                  await saveCustomerMenuSelection(localStorage.getItem("bookingId"), ICMT_Id);
-                }
-                // Save menu price to booking
-                const bookingId = localStorage.getItem('bookingId');
-                if (bookingId && menuPrice) {
-                  await updateMenuFee(bookingId, { menueFee: menuPrice });
-                }
-                alert("Selections and menu price saved to backend!");
-              } catch (err) {
-                alert("Failed to save selections.");
-                console.error(err);
-              }
-            }}
-            type="button"
-          >
-            Save
-          </button>
-        </div>
+          <div className="fixed bottom-0 left-0 right-0 bg-white py-4 shadow-lg border-t border-gray-200">
+            <div className="max-w-4xl mx-auto px-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                {saveError && (
+                  <div className="text-red-600 flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full">
+                    <XCircle size={18} /> 
+                    <span className="text-sm">{saveError}</span>
+                  </div>
+                )}
+                <button
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold text-white shadow-lg transition ${
+                    saveLoading 
+                      ? 'bg-blue-400' 
+                      : 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl'
+                  }`}
+                  onClick={handleSaveSelections}
+                  disabled={saveLoading}
+                >
+                  {saveLoading ? (
+                    <>
+                      <Loader2 className="animate-spin h-5 w-5" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-5 w-5" />
+                      <span>Confirm Your Selections</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -6,6 +6,7 @@ import EventServiceList from '../events/EventServiceList'
 import VendorList from '../events/VendorList'
 import CustomerEventServiceList from '../events/CustomerEventServiceList'
 import AdminTableChairArrangement from '../events/AdminTableChairArrangement'
+import AdminBarManagementPage from '../events/AdminBarManagementPage'
 
 
 const EventManagementSAN = ({ setRenderContent }) => {
@@ -19,22 +20,32 @@ const EventManagementSAN = ({ setRenderContent }) => {
   const handleRenderContent = (display) => {
     switch (display) {
       case 'assignEmployees':
+        setClickedItem('assignEmployees');
         setRenderContent(() => () => <EventAssignment />);
         break;
       case 'eventDetails':
+        setClickedItem('eventDetails');
         setRenderContent(() => () => <SeeEvents />);
         break;
       case 'eventServices':
+        setClickedItem('eventServices');
         setRenderContent(() => () => <EventServiceList />);
         break;
       case 'eventVendors':
+        setClickedItem('eventVendors');
         setRenderContent(() => () => <VendorList />);
         break;
       case 'customerEventServices':
+        setClickedItem('customerEventServices');
         setRenderContent(() => () => <CustomerEventServiceList />);
         break;
       case 'TableChairArrangement':
+        setClickedItem('TableChairArrangement');
         setRenderContent(() => () => <AdminTableChairArrangement />);
+        break;
+      case 'AdminBarPlan':
+        setClickedItem('AdminBarPlan');
+        setRenderContent(() => () => <AdminBarManagementPage />);
         break;
       default:
         setRenderContent(() => () => <EventAssignment />);
@@ -51,61 +62,71 @@ const EventManagementSAN = ({ setRenderContent }) => {
         </button>
         <ul class="space-y-2">
           <li>
-            <a href="#" onClick={() => handleRenderContent('assignEmployees')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'assignEmployees' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+            <a href="#" onClick={() => handleRenderContent('assignEmployees')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'assignEmployees' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2V19.2c0-3.2-6.4-4.8-9.6-4.8z" />
               </svg>
+
               <span class="ml-3">Event Employees</span>
             </a>
           </li>
           <li>
-            <a href="#" onClick={() => handleRenderContent('eventDetails')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+            <a href="#" onClick={() => handleRenderContent('eventDetails')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'eventDetails' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V9l-6-6H5zm7 3v5h5v-1h-4V6h-1z" />
               </svg>
+
               <span class="ml-3">Event Details</span>
             </a>
           </li>
 
           <li>
-            <a href="#" onClick={() => handleRenderContent('eventServices')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+            <a href="#" onClick={() => handleRenderContent('eventServices')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'eventServices' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2z" />
               </svg>
+
               <span class="ml-3">Event Services</span>
             </a>
           </li>
 
           <li>
-            <a href="#" onClick={() => handleRenderContent('eventVendors')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+            <a href="#" onClick={() => handleRenderContent('eventVendors')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'eventVendors' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 6l9 6 9-6v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" />
               </svg>
+
               <span class="ml-3">Event Vendors</span>
             </a>
           </li>
 
           <li>
-            <a href="#" onClick={() => handleRenderContent('customerEventServices')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+            <a href="#" onClick={() => handleRenderContent('customerEventServices')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'customerEventServices' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a5 5 0 100 10 5 5 0 000-10zm0 12c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z" />
               </svg>
+
               <span class="ml-3">Customer Event Services</span>
             </a>
           </li>
 
-                    <li>
-            <a href="#" onClick={() => handleRenderContent('TableChairArrangement')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-              <svg aria-hidden="true" class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+          <li>
+            <a href="#" onClick={() => handleRenderContent('TableChairArrangement')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'TableChairArrangement' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 3h16v2H4V3zm2 4h12v14H6V7zm2 2v10h8V9H8z" />
               </svg>
+
               <span class="ml-3">Table Chair Arrangement</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" onClick={() => handleRenderContent('AdminBarPlan')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'AdminBarPlan' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 2h10l-1 5h2v2H6V7h2L7 2zm2.5 14h5v6h-5v-6z" />
+              </svg>
+
+              <span class="ml-3">Bar Management</span>
             </a>
           </li>
 
