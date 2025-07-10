@@ -200,6 +200,7 @@ class AllEvent {
         // Delete from the junction table first.
         await connection.query('DELETE FROM arrangement_reservation WHERE Arrangement_ID = ?', [Arrangement_Id]);
 
+        
         const [arrangementRows] = await connection.query(
           'SELECT Table_Reserve_ID FROM table_chair_arrangement WHERE Arrangement_ID = ?',
           [Arrangement_Id]

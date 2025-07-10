@@ -81,11 +81,48 @@ class Bar {
     return result;
   }
 
-  static async delete(id) {
-    const [result] = await db.execute('DELETE FROM bar WHERE BarRequirementID = ?', [id]);
-    return result;
+static async delete(id) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+          const [barRows] = await connection.query(
+          'SELECT Event_ID FROM event WHERE BarRequirementID = ?',
+          [id]
+        );
+    if (barRows.length === 0) {
+      throw new Error(`No event found for BarRequirementID ${id}`);
+
+    }
+    // Get the Event_ID from the event table
+    const eventId = barRows[0].Event_ID;
+
+    // Delete dependent records first
+    await connection.query('DELETE FROM bite WHERE BarRequirementID = ?', [id]);
+    await connection.query('DELETE FROM liquor_items WHERE BarRequirementID = ?', [id]);
+    await connection.query('DELETE FROM soft_drink_items WHERE BarRequirementID = ?', [id]);
+    console.log(`Deleted all dependent records for BarRequirementID ${id}`);
+
+    await connection.query('UPDATE event SET BarRequirementID = NULL WHERE Event_ID = ?', [eventId]);
+
+
+    // Then delete the main bar record
+    await connection.query('DELETE FROM bar WHERE BarRequirementID = ?', [id]);
+    
+
+    await connection.commit();
+    return { success: true };
+  } catch (error) {
+    await connection.rollback();
+    console.error(`Error deleting BarRequirementID ${id}:`, error);
+    throw error;
+  } finally {
+    connection.release();
   }
 }
+
+}
+
 
 class Bite {
   static async create(biteData) {
