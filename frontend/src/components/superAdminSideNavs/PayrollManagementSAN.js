@@ -112,7 +112,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
               }`}
             >
               <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
+                className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
