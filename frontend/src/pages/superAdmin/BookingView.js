@@ -224,10 +224,6 @@ const BookingView = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-800">Booking Management</h1>
-          <p className="text-gray-600 mt-2">Create new bookings for customers</p>
-        </div>
         
         {/* Customer Selection Tabs */}
         <div className="mb-6">
