@@ -266,6 +266,7 @@ export const getBookings = async (req, res) => {
 export const searchBookings = async (req, res) => {
     try {
         const item = req.query.search;
+        console.log(";;;", item);
         const bookings = await searchAllBookings(item);
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {

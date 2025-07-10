@@ -73,4 +73,13 @@ export const updateAdditionalHours = async (id, {additionalHours}) => {
   return res.data;
 }
 
+// Add to services/BookngService.js
+export const searchBookings = async (params) => {
+  try {
+    const response = await api.get('/bookings/search', { params });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export default BookingService;
