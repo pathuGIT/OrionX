@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Logout } from '../../components/Logout'
 import AddCustomer from '../../pages/superAdmin/AddCustomer'
 import ManageCustomer from '../../pages/superAdmin/ManageCustomer';
+import Register_Customer from '../../pages/superAdmin/Register_Customer';
 
 const CustomersManagementSAN = ({ setRenderContent }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,6 +22,10 @@ const CustomersManagementSAN = ({ setRenderContent }) => {
             case 'manage-customer':
                 setClickedItem('manage-customer');
                 setRenderContent(() => () => <ManageCustomer />);
+                break;
+            case 'register-customer':
+                setClickedItem('register-customer');
+                setRenderContent(() => () => <Register_Customer />);
                 break;
             default:
                 setClickedItem('manage-customer');
@@ -53,6 +58,14 @@ const CustomersManagementSAN = ({ setRenderContent }) => {
                         </a>
                     </li>
 
+                    <li>
+                        <a href="#" onClick={() => handleRenderContent('register-customer')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'manage-customer' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
+                            <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M9 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4H7Zm8-1a1 1 0 0 1 1-1h1v-1a1 1 0 1 1 2 0v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1h-1a1 1 0 0 1-1-1Z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="ml-3">Register Customers</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="#" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
