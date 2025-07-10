@@ -14,6 +14,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
     const [saving, setSaving] = useState(false);
+    const [contract, setContract] = useState('');
 
     useEffect(() => {
         if (label === "Venue ID") {
@@ -73,6 +74,23 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                                 ))}
                             </select>
                         )}
+                        {selectedVenue &&
+                            selectedVenue === '2' && (
+                                <div className="mt-2">
+                                    <input
+                                        type="number"
+                                        placeholder="Enter contract money"
+                                        value={contract}
+                                        onChange={(e) => setContract(e.target.value)}
+                                        className="w-full p-2 border rounded mb-2"
+                                        required
+                                    />
+                                    <p className="text-sm text-gray-500 mb-2">
+                                        contract money is required to confirm this booking.
+                                    </p>
+                                </div>
+                            )
+                        }
 
                         {label === "Damage Fee (Rs)" && (
                             <input
@@ -114,7 +132,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                                         if (label === "Venue ID") {
                                             await updateBookingVenue(bookingId, selectedVenue);
                                         } else if (label === "Status") {
-                                            await updateBookingStatus(bookingId, selectedVenue);
+                                            await updateBookingStatus(bookingId, selectedVenue, contract);
                                         } else if (label === "Damage Fee (Rs)") {
                                             await updateDamageFee(bookingId, selectedVenue);
                                         } else if (label === "Guests") {

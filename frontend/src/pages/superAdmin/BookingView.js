@@ -147,7 +147,7 @@ const BookingView = () => {
   const handleSearch = async (e) => {
     const value = e.target.value;
     setSearch({ property: value });
-    
+
     if (value.length > 2) {
       try {
         const response = await searchCustomer(value.trim());
@@ -170,19 +170,19 @@ const BookingView = () => {
 
   const submitBooking = async (e) => {
     e.preventDefault();
-    
+
     if (!booking.customerId) {
       setBErrmsg({ msg: 'Please select a customer first', color: 'text-red-600' });
       return;
     }
-    
+
     setBtnBookingText("Adding...");
     try {
       const res = await BookingService.createBooking(booking);
       setBookSuccess(true);
       setResult(`Successfully created booking: ${res.booking_id}`);
       setBErrmsg({ msg: '', color: 'text-red-600' });
-      
+
       // Reset form after successful booking
       setBooking({
         date: '',
@@ -199,7 +199,7 @@ const BookingView = () => {
       if (err.response?.data?.message) {
         setBErrmsg({ msg: err.response.data.message, color: 'text-red-600' });
       } else {
-        setBErrmsg({ msg: 'All fields must be filled.', color: 'text-red-600' }); 
+        setBErrmsg({ msg: 'All fields must be filled.', color: 'text-red-600' });
       }
     } finally {
       setBtnBookingText("Add Booking");
@@ -210,11 +210,11 @@ const BookingView = () => {
   const inputClass = 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5';
   const labelClass = 'block mb-2 text-sm font-medium text-gray-900';
   const cardClass = 'bg-white rounded-lg shadow p-6 mb-6';
-  const tabClass = (isActive) => 
-    `px-4 py-2 text-sm font-medium rounded-t-lg ${isActive 
-      ? 'bg-white text-blue-600 border-b-2 border-blue-600' 
+  const tabClass = (isActive) =>
+    `px-4 py-2 text-sm font-medium rounded-t-lg ${isActive
+      ? 'bg-white text-blue-600 border-b-2 border-blue-600'
       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`;
-  
+
   const SuccessIcon = () => (
     <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -224,37 +224,37 @@ const BookingView = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        
+
         {/* Customer Selection Tabs */}
         <div className="mb-6">
           <div className="flex border-b border-gray-200">
-            <button 
-              className={tabClass(activeTab === 'new')} 
+            <button
+              className={tabClass(activeTab === 'new')}
               onClick={() => setActiveTab('new')}
             >
               New Customer
             </button>
-            <button 
-              className={tabClass(activeTab === 'existing')} 
+            <button
+              className={tabClass(activeTab === 'existing')}
               onClick={() => setActiveTab('existing')}
             >
               Existing Customer
             </button>
           </div>
         </div>
-        
+
         {/* Customer Form */}
         <div className={cardClass}>
           {activeTab === 'new' ? (
             <>
               <h3 className="text-xl font-semibold text-gray-800 mb-4">New Customer Information</h3>
-              
+
               {errmsg.msg && (
                 <div className={`mb-4 p-3 rounded-lg ${errmsg.color === 'text-red-600' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
                   {errmsg.msg}
                 </div>
               )}
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Name */}
                 <div>
@@ -269,7 +269,7 @@ const BookingView = () => {
                     className={inputClass}
                   />
                 </div>
-                
+
                 {/* Email */}
                 <div>
                   <label htmlFor="email" className={labelClass}>Email Address</label>
@@ -283,7 +283,7 @@ const BookingView = () => {
                     className={inputClass}
                   />
                 </div>
-                
+
                 {/* Phone */}
                 <div>
                   <label htmlFor="phone" className={labelClass}>Phone Number</label>
@@ -297,7 +297,7 @@ const BookingView = () => {
                     className={inputClass}
                   />
                 </div>
-                
+
                 {/* NIC */}
                 <div>
                   <label htmlFor="nic" className={labelClass}>NIC Number</label>
@@ -311,7 +311,7 @@ const BookingView = () => {
                     className={inputClass}
                   />
                 </div>
-                
+
                 {/* Address */}
                 <div className="md:col-span-2">
                   <label htmlFor="address" className={labelClass}>Address</label>
@@ -326,7 +326,7 @@ const BookingView = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 {!customerSuccess ? (
                   <button
@@ -348,7 +348,7 @@ const BookingView = () => {
           ) : (
             <>
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Existing Customer</h3>
-              
+
               <div className="mb-4">
                 <label htmlFor="customer-search" className={labelClass}>Search Customer</label>
                 <div className="relative">
@@ -367,13 +367,13 @@ const BookingView = () => {
                     </svg>
                   </div>
                 </div>
-                
+
                 {searchresult && serachlist.length > 0 && (
                   <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto">
                     <ul className="py-1">
                       {serachlist.map((item) => (
-                        <li 
-                          key={item.customer_id} 
+                        <li
+                          key={item.customer_id}
                           className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${selectedCustomer?.customer_id === item.customer_id ? 'bg-blue-50' : ''}`}
                           onClick={() => selectCustomer(item)}
                         >
@@ -385,7 +385,7 @@ const BookingView = () => {
                   </div>
                 )}
               </div>
-              
+
               {selectedCustomer && (
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
                   <div className="font-medium text-blue-800">Selected Customer</div>
@@ -396,7 +396,7 @@ const BookingView = () => {
                   </div>
                 </div>
               )}
-              
+
               {!selectedCustomer && (
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-600 text-center">
                   Search and select a customer to create a booking
@@ -405,17 +405,17 @@ const BookingView = () => {
             </>
           )}
         </div>
-        
+
         {/* Booking Form */}
         <div className={cardClass}>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Booking Information</h3>
-          
+
           {bErrmsg.msg && (
             <div className={`mb-4 p-3 rounded-lg ${bErrmsg.color === 'text-red-600' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
               {bErrmsg.msg}
             </div>
           )}
-          
+
           <form onSubmit={submitBooking} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Date */}
@@ -435,7 +435,7 @@ const BookingView = () => {
                   />
                 </div>
               </div>
-              
+
               {/* Slot */}
               <div>
                 <label htmlFor="slot" className={labelClass}>
@@ -453,10 +453,10 @@ const BookingView = () => {
                   <option value="night">Night</option>
                 </select>
               </div>
-              
+
               {/* Venue Dropdown */}
               <VenueDropdown venues={venues} booking={booking} setBooking={setBooking} />
-              
+
               {/* Guests */}
               <div>
                 <label htmlFor="number_of_guests" className={labelClass}>
@@ -472,7 +472,7 @@ const BookingView = () => {
                   className={inputClass}
                 />
               </div>
-              
+
               {/* Extra Hours */}
               <div>
                 <label htmlFor="additional_hours" className={labelClass}>
@@ -489,17 +489,21 @@ const BookingView = () => {
                 />
               </div>
             </div>
-            
+
             {/* Deposit */}
-            <div className="flex items-start pt-2">
-              <div className="flex items-center h-5">
+            <div className="flex items-end pt-2">
+              <div>
+                <label htmlFor="number_of_guests" className={labelClass}>
+                  Number of Guests
+                </label>
                 <input
                   id="pay_deposit"
                   name="payDeposit"
-                  type="checkbox"
+                  type="number"
+                  required
                   checked={booking.payDeposit}
                   onChange={handleBookingChange}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  className={inputClass}
                 />
               </div>
               <div className="ml-3 text-sm">
@@ -509,15 +513,16 @@ const BookingView = () => {
                 <p className="text-gray-500">Secures the booking with a deposit</p>
               </div>
             </div>
-            
+
+
+
             <div className="mt-6">
               {!bookSuccess ? (
                 <button
                   type="submit"
                   disabled={!selectedCustomer}
-                  className={`w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-6 rounded-lg flex items-center justify-center ${
-                    !selectedCustomer ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-6 rounded-lg flex items-center justify-center ${!selectedCustomer ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -536,7 +541,7 @@ const BookingView = () => {
             </div>
           </form>
         </div>
-        
+
         {/* Status Bar */}
         <div className="bg-white rounded-lg shadow p-6 text-center">
           <div className="flex flex-col sm:flex-row justify-around items-center">

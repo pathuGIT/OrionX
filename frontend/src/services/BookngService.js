@@ -32,8 +32,8 @@ export const getPrintBookingDetails = async (id) => {
   return res.data;
 }
 
-export const updateBookingStatus = async (id, status) => {
-  const res = await api.put(`/booking/${id}/status`, { status });
+export const updateBookingStatus = async (id, status, payDeposit) => {
+  const res = await api.put(`/booking/${id}/status`, { status, payDeposit });
   return res.data;
 }
 
