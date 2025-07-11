@@ -4,7 +4,7 @@ import { createEvents } from '../controllers/eventController.js';
 import { createWedding } from '../controllers/weddingController.js';
 import { getCustomerBookings } from '../controllers/customerBookingController.js';
 import { customer } from '../middleware/Customer.js';
-import { getPlannedEvents } from '../controllers/plannedEventController.js';
+import { getPlannedEvents, updatetheEvent, deletetheEvent } from '../controllers/plannedEventController.js';
 import { getVendorsForCustomerBooking } from '../controllers/serviceVendorController.js';
 import { getEventServices } from '../controllers/eventServiceController.js';
 import { saveSelectedServices } from '../controllers/saveSelectedServiceController.js';
@@ -78,7 +78,11 @@ eventRoute.post('/createCustomEvents', customer, createEvents);
 weddingRoutes.post('/createWedding', customer, createWedding);
 cusBookingRoutes.get('/:customerID', getCustomerBookings);//controller -ashen(don't delete this line)
 dispayEventsRoutes.get('/:customerID/:bookingID',  getPlannedEvents);
-serviceVendorRoutes.get('/getServiceVendors/:customerId/:bookingId', customer, getVendorsForCustomerBooking);
+dispayEventsRoutes.put('/updateEvent/:Id',  updatetheEvent);
+dispayEventsRoutes.delete('/deleteEvent/:Id',  deletetheEvent);
+
+
+serviceVendorRoutes.get('/getServiceVendors/:customerId/:bookingId',  getVendorsForCustomerBooking);
 EventServiceRoutes.get('/getEventService', customer, getEventServices);
 saveSelectedServiceRoutes.post('/saveServices', customer, saveSelectedServices);
 tableArrangementRoutes.post('/createTableArrangement/:bookingid', customer, createArrangement);

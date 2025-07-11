@@ -34,6 +34,34 @@ export const getPlannedEvents = async (customerID, bookingID) => {
   }
 };
 
+export const updatetheEvent = async (eventId, eventData) => {
+  try {
+    const response = await api.put(`/displayEvents/updateEvent/${eventId}`, eventData);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || 
+      error.response?.data?.message || 
+      'Event update failed'
+    );
+  }
+};
+
+export const deletetheEvent = async (eventId, eventType) => {
+  try {
+    await api.delete(`/displayEvents/deleteEvent/${eventId}`, { 
+      data: { eventType } 
+    });
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || 
+      error.response?.data?.message || 
+      'Event deletion failed'
+    );
+  }
+};
+
+
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 export const getEventServices = async () => {
