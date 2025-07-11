@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
     getAllArrangements,
     getArrangementById,
-    createArrangement,
     updateArrangement,
     deleteArrangement
 } from '../../services/EventService';
@@ -62,7 +61,7 @@ function AdminTableChairArrangement() {
     const [editingDesignId, setEditingDesignId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [successMessage, setSuccessMessage] = useState(''); // New state for success messages
+    const [successMessage, setSuccessMessage] = useState('');
     const [activeTab, setActiveTab] = useState('arrangements');
     const [selectedArrangement, setSelectedArrangement] = useState(null);
     const [filters, setFilters] = useState({
@@ -209,29 +208,20 @@ function AdminTableChairArrangement() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!editingId) return; // Only allow updates, no creation
+
         setIsLoading(true);
         setError('');
         setSuccessMessage('');
 
         try {
             const submissionData = { ...formData };
-            let successMsg = '';
-
-            if (editingId) {
-                await updateArrangement(editingId, submissionData);
-                successMsg = 'Arrangement updated successfully!';
-            } else {
-                const creationData = { ...submissionData };
-                delete creationData.Arrangement_ID;
-                await createArrangement(creationData);
-                successMsg = 'Arrangement created successfully!';
-            }
-
-            setSuccessMessage(successMsg);
+            await updateArrangement(editingId, submissionData);
+            setSuccessMessage('Arrangement updated successfully!');
             handleCancelEdit();
             fetchArrangements();
         } catch (err) {
-            setError(err.message || 'Operation failed');
+            setError(err.message || 'Update failed');
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -379,106 +369,107 @@ function AdminTableChairArrangement() {
 
             {activeTab === 'arrangements' && (
                 <>
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-700">
-                            {editingId ? 'Edit Arrangement' : 'Create New Arrangement'}
-                        </h2>
-                        <form onSubmit={handleSubmit}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                {editingId && (
+                    {/* The form will only be displayed when an arrangement is being edited */}
+                    {editingId && (
+                        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                            <h2 className="text-xl font-semibold mb-4 text-gray-700">
+                                Edit Arrangement
+                            </h2>
+                            <form onSubmit={handleSubmit}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
                                         <label className="block text-gray-700 font-medium mb-2">Arrangement ID</label>
                                         <input type="text" value={formData.Arrangement_ID} className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" disabled />
                                     </div>
-                                )}
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">Head Table Pax *</label>
-                                    <input type="number" name="Head_Table_Pax" value={formData.Head_Table_Pax} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" max="50" required />
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">Head Table Pax *</label>
+                                        <input type="number" name="Head_Table_Pax" value={formData.Head_Table_Pax} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" max="50" required />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="mb-6">
-                                <h3 className="text-lg font-medium text-gray-700 mb-4">Select Table Design</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    {tableDesigns.map(design => (
-                                        <div key={design.my_row_id} className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => applyDesign(design)}>
-                                            <div className="grid grid-cols-2 gap-2 mb-3">
-                                                <div>
-                                                    <div className="text-sm text-gray-600">Top Cloth</div>
-                                                    <div className="flex items-center">
-                                                        <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Top_Cloth_Color }}></div>
-                                                        <span className="text-sm truncate">{design.Top_Cloth_Color}</span>
+                                <div className="mb-6">
+                                    <h3 className="text-lg font-medium text-gray-700 mb-4">Select Table Design</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {tableDesigns.map(design => (
+                                            <div key={design.my_row_id} className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => applyDesign(design)}>
+                                                <div className="grid grid-cols-2 gap-2 mb-3">
+                                                    <div>
+                                                        <div className="text-sm text-gray-600">Top Cloth</div>
+                                                        <div className="flex items-center">
+                                                            <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Top_Cloth_Color }}></div>
+                                                            <span className="text-sm truncate">{design.Top_Cloth_Color}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm text-gray-600">Table Cloth</div>
+                                                        <div className="flex items-center">
+                                                            <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Table_Cloth_Color }}></div>
+                                                            <span className="text-sm truncate">{design.Table_Cloth_Color}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm text-gray-600">Bow Color</div>
+                                                        <div className="flex items-center">
+                                                            <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Bow_Color }}></div>
+                                                            <span className="text-sm truncate">{design.Bow_Color}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm text-gray-600">Chair Cover</div>
+                                                        <div className="flex items-center">
+                                                            <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Chair_Cover_Color }}></div>
+                                                            <span className="text-sm truncate">{design.Chair_Cover_Color}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <div className="text-sm text-gray-600">Table Cloth</div>
-                                                    <div className="flex items-center">
-                                                        <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Table_Cloth_Color }}></div>
-                                                        <span className="text-sm truncate">{design.Table_Cloth_Color}</span>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-sm text-gray-600">Bow Color</div>
-                                                    <div className="flex items-center">
-                                                        <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Bow_Color }}></div>
-                                                        <span className="text-sm truncate">{design.Bow_Color}</span>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-sm text-gray-600">Chair Cover</div>
-                                                    <div className="flex items-center">
-                                                        <div className="w-5 h-5 rounded-full mr-1 border border-gray-300" style={{ backgroundColor: design.Chair_Cover_Color }}></div>
-                                                        <span className="text-sm truncate">{design.Chair_Cover_Color}</span>
-                                                    </div>
-                                                </div>
+                                                <button type="button" className="text-blue-600 text-sm hover:text-blue-800" onClick={(e) => { e.stopPropagation(); applyDesign(design); }}>Apply Design</button>
                                             </div>
-                                            <button type="button" className="text-blue-600 text-sm hover:text-blue-800" onClick={(e) => { e.stopPropagation(); applyDesign(design); }}>Apply Design</button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">Top Cloth Color *</label>
+                                        <input type="text" name="Top_Cloth_Color" value={formData.Top_Cloth_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">Table Cloth Color *</label>
+                                        <input type="text" name="Table_Cloth_Color" value={formData.Table_Cloth_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">Bow Color *</label>
+                                        <input type="text" name="Bow_Color" value={formData.Bow_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-700 font-medium mb-2">Chair Cover Color *</label>
+                                        <input type="text" name="Chair_Cover_Color" value={formData.Chair_Cover_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
+                                    </div>
+                                </div>
+                                <div className="mb-6">
+                                    <h3 className="text-lg font-medium text-gray-700 mb-4">Table Reservations</h3>
+                                    {formData.reservedTables.map((table, index) => (
+                                        <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
+                                            <div>
+                                                <label className="block text-gray-700 font-medium mb-2">Table Number</label>
+                                                <input type="number" name="tableNumber" value={table.tableNumber} onChange={(e) => handleTableChange(index, e)} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" placeholder="e.g., 12" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-gray-700 font-medium mb-2">Reserve Name</label>
+                                                <input type="text" name="reserveName" value={table.reserveName} onChange={(e) => handleTableChange(index, e)} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., John Smith" />
+                                            </div>
+                                            <div>
+                                                <button type="button" onClick={() => removeTable(index)} className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200" disabled={formData.reservedTables.length <= 1}>Remove Table</button>
+                                            </div>
                                         </div>
                                     ))}
+                                    <button type="button" onClick={addTable} className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">+ Add Another Table</button>
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">Top Cloth Color *</label>
-                                    <input type="text" name="Top_Cloth_Color" value={formData.Top_Cloth_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
+                                <div className="flex flex-wrap gap-4">
+                                    <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200" disabled={isLoading}>{isLoading ? 'Processing...' : 'Update Arrangement'}</button>
+                                    <button type="button" onClick={handleCancelEdit} className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-lg transition duration-200" disabled={isLoading}>Cancel Edit</button>
                                 </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">Table Cloth Color *</label>
-                                    <input type="text" name="Table_Cloth_Color" value={formData.Table_Cloth_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">Bow Color *</label>
-                                    <input type="text" name="Bow_Color" value={formData.Bow_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">Chair Cover Color *</label>
-                                    <input type="text" name="Chair_Cover_Color" value={formData.Chair_Cover_Color} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 cursor-not-allowed" required disabled />
-                                </div>
-                            </div>
-                            <div className="mb-6">
-                                <h3 className="text-lg font-medium text-gray-700 mb-4">Table Reservations</h3>
-                                {formData.reservedTables.map((table, index) => (
-                                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">Table Number</label>
-                                            <input type="number" name="tableNumber" value={table.tableNumber} onChange={(e) => handleTableChange(index, e)} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" placeholder="e.g., 12" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">Reserve Name</label>
-                                            <input type="text" name="reserveName" value={table.reserveName} onChange={(e) => handleTableChange(index, e)} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., John Smith" />
-                                        </div>
-                                        <div>
-                                            <button type="button" onClick={() => removeTable(index)} className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200" disabled={formData.reservedTables.length <= 1}>Remove Table</button>
-                                        </div>
-                                    </div>
-                                ))}
-                                <button type="button" onClick={addTable} className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">+ Add Another Table</button>
-                            </div>
-                            <div className="flex flex-wrap gap-4">
-                                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200" disabled={isLoading}>{isLoading ? 'Processing...' : (editingId ? 'Update Arrangement' : 'Create Arrangement')}</button>
-                                {editingId && <button type="button" onClick={handleCancelEdit} className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-lg transition duration-200" disabled={isLoading}>Cancel Edit</button>}
-                            </div>
-                        </form>
-                    </div>
+                            </form>
+                        </div>
+                    )}
 
                     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                         <h2 className="text-xl font-semibold mb-4 text-gray-700">Filter Arrangements</h2>

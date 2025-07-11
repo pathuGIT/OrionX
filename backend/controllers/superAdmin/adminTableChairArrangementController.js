@@ -1,27 +1,36 @@
 import AdminTableChairArrangement from '../../models/superAdmin/adminTableChairArrangementModel.js';
 
 // Create arrangement
-export const createAdminArrangement = async (req, res) => {
-    try {
-        const arrangementData = req.body;
-        
-        // Validate required fields
-        if (!arrangementData.Arrangement_ID || 
-            !arrangementData.Head_Table_Pax ||
-            !arrangementData.reservedTables ||
-            arrangementData.reservedTables.length === 0) {
-            return res.status(400).json({ 
-                error: 'Arrangement ID, Head Table Pax, and at least one table reservation are required' 
+ export  const createAdminArrangement = async(req, res) => {
+        try {
+            const arrangementData = req.body;
+
+            // --- Validation ---
+            if (!arrangementData.Event_ID) {
+                return res.status(400).json({ error: 'Event ID is required to create an arrangement.' });
+            }
+            if (!arrangementData.Head_Table_Pax || arrangementData.Head_Table_Pax <= 0) {
+                return res.status(400).json({ error: 'Valid Head Table Pax is required.' });
+            }
+            if (!arrangementData.Top_Cloth_Color || !arrangementData.Table_Cloth_Color || !arrangementData.Bow_Color || !arrangementData.Chair_Cover_Color) {
+                return res.status(400).json({ error: 'All color design fields are required.' });
+            }
+
+
+            const newArrangement = await EventService.createArrangement(arrangementData);
+            res.status(201).json({
+                message: "Arrangement created successfully!",
+                data: newArrangement
             });
+
+        } catch (error) {
+            console.error('Controller Error: creating arrangement:', error);
+            res.status(500).json({ error: error.message || 'An internal server error occurred.' });
         }
-        
-        const newArrangement = await AdminTableChairArrangement.createArrangement(arrangementData);
-        res.status(201).json(newArrangement);
-    } catch (error) {
-        console.error('Error creating arrangement:', error);
-        res.status(500).json({ error: 'Internal server error' });
+
     }
-};
+    
+
 
 // Update arrangement
 export const updateArrangement = async (req, res) => {
@@ -85,10 +94,24 @@ export const getAllArrangements = async (req, res) => {
     }
 };
 
+
+export const getAllEventsForTable = async (req, res) => {
+    try {
+        const allevents = await AdminTableChairArrangement.getevents();
+        res.status(200).json(allevents);
+    } catch (error) {
+        console.error('Error fetching arrangements:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
 export default {
     createAdminArrangement,
     updateArrangement,
     deleteArrangement,
     getArrangementById,
-    getAllArrangements
+    getAllArrangements,
+    getAllEventsForTable
 };

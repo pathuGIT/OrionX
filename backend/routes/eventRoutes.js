@@ -38,7 +38,7 @@ import {getAllVendors , createVendor, updateVendor, deleteVendor, getVendorServi
 
 import { getAllCustomerEventServices, getCustomerEventServiceById, createCustomerEventService, updateCustomerEventService, deleteCustomerEventService, getAllCustomers, getAllBookings, getAllEventServicesCustomer } from '../controllers/superAdmin/customerEventServiceController.js';
 
-import { createAdminArrangement, getAllArrangements, getArrangementById, updateArrangement, deleteArrangement } from '../controllers/superAdmin/adminTableChairArrangementController.js';
+import { createAdminArrangement, getAllArrangements, getArrangementById, updateArrangement, deleteArrangement,getAllEventsForTable } from '../controllers/superAdmin/adminTableChairArrangementController.js';
 
 import { createTableDesign, getAllTableDesigns, getTableDesignById, updateTableDesign, deleteTableDesign } from '../controllers/superAdmin/tableDesignController.js';
 
@@ -149,6 +149,7 @@ AdminEventRoutes.get('/getadminTableChair', getAllArrangements);
 AdminEventRoutes.get('/getadminTableChair/:id', getArrangementById);
 AdminEventRoutes.put('/updateadminTableChair/:id', updateArrangement);
 AdminEventRoutes.delete('/deleteadminTableChair/:id', deleteArrangement);
+AdminEventRoutes.get('/geteventsForTable', getAllEventsForTable); // Assuming this is to get all events for table arrangements
 
 
 AdminEventRoutes.post('/create-table-designs', createTableDesign);

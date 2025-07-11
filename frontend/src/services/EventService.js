@@ -644,6 +644,18 @@ export const getAllArrangements = async () => {
   }
 };
 
+// Get all events for table chair
+
+export const getadminTableChair = async () => {
+  try {
+    const response = await api.get('/AdminEvents/geteventsForTable');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to fetch arrangements');
+  }
+};
+
+
 // Get a single arrangement by ID
 export const getArrangementById = async (id) => {
   try {
