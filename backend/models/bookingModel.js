@@ -165,7 +165,6 @@ export const checkBookingExists = (date, slot, venueId) => {
 ///////////////////// advance booking view models
 
 export const getAllBookings = (status) => {
-  console.log("Status:", status);
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
     p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
     FROM booking b
@@ -182,7 +181,6 @@ export const getAllBookings = (status) => {
 }
 
 export const searchAllBookings = (item) => {
-  console.log("Status:", item);
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
     p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
     FROM booking b
