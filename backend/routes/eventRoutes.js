@@ -76,8 +76,8 @@ const AdminEventRoutes = express.Router();
 //app.js routes -ashen(don't delete this line)
 eventRoute.post('/createCustomEvents', customer, createEvents);
 weddingRoutes.post('/createWedding', customer, createWedding);
-cusBookingRoutes.get('/:customerID', customer, getCustomerBookings);//controller -ashen(don't delete this line)
-dispayEventsRoutes.get('/:customerID', customer, getPlannedEvents);
+cusBookingRoutes.get('/:customerID', getCustomerBookings);//controller -ashen(don't delete this line)
+dispayEventsRoutes.get('/:customerID/:bookingID',  getPlannedEvents);
 serviceVendorRoutes.get('/getServiceVendors/:customerId/:bookingId', customer, getVendorsForCustomerBooking);
 EventServiceRoutes.get('/getEventService', customer, getEventServices);
 saveSelectedServiceRoutes.post('/saveServices', customer, saveSelectedServices);

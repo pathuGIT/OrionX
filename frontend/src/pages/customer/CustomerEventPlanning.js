@@ -4,6 +4,7 @@ import EventForm from "../../pages/customer/CustomEventForm.js";
 import { useParams } from "react-router-dom";
 import { decryptBookingId } from "../../utills/encryptionUtils.js";
 
+
 const CustomerEventPlanning = () => {
    
     const { bookingId } = useParams();
