@@ -1,5 +1,11 @@
-// eventPDFService.js
 import PDFDocument from 'pdfkit';
+import fs from 'fs'; // Import the file system module
+import path from 'path'; // 1. Import the path module
+import { fileURLToPath } from 'url';
+
+// 2. Define __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export function generateEventReport(reportData) {
     return new Promise((resolve, reject) => {
@@ -15,8 +21,52 @@ export function generateEventReport(reportData) {
             const isCustomEvent = reportData.custom_event_name;
             const eventType = isWedding ? 'Wedding' : isCustomEvent ? 'Custom Event' : 'Event';
 
+
+            // --- WATERMARK LOGIC ---
+            // 💧 Define the watermark function
+            const addWatermark = () => {
+                const logoPath = path.resolve(__dirname, '../public/images/logo.png');
+                if (!fs.existsSync(logoPath)) {
+                    console.error("Watermark logo not found at path:", logoPath);
+                    return;
+                }
+
+                // Get page dimensions
+                const pageWidth = doc.page.width;
+                const pageHeight = doc.page.height;
+                const imageWidth = 800; // Adjust the size of your watermark
+
+                // Calculate center position
+                const x = (pageWidth - imageWidth) / 2;
+                const y = (pageHeight - imageWidth) / 2; // Assuming a square-ish logo
+
+                // Set opacity, draw image, then restore opacity
+                doc.opacity(0.1) // Set transparency (0.0 to 1.0)
+                    .image(logoPath, x, y, { width: imageWidth })
+                    .opacity(1); // Restore full opacity for subsequent text
+            };
+
+            // ✨ Add the watermark to every new page automatically
+            doc.on('pageAdded', addWatermark);
+
+            // --- Call watermark for the FIRST page ---
+            addWatermark();
+
+
+
             // Header
             const drawHeader = (title) => {
+                // Add the logo
+                try {
+
+                    const logoPath = path.resolve(__dirname, '../public/images/logo.png');
+                    // Place the logo at the top left of the page
+                    doc.image(logoPath, 40, 30, { width: 70 });
+                } catch (error) {
+                    console.error("Error embedding image: ", error);
+                }
+
+
                 doc.font('Helvetica-Bold').fontSize(20).fillColor('#000')
                     .text('Deandra', { align: 'center' });
                 doc.moveDown(0.3);
@@ -169,7 +219,7 @@ export function generateEventReport(reportData) {
             doc.font('Helvetica').text('_____________________', 70, sigLineY);
             doc.font('Helvetica-Bold').text('Signature of the Guest', 70, sigTextY);
 
-            doc.font('Helvetica').text('_____________________',250, sigLineY);
+            doc.font('Helvetica').text('_____________________', 250, sigLineY);
             doc.font('Helvetica-Bold').text('Meeting by', 282, sigTextY);
 
             doc.font('Helvetica').text('_____________________', 435, sigLineY);
