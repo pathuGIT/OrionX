@@ -1,5 +1,5 @@
 import api from './Api';
-
+import axios from 'axios';
  
 
 export const getEmployees = async () => {
@@ -296,4 +296,57 @@ export const getPayEntries = async (date) => {
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Failed to load pay entries');
     }
+};
+
+
+// export const notifyEmployees = async (payData) => {
+//   // Replace with your actual API call
+//   const response = await fetch("/api/notify-employees", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ payData }),
+//   });
+//   if (!response.ok) throw new Error("Failed to notify employees");
+//   return response.json();
+// };
+
+
+// export const notifyPayroll = async (date) => {
+//   try {
+//     const response = await api.post('/user/payroll/notify', { date });
+//     return {
+//       success: true,
+//       data: response.data,
+//       message: response.data.message || 'Notifications sent successfully'
+//     };
+//   } catch (error) {
+//     return {
+//       success: false,
+//       message: error.response?.data?.error || 'Failed to send notifications',
+//       error: error.message
+//     };
+//   }
+// };
+
+// ... (other imports and functions remain the same) ...
+
+const API_URL = 'http://localhost:8000/api/user'; // Update base URL as needed
+
+// Send ID to employee
+export const sendIdToEmp = (data) => {
+  return axios.post(`${API_URL}/send-id-to-emp`, data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};
+
+// Notify employees about payroll - FIXED URL
+export const notifyPayroll = (date) => {
+  return axios.post(`${API_URL}/payroll/notify`, { date });
+};
+
+// Notify single employee - FIXED URL
+export const notifyEmployeePayroll = (date, employeeId) => {
+  return axios.post(`${API_URL}/payroll/notify-employee`, { date, employeeId });
 };

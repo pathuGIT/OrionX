@@ -8,6 +8,7 @@ const BookingsAnalyze = () => {
     const [status, setStatus] = useState('all');
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [color, setColor] = useState(null);
     const [serchBy, setSerchBy] = useState("");
 
     useEffect(() => {
@@ -49,6 +50,8 @@ const BookingsAnalyze = () => {
                 <BookingDetailsView 
                     bookingId={selectedBooking.booking_id} 
                     onClose={() => setSelectedBooking(null)}
+                    color={color}
+                    setColor={setColor}
                 />
             )}
         </div>

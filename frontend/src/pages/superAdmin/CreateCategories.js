@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCategories, addCategory, getCategoryById, deleteCategory, updateCategoryById } from '../../services/MenuService';
 import CreateItem from './CreateItem';
@@ -8,13 +8,16 @@ function CreateCategory({setRenderContent}) {
   const [categories, setCategories] = useState([]);
   const [btnname, setBtnname] = useState('Add Category');
   const [isAdding, setIsAdding] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const topRef = useRef(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
-        setCategories(fetchedCategories);
+        // Reverse the array to show newest first
+        setCategories(fetchedCategories.reverse());
 
         const nextId = fetchedCategories.length
           ? `C${(fetchedCategories.length + 1).toString().padStart(6, '0')}`
@@ -23,6 +26,7 @@ function CreateCategory({setRenderContent}) {
         setCategory((prev) => ({ ...prev, category_id: nextId }));
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setError('Failed to load categories. Please try again.');
       }
     };
     fetchCategories();
@@ -36,20 +40,24 @@ function CreateCategory({setRenderContent}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
     if (!category.category_name.trim()) {
-      alert('Category name cannot be empty or just spaces!');
+      setError('Category name cannot be empty or just spaces!');
       return;
     }
 
     if (handleValidation()) {
-      alert('This category name already exists! Please enter a unique name.');
+      setError('This category name already exists! Please enter a unique name.');
       return;
     }
 
     try {
       if (btnname === 'Add Category') {
-        await addCategory(category);
+        const newCategory = {
+          category_name: category.category_name
+        };
+        await addCategory(newCategory);
         alert('Category added successfully!');
         setCategory({ category_name: '' });
         setIsAdding(false);
@@ -63,10 +71,16 @@ function CreateCategory({setRenderContent}) {
       }
 
       const updatedCategories = await getCategories();
-      setCategories(updatedCategories);
+      // Reverse the array to show newest first
+      setCategories(updatedCategories.reverse());
+      
+      // Scroll to top after adding/updating
+      if (topRef.current) {
+        topRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while processing the category.');
+      setError(error.response?.data?.message || 'An error occurred while processing the category. Please try again.');
     }
   };
 
@@ -79,14 +93,20 @@ function CreateCategory({setRenderContent}) {
     try {
       const fetchedCategory = await getCategoryById(id);
       if (!fetchedCategory) {
-        alert('Category ID not found.');
+        setError('Category ID not found.');
         return;
       }
       setCategory({ category_id: id, category_name: fetchedCategory.category_name });
       setBtnname('Update');
       setIsAdding(true);
+      
+      // Scroll to form when editing
+      if (topRef.current) {
+       topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (error) {
       console.error('Error fetching category by ID:', error);
+      setError('Failed to load category details. Please try again.');
     }
   };
 
@@ -97,17 +117,23 @@ function CreateCategory({setRenderContent}) {
     try {
       const deleteResponse = await deleteCategory(id);
       if (deleteResponse) {
-        alert(deleteResponse.message);
+        alert(deleteResponse.message || 'Category deleted successfully');
         const updatedCategories = await getCategories();
-        setCategories(updatedCategories);
+        // Reverse the array to show newest first
+        setCategories(updatedCategories.reverse());
       }
     } catch (error) {
       console.error('Error deleting category:', error);
+      setError(error.response?.data?.message || 'Failed to delete category. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div
+  className="min-h-screen bg-gray-50 p-6 overflow-y-auto"
+  style={{ maxHeight: '80vh' }}
+  ref={topRef}
+>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
@@ -123,7 +149,12 @@ function CreateCategory({setRenderContent}) {
           </div>
           {!isAdding && (
             <button
-              onClick={() => setIsAdding(true)}
+              onClick={() => {
+                setIsAdding(true);
+                if (topRef.current) {
+                  topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -133,6 +164,12 @@ function CreateCategory({setRenderContent}) {
             </button>
           )}
         </div>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+            <p>{error}</p>
+          </div>
+        )}
 
         {isAdding && (
           <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 transition-all duration-300">
@@ -160,6 +197,7 @@ function CreateCategory({setRenderContent}) {
                       setIsAdding(false);
                       setBtnname('Add Category');
                       setCategory({ category_name: '' });
+                      setError(null);
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200"
                   >
@@ -193,7 +231,12 @@ function CreateCategory({setRenderContent}) {
               <h3 className="mt-4 text-lg font-medium text-gray-900">No categories available</h3>
               <p className="mt-1 text-sm text-gray-500">Get started by adding your first category</p>
               <button
-                onClick={() => setIsAdding(true)}
+                onClick={() => {
+                  setIsAdding(true);
+                  if (topRef.current) {
+                    topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
                 className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-200"
               >
                 Add Category
@@ -230,20 +273,14 @@ function CreateCategory({setRenderContent}) {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <button
                           onClick={() => handleEdit(cat.category_id)}
-                          className="text-purple-600 hover:text-purple-900 px-3 py-1 rounded-md bg-purple-50 hover:bg-purple-100 transition duration-200 flex items-center"
+                          className="text-purple-600 hover:text-purple-900 px-3 py-1 rounded-md bg-purple-50 hover:bg-purple-100 transition duration-200"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(cat.category_id)}
-                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200 flex items-center"
+                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
                           Delete
                         </button>
                       </td>
@@ -252,7 +289,12 @@ function CreateCategory({setRenderContent}) {
                   <tr>
                     <td colSpan="2" className="px-6 py-4 text-center">
                       <button
-                        onClick={() => setIsAdding(true)}
+                        onClick={() => {
+                          setIsAdding(true);
+                          if (topRef.current) {
+                            topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
                         className="text-purple-600 hover:text-purple-800 font-medium flex items-center justify-center w-full py-2"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">

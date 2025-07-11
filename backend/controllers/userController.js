@@ -18,8 +18,16 @@ import {
   DeductionModel,
   calculatePayModel,
   getPayEntriesModel,
+  
+  
 } from "../models/userModel.js";
 import pool from "../config/db.js";
+
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 import { sendIdToUserMethod } from "../controllers/mailController.js";
 import {
@@ -31,6 +39,192 @@ import {
   updateCustomerModel,
   getBookingsByCustomerIdModel,
 } from "../models/customerModel.js";
+
+//...........................................................................
+
+// Create reusable transporter object
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.MAIL_ADDRESS,
+    pass: process.env.MAIL_PSWD,
+  },
+});
+
+// Send ID to employee
+export const sendIdToEmp = async (req, res) => {
+  const { name, subject, email, message } = req.body;
+
+  try {
+    const mailOptions = {
+      from: `"Deandra" <${process.env.MAIL_ADDRESS}>`,
+      to: email,
+      subject,
+      text: `Hello ${name},\n\n${message}`,
+      html: `<p>Hello ${name},</p><p>${message}</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Email error:', error);
+    res.status(500).json({ 
+      msg: 'Failed to send email',
+      error: error.message 
+    });
+  }
+};
+
+// Send salary notification to employee
+export const sendSalaryEmail = async (name, email, netSalary, month, deductions) => {
+  const subject = `Your Salary Statement - ${month}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2c3e50;">Dear ${name},</h2>
+      <p>Your salary for <strong>${month}</strong> has been processed:</p>
+      
+      <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #27ae60;">Salary Details</h3>
+        <p><strong>Net Salary:</strong> LKR ${netSalary.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Total Deductions:</strong> LKR ${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Payment Date:</strong> ${new Date().toLocaleDateString()}</p>
+      </div>
+      
+      <p>If you have any questions about your salary, please contact the HR department.</p>
+      
+      <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <small>This is an automated message. Please do not reply directly to this email.</small>
+      </p>
+      
+      <p>Best regards,<br>The Payroll Team<br>Deandra Management</p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"Deandra Payroll" <${process.env.MAIL_ADDRESS}>`,
+      to: email,
+      subject,
+      html
+    });
+    return true;
+  } catch (error) {
+    console.error(`Failed to send salary email to ${email}:`, error);
+    return false;
+  }
+};
+
+// Notify employees about payroll
+export const notifyEmployeesPayroll = async (req, res) => {
+  const { date } = req.body;
+  
+  try {
+    const payEntries = await getPayEntriesModel(date);
+    
+    if (!payEntries?.length) {
+      return res.status(404).json({ 
+        success: false,
+        message: "No payroll data found for the specified date" 
+      });
+    }
+
+    const results = [];
+    for (const entry of payEntries) {
+      try {
+        const employee = await getEmployeeByuserIdModel(entry.employee_id);
+        if (employee?.email) {
+          const emailSent = await sendSalaryEmail(
+            employee.name,
+            employee.email,
+            entry.net_salary,
+            date,
+            entry.total_deduction
+          );
+          
+          results.push({
+            employee_id: entry.employee_id,
+            status: emailSent ? 'success' : 'failed',
+            message: emailSent ? 'Email sent' : 'Failed to send email'
+          });
+        } else {
+          results.push({
+            employee_id: entry.employee_id,
+            status: 'failed',
+            message: 'Employee email not found'
+          });
+        }
+      } catch (error) {
+        results.push({
+          employee_id: entry.employee_id,
+          status: 'failed',
+          message: error.message
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.status === 'success').length;
+    
+    res.status(200).json({ 
+      success: true,
+      message: `Salary notifications sent to ${successCount}/${payEntries.length} employees`,
+      results
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to send notifications",
+      details: error.message 
+    });
+  }
+};
+export const notifySingleEmployeePayroll = async (req, res) => {
+  const { date, employeeId } = req.body;
+  
+  try {
+    const payEntry = await getPayEntryByEmployeeAndDateModel(employeeId, date);
+    
+    if (!payEntry) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Payroll data not found for the specified employee and date" 
+      });
+    }
+
+    const employee = await getEmployeeByuserIdModel(employeeId);
+    if (!employee?.email) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee email not found"
+      });
+    }
+
+    const emailSent = await sendSalaryEmail(
+      employee.name,
+      employee.email,
+      payEntry.net_salary,
+      date,
+      payEntry.total_deduction
+    );
+
+    res.status(200).json({
+      success: true,
+      message: emailSent ? 'Email sent successfully' : 'Failed to send email',
+      employee_id: employeeId,
+      status: emailSent ? 'success' : 'failed'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to send notification",
+      details: error.message 
+    });
+  }
+};
+
+  //....................................
 
 //add employees (employees add to system by admin)
 export const addEmployee = async (req, res) => {

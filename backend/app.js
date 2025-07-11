@@ -26,6 +26,8 @@ import menuViewRoutes from './routes/menuViewRoutes.js';
 import summaryRoutes from './routes/summaryRoutes.js';
 import overviewRout from './routes/overviewRoutes.js';
 import settingRoute from './routes/settingRoutes.js';
+import AdminCorrectMenusRoute from './routes/AdminCorrectMenusRoute.js';
+
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -51,6 +53,8 @@ app.use('/api/customerMenuSelection', customerSelectionRoutes);
 // Menu Overview routes
 app.use('/api/advanceMenu', advanceMenuViewRoute);
 app.use('/api/advanceMenuView', menuViewRoutes);
+app.use('/api/AdminCorrectMenus', AdminCorrectMenusRoute); // Admin Correct Menus Route
+
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
@@ -84,6 +88,11 @@ app.use('/api/pdf', pdfRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
+});
+
+app.post('/api/notify-payroll', (req, res) => {
+  // send emails logic here
+  res.json({ success: true });
 });
 
 export default app;

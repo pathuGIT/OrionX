@@ -198,6 +198,7 @@ export const adminBarManagementController = {
 
 
 
+
  updateLiquorItem :  async (req, res) => {
   try {
     const result = await LiquorItem.update(req.params.id, req.body);

@@ -11,8 +11,6 @@ const BookingService = {
   }
 };
 
-
-/////////////
 export const getBookings = async (status = 'all') => {
   const res = await api.get(`/booking?status=${status}`);
   return res.data;
@@ -40,7 +38,6 @@ export const updateBookingStatus = async (id, status) => {
 }
 
 export const updateDamageFee = async (id, { damageFee, refundAmount, depositAmount, status }) => {
-  console.log("updateDamageFee called with:", id, damageFee, refundAmount, depositAmount, status);
   const res = await api.put(`/booking/${id}/damage-fee`, { damageFee, refundAmount, depositAmount, status });
   return res.data;
 }
@@ -72,9 +69,17 @@ export const updateBookingGuest = async (id, {number_of_guests}) => {
 }
 
 export const updateAdditionalHours = async (id, {additionalHours}) => {
-  console.log("ssssssssssssssssss:",id,additionalHours)
   const res = await api.put(`/booking/${id}/additional-hours`, { additionalHours });
   return res.data;
 }
 
+// Add to services/BookngService.js
+export const searchBookings = async (params) => {
+  try {
+    const response = await api.get('/bookings/search', { params });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export default BookingService;

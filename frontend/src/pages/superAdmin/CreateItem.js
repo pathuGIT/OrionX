@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getItems, addItem, getItemById, deleteItem, updateItem } from '../../services/MenuService';
 
@@ -8,12 +8,14 @@ function CreateItem({setRenderContent}) {
   const [btnName, setBtnName] = useState('Add Item');
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
+  const topRef = useRef(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const fetchedItems = await getItems();
-        setItems(fetchedItems);
+        // Reverse the array to show newest first
+        setItems(fetchedItems.reverse());
 
         const nextId = fetchedItems.length
           ? `IT${(fetchedItems.length + 1).toString().padStart(6, '0')}`
@@ -62,7 +64,13 @@ function CreateItem({setRenderContent}) {
       }
 
       const updatedItems = await getItems();
-      setItems(updatedItems);
+      // Reverse the array to show newest first
+      setItems(updatedItems.reverse());
+      
+      // Scroll to top after adding/updating
+      if (topRef.current) {
+        topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while processing the item.');
@@ -85,6 +93,11 @@ function CreateItem({setRenderContent}) {
       setItem({ item_id: id, item_name: itemById.item_name });
       setBtnName('Update');
       setIsAdding(true);
+
+      // Scroll to form when editing
+      if (topRef.current) {
+        topRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (error) {
       console.error('Error fetching item by ID:', error);
     }
@@ -99,7 +112,8 @@ function CreateItem({setRenderContent}) {
       if (deleteResponse) {
         alert(deleteResponse.message);
         const updatedItems = await getItems();
-        setItems(updatedItems);
+        // Reverse the array to show newest first
+        setItems(updatedItems.reverse());
       }
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -107,7 +121,11 @@ function CreateItem({setRenderContent}) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+     <div
+  className="min-h-screen bg-gray-50 p-6 overflow-y-auto"
+  style={{ maxHeight: '80vh' }}
+  ref={topRef}
+>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
@@ -123,7 +141,12 @@ function CreateItem({setRenderContent}) {
           </div>
           {!isAdding && (
             <button
-              onClick={() => setIsAdding(true)}
+              onClick={() => {
+                setIsAdding(true);
+                if (topRef.current) {
+                  topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -193,7 +216,12 @@ function CreateItem({setRenderContent}) {
               <h3 className="mt-4 text-lg font-medium text-gray-900">No items available</h3>
               <p className="mt-1 text-sm text-gray-500">Get started by adding your first item</p>
               <button
-                onClick={() => setIsAdding(true)}
+                onClick={() => {
+                  setIsAdding(true);
+                  if (topRef.current) {
+                    topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-200"
               >
                 Add Item
@@ -230,20 +258,14 @@ function CreateItem({setRenderContent}) {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <button
                           onClick={() => handleEdit(it.item_id)}
-                          className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition duration-200 flex items-center"
+                          className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition duration-200"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(it.item_id)}
-                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200 flex items-center"
+                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 transition duration-200"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
                           Delete
                         </button>
                       </td>
@@ -252,7 +274,12 @@ function CreateItem({setRenderContent}) {
                   <tr>
                     <td colSpan="2" className="px-6 py-4 text-center">
                       <button
-                        onClick={() => setIsAdding(true)}
+                        onClick={() => {
+                          setIsAdding(true);
+                          if (topRef.current) {
+                            topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
                         className="text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center w-full py-2"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">

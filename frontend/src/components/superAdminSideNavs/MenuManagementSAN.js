@@ -7,7 +7,9 @@ import CreateItem from '../../pages/superAdmin/CreateItem';
 import CreateCategoryMenuType from '../../pages/superAdmin/CreateCategoryMenuType';
 import MenuOverview from '../../pages/superAdmin/MenuOverview';
 import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategoryMenuType';
-import CustomerMenuSummaryReport from '../../pages/superAdmin/CustomerMenuSummary'; 
+// import CustomerMenuSummaryReport from '../../pages/superAdmin/CustomerMenuSummary'; 
+import AdminCorrectMenuSelections from '../../pages/superAdmin/AdminCorrectMenuSelections';
+import AdminMenuOrdersPage from '../../pages/superAdmin/AdminViewMenuOrders';
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -62,8 +64,14 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         setClickedItem('CreateItemCategoryMenuType');
         setRenderContent(() => () => <CreateItemCategoryMenuType />);
         break;
-      case 'CustomerMenuSummary':
-        setRenderContent(() => () => <CustomerMenuSummaryReport />);
+      // case 'CustomerMenuSummary':
+      //   setRenderContent(() => () => <CustomerMenuSummaryReport />);
+      //   break;
+      case 'AdminCorrectMenuSelections' :
+        setRenderContent(() => () => <AdminCorrectMenuSelections />);
+        break;
+      case 'AdminMenuOrdersPage':
+        setRenderContent(() => () => <AdminMenuOrdersPage />);
         break;
       default:
         setRenderContent(() => () => <MenuOverview/>);
@@ -80,7 +88,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         </button>
         <ul class="space-y-2">
           <li>
-            <a href="#" onClick={() => handleRenderContent('MenuOverview')} class={`flex items-center p-2 text-base font-normal rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${activeTab === 'MenuOverview' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900'}`}>
+            <a href="#" onClick={() => handleRenderContent('MenuOverview')} class={`flex items-center p-2 text-base font-normal rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${activeTab === 'MenuOverview' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900'} ${clickedItem === 'booking-view' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
               <svg aria-hidden="true" class={`w-6 h-6 transition duration-75 ${activeTab === 'MenuOverview' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-400 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
@@ -101,9 +109,9 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isPagesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuListTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Menu List Setup</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuListTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'} `}>Menu List Setup</a></li>
               <li><a href="#" onClick={() => handleRenderContent('createMenuTypes')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Define Menu Types</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('createCategory')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createCategory' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Manage Food Categorie</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createCategory')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createCategory' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Manage Food categories</a></li>
               <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItem' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Add Food Items</a></li>
               <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Link Categories to Menu Types</a></li>
               <li><a href="#" onClick={() => handleRenderContent('CreateItemCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItemCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Map Items with Categories & Menu Types</a></li>
@@ -122,8 +130,8 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               </svg>
             </button>
             <ul class={`${isSalesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
-              <li><a href="#" onClick={() => handleRenderContent('CustomerMenuSummary')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>View Catering Orders</a></li>
-              <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('AdminMenuOrdersPage')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>View Catering Orders</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('AdminCorrectMenuSelections')}  class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
               <li><a href="#" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Staff</a></li>
             </ul>
           </li>
@@ -174,5 +182,6 @@ const MenuManagementSAN = ({ setRenderContent }) => {
     </div>
   );
 }
+
 
 export default MenuManagementSAN;

@@ -17,13 +17,16 @@ export const createEvent = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   try {
-    const { eventType, ...data } = req.body;
-    await AllEvent.update(req.params.id, eventType, data.data);
+    // Pass the entire body without destructuring
+    console.log('Updating event with ID:', req.params.id, 'Data:', req.body);
+    await AllEvent.update(req.params.id, req.body);
     res.json({ message: 'Event updated successfully' });
   } catch (error) {
+    console.error('Update error:', error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 export const deleteEvent = async (req, res) => {
   try {

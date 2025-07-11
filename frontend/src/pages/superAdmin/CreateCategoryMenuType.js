@@ -80,7 +80,7 @@ function CreateCategoryMenuType({setRenderContent}) {
       
       // Scroll to top after adding/updating
       if (topRef.current) {
-        topRef.current.scrollIntoView({ behavior: 'smooth' });
+        topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
       console.error('Error saving Category Menu Type:', error);
@@ -102,7 +102,7 @@ function CreateCategoryMenuType({setRenderContent}) {
       
       // Scroll to form when editing
       if (topRef.current) {
-        topRef.current.scrollIntoView({ behavior: 'smooth' });
+        topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
       console.error('Error loading data for edit:', error);
@@ -124,7 +124,11 @@ function CreateCategoryMenuType({setRenderContent}) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6" ref={topRef}>
+    <div
+  className="min-h-screen bg-gray-50 p-6 overflow-y-auto"
+  style={{ maxHeight: '80vh' }}
+  ref={topRef}
+>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
@@ -143,7 +147,7 @@ function CreateCategoryMenuType({setRenderContent}) {
               onClick={() => {
                 setIsAdding(true);
                 if (topRef.current) {
-                  topRef.current.scrollIntoView({ behavior: 'smooth' });
+                  topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center"
@@ -256,7 +260,7 @@ function CreateCategoryMenuType({setRenderContent}) {
                 onClick={() => {
                   setIsAdding(true);
                   if (topRef.current) {
-                    topRef.current.scrollIntoView({ behavior: 'smooth' });
+                    topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
                 className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-200"
@@ -317,7 +321,7 @@ function CreateCategoryMenuType({setRenderContent}) {
                         onClick={() => {
                           setIsAdding(true);
                           if (topRef.current) {
-                            topRef.current.scrollIntoView({ behavior: 'smooth' });
+                            topRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                           }
                         }}
                         className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center justify-center w-full py-2"
