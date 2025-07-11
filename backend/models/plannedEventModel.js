@@ -1,8 +1,9 @@
 import db from "../config/db.js";
 
 class plannedEvent {
-    static async getPlannedEvent(customerID) {
+    static async getPlannedEvent(customerID, bookingID) {
         try {
+            // Add b.booking_id = ? to the WHERE clause
             const [results] = await db.query(
                 `SELECT 
                     e.Event_ID, 
@@ -29,14 +30,14 @@ class plannedEvent {
                 LEFT JOIN event e ON b.booking_id = e.booking_id
                 LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
                 LEFT JOIN customevent c ON e.Event_ID = c.Event_ID
-                WHERE b.customer_id = ?`,
-                [customerID]
+                WHERE b.customer_id = ? AND b.booking_id = ?`,
+                [customerID, bookingID] // Pass both IDs as parameters
             );
 
-            return results;  // ✅ Return results instead of using res.json()
+            return results;
         } catch (error) {
             console.error("Database Error:", error);
-            throw new Error("Failed to fetch event details.");  // ✅ Throw an error instead of res.status()
+            throw new Error("Failed to fetch event details.");
         }
     }
 }

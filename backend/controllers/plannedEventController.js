@@ -2,24 +2,24 @@ import plannedEvent from '../models/plannedEventModel.js'; // Import the planned
 
 export const getPlannedEvents = async (req, res) => {
     try {
-        const customerID = req.params.customerID; // Get customer ID from request parameters
-        console.log("Fetching events for customer ID:", customerID); // Log customer ID
+        // Get customerID and bookingID from request parameters
+        const { customerID, bookingID } = req.params;
+        console.log(`Fetching events for customer ID: ${customerID} and booking ID: ${bookingID}`);
 
-        if (!customerID) {
-            return res.status(400).json({ success: false, message: "Customer ID is required." });
+        if (!customerID || !bookingID) {
+            return res.status(400).json({ success: false, message: "Customer ID and Booking ID are required." });
         }
 
-        // ✅ Get events without using res in the model
-        const events = await plannedEvent.getPlannedEvent(customerID);
+        // Pass both IDs to the model function
+        const events = await plannedEvent.getPlannedEvent(customerID, bookingID);
 
         if (!events || events.length === 0) {
-            return res.status(404).json({ success: false, message: "No events found for this customer." });
+            return res.status(404).json({ success: false, message: "No event found for this customer and booking." });
         }
 
-        // ✅ Send response here
-        res.status(200).json({ success: true, message: "Events retrieved successfully", data: events });
+        res.status(200).json({ success: true, message: "Event retrieved successfully", data: events });
     } catch (error) {
-        console.error("Error fetching planned events:", error);
+        console.error("Error fetching planned event:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
