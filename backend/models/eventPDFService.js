@@ -18,7 +18,7 @@ export function generateEventReport(reportData) {
             // Header
             const drawHeader = (title) => {
                 doc.font('Helvetica-Bold').fontSize(20).fillColor('#000')
-                    .text('ORIONX', { align: 'center' });
+                    .text('Deandra', { align: 'center' });
                 doc.moveDown(0.3);
                 doc.font('Helvetica').fontSize(12).fillColor('gray')
                     .text(title, { align: 'center' });
@@ -166,11 +166,15 @@ export function generateEventReport(reportData) {
             const sigLineY = doc.y;
             const sigTextY = sigLineY + 15;
 
-            doc.font('Helvetica').text('_________________________', 70, sigLineY);
-            doc.font('Helvetica-Bold').text('Signature of the Guest', 80, sigTextY);
+            doc.font('Helvetica').text('_____________________', 70, sigLineY);
+            doc.font('Helvetica-Bold').text('Signature of the Guest', 70, sigTextY);
 
-            doc.font('Helvetica').text('_________________________', 330, sigLineY);
-            doc.font('Helvetica-Bold').text('Meeting by', 350, sigTextY);
+            doc.font('Helvetica').text('_____________________',250, sigLineY);
+            doc.font('Helvetica-Bold').text('Meeting by', 282, sigTextY);
+
+            doc.font('Helvetica').text('_____________________', 435, sigLineY);
+            doc.font('Helvetica-Bold').text('Date', 467, sigTextY);
+
 
             doc.end();
         } catch (error) {
