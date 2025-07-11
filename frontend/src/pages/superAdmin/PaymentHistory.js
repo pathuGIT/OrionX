@@ -118,24 +118,22 @@ const PaymentHistory = () => {
       };
 
       // Add logo
-      const addLogo = () => {
-        try {
-          // Get the logo from public folder
-          const logoPath = window.location.origin + '/15.svg';
-          
-          // Add logo to PDF
-          doc.addImage(
-            logoPath, 
-            'SVG', 
-            40, 
-            20, 
-            50, 
-            50
-          );
-        } catch (e) {
-          console.error('Error adding logo:', e);
-        }
-      };
+const addLogo = () => {
+  try {
+    // Correct path to public folder asset
+    const logoPath = window.location.origin + '/15.svg';
+    doc.addImage(
+      logoPath,
+      'SVG',
+      40,
+      20,
+      50,
+      50
+    );
+  } catch (e) {
+    console.error('Error adding logo:', e);
+  }
+};
 
       // Add title
       doc.setFontSize(18);
@@ -201,7 +199,7 @@ const PaymentHistory = () => {
       ]);
 
       // Add watermark and logo to first page
-      addWatermark();
+      //addWatermark();
       addLogo();
 
       // Calculate table width and center it
