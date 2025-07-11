@@ -129,7 +129,10 @@ const SeeEvents = () => {
                     // Wedding specific
                     groomName: values.details.groomName || '',
                     brideName: values.details.brideName || '',
-                    groomContact: values.details.groomContactNo || '',
+                    groomContact: values.details.groomContact || '',
+                    brideContact: values.details.brideContact || '',
+                    fountain: values.details.fountain || '',
+                    prosperityTable: values.details.prosperityTable || '',
                     // Custom specific
                     contactPersonName: values.details.contactPersonName || '',
                     contactPersonNumber: values.details.contactPersonNumber || '',
@@ -253,7 +256,8 @@ const SeeEvents = () => {
                         >
                             {({ values, isSubmitting }) => (
                                 <Form className="flex flex-col flex-grow">
-                                    <div className="flex-grow overflow-y-auto p-6 space-y-6">
+                                    {/* Make this div scrollable */}
+                                    <div className="flex-grow overflow-y-auto p-6 space-y-6" style={{ maxHeight: '60vh' }}>
                                         <div className="space-y-4">
                                             <h4 className="font-semibold text-gray-600 border-b pb-2">Event Details</h4>
                                             {values.Event_Type === 'custom' && (
@@ -331,6 +335,57 @@ const SeeEvents = () => {
                                                             />
                                                         </div>
                                                     </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Groom's Address</label>
+                                                            <Field 
+                                                                name="details.groomAddress" 
+                                                                as="textarea"
+                                                                rows="2"
+                                                                className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Bride's Address</label>
+                                                            <Field 
+                                                                name="details.brideAddress" 
+                                                                as="textarea"
+                                                                rows="2"
+                                                                className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Fountain</label>
+                                                            <Field as="select" name="details.fountain" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                                                                <option value="">Select</option>
+                                                                <option value="yes">Yes</option>
+                                                                <option value="no">No</option>
+                                                            </Field>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Prosperity Table</label>
+                                                            <Field as="select" name="details.prosperityTable" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                                                                <option value="">Select</option>
+                                                                <option value="yes">Yes</option>
+                                                                <option value="no">No</option>
+                                                            </Field>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Poruwa Ceremony (From - To)</label>
+                                                            <div className="flex gap-2">
+                                                                <Field type="time" name="details.poruwaCeremonyFrom" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                                                <Field type="time" name="details.poruwaCeremonyTo" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Registration Time</label>
+                                                            <Field type="time" name="details.registrationTime" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -400,6 +455,14 @@ const SeeEvents = () => {
                                                     <Field 
                                                         type="time" 
                                                         name="details.dressTime" 
+                                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" 
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Additional Time</label>
+                                                    <Field 
+                                                        type="time" 
+                                                        name="details.additionalTime" 
                                                         className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" 
                                                     />
                                                 </div>
