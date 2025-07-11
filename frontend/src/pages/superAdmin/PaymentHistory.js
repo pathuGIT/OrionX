@@ -79,123 +79,188 @@ const PaymentHistory = () => {
     })}`;
   };
 
-  const handleExport = () => {
-    // Create new PDF document in landscape mode
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'pt',
-      format: 'a4'
-    });
+  const handleExport = async () => {
+    try {
+      // Create new PDF document in landscape mode
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: 'a4'
+      });
 
-    // Add title
-    doc.setFontSize(18);
-    doc.setFont(undefined, 'bold');
-    doc.text('Payment History Report', doc.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
-    
-    // Add report date
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Generated on: ${moment().format('DD MMM YYYY hh:mm A')}`, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
-    
-    // Add filter information
-    let filterInfo = 'Filters: ';
-    let hasFilters = false;
-    
-    if (filters.employee) {
-      const employee = history.find(e => e.employee_id === filters.employee);
-      filterInfo += `Employee: ${employee?.employee_name || filters.employee} `;
-      hasFilters = true;
-    }
-    
-    if (filters.month) {
-      filterInfo += `| Month: ${moment().month(filters.month - 1).format('MMMM')} `;
-      hasFilters = true;
-    }
-    
-    if (filters.year) {
-      filterInfo += `| Year: ${filters.year} `;
-      hasFilters = true;
-    }
-    
-    if (searchTerm) {
-      filterInfo += `| Search: "${searchTerm}"`;
-      hasFilters = true;
-    }
-    
-    if (hasFilters) {
-      doc.setFontSize(9);
-      doc.text(filterInfo, 40, 80, { maxWidth: doc.internal.pageSize.getWidth() - 80 });
-    }
+      // Get page dimensions
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      
+      // Add watermark to every page
+      const addWatermark = () => {
+        // Save current state to restore later
+        doc.saveGraphicsState();
+        
+        // Set watermark properties
+        doc.setFontSize(60);
+        doc.setGState(new doc.GState({ opacity: 0.1 }));
+        doc.setTextColor(150);
+        doc.setFont(undefined, 'bold');
+        
+        // Add watermark text at center of page
+        doc.text('Deandra Bolgoda', 
+          pageWidth / 2, 
+          pageHeight / 2, 
+          { 
+            align: 'center',
+            angle: 45 
+          }
+        );
+        
+        // Restore graphics state
+        doc.restoreGraphicsState();
+      };
 
-    // Prepare table data
-    const headers = [
-      'Employee ID',
-      'Name',
-      'Period',
-      'Base Salary',
-      'Service Charge',
-      'Deductions',
-      'Net Salary',
-      'Payment Date'
-    ];
-    
-    const data = filteredHistory.map(item => [
-      item.employee_id,
-      item.employee_name,
-      moment(item.calculation_date).format('MMM YYYY'),
-      formatCurrency(item.basic_salary),
-      formatCurrency(item.total_service_charge),
-      formatCurrency(item.total_deduction),
-      formatCurrency(item.net_salary),
-      moment(item.calculation_date).format('DD MMM YYYY')
-    ]);
+      // Add logo
+      const addLogo = () => {
+        try {
+          // Get the logo from public folder
+          const logoPath = window.location.origin + '/15.svg';
+          
+          // Add logo to PDF
+          doc.addImage(
+            logoPath, 
+            'SVG', 
+            40, 
+            20, 
+            50, 
+            50
+          );
+        } catch (e) {
+          console.error('Error adding logo:', e);
+        }
+      };
 
-    // Generate table
-    autoTable(doc, {
-      head: [headers],
-      body: data,
-      startY: hasFilters ? 100 : 80,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: 'bold',
-        fontSize: 10
-      },
-      bodyStyles: {
-        fontSize: 9
-      },
-      styles: {
-        cellPadding: 3,
-        valign: 'middle'
-      },
-      columnStyles: {
-        0: { cellWidth: 70 },
-        1: { cellWidth: 90 },
-        2: { cellWidth: 60 },
-        3: { cellWidth: 70 },
-        4: { cellWidth: 70 },
-        5: { cellWidth: 70 },
-        6: { cellWidth: 70 },
-        7: { cellWidth: 70 }
-      },
-      margin: { left: 40, right: 40 }
-    });
+      // Add title
+      doc.setFontSize(18);
+      doc.setFont(undefined, 'bold');
+      doc.text('Payment History Report', pageWidth / 2, 40, { align: 'center' });
+      
+      // Add report date
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Generated on: ${moment().format('DD MMM YYYY hh:mm A')}`, pageWidth / 2, 60, { align: 'center' });
+      
+      // Add filter information
+      let filterInfo = 'Filters: ';
+      let hasFilters = false;
+      
+      if (filters.employee) {
+        const employee = history.find(e => e.employee_id === filters.employee);
+        filterInfo += `Employee: ${employee?.employee_name || filters.employee} `;
+        hasFilters = true;
+      }
+      
+      if (filters.month) {
+        filterInfo += `| Month: ${moment().month(filters.month - 1).format('MMMM')} `;
+        hasFilters = true;
+      }
+      
+      if (filters.year) {
+        filterInfo += `| Year: ${filters.year} `;
+        hasFilters = true;
+      }
+      
+      if (searchTerm) {
+        filterInfo += `| Search: "${searchTerm}"`;
+        hasFilters = true;
+      }
+      
+      if (hasFilters) {
+        doc.setFontSize(9);
+        doc.text(filterInfo, pageWidth / 2, 80, { align: 'center', maxWidth: pageWidth - 80 });
+      }
 
-    // Add page numbers
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(9);
-      doc.text(
-        `Page ${i} of ${pageCount}`, 
-        doc.internal.pageSize.getWidth() - 40, 
-        doc.internal.pageSize.getHeight() - 20
-      );
+      // Prepare table data
+      const headers = [
+        'Employee ID',
+        'Name',
+        'Period',
+        'Base Salary',
+        'Service Charge',
+        'Deductions',
+        'Net Salary',
+        'Payment Date'
+      ];
+      
+      const data = filteredHistory.map(item => [
+        item.employee_id,
+        item.employee_name,
+        moment(item.calculation_date).format('MMM YYYY'),
+        formatCurrency(item.basic_salary),
+        formatCurrency(item.total_service_charge),
+        formatCurrency(item.total_deduction),
+        formatCurrency(item.net_salary),
+        moment(item.calculation_date).format('DD MMM YYYY')
+      ]);
+
+      // Add watermark and logo to first page
+      addWatermark();
+      addLogo();
+
+      // Calculate table width and center it
+      const tableWidth = 570; // Sum of column widths
+      const margin = (pageWidth - tableWidth) / 2;
+
+      // Generate table with centered alignment
+      autoTable(doc, {
+        head: [headers],
+        body: data,
+        startY: hasFilters ? 100 : 80,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 10
+        },
+        bodyStyles: {
+          fontSize: 9
+        },
+        styles: {
+          cellPadding: 3,
+          valign: 'middle',
+          halign: 'center' // Center-align all cells
+        },
+        columnStyles: {
+          0: { cellWidth: 70, halign: 'left' },
+          1: { cellWidth: 90, halign: 'left' },
+          2: { cellWidth: 60 },
+          3: { cellWidth: 70 },
+          4: { cellWidth: 70 },
+          5: { cellWidth: 70 },
+          6: { cellWidth: 70 },
+          7: { cellWidth: 70 }
+        },
+        margin: { left: margin, right: margin },
+        didDrawPage: function(data) {
+          // Add watermark to subsequent pages
+          if (data.pageNumber > 1) {
+            addWatermark();
+          }
+          
+          // Add page numbers
+          doc.setFontSize(9);
+          doc.text(
+            `Page ${data.pageNumber} of ${data.pageCount}`, 
+            pageWidth - 40, 
+            pageHeight - 20
+          );
+        }
+      });
+
+      // Save the PDF
+      doc.save(`payment_history_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      alert('Failed to generate PDF. Please try again.');
     }
-
-    // Save the PDF
-    doc.save(`payment_history_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
   };
 
   // Get unique years from history
