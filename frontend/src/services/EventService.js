@@ -23,6 +23,18 @@ export const getCustomerBookings = async (customerID) => {
   }
 };
 
+export const getTotalCustomerBookings = async (customerID) => {
+  try {
+    const response = await api.get(`/customer/getTotalBookingEvents/${customerID}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("You Have No Bookings:", error);
+    throw error;
+  }
+};
+
+
+
 
 export const getPlannedEvents = async (customerID, bookingID) => {
   try {

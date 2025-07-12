@@ -2,7 +2,7 @@ import express from 'express';
 import { createEvents } from '../controllers/eventController.js';
 //import { validateEvent } from '../middleware/validateEvent.js';
 import { createWedding } from '../controllers/weddingController.js';
-import { getCustomerBookings } from '../controllers/customerBookingController.js';
+import { getCustomerBookings,getTotallBookingCustomerBookings } from '../controllers/customerBookingController.js';
 import { customer } from '../middleware/Customer.js';
 import { getPlannedEvents, updatetheEvent, deletetheEvent } from '../controllers/plannedEventController.js';
 import { getVendorsForCustomerBooking } from '../controllers/serviceVendorController.js';
@@ -80,6 +80,8 @@ cusBookingRoutes.get('/:customerID', getCustomerBookings);//controller -ashen(do
 dispayEventsRoutes.get('/:customerID/:bookingID',  getPlannedEvents);
 dispayEventsRoutes.put('/updateEvent/:Id',  updatetheEvent);
 dispayEventsRoutes.delete('/deleteEvent/:Id',  deletetheEvent);
+
+cusBookingRoutes.get('/getTotalBookingEvents/:customerID', getTotallBookingCustomerBookings);
 
 
 serviceVendorRoutes.get('/getServiceVendors/:customerId/:bookingId',  getVendorsForCustomerBooking);
