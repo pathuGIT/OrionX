@@ -55,10 +55,28 @@ export const updatetheEvent = async (req, res) => {
 
 export const deletetheEvent = async (req, res) => {
   try {
-    const { eventType } = req.body;
-    await plannedEvent.delete(req.params.id, eventType);
-    res.json({ message: 'Event deleted successfully' });
+    const eventId = req.params.Id;
+    const eventData = req.body;
+    
+    // Clean up null values
+    Object.keys(eventData).forEach(key => {
+      if (eventData[key] === null || eventData[key] === 'null' || eventData[key] === '') {
+        eventData[key] = null;
+      }
+    });
+
+    const updatedEvent = await plannedEvent.delete(eventId, eventData);
+    
+    res.json({ 
+      message: 'Event updated successfully',
+      event: updatedEvent
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Update error:', error);
+    res.status(500).json({ 
+      error: error.message || 'Update failed',
+      details: error.stack
+    });
   }
 };
+

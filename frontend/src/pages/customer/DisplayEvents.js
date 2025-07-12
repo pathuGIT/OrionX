@@ -146,13 +146,9 @@ const DisplayEvents = () => {
     setSelectedEvent(updatedEvent);
   };
 
-  const handleDeleteEvent = async (eventId) => {
+const handleDeleteEvent = async (eventId) => {
     try {
-      if (!eventTypes[eventId]) {
-        throw new Error("Event type not found for deletion");
-      }
-      
-      await deletetheEvent(eventId, eventTypes[eventId]);
+      await deletetheEvent(eventId);
       
       setEvents(prevEvents => 
         prevEvents.filter(e => e.Event_ID !== eventId)
@@ -166,7 +162,7 @@ const DisplayEvents = () => {
       alert('Event deleted successfully!');
     } catch (error) {
       console.error('Failed to delete event:', error);
-      alert('Failed to delete event. Please try again.');
+      alert(`Failed to delete event: ${error.message}`);
     }
   };
 

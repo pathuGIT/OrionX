@@ -58,19 +58,18 @@ export const updatetheEvent = async (eventId, eventData) => {
   }
 };
 
-export const deletetheEvent = async (eventId, eventType) => {
+export const deletetheEvent = async (eventId) => {
   try {
-    await api.delete(`/displayEvents/deleteEvent/${eventId}`, { 
-      data: { eventType } 
-    });
+    const response = await api.delete(`/displayEvents/deleteEvent/${eventId}`);
+    return response.data;
   } catch (error) {
     throw new Error(
-      error.response?.data?.error || 
-      error.response?.data?.message || 
-      'Event deletion failed'
+      error.response?.data?.error?.message || 
+      'Failed to delete event. Please try again.'
     );
   }
 };
+
 
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;

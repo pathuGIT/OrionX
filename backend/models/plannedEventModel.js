@@ -153,97 +153,83 @@ static async update(eventId, eventData) {
 
 
     // Delete event and type-specific details
-    static async delete(eventId) {
-        const connection = await db.getConnection();
-        try {
-            await connection.beginTransaction();
+static async delete(eventId) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
 
-            // 1. Get all associated IDs from the Event table first.
-            const [eventRows] = await connection.query(
-                'SELECT booking_id, BarRequirementID FROM Event WHERE Event_ID = ?',
-                [eventId]
-            );
+    // 1. Get all associated IDs from the Event table
+    const [eventRows] = await connection.query(
+      'SELECT booking_id, BarRequirementID FROM Event WHERE Event_ID = ?',
+      [eventId]
+    );
 
-            if (eventRows.length === 0) {
-                await connection.commit();
-                console.log(`Event with ID ${eventId} not found. Nothing to delete.`);
-                return true;
-            }
-
-            const { booking_id, BarRequirementID } = eventRows[0];
-
-
-
-            // 3. Clean up Table Arrangement data (if it exists).
-            // This is a deep chain of dependencies that must be deleted from the inside out.
-            const [tableChairRows] = await connection.query(
-                'SELECT Arrangement_Id FROM event_table_chair WHERE Event_ID = ?',
-                [eventId]
-            );
-
-            if (tableChairRows.length > 0) {
-                const { Arrangement_Id } = tableChairRows[0];
-                // Delete from the junction table first.
-                await connection.query('DELETE FROM arrangement_reservation WHERE Arrangement_ID = ?', [Arrangement_Id]);
-
-
-                const [arrangementRows] = await connection.query(
-                    'SELECT Table_Reserve_ID FROM table_chair_arrangement WHERE Arrangement_ID = ?',
-                    [Arrangement_Id]
-                );
-                if (arrangementRows.length > 0 && arrangementRows[0].Table_Reserve_ID) {
-                    const { Table_Reserve_ID } = arrangementRows[0];
-                    await connection.query('DELETE FROM table_reserve WHERE Table_Reserve_ID = ?', [Table_Reserve_ID]);
-                }
-                // Now delete the arrangement and the event's link to it.
-                await connection.query('DELETE FROM table_chair_arrangement WHERE Arrangement_ID = ?', [Arrangement_Id]);
-                await connection.query('DELETE FROM event_table_chair WHERE Event_ID = ?', [eventId]);
-            }
-
-            await connection.query('DELETE FROM event_cordinator WHERE Event_ID = ?', [eventId]);
-            await connection.query('DELETE FROM event_assigned_employee WHERE Event_ID = ?', [eventId]);
-            await connection.query('DELETE FROM event_event_service WHERE Event_ID = ?', [eventId]);
-
-            // 5. Clean up dependencies linked via booking_id.
-            if (booking_id) {
-                await connection.query('DELETE FROM customer_event_service WHERE booking_id = ?', [booking_id]);
-            }
-
-            await connection.query('DELETE FROM Wedding WHERE Event_ID = ?', [eventId]);
-            await connection.query('DELETE FROM CustomEvent WHERE Event_ID = ?', [eventId]);
-
-            // 2. Clean up Bar-related data (if it exists).
-            // These tables are referenced by the Bar table.
-            if (BarRequirementID) {
-                await connection.query('DELETE FROM Bite WHERE BarRequirementID = ?', [BarRequirementID]);
-                await connection.query('DELETE FROM liquor_items WHERE BarRequirementID = ?', [BarRequirementID]);
-                await connection.query('DELETE FROM soft_drink_items WHERE BarRequirementID = ?', [BarRequirementID]);
-                // Now delete the Bar record itself.
-            }
-            await connection.query('DELETE FROM Bar WHERE BarRequirementID = ?', [BarRequirementID]);
-            // 4. Clean up other direct event dependencies.
-            // These tables all have a foreign key pointing directly to the Event table.
-            // They MUST be cleared before deleting the event.
-
-
-
-            // 6. FINALLY: Now that all child records are gone, delete the master Event record.
-
-            await connection.query('DELETE FROM Event WHERE Event_ID = ?', [eventId]);
-            // Note: We are not deleting the booking or customer itself, as they might be related to other records.
-
-            await connection.commit();
-            console.log(`Successfully deleted event ${eventId} and all related data.`);
-            return true;
-
-        } catch (error) {
-            await connection.rollback();
-            console.error(`Error deleting event ${eventId}:`, error);
-            throw error;
-        } finally {
-            connection.release();
-        }
+    if (eventRows.length === 0) {
+      await connection.commit();
+      return { message: `Event with ID ${eventId} not found` };
     }
+
+    const { booking_id, BarRequirementID } = eventRows[0];
+
+    // 2. Clean up Table Arrangement data
+    const [tableChairRows] = await connection.query(
+      'SELECT Arrangement_Id FROM event_table_chair WHERE Event_ID = ?',
+      [eventId]
+    );
+
+    if (tableChairRows.length > 0) {
+      const { Arrangement_Id } = tableChairRows[0];
+      await connection.query('DELETE FROM arrangement_reservation WHERE Arrangement_ID = ?', [Arrangement_Id]);
+      
+      const [arrangementRows] = await connection.query(
+        'SELECT Table_Reserve_ID FROM table_chair_arrangement WHERE Arrangement_ID = ?',
+        [Arrangement_Id]
+      );
+      
+      if (arrangementRows.length > 0 && arrangementRows[0].Table_Reserve_ID) {
+        const { Table_Reserve_ID } = arrangementRows[0];
+        await connection.query('DELETE FROM table_reserve WHERE Table_Reserve_ID = ?', [Table_Reserve_ID]);
+      }
+      
+      await connection.query('DELETE FROM table_chair_arrangement WHERE Arrangement_ID = ?', [Arrangement_Id]);
+      await connection.query('DELETE FROM event_table_chair WHERE Event_ID = ?', [eventId]);
+    }
+
+    // 3. Clean up other event dependencies
+    await connection.query('DELETE FROM event_cordinator WHERE Event_ID = ?', [eventId]);
+    await connection.query('DELETE FROM event_assigned_employee WHERE Event_ID = ?', [eventId]);
+    await connection.query('DELETE FROM event_event_service WHERE Event_ID = ?', [eventId]);
+
+    // 4. Clean up booking dependencies
+    if (booking_id) {
+      await connection.query('DELETE FROM customer_event_service WHERE booking_id = ?', [booking_id]);
+    }
+
+    // 5. Delete type-specific records
+    await connection.query('DELETE FROM Wedding WHERE Event_ID = ?', [eventId]);
+    await connection.query('DELETE FROM CustomEvent WHERE Event_ID = ?', [eventId]);
+
+    // 6. Clean up bar requirements
+    if (BarRequirementID) {
+      await connection.query('DELETE FROM Bite WHERE BarRequirementID = ?', [BarRequirementID]);
+      await connection.query('DELETE FROM liquor_items WHERE BarRequirementID = ?', [BarRequirementID]);
+      await connection.query('DELETE FROM soft_drink_items WHERE BarRequirementID = ?', [BarRequirementID]);
+      await connection.query('DELETE FROM Bar WHERE BarRequirementID = ?', [BarRequirementID]);
+    }
+
+    // 7. Finally delete the event
+    await connection.query('DELETE FROM Event WHERE Event_ID = ?', [eventId]);
+
+    await connection.commit();
+    return { message: `Event ${eventId} deleted successfully` };
+
+  } catch (error) {
+    await connection.rollback();
+    throw new Error(`Database deletion failed: ${error.message}`);
+  } finally {
+    connection.release();
+  }
+}
 
 
 
