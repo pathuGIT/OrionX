@@ -16,6 +16,7 @@ const Card = ({ title, value, icon, color }) => (
     </div>
 );
 
+
 const Profile = () => {
     const [activePage, setActivePage] = useState('dashboard');
     const [sidebarOpen, setSidebarOpen] = useState(false);
