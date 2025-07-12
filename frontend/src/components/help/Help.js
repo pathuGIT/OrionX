@@ -75,7 +75,7 @@ const Help = ({ tz }) => {
       {/* Main Content */}
       <div className="flex flex-col md:flex-row flex-1 max-w-6xl mx-auto w-full p-4 gap-6">
         {/* Navigation Sidebar */}
-        <div className="w-full md:w-64 bg-white rounded-lg shadow-sm border border-gray-200 p-4 h-fit md:sticky md:top-4">
+        <div className="w-full md:w-64 bg-white rounded-lg shadow-sm border border-gray-200 p-4 h-fit md:sticky md:top-16">
           <h2 className="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">Help Topics</h2>
           <nav className="space-y-1">
             {filteredSections.map((section) => (
