@@ -109,7 +109,7 @@ const PaymentHistory = () => {
           pageHeight / 2, 
           { 
             align: 'center',
-            angle: 45 
+            angle: 0, 
           }
         );
         
@@ -118,29 +118,44 @@ const PaymentHistory = () => {
       };
 
       // Add logo
-      const addLogo = () => {
-        try {
-          // Get the logo from public folder
-          const logoPath = window.location.origin + '/15.svg';
-          
-          // Add logo to PDF
-          doc.addImage(
-            logoPath, 
-            'SVG', 
-            40, 
-            20, 
-            50, 
-            50
-          );
-        } catch (e) {
-          console.error('Error adding logo:', e);
-        }
-      };
+// const addLogo = () => {
+//   try {
+//     // Correct path to public folder asset
+//     const logoPath = window.location.origin + '/logo192.png';
+//     doc.addImage(
+//       logoPath,
+//       'PNG',
+//       40,
+//       20,
+//       50,
+//       50
+//     );
+//   } catch (e) {
+//     console.error('Error adding logo:', e);
+//   }
+// };
+
+const addLogo = () => {
+  try {
+    // Use relative path from public folder
+    const logoPath = '/logo2.png'; 
+    doc.addImage(
+      logoPath,
+      'PNG',
+      50,
+      30,
+      60,
+      50
+    );
+  } catch (e) {
+    console.error('Error adding logo:', e);
+  }
+};
 
       // Add title
       doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text('Payment History Report', pageWidth / 2, 40, { align: 'center' });
+      doc.text('Payment  Report', pageWidth / 2, 40, { align: 'center' });
       
       // Add report date
       doc.setFontSize(10);
