@@ -7,6 +7,8 @@ import BookingHistoryView from '../../pages/superAdmin/BookingsAnalyze';
 import InvoiceView from '../../pages/superAdmin/InvoiceView';
 import BookingsView from '../../pages/superAdmin/BookingsAnalyze';
 import BookingsAnalyze from '../../pages/superAdmin/BookingsAnalyze';
+import Help from '../help/Help';
+import HelpData from '../help/bookingHelpData.json';
 
 const BookingManagementSAN = ({ setRenderContent }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,6 +41,10 @@ const BookingManagementSAN = ({ setRenderContent }) => {
             case 'invoice-view':
                 setClickedItem('invoice-view');
                 setRenderContent(() => () => <InvoiceView />);
+                break;
+            case 'help':
+                setClickedItem('help');
+                setRenderContent(() => () => <Help tz={HelpData} />);
                 break;
             default:
                 setClickedItem('calender-view');
@@ -98,7 +104,7 @@ const BookingManagementSAN = ({ setRenderContent }) => {
                     </li>
 
                     <li>
-                        <a href="#" class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'help-view' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+                        <a href="#" onClick={() => handleRenderContent('help')}  class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'help-view' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
                             <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm1 12H9v-2h2zm0-4H9V6h2z" clipRule="evenodd"></path>
                             </svg>

@@ -93,7 +93,7 @@ export const getVenueBytId = async (venueId) => {
 }
 
 export const getSelectedMenuPrice = async (bookingId) => {
-  const [rows] = await pool.query('select x.price from view_item_category_menu_type x inner join customer_menu_item_selection z on x.ICMT_Id = z.ICMT_Id where booking_id = ? limit 1;', [bookingId]);
+  const [rows] = await pool.query('select x.price from view_item_category_menu_type x inner join customer_menu_item_selection z on x.ICMT_Id = z.ICMT_Id where booking_id = ? limit 1', [bookingId]);
   console.log("mek thmi menu price:: ", rows[0])
   return rows[0];
 }
@@ -115,12 +115,13 @@ export const insertBooking = async (booking) => {
 }
 
 export const insertContract = async (contract) => {
+  console.log("insertContract", contract);
   const sql = `
     INSERT INTO contract
       ( booking_id, deposit_amount, damage_fee, refund_amount, status, created_at, updated_at)
-    VALUES (?, 50000.00, 0.00, 0.00, 'pending', NOW(), NOW())
+    VALUES (?, ?, 0.00, 0.00, 'pending', NOW(), NOW())
   `;
-  await pool.query(sql, [contract.bookingId]);
+  await pool.query(sql, [contract.bookingId, contract.payDeposit]);
 }
 
 export const insertPricing = async (pricing) => {
@@ -164,7 +165,6 @@ export const checkBookingExists = (date, slot, venueId) => {
 ///////////////////// advance booking view models
 
 export const getAllBookings = (status) => {
-  console.log("Status:", status);
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
     p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
     FROM booking b
@@ -181,7 +181,6 @@ export const getAllBookings = (status) => {
 }
 
 export const searchAllBookings = (item) => {
-  console.log("Status:", item);
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
     p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
     FROM booking b
@@ -281,8 +280,9 @@ export const updateBookingVenueModel = (bookingId, venueId) => {
     [venueId, bookingId]
   );
 }
-
+//
 export const updateDamageFeeModel = async (bookingId, damageFee, refundAmount, depositAmount, status) => {
+  console.log("data ", { bookingId, damageFee, refundAmount, depositAmount, status });
   const sql = `UPDATE contract SET damage_fee = ?, refund_amount = ?, deposit_amount = ?, status = ?,  updated_at = NOW() WHERE booking_id = ?`;
   return await pool.query(sql, [damageFee, refundAmount, depositAmount, status, bookingId]);
 }

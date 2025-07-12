@@ -18,10 +18,10 @@ const SuperAdminDB = () => {
   const [isMobileTopNavOpen, setIsMobileTopNavOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Reset to default content (OverView) when topNav changes
-    setRenderContent(() => () => <OverView />);
-  }, [topNav]);
+  // useEffect(() => {
+  //   // Reset to default content (OverView) when topNav changes
+  //   setRenderContent(() => () => <OverView />);
+  // }, [topNav]);
   
   // Close mobile menus when screen resizes to desktop
   useEffect(() => {

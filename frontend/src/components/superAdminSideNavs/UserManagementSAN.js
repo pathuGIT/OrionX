@@ -3,6 +3,8 @@ import superAdminHome from '../../pages/superAdmin/SuperAdminHome';
 import AddEmployee from '../../pages/superAdmin/AddEmployee';
 //import GetEmployees from '../../pages/superAdmin/GetEmployee';
 import UpdateEmployees from '../../pages/superAdmin/UpdateEmployees';
+import Help from '../help/Help';
+import EmpHelpData from '../help/empHelpData.json'
 import { Logout } from '../../components/Logout'
 
 
@@ -26,6 +28,10 @@ const UserManagementSAN = ({ setRenderContent }) => {
       case 'updateEmployeesById':
         setClickedItem('updateEmployeesById');
         setRenderContent(() => () => <UpdateEmployees />);
+        break;
+      case 'help':
+        setClickedItem('help');
+        setRenderContent(() => () => <Help tz={EmpHelpData} />);
         break;
       default:
         setClickedItem('updateEmployeesById');
@@ -64,7 +70,7 @@ const UserManagementSAN = ({ setRenderContent }) => {
           </li>
 
           <li>
-            <a href="#" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <a href="#" onClick={() => handleRenderContent('help')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
               <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fillRule="evenodd" d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm1 12H9v-2h2zm0-4H9V6h2z" clipRule="evenodd"></path>
               </svg>

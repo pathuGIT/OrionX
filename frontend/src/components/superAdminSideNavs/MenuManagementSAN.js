@@ -10,6 +10,8 @@ import CreateItemCategoryMenuType from '../../pages/superAdmin/CreateItemCategor
 // import CustomerMenuSummaryReport from '../../pages/superAdmin/CustomerMenuSummary'; 
 import AdminCorrectMenuSelections from '../../pages/superAdmin/AdminCorrectMenuSelections';
 import AdminMenuOrdersPage from '../../pages/superAdmin/AdminViewMenuOrders';
+import Help from '../help/Help';
+import MenuHelpData from '../help/menuHelpData.json'
 
 const MenuManagementSAN = ({ setRenderContent }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,6 +21,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
   const [clickedItem, setClickedItem] = useState(null);
   const [activeTab, setActiveTab] = useState('MenuOverview'); // Track active tab
 
+  
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
   const toggleDropdown = dropdown => {
     if (dropdown === 'pages') setIsPagesDropdownOpen(prev => !prev);
@@ -64,14 +67,14 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         setClickedItem('CreateItemCategoryMenuType');
         setRenderContent(() => () => <CreateItemCategoryMenuType />);
         break;
-      // case 'CustomerMenuSummary':
-      //   setRenderContent(() => () => <CustomerMenuSummaryReport />);
-      //   break;
       case 'AdminCorrectMenuSelections' :
         setRenderContent(() => () => <AdminCorrectMenuSelections />);
         break;
       case 'AdminMenuOrdersPage':
         setRenderContent(() => () => <AdminMenuOrdersPage />);
+        break;
+      case 'help':
+        setRenderContent(() => () => <Help tz={MenuHelpData} />);
         break;
       default:
         setRenderContent(() => () => <MenuOverview/>);
@@ -154,7 +157,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
           </li>
 
           <li>
-            <a href="#" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <a href="#" onClick={() => handleRenderContent('help')}  class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
               <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fillRule="evenodd" d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm1 12H9v-2h2zm0-4H9V6h2z" clipRule="evenodd"></path>
               </svg>

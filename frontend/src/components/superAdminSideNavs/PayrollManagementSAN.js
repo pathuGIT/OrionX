@@ -3,26 +3,25 @@ import { Logout } from "../../components/Logout";
 import ServicesChargeCalc from "../../pages/superAdmin/ServicesChargeCalc";
 import Deductions from "../../pages/superAdmin/Deductions";
 import Pay from "../../pages/superAdmin/Pay";
+import Help from '../help/Help';
 //import PaymentHistory from "./pages/superAdmin/PaymentHistory";
 import PaymentHistory from "../../pages/superAdmin/PaymentHistory";
+import PayHelpData from '../help/payHelpData.json'
 
 const PayrollManagementSAN = ({ setRenderContent }) => {
   const [clickedItem, setClickedItem] = useState(null);
 
-  const handleRenderContent = useCallback(
-    (display) => {
-      setClickedItem(display);
-      switch (display) {
-        case "ServicesChargeCalculation":
-          setRenderContent(() => () => <ServicesChargeCalc />);
-          break;
-        default:
-          setRenderContent(() => () => <ServicesChargeCalc />);
-          setClickedItem("ServicesChargeCalculation");
-      }
-    },
-    [setRenderContent]
-  );
+  const handleRenderContent = useCallback((display) => {
+    setClickedItem(display);
+    switch (display) {
+      case "ServicesChargeCalculation":
+        setRenderContent(() => () => <ServicesChargeCalc />);
+        break;
+      default:
+        setRenderContent(() => () => <ServicesChargeCalc />);
+        setClickedItem("ServicesChargeCalculation");
+    }
+  }, [setRenderContent]);
 
   const handleRenderContentdeduction = useCallback(
     (display) => {
@@ -44,6 +43,9 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
       switch (display) {
         case "PayManagement":
           setRenderContent(() => () => <Pay />);
+          break;
+        case "help":
+          setRenderContent(() => () => <Help tz={PayHelpData} />);
           break;
         default:
           setRenderContent(() => () => <p>Page </p>);
@@ -160,6 +162,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           </li>
 
           <li>
+            
             <button
               onClick={() => handleRenderContentHistory("HistoryManagement")}
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
@@ -190,7 +193,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           </li>
 
           <li>
-            <button className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
+            <button onClick={() => handleRenderContentPay("help")} className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
               <svg
                 aria-hidden="true"
                 className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
