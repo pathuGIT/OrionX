@@ -67,9 +67,6 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         setClickedItem('CreateItemCategoryMenuType');
         setRenderContent(() => () => <CreateItemCategoryMenuType />);
         break;
-      // case 'CustomerMenuSummary':
-      //   setRenderContent(() => () => <CustomerMenuSummaryReport />);
-      //   break;
       case 'AdminCorrectMenuSelections' :
         setRenderContent(() => () => <AdminCorrectMenuSelections />);
         break;

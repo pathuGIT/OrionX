@@ -17,9 +17,6 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
       case "ServicesChargeCalculation":
         setRenderContent(() => () => <ServicesChargeCalc />);
         break;
-      case "help":
-        setRenderContent(() => () => <Help tz={PayHelpData} />);
-        break;
       default:
         setRenderContent(() => () => <ServicesChargeCalc />);
         setClickedItem("ServicesChargeCalculation");
@@ -46,6 +43,9 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
       switch (display) {
         case "PayManagement":
           setRenderContent(() => () => <Pay />);
+          break;
+        case "help":
+          setRenderContent(() => () => <Help tz={PayHelpData} />);
           break;
         default:
           setRenderContent(() => () => <p>Page </p>);
