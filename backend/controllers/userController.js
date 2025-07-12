@@ -18,6 +18,7 @@ import {
   DeductionModel,
   calculatePayModel,
   getPayEntriesModel,
+  getPaymentHistoryModel
   
   
 } from "../models/userModel.js";
@@ -884,6 +885,23 @@ export const getCustomerBookings = async (req, res) => {
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+};
+
+// Add this to your controllers
+export const getPaymentHistory = async (req, res) => {
+  try {
+    const history = await getPaymentHistoryModel();
+    res.status(200).json({
+      success: true,
+      data: history
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve payment history",
+      error: error.message
+    });
   }
 };
  

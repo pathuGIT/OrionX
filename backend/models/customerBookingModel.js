@@ -12,8 +12,8 @@ class customerBookingModel {
                     c.name AS customer_name 
                  FROM booking AS b
                  LEFT JOIN customer AS c ON b.customer_id = c.customer_id
-                 WHERE b.customer_id = ? AND (b.status = 'confirmed' OR b.status = 'done')`, 
-                [customerID] 
+                 WHERE b.customer_id = ? AND (b.status = 'confirmed' OR b.status = 'done')`,
+                [customerID]
             );
             return result;
         } catch (error) {
@@ -21,6 +21,44 @@ class customerBookingModel {
             throw new Error("Failed to get customer bookings.");
         }
     }
+
+    static async getTotalBookingEvents(customerID) {
+        try {
+            const [result] = await db.query(
+                `
+                    SELECT
+                         (
+                            SELECT MIN(DATEDIFF(b2.booking_date, CURDATE()))
+                            FROM booking AS b2
+                            WHERE b2.customer_id = ?
+                            AND (b2.status = 'confirmed' OR b2.status = 'done')
+                            AND DATEDIFF(b2.booking_date, CURDATE()) >= 0
+                        ) AS days_remaining,
+
+                        SUM(CASE 
+                            WHEN DATEDIFF(b.booking_date, CURDATE()) >= 0 THEN 1 
+                            ELSE 0 
+                        END) AS total_upcoming_bookings,
+
+                        SUM(CASE 
+                            WHEN DATEDIFF(b.booking_date, CURDATE()) < 0 THEN 1 
+                            ELSE 0 
+                        END) AS total_completed_bookings
+
+                    FROM booking AS b
+                    WHERE b.customer_id = ?
+                    AND (b.status = 'confirmed' OR b.status = 'done')`,
+                [customerID, customerID]
+            );
+            return result;
+        } catch (error) {
+            console.error("Database Error (getBookingEvents):", error);
+            throw new Error("Failed to get booking events.");
+        }
+    }
+
+
+
 }
 
 export default customerBookingModel;

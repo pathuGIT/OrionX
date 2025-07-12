@@ -7,6 +7,7 @@ import VendorList from '../events/VendorList'
 import CustomerEventServiceList from '../events/CustomerEventServiceList'
 import AdminTableChairArrangement from '../events/AdminTableChairArrangement'
 import AdminBarManagementPage from '../events/AdminBarManagementPage'
+import AdminReports from '../events/AdminReports'
 
 
 const EventManagementSAN = ({ setRenderContent }) => {
@@ -46,6 +47,10 @@ const EventManagementSAN = ({ setRenderContent }) => {
       case 'AdminBarPlan':
         setClickedItem('AdminBarPlan');
         setRenderContent(() => () => <AdminBarManagementPage />);
+        break;
+      case 'Reports':
+        setClickedItem('Reports');
+        setRenderContent(() => () => <AdminReports />);
         break;
       default:
         setRenderContent(() => () => <EventAssignment />);
@@ -127,6 +132,18 @@ const EventManagementSAN = ({ setRenderContent }) => {
               </svg>
 
               <span class="ml-3">Bar Management</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" onClick={() => handleRenderContent('Reports')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'AdminBarPlan' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>
+              <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
+                fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 2a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 14h8v2H8v-2zm0 4h5v2H8v-2z" />
+              </svg>
+
+
+              <span class="ml-3">Reports</span>
             </a>
           </li>
 

@@ -7,51 +7,58 @@ class AdminTableChairArrangement {
             connection = await db.getConnection();
             const [arrangements] = await connection.query(`
                 SELECT
-                        c.name AS customer_name,
-                        b.booking_date,
-                        v.venue_name,
-                        v.Location,
-                        CASE
-                            WHEN w.Event_ID IS NOT NULL THEN 'wedding'
-                            ELSE ce.Event_Name
-                        END AS event_name,
-                        tca.Arrangement_ID,
-                        tca.Head_Table_Pax,
-                        tca.Top_Cloth_Color,
-                        tca.Table_Cloth_Color,
-                        tca.Bow_Color,
-                        tca.Chair_Cover_Color,
-                        GROUP_CONCAT(tr.Table_Number) AS reserved_tables,
-                        GROUP_CONCAT(tr.Reserve_Name) AS reserve_names
-                    FROM
-                        customer c
-                    JOIN
-                        booking b ON c.customer_id = b.customer_id
-                    JOIN
-                        venue v ON b.venue_id = v.venue_id
-                    JOIN
-                        event e ON b.booking_id = e.booking_id
-                    LEFT JOIN
-                        wedding w ON e.Event_ID = w.Event_ID
-                    LEFT JOIN
-                        customevent ce ON e.Event_ID = ce.Event_ID
-                    JOIN
-                        event_table_chair etc ON e.Event_ID = etc.Event_ID
-                    JOIN
-                        table_chair_arrangement tca ON etc.Arrangement_Id = tca.Arrangement_ID
-                    LEFT JOIN
-                        arrangement_reservation ar ON tca.Arrangement_ID = ar.Arrangement_ID
-                    LEFT JOIN
-                        table_reserve tr ON ar.Table_Reserve_ID = tr.Table_Reserve_ID
-                    WHERE
-                        w.Event_ID IS NOT NULL OR ce.Event_ID IS NOT NULL
-                    GROUP BY
-                        c.name,
-                        b.booking_date,
-                        v.venue_name,
-                        v.Location,
-                        event_name,
-                        tca.Arrangement_ID
+                    c.name AS customer_name,
+                    b.booking_date,
+                    v.venue_name,
+                    v.Location,
+                    CASE
+                        WHEN w.Event_ID IS NOT NULL THEN 'wedding'
+                        ELSE ce.Event_Name
+                    END AS event_name,
+                    tca.Arrangement_ID,
+                    tca.Head_Table_Pax,
+                    tca.Top_Cloth_Color,
+                    tca.Table_Cloth_Color,
+                    tca.Bow_Color,
+                    tca.Chair_Cover_Color,
+                    GROUP_CONCAT(tr.Table_Number) AS reserved_tables,
+                    GROUP_CONCAT(tr.Reserve_Name) AS reserve_names
+                FROM
+                    customer c
+                JOIN
+                    booking b ON c.customer_id = b.customer_id
+                JOIN
+                    venue v ON b.venue_id = v.venue_id
+                JOIN
+                    event e ON b.booking_id = e.booking_id
+                LEFT JOIN
+                    wedding w ON e.Event_ID = w.Event_ID
+                LEFT JOIN
+                    customevent ce ON e.Event_ID = ce.Event_ID
+                JOIN
+                    event_table_chair etc ON e.Event_ID = etc.Event_ID
+                JOIN
+                    table_chair_arrangement tca ON etc.Arrangement_Id = tca.Arrangement_ID
+                LEFT JOIN
+                    arrangement_reservation ar ON tca.Arrangement_ID = ar.Arrangement_ID
+                LEFT JOIN
+                    table_reserve tr ON ar.Table_Reserve_ID = tr.Table_Reserve_ID
+                WHERE
+                    w.Event_ID IS NOT NULL OR ce.Event_ID IS NOT NULL
+                GROUP BY
+                    c.name,
+                    b.booking_date,
+                    v.venue_name,
+                    v.Location,
+                    event_name, -- Grouping by the alias is often sufficient
+                    w.Event_ID, -- Explicitly including the columns from the CASE statement
+                    ce.Event_Name, -- Explicitly including the columns from the CASE statement
+                    tca.Arrangement_ID,
+                    tca.Head_Table_Pax,
+                    tca.Top_Cloth_Color,
+                    tca.Table_Cloth_Color,
+                    tca.Bow_Color,
+                    tca.Chair_Cover_Color
             `);
             return arrangements;
         } catch (error) {

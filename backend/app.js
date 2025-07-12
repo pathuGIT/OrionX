@@ -29,6 +29,7 @@ import settingRoute from './routes/settingRoutes.js';
 import AdminCorrectMenusRoute from './routes/AdminCorrectMenusRoute.js';
 
 
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -94,5 +95,16 @@ app.post('/api/notify-payroll', (req, res) => {
   // send emails logic here
   res.json({ success: true });
 });
+
+// // In your backend (Node/Express example)
+// app.get('/api/user/payment-history', async (req, res) => {
+//   // Fetch payment history from your database
+//   const history = await PaymentHistoryModel.find().sort({ date: -1 });
+//   res.json({ success: true, data: history });
+// });
+
+
+
+
 
 export default app;

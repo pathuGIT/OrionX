@@ -23,6 +23,18 @@ export const getCustomerBookings = async (customerID) => {
   }
 };
 
+export const getTotalCustomerBookings = async (customerID) => {
+  try {
+    const response = await api.get(`/customer/getTotalBookingEvents/${customerID}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("You Have No Bookings:", error);
+    throw error;
+  }
+};
+
+
+
 
 export const getPlannedEvents = async (customerID, bookingID) => {
   try {
@@ -33,6 +45,34 @@ export const getPlannedEvents = async (customerID, bookingID) => {
     throw error;
   }
 };
+
+export const updatetheEvent = async (eventId, eventData) => {
+  try {
+    const response = await api.put(`/displayEvents/updateEvent/${eventId}`, eventData);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || 
+      error.response?.data?.message || 
+      'Event update failed'
+    );
+  }
+};
+
+export const deletetheEvent = async (eventId, eventType) => {
+  try {
+    await api.delete(`/displayEvents/deleteEvent/${eventId}`, { 
+      data: { eventType } 
+    });
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || 
+      error.response?.data?.message || 
+      'Event deletion failed'
+    );
+  }
+};
+
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -985,6 +1025,16 @@ export const downloadReportAPI = async (bookingId) => {
         return response.data;
     } catch (error) {
         console.error("Error downloading report:", error.message);
+        throw error;
+    }
+};
+
+export const getAllBookingReports = async () => {
+    try {
+        const response = await api.get('/pdf/booking-reports');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching booking reports:', error);
         throw error;
     }
 };

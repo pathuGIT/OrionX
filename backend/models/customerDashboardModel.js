@@ -14,7 +14,7 @@ class CustomerDashboardModel {
     static async getPlanningStatus(bookingId) {
         // First determine event type
         const eventType = await this.getEventType(bookingId);
-        
+
         const tasks = [
             {
                 key: 'eventDetails',
@@ -24,9 +24,7 @@ class CustomerDashboardModel {
             {
                 key: 'menuSelection',
                 title: 'Select Your Menu',
-                query: `SELECT 1 FROM bite b
-                        JOIN event e ON b.BarRequirementID = e.BarRequirementID
-                        WHERE e.booking_id = ?`
+                query: `SELECT 1 FROM view_customer_menu_item_selection WHERE booking_id = ?`
             },
             {
                 key: 'servicesSelection',
@@ -35,7 +33,7 @@ class CustomerDashboardModel {
                         WHERE booking_id = ?`
             },
             {
-               key: 'tableArrangement',
+                key: 'tableArrangement',
                 title: 'Arrange Seating & Tables',
                 // CORRECTED QUERY: This now correctly checks the event_table_chair table.
                 query: `SELECT 1 FROM event e
@@ -84,15 +82,15 @@ class CustomerDashboardModel {
                 `SELECT Event_Type FROM event WHERE booking_id = ?`,
                 [bookingId]
             );
-            
+
             if (eventRows.length === 0) return 'unknown';
-            
+
             // Check if it's a wedding
             const [weddingRows] = await db.query(
                 `SELECT 1 FROM wedding WHERE Event_ID = ?`,
                 [eventRows[0].Event_ID]
             );
-            
+
             return weddingRows.length > 0 ? 'wedding' : 'custom';
         } catch (error) {
             console.error('Error determining event type:', error);

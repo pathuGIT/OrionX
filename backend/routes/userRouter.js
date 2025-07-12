@@ -23,7 +23,8 @@ import {
     getCustomerBookings,
     notifyEmployeesPayroll,
     notifySingleEmployeePayroll,
-    sendIdToEmp
+    sendIdToEmp,
+    getPaymentHistory
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -70,6 +71,8 @@ router.get('/entries/:date',getPayEntries);
 router.post('/payroll/notify',  notifyEmployeesPayroll);
 router.post('/send-id-to-emp', sendIdToEmp);
 router.post('/payroll/notify-employee', notifySingleEmployeePayroll);
+
+router.get('/payment-history',   getPaymentHistory);
  
 
 
