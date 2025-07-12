@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { getAllMenuViews, saveCustomerMenuSelection, checkBookingMenuSelection } from "../services/MenuService";
 import { updateMenuFee } from "../services/BookngService";
-import { Loader2, AlertCircle, ChevronDown, ChevronUp, Check, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, AlertCircle, ChevronDown, ChevronUp, Check, CheckCircle, XCircle, X } from "lucide-react";
 
-const CustomerMenuTypeSelection = () => {
-  const { menuListTypeId } = useParams();
-
-  // State declarations
+const CustomerMenuTypeSelection = ({ menuListTypeId, onClose }) => {
   const [menuViews, setMenuViews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,13 +15,11 @@ const CustomerMenuTypeSelection = () => {
   const [saveError, setSaveError] = useState(null);
   const [notification, setNotification] = useState(null);
 
-  // Show notification and auto-hide after 3 seconds
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Fetch menu views when component loads
   useEffect(() => {
     const fetchMenuViews = async () => {
       try {
@@ -47,7 +41,6 @@ const CustomerMenuTypeSelection = () => {
     fetchMenuViews();
   }, [menuListTypeId]);
 
-  // Check if booking already has selections
   useEffect(() => {
     const checkBooking = async () => {
       const bookingId = localStorage.getItem("bookingId");
@@ -109,7 +102,6 @@ const CustomerMenuTypeSelection = () => {
     setSaveError(null);
 
     try {
-      // Validate selections
       if (!expandedMenuTypeId) {
         throw new Error("Please expand and select a menu type first.");
       }
@@ -146,15 +138,12 @@ const CustomerMenuTypeSelection = () => {
         throw new Error("Booking session expired. Please start a new booking.");
       }
 
-      console.log("psosos::", ICMT_Ids)
-      // Save selections
       await Promise.all(
         ICMT_Ids.map(ICMT_Id => 
           saveCustomerMenuSelection(bookingId, ICMT_Id)
         )
       );
 
-      // Update menu fee if needed
       if (menuPrice) {
         await updateMenuFee(bookingId, { menueFee: menuPrice });
       }
@@ -166,17 +155,14 @@ const CustomerMenuTypeSelection = () => {
       let errorMessage = "Failed to save selections.";
       
       if (error.response) {
-        // Server responded with error status
         if (error.response.status === 500) {
           errorMessage = "Server error. Please try again later.";
         } else {
           errorMessage = error.response.data?.message || errorMessage;
         }
       } else if (error.request) {
-        // Request was made but no response
         errorMessage = "Network error. Please check your connection.";
       } else {
-        // Other errors
         errorMessage = error.message || errorMessage;
       }
       
@@ -187,7 +173,6 @@ const CustomerMenuTypeSelection = () => {
     }
   };
 
-  // Group menuViews by menu_type_id
   const groupedMenu = () => {
     const map = new Map();
 
@@ -222,28 +207,44 @@ const CustomerMenuTypeSelection = () => {
     return Array.from(map.values());
   };
 
+  const handleCloseDialog = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full text-center">
+          <Loader2 className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-700">Loading menu options...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded flex items-center gap-2">
-          <AlertCircle className="h-5 w-5" />
-          {error}
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded flex items-center gap-2">
+            <AlertCircle className="h-5 w-5" />
+            {error}
+          </div>
+          <button
+            onClick={handleCloseDialog}
+            className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          >
+            Close
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative">
-      {/* Notification Component */}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       {notification && (
         <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center ${
           notification.type === 'success' 
@@ -259,12 +260,20 @@ const CustomerMenuTypeSelection = () => {
         </div>
       )}
 
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-8">
-        <div className="p-6 max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-8 text-center text-blue-900">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+        <button
+          onClick={handleCloseDialog}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition"
+          aria-label="Close menu selection"
+        >
+          <X className="h-6 w-6 text-gray-500" />
+        </button>
+
+        <div className="p-6">
+          <h2 className="text-3xl font-bold mb-6 text-center text-blue-900">
             Select Your Perfect Menu
           </h2>
-          <p className="text-center text-blue-600 mb-8">
+          <p className="text-center text-blue-600 mb-6">
             Choose from our delicious options below
           </p>
 
@@ -274,7 +283,7 @@ const CustomerMenuTypeSelection = () => {
             return (
               <div 
                 key={menu.menu_type_id} 
-                className={`border rounded-lg mb-6 shadow-lg transition-all duration-300 ${isOpen ? 'border-blue-300 bg-white' : 'border-gray-200 bg-white hover:bg-blue-50'}`}
+                className={`border rounded-lg mb-4 shadow-md transition-all duration-300 ${isOpen ? 'border-blue-300 bg-white' : 'border-gray-200 bg-white hover:bg-blue-50'}`}
               >
                 <button
                   onClick={() => {
@@ -364,8 +373,8 @@ const CustomerMenuTypeSelection = () => {
         </div>
         
         {!hideSave && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white py-4 shadow-lg border-t border-gray-200">
-            <div className="max-w-4xl mx-auto px-6">
+          <div className="sticky bottom-0 bg-white py-4 shadow-lg border-t border-gray-200">
+            <div className="px-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 {saveError && (
                   <div className="text-red-600 flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full">

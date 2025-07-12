@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllStructuredMenuSelections, getMenuOverview } from "../services/MenuService";
 import { Loader2, AlertCircle, Star, ChevronRight } from "lucide-react";
 
-const PopularMenuSelections = ({ setActivePage }) => {
+const PopularMenuSelections = ({ setActivePage, closeSidebar }) => {
   const [popularItems, setPopularItems] = useState([]);
   const [menuOverview, setMenuOverview] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,6 @@ const PopularMenuSelections = ({ setActivePage }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch both menu selections and menu overview data
         const [selectionsData, overviewData] = await Promise.all([
           getAllStructuredMenuSelections(),
           getMenuOverview()
@@ -21,10 +20,8 @@ const PopularMenuSelections = ({ setActivePage }) => {
 
         setMenuOverview(overviewData);
 
-        // Process the data to find popular items
         const itemCounts = {};
         
-        // Count how many times each item appears in selections
         selectionsData.forEach(customer => {
           customer.bookings.forEach(booking => {
             booking.menus.forEach(menu => {
@@ -38,14 +35,13 @@ const PopularMenuSelections = ({ setActivePage }) => {
           });
         });
 
-        // Convert to array and sort by popularity
         const popularItemsArray = Object.entries(itemCounts)
           .map(([key, count]) => {
             const [item_id, item_name] = key.split('-');
             return { item_id, item_name, count };
           })
           .sort((a, b) => b.count - a.count)
-          .slice(0, 12); // Get top 12 most popular items
+          .slice(0, 12);
 
         setPopularItems(popularItemsArray);
       } catch (err) {
@@ -59,7 +55,6 @@ const PopularMenuSelections = ({ setActivePage }) => {
     fetchData();
   }, []);
 
-  // Function to find which menu type contains a specific item
   const findItemMenuType = (itemId) => {
     for (const menuList of menuOverview) {
       for (const menuType of menuList.types) {
@@ -95,7 +90,6 @@ const PopularMenuSelections = ({ setActivePage }) => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Heading */}
       <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">
         Customer Favorites
       </h1>
@@ -103,7 +97,6 @@ const PopularMenuSelections = ({ setActivePage }) => {
         Discover our most popular menu selections chosen by our customers
       </p>
 
-      {/* Grid of popular items */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {popularItems.map((item, index) => {
           const menuInfo = findItemMenuType(item.item_id);
@@ -138,7 +131,10 @@ const PopularMenuSelections = ({ setActivePage }) => {
                     #{index + 1} Most Popular
                   </span>
                   <button 
-                    onClick={() => navigate('/menu-types')}
+                    onClick={() => {
+                      setActivePage('plan-menulist');
+                      closeSidebar?.();
+                    }}
                     className="flex items-center text-blue-600 hover:text-blue-800 transition"
                   >
                     View Menu
@@ -151,13 +147,15 @@ const PopularMenuSelections = ({ setActivePage }) => {
         })}
       </div>
 
-      {/* Call to action */}
       <div className="mt-12 text-center">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
           Ready to create your own perfect menu?
         </h2>
         <button
-          onClick={() => navigate('/menu-types')}
+          onClick={() => {
+            setActivePage('plan-menulist');
+            closeSidebar?.();
+          }}
           className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-md"
         >
           Explore All Menu Options
@@ -167,4 +165,4 @@ const PopularMenuSelections = ({ setActivePage }) => {
   );
 };
 
-export default PopularMenuSelections; 
+export default PopularMenuSelections;

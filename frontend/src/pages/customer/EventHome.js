@@ -71,7 +71,7 @@ const EventHome = () => {
       case 'menu-report':
         return <MenuSummaryReport bookingId={bookingId}/>;
       case 'popular-menus':
-        return <PopularMenuSelections />;
+        return <PopularMenuSelections setActivePage={setActivePage} closeSidebar={closeSidebar}/>;
       
       case 'dashboard':
       default:
