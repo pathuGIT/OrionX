@@ -74,7 +74,7 @@ export const deletetheEvent = async (eventId, eventType) => {
 };
 
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export const getEventServices = async () => {
   try {
