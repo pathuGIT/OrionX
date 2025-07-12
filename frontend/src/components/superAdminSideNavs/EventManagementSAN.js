@@ -54,6 +54,7 @@ const EventManagementSAN = ({ setRenderContent }) => {
       case 'help':
         setClickedItem('help');
         setRenderContent(() => () => <Help tz={EventHelpData}/>);
+        break;
       case 'Reports':
         setClickedItem('Reports');
         setRenderContent(() => () => <AdminReports />);
