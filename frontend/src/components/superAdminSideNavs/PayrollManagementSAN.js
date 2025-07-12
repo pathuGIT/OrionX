@@ -3,6 +3,7 @@ import { Logout } from "../../components/Logout";
 import ServicesChargeCalc from "../../pages/superAdmin/ServicesChargeCalc";
 import Deductions from "../../pages/superAdmin/Deductions";
 import Pay from "../../pages/superAdmin/Pay";
+import Help from '../help/Help';
 
 const PayrollManagementSAN = ({ setRenderContent }) => {
   const [clickedItem, setClickedItem] = useState(null);
@@ -12,6 +13,9 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
     switch (display) {
       case "ServicesChargeCalculation":
         setRenderContent(() => () => <ServicesChargeCalc />);
+        break;
+      case "help":
+        setRenderContent(() => () => <Help />);
         break;
       default:
         setRenderContent(() => () => <ServicesChargeCalc />);
@@ -133,7 +137,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           </li>
 
           <li>
-            <button className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
+            <button onClick={() => handleRenderContentPay("help")} className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
               <svg
                 aria-hidden="true"
                 className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"

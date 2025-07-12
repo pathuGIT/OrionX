@@ -16,15 +16,6 @@ const ManageCustomer = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [password, setPassword] = useState('');
 
-    
-    // Watch for status change to 'active' and show register modal
-    // useEffect(() => {
-    //     if (selectedCustomer && selectedCustomer.staus === 'active') {
-    //         setShowRegister(true);
-    //     } else {
-    //         setShowRegister(false);
-    //     }
-    // }, [selectedCustomer]);
 
     useEffect(() => {
         loadCustomers();
