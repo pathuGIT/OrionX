@@ -528,7 +528,7 @@ export const sendSalaryEmail = async (name, email, netSalary, month, deductions)
         <small>This is an automated message. Please do not reply directly to this email.</small>
       </p>
       
-      <p>Best regards,<br>The Payroll Team<br>Deandra Management</p>
+      <p> Thanks you !,<br> Deandra Bolgoda</p>
     </div>
   `;
 
@@ -548,4 +548,42 @@ export const getPayEntryByEmployeeAndDateModel = async (employeeId, date) => {
     [employeeId, date]
   );
   return rows[0];
+};
+
+export const getPayEntriesByEmployeeModel = async (employeeId) => {
+  const [rows] = await pool.query(
+    `SELECT * 
+     FROM employee_salary_calculation 
+     WHERE employee_id = ?`,
+    [employeeId]
+  );
+  return rows;
+};
+
+// Add this to your models
+export const getPaymentHistoryModel = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const [results] = await connection.query(`
+      SELECT 
+         
+        esc.employee_id,
+        e.name AS employee_name,
+        DATE_FORMAT(esc.calculation_date, '%Y-%m') AS month_year,
+	      esc.basic_salary,
+        esc.total_service_charge,
+        esc.total_deduction,
+        esc.net_salary,
+        esc.calculation_date
+      FROM employee_salary_calculation esc
+      JOIN employee e ON esc.employee_id = e.employee_id
+      ORDER BY esc.calculation_date DESC
+      LIMIT 100;
+    `);
+    return results;
+  } catch (error) {
+    throw new Error(`Payment history query failed: ${error.message}`);
+  } finally {
+    connection.release();
+  }
 };

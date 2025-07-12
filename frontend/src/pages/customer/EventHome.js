@@ -39,7 +39,7 @@ const EventHome = () => {
     const renderContent = () => {
         switch (activePage) {
             case 'plan-event': return <EventPlan bookingId={bookingId} />;
-            case 'view-events': return <DisplayEvents customerID={customerID} />;
+            case 'view-events': return <DisplayEvents customerID={customerID} bookingId={bookingId} />;
             case 'Select-Services': return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
             case 'view-Vendors': return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
             case 'Select-Tables': return <ChairArrangement bookingId={bookingId} />;

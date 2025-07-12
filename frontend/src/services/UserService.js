@@ -1,5 +1,7 @@
 import api from './Api';
 import axios from 'axios';
+// ...existing code...
+ 
  
 
 export const getEmployees = async () => {
@@ -349,4 +351,24 @@ export const notifyPayroll = (date) => {
 // Notify single employee - FIXED URL
 export const notifyEmployeePayroll = (date, employeeId) => {
   return axios.post(`${API_URL}/payroll/notify-employee`, { date, employeeId });
+};
+
+
+// Add this to your services
+export const getPaymentHistory = async () => {
+  try {
+    const response = await api.get('/user/payment-history');
+    return {
+      success: true,
+      data: response.data.data || [],
+      message: 'Payment history retrieved successfully'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to fetch payment history',
+      error: error.message,
+      data: []
+    };
+  }
 };

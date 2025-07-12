@@ -4,6 +4,8 @@ import ServicesChargeCalc from "../../pages/superAdmin/ServicesChargeCalc";
 import Deductions from "../../pages/superAdmin/Deductions";
 import Pay from "../../pages/superAdmin/Pay";
 import Help from '../help/Help';
+//import PaymentHistory from "./pages/superAdmin/PaymentHistory";
+import PaymentHistory from "../../pages/superAdmin/PaymentHistory";
 
 const PayrollManagementSAN = ({ setRenderContent }) => {
   const [clickedItem, setClickedItem] = useState(null);
@@ -23,27 +25,47 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
     }
   }, [setRenderContent]);
 
-  const handleRenderContentdeduction = useCallback((display) => {
-    setClickedItem(display);
-    switch (display) {
-      case "deductionManagement":
-        setRenderContent(() => () => <Deductions />);
-        break;
-      default:
-        setRenderContent(() => () => <p>Page </p>);
-    }
-  }, [setRenderContent]);
+  const handleRenderContentdeduction = useCallback(
+    (display) => {
+      setClickedItem(display);
+      switch (display) {
+        case "deductionManagement":
+          setRenderContent(() => () => <Deductions />);
+          break;
+        default:
+          setRenderContent(() => () => <p>Page </p>);
+      }
+    },
+    [setRenderContent]
+  );
 
-  const handleRenderContentPay = useCallback((display) => {
-    setClickedItem(display);
-    switch (display) {
-      case "PayManagement":
-        setRenderContent(() => () => <Pay />);
-        break;
-      default:
-        setRenderContent(() => () => <p>Page </p>);
-    }
-  }, [setRenderContent]);
+  const handleRenderContentPay = useCallback(
+    (display) => {
+      setClickedItem(display);
+      switch (display) {
+        case "PayManagement":
+          setRenderContent(() => () => <Pay />);
+          break;
+        default:
+          setRenderContent(() => () => <p>Page </p>);
+      }
+    },
+    [setRenderContent]
+  );
+
+  const handleRenderContentHistory = useCallback(
+    (display) => {
+      setClickedItem(display);
+      switch (display) {
+        case "HistoryManagement":
+          setRenderContent(() => () => <PaymentHistory />);
+          break;
+        default:
+          setRenderContent(() => () => <p>Page </p>);
+      }
+    },
+    [setRenderContent]
+  );
 
   useEffect(() => {
     handleRenderContent("null");
@@ -57,8 +79,8 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
             <button
               onClick={() => handleRenderContent("ServicesChargeCalculation")}
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
-                clickedItem === "ServicesChargeCalculation" 
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100'
+                clickedItem === "ServicesChargeCalculation"
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100"
                   : ""
               }`}
             >
@@ -78,10 +100,12 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
 
           <li>
             <button
-              onClick={() => handleRenderContentdeduction("deductionManagement")}
+              onClick={() =>
+                handleRenderContentdeduction("deductionManagement")
+              }
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
-                clickedItem === "deductionManagement" 
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100'
+                clickedItem === "deductionManagement"
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100"
                   : ""
               }`}
             >
@@ -110,8 +134,8 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
             <button
               onClick={() => handleRenderContentPay("PayManagement")}
               className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
-                clickedItem === "PayManagement" 
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100'
+                clickedItem === "PayManagement"
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100"
                   : ""
               }`}
             >
@@ -137,6 +161,37 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
           </li>
 
           <li>
+            
+            <button
+              onClick={() => handleRenderContentHistory("HistoryManagement")}
+              className={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full ${
+                clickedItem === "HistoryManagement"
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100"
+                  : ""
+              }`}
+            >
+              <svg
+                class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"
+                />
+              </svg>
+              <span className="ml-3">Employee Payment History</span>
+            </button>
+          </li>
+
+          <li>
             <button onClick={() => handleRenderContentPay("help")} className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
               <svg
                 aria-hidden="true"
@@ -155,9 +210,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
             </button>
           </li>
           <li>
-            <button
-              className="flex items-center p-2 text-base font-normal text-red-600 rounded-lg hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-800 group w-full"
-            >
+            <button className="flex items-center p-2 text-base font-normal text-red-600 rounded-lg hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-800 group w-full">
               <svg
                 className="flex-shrink-0 w-6 h-6 text-red-500 transition duration-75 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-white"
                 fill="currentColor"

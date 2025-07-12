@@ -17,13 +17,33 @@ export const createEvent = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   try {
-    // Pass the entire body without destructuring
-    console.log('Updating event with ID:', req.params.id, 'Data:', req.body);
-    await AllEvent.update(req.params.id, req.body);
-    res.json({ message: 'Event updated successfully' });
+    // Structure data properly
+    const eventData = {
+      ...req.body,
+      // Ensure details exists
+      details: req.body.details || {}
+    };
+
+    // Clean up null values
+    Object.keys(eventData).forEach(key => {
+      if (eventData[key] === null || eventData[key] === 'null') {
+        delete eventData[key];
+      }
+    });
+
+    console.log('Updating event:', req.params.id, eventData);
+    const updatedEvent = await AllEvent.update(req.params.id, eventData);
+    
+    res.json({ 
+      message: 'Event updated successfully',
+      event: updatedEvent
+    });
   } catch (error) {
     console.error('Update error:', error);
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ 
+      error: error.message || 'Update failed',
+      details: error.stack // Include stack trace for debugging
+    });
   }
 };
 
