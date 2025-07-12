@@ -528,7 +528,7 @@ export const sendSalaryEmail = async (name, email, netSalary, month, deductions)
         <small>This is an automated message. Please do not reply directly to this email.</small>
       </p>
       
-      <p>Best regards,<br>The Payroll Team<br>Deandra Management</p>
+      <p> Thanks you !,<br> Deandra Bolgoda</p>
     </div>
   `;
 

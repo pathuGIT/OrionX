@@ -116,44 +116,62 @@ const PaymentHistory = () => {
         // Restore graphics state
         doc.restoreGraphicsState();
       };
+      
+      const addLogo = () => {
+        try {
+          // Use relative path from public folder
+          const logoPath = '/logo2.png'; 
+          doc.addImage(
+            logoPath,
+            'PNG',
+            50,
+            30,
+            60,
+            50
+          );
+        } catch (e) {
+          console.error('Error adding logo:', e);
+        }
+      };
 
-      // Add logo
-// const addLogo = () => {
-//   try {
-//     // Correct path to public folder asset
-//     const logoPath = window.location.origin + '/logo192.png';
-//     doc.addImage(
-//       logoPath,
-//       'PNG',
-//       40,
-//       20,
-//       50,
-//       50
-//     );
-//   } catch (e) {
-//     console.error('Error adding logo:', e);
-//   }
-// };
-
-const addLogo = () => {
-  try {
-    // Use relative path from public folder
-    const logoPath = '/logo2.png'; 
-    doc.addImage(
-      logoPath,
-      'PNG',
-      50,
-      30,
-      60,
-      50
-    );
-  } catch (e) {
-    console.error('Error adding logo:', e);
-  }
-};
+      // Add footer with blue background and contact info
+      const addFooter = (pageNumber, pageCount) => {
+        const footerHeight = 40;
+        const footerY = pageHeight - footerHeight;
+        
+        // Blue footer background
+        doc.setFillColor(41, 128, 185);
+        doc.rect(0, footerY, pageWidth, footerHeight, 'F');
+        
+        // Footer text (white)
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        
+        // Prepared by text
+        doc.text(
+          'Prepared by: Deandra Bolgoda', 
+          40, 
+          footerY + 15
+        );
+        
+        // Contact info
+        doc.text(
+          'Contact: Deandrabolgoda@gmail.com | +94 77 974 0722', 
+          40, 
+          footerY + 30
+        );
+        
+        // Page numbers
+        doc.text(
+          `Page ${pageNumber} of ${pageCount}`, 
+          pageWidth - 40, 
+          footerY + 25,
+          { align: 'right' }
+        );
+      };
 
       // Add title
-      doc.setFontSize(18);
+      doc.setFontSize(20);
       doc.setFont(undefined, 'bold');
       doc.text('Payment  Report', pageWidth / 2, 40, { align: 'center' });
       
@@ -260,13 +278,8 @@ const addLogo = () => {
             addWatermark();
           }
           
-          // Add page numbers
-          doc.setFontSize(9);
-          doc.text(
-            `Page ${data.pageNumber} of ${data.pageCount}`, 
-            pageWidth - 40, 
-            pageHeight - 20
-          );
+          // Add footer to every page
+          addFooter(data.pageNumber, data.pageCount);
         }
       });
 
