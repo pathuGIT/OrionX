@@ -49,12 +49,11 @@ export const getPlannedEvents = async (customerID, bookingID) => {
 export const updatetheEvent = async (eventId, eventData) => {
   try {
     const response = await api.put(`/displayEvents/updateEvent/${eventId}`, eventData);
-    return response.data;
+    return response.data.event; // Return updated event object
   } catch (error) {
     throw new Error(
-      error.response?.data?.error || 
       error.response?.data?.message || 
-      'Event update failed'
+      'Event update failed. Please try again.'
     );
   }
 };

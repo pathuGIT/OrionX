@@ -27,22 +27,17 @@ export const getPlannedEvents = async (req, res) => {
 
 export const updatetheEvent = async (req, res) => {
   try {
-    // Structure data properly
-    const eventData = {
-      ...req.body,
-      // Ensure details exists
-      details: req.body.details || {}
-    };
-
+    const eventId = req.params.Id;
+    const eventData = req.body;
+    
     // Clean up null values
     Object.keys(eventData).forEach(key => {
-      if (eventData[key] === null || eventData[key] === 'null') {
-        delete eventData[key];
+      if (eventData[key] === null || eventData[key] === 'null' || eventData[key] === '') {
+        eventData[key] = null;
       }
     });
 
-    console.log('Updating event:', req.params.id, eventData);
-    const updatedEvent = await plannedEvent.update(req.params.id, eventData);
+    const updatedEvent = await plannedEvent.update(eventId, eventData);
     
     res.json({ 
       message: 'Event updated successfully',
@@ -50,9 +45,9 @@ export const updatetheEvent = async (req, res) => {
     });
   } catch (error) {
     console.error('Update error:', error);
-    res.status(400).json({ 
+    res.status(500).json({ 
       error: error.message || 'Update failed',
-      details: error.stack // Include stack trace for debugging
+      details: error.stack
     });
   }
 };

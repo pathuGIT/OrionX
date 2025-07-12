@@ -37,28 +37,33 @@ const SelectField = ({ label, name, value, options, onChange }) => (
   </div>
 );
 
-// FIXED: Time formatting function
+// FIXED: Improved time formatting function
 const formatDateTime = (dateTimeString) => {
   if (!dateTimeString) return "N/A";
   
   // Handle time-only strings (HH:MM:SS)
   if (typeof dateTimeString === 'string' && /^\d{1,2}:\d{2}(:\d{2})?$/.test(dateTimeString)) {
-    const [hours, minutes] = dateTimeString.split(":");
-    const hour = parseInt(hours, 10);
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
+    const parts = dateTimeString.split(":");
+    const hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHour = hours % 12 || 12;
     return `${displayHour}:${minutes} ${period}`;
   }
   
   // Handle full date-time strings
-  const date = new Date(dateTimeString);
-  if (isNaN(date.getTime())) return "Invalid Date";
-  
-  return date.toLocaleString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  });
+  try {
+    const date = new Date(dateTimeString);
+    if (isNaN(date.getTime())) return "Invalid Date";
+    
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  } catch (e) {
+    return "Invalid Format";
+  }
 };
 
 // Main Component
@@ -89,15 +94,13 @@ const DisplayEvents = () => {
           return;
         }
 
-        let decryptedBookingId = null;
         if (!bookingId) {
           setError("Booking ID is missing from the URL.");
           setLoading(false);
           return;
         }
         
-        decryptedBookingId = decryptBookingId(bookingId);
-        
+        const decryptedBookingId = decryptBookingId(bookingId);
         if (!decryptedBookingId) {
           setError("Could not verify the event identifier.");
           setLoading(false);
@@ -475,15 +478,15 @@ const UpdateEventModal = ({ event, eventType, onClose, onEventUpdated }) => {
     setError(null);
     
     try {
-      // FIXED: Normalize time values to HH:MM:SS format
+      // FIXED: Enhanced time normalization
       const normalizeTime = (time) => {
         if (!time) return null;
         if (typeof time === 'string') {
-          // Convert "HH:MM" to "HH:MM:00"
+          // Handle HH:MM format
           if (/^\d{1,2}:\d{2}$/.test(time)) {
             return `${time}:00`;
           }
-          // Ensure "HH:MM:SS" format
+          // Handle HH:MM:SS format
           if (/^\d{1,2}:\d{2}:\d{2}$/.test(time)) {
             return time;
           }
@@ -732,12 +735,12 @@ const UpdateEventModal = ({ event, eventType, onClose, onEventUpdated }) => {
             <button 
               type="submit" 
               disabled={isSubmitting} 
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-300"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-300 flex items-center justify-center"
             >
               {isSubmitting ? (
                 <>
                   <span className="mr-2">Saving...</span>
-                  <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
+                  <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-r-transparent"></div>
                 </>
               ) : 'Save Changes'}
             </button>

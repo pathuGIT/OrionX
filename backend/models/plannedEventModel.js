@@ -42,112 +42,113 @@ class plannedEvent {
             throw new Error("Failed to fetch event details.");
         }
     }
- static async update(eventId, eventData) {
-  const connection = await db.getConnection();
-  try {
-    await connection.beginTransaction();
+static async update(eventId, eventData) {
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction();
 
-    // Determine event type in a single query
-    const [eventType] = await connection.query(
-      `SELECT 
-        (SELECT COUNT(*) FROM wedding WHERE Event_ID = ?) AS isWedding,
-        (SELECT COUNT(*) FROM customevent WHERE Event_ID = ?) AS isCustom`,
-      [eventId, eventId]
-    );
+      // Determine event type
+      const [eventType] = await connection.query(
+        `SELECT 
+          (SELECT COUNT(*) FROM wedding WHERE Event_ID = ?) AS isWedding,
+          (SELECT COUNT(*) FROM customevent WHERE Event_ID = ?) AS isCustom`,
+        [eventId, eventId]
+      );
 
-    const { isWedding, isCustom } = eventType[0];
+      const { isWedding, isCustom } = eventType[0];
 
-    // Update base event table
-    await connection.query(
-      `UPDATE event SET
-        Buffet_TimeFrom = ?,
-        Buffet_TimeTo = ?,
-        Additional_Time = ?,
-        Function_durationFrom = ?,
-        Function_durationTo = ?,
-        Tea_table_Time = ?,
-        Dress_Time = ?
-      WHERE Event_ID = ?`,
-      [
-        eventData.Buffet_TimeFrom ?? null,
-        eventData.Buffet_TimeTo ?? null,
-        eventData.Additional_Time ?? null,
-        eventData.Function_durationFrom ?? null,
-        eventData.Function_durationTo ?? null,
-        eventData.Tea_table_Time ?? null,
-        eventData.Dress_Time ?? null,
-        eventId
-      ]
-    );
-
-    // Update type-specific table
-    if (isWedding) {
+      // Update base event table
       await connection.query(
-        `UPDATE wedding SET
-          Groom_Name = ?,
-          Bride_Name = ?,
-          Groom_Contact_no = ?,
-          Bride_Contact_no = ?,
-          Poruwa_CeremonyFrom = ?,
-          Poruwa_CeremonyTo = ?,
-          Registration_Time = ?,
-          Fountain = ?,
-          ProsperityTable = ?,
-          Groom_Address = ?,
-          Bride_Address = ?
+        `UPDATE event SET
+          Buffet_TimeFrom = ?,
+          Buffet_TimeTo = ?,
+          Function_durationFrom = ?,
+          Function_durationTo = ?,
+          Tea_table_Time = ?,
+          Dress_Time = ?
         WHERE Event_ID = ?`,
         [
-          eventData.details?.groomName || eventData.Groom_Name || '',
-          eventData.details?.brideName || eventData.Bride_Name || '',
-          eventData.details?.groomContact || eventData.Groom_Contact_no || '',
-          eventData.details?.brideContact || eventData.Bride_Contact_no || '',
-          eventData.details?.poruwaCeremonyFrom || eventData.Poruwa_CeremonyFrom || null,
-          eventData.details?.poruwaCeremonyTo || eventData.Poruwa_CeremonyTo || null,
-          eventData.details?.registrationTime || eventData.Registration_Time || null,
-          eventData.details?.fountain || eventData.Fountain || 'no',
-          eventData.details?.prosperityTable || eventData.ProsperityTable || 'no',
-          eventData.details?.groomAddress || eventData.Groom_Address || '',
-          eventData.details?.brideAddress || eventData.Bride_Address || '',
+          eventData.Buffet_TimeFrom,
+          eventData.Buffet_TimeTo,
+          eventData.Function_durationFrom,
+          eventData.Function_durationTo,
+          eventData.Tea_table_Time,
+          eventData.Dress_Time,
           eventId
         ]
       );
-    } else if (isCustom) {
-      await connection.query(
-        `UPDATE customevent SET
-          Event_Name = ?,
-          ContactPersonName = ?,
-          ContactPersonNumber = ?
-        WHERE Event_ID = ?`,
-        [
-          eventData.Event_Name || eventData.Custom_Event_Name || '',
-          eventData.details?.contactPersonName || eventData.ContactPersonName || '',
-          eventData.details?.contactPersonNumber || eventData.ContactPersonNumber || '',
-          eventId
-        ]
+
+      // Update wedding-specific fields
+      if (isWedding) {
+        await connection.query(
+          `UPDATE wedding SET
+            Groom_Name = ?,
+            Bride_Name = ?,
+            Groom_Contact_no = ?,
+            Bride_Contact_no = ?,
+            Poruwa_CeremonyFrom = ?,
+            Poruwa_CeremonyTo = ?,
+            Registration_Time = ?,
+            Fountain = ?,
+            ProsperityTable = ?,
+            Groom_Address = ?,
+            Bride_Address = ?
+          WHERE Event_ID = ?`,
+          [
+            eventData.Groom_Name || null,
+            eventData.Bride_Name || null,
+            eventData.Groom_Contact_no || null,
+            eventData.Bride_Contact_no || null,
+            eventData.Poruwa_CeremonyFrom || null,
+            eventData.Poruwa_CeremonyTo || null,
+            eventData.Registration_Time || null,
+            eventData.Fountain || 'no',
+            eventData.ProsperityTable || 'no',
+            eventData.Groom_Address || null,
+            eventData.Bride_Address || null,
+            eventId
+          ]
+        );
+      }
+
+      // Update custom event-specific fields
+      if (isCustom) {
+        await connection.query(
+          `UPDATE customevent SET
+            Event_Name = ?,
+            ContactPersonName = ?,
+            ContactPersonNumber = ?
+          WHERE Event_ID = ?`,
+          [
+            eventData.Custom_Event_Name || null,
+            eventData.ContactPersonName || null,
+            eventData.ContactPersonNumber || null,
+            eventId
+          ]
+        );
+      }
+
+      await connection.commit();
+
+      // Fetch updated event data
+      const [updated] = await connection.query(
+        `SELECT e.*, w.*, c.*
+         FROM event e
+         LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+         LEFT JOIN customevent c ON e.Event_ID = c.Event_ID
+         WHERE e.Event_ID = ?`,
+        [eventId]
       );
+      
+      return updated[0];
+
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
     }
-
-    await connection.commit();
-
-    // Return combined event data
-    const [updated] = await connection.query(
-      `SELECT e.*, w.*, c.*
-       FROM event e
-       LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
-       LEFT JOIN customevent c ON e.Event_ID = c.Event_ID
-       WHERE e.Event_ID = ?`,
-      [eventId]
-    );
-    
-    return updated[0];
-
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
   }
-}
 
 
 
