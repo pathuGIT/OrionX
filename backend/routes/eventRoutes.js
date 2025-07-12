@@ -46,7 +46,7 @@ import { adminBarManagementController } from '../controllers/superAdmin/adminBar
 
 import { getEventProgress } from '../controllers/customerDashboardController.js';
 
-import { downloadEventReport } from '../controllers/eventPDFReportController.js';
+import { downloadEventReport,getAllBookingReports } from '../controllers/eventPDFReportController.js';
 
 // Create separate routers for events and weddings
 const eventRoute = express.Router();
@@ -194,4 +194,5 @@ AdminEventRoutes.delete('/soft-drink-items/:id', adminBarManagementController.de
 
 progressRoutes.get('/customerDashboard/:bookingId', customer, getEventProgress);
 pdfRoutes.get('/events/:bookingId', downloadEventReport);
+pdfRoutes.get('/booking-reports', getAllBookingReports);
 export { eventRoute, weddingRoutes, cusBookingRoutes, dispayEventsRoutes, serviceVendorRoutes, EventServiceRoutes, saveSelectedServiceRoutes, tableArrangementRoutes, reservationRoutes, planBarRoutes, planBiteRoutes, BarArrangeRoutes, AdminRoutes, AdminEventRoutes, progressRoutes,pdfRoutes };

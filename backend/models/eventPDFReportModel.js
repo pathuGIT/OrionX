@@ -81,6 +81,56 @@ class ReportModel {
             throw new Error("Database query for report failed.");
         }
     }
+
+// Controller for admin bookings report
+static async getAllBookingReports() {
+        const query = `
+            SELECT 
+                b.booking_id,
+                b.booking_date,
+                c.name AS customer_name,
+                c.email,
+                c.phone,
+                e.Event_ID,
+                CASE 
+                    WHEN w.Event_ID IS NOT NULL THEN 'wedding'
+                    WHEN ce.Event_ID IS NOT NULL THEN 'custom'
+                    ELSE 'No Event Details'
+                END AS event_type,
+                w.Groom_Name,
+                w.Bride_Name,
+                ce.Event_Name,
+                ce.ContactPersonName
+            FROM booking b
+            JOIN customer c ON b.customer_id = c.customer_id
+            LEFT JOIN event e ON b.booking_id = e.booking_id
+            LEFT JOIN wedding w ON e.Event_ID = w.Event_ID
+            LEFT JOIN customevent ce ON e.Event_ID = ce.Event_ID
+            ORDER BY b.booking_date DESC
+        `;
+
+        try {
+            const [results] = await db.query(query);
+            return results;
+        } catch (error) {
+            console.error('Database query error:', error);
+            
+            // Enhance error information
+            error.details = {
+                query,
+                timestamp: new Date().toISOString()
+            };
+            
+            throw error;
+        }
+    }
+
+
+
+
+
+
+
 }
 
 export default ReportModel;

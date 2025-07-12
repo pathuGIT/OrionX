@@ -1016,3 +1016,13 @@ export const downloadReportAPI = async (bookingId) => {
         throw error;
     }
 };
+
+export const getAllBookingReports = async () => {
+    try {
+        const response = await api.get('/pdf/booking-reports');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching booking reports:', error);
+        throw error;
+    }
+};
