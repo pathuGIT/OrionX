@@ -91,7 +91,8 @@ const EventHomeSideNav = ({ setActivePage, closeSidebar }) => {
           menuName="menu"
           subItems={[
             { page: 'plan-menulist', label: '🍽️ Select New Menu' },
-            { page: 'my-menu', label: '📋 Saved Menus' }
+            { page: 'menu-report', label: '📋 Saved Menus' },
+            { page: 'popular-menus', label: 'Favourite Menus'}
           ]}
         >
           Menu Planning

@@ -391,7 +391,7 @@ const CustomerMenuTypeSelection = () => {
                     <>
                       <CheckCircle className="h-5 w-5" />
                       <span>Confirm Your Selections</span>
-                    </>
+                    </> 
                   )}
                 </button>
               </div>

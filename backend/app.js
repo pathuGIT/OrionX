@@ -55,10 +55,12 @@ app.use('/api/advanceMenu', advanceMenuViewRoute);
 app.use('/api/advanceMenuView', menuViewRoutes);
 app.use('/api/AdminCorrectMenus', AdminCorrectMenusRoute); // Admin Correct Menus Route
 
+app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
+
+
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
-app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
 
 
 app.use('/api/overview', overviewRout);

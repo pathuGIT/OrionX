@@ -12,6 +12,9 @@ import PlanBarForm from './PlanBarForm';
 import PlanBiteForm from './PlanBiteForm';
 
 import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+import MenuSummaryReport from './MenuSummaryReport';
+import PopularMenuSelections from '../../components/PopularMenus';
+
 import BarManagement from './BarManagement';
 
 // import ProfileNavbar from '../components/ProfileNavbar';
@@ -65,6 +68,11 @@ const EventHome = () => {
         return <BarManagement bookingId={bookingId} />;
       case 'plan-menulist':
         return <CustomerMenuListSelection/>;
+      case 'menu-report':
+        return <MenuSummaryReport bookingId={bookingId}/>;
+      case 'popular-menus':
+        return <PopularMenuSelections />;
+      
       case 'dashboard':
       default:
         return (
