@@ -4,6 +4,7 @@ import { getEventServices, saveSelectedServices } from "../../services/EventServ
 import { CheckCircle, XCircle, PartyPopper, Check, Loader2 } from "lucide-react";
 import { decryptCustId, decryptBookingId } from "../../utills/encryptionUtils";
 
+
 const EventServiceSelector = ({ customerID, bookingId }) => {
     const { user } = useContext(AuthContext);
     const [services, setServices] = useState([]);

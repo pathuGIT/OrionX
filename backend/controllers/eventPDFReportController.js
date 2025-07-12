@@ -32,3 +32,28 @@ export const downloadEventReport = async (req, res) => {
         }
     }
 };
+
+
+export const getAllBookingReports = async (req, res) => {
+    try {
+        const reports = await ReportModel.getAllBookingReports();
+        res.status(200).json(reports);
+    } catch (error) {
+        console.error('Error fetching booking reports:', error);
+        
+        // Handle specific error cases
+        if (error.code) {
+            // MySQL error
+            res.status(500).json({ 
+                message: 'Database error',
+                errorCode: error.code,
+                sqlMessage: error.sqlMessage 
+            });
+        } else {
+            // Generic error
+            res.status(500).json({ 
+                message: error.message || 'Internal server error' 
+            });
+        }
+    }
+};

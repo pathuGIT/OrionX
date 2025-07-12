@@ -71,20 +71,34 @@ class AllEvent {
     try {
       await connection.beginTransaction();
 
-      // Ensure eventType is properly extracted
-      const eventType = eventData.Event_Type || 'wedding'; // Default to wedding
+      // Check existence in type-specific tables
+      const [weddingExists] = await connection.query(
+        'SELECT 1 FROM wedding WHERE Event_ID = ?',
+        [eventId]
+      );
+      const [customExists] = await connection.query(
+        'SELECT 1 FROM customevent WHERE Event_ID = ?',
+        [eventId]
+      );
+
+      const isWedding = weddingExists.length > 0;
+      const isCustom = customExists.length > 0;
+
+      if (!isWedding && !isCustom) {
+        throw new Error('Event not found in wedding or custom tables');
+      }
 
       // Update base event table
       await connection.query(
-        `UPDATE Event SET
-        Buffet_TimeFrom = ?,
-        Buffet_TimeTo = ?,
-        Additional_Time = ?,
-        Function_durationFrom = ?,
-        Function_durationTo = ?,
-        Tea_table_Time = ?,
-        Dress_Time = ?
-       WHERE Event_ID = ?`,
+        `UPDATE event SET
+      Buffet_TimeFrom = ?,
+      Buffet_TimeTo = ?,
+      Additional_Time = ?,
+      Function_durationFrom = ?,
+      Function_durationTo = ?,
+      Tea_table_Time = ?,
+      Dress_Time = ?
+      WHERE Event_ID = ?`,
         [
           eventData.Buffet_TimeFrom || null,
           eventData.Buffet_TimeTo || null,
@@ -97,50 +111,48 @@ class AllEvent {
         ]
       );
 
-      // Conditionally update type-specific table
-      if (eventType === 'wedding') {
+      // Update type-specific table
+      if (isWedding) {
         await connection.query(
-          `UPDATE Wedding SET
-          Groom_Name = ?,
-          Bride_Name = ?,
-          Groom_Contact_no = ?,
-          Bride_Contact_no = ?,
-          Poruwa_CeremonyFrom = ?,
-          Groom_Contact_no = ?,
-          Poruwa_CeremonyTo = ?,
-          Registration_Time = ?,
-          Fountain = ?,
-          ProsperityTable = ?,
-          Groom_Address = ?,
-          Bride_Address = ?
-         WHERE Event_ID = ?`,
+          `UPDATE wedding SET
+        Groom_Name = ?,
+        Bride_Name = ?,
+        Groom_Contact_no = ?,
+        Bride_Contact_no = ?,
+        Poruwa_CeremonyFrom = ?,
+        Poruwa_CeremonyTo = ?,
+        Registration_Time = ?,
+        Fountain = ?,
+        ProsperityTable = ?,
+        Groom_Address = ?,
+        Bride_Address = ?
+        WHERE Event_ID = ?`,
           [
-            eventData.details?.groomName || '',
-            eventData.details?.brideName || '',
-            eventData.details?.groomContact || '',
-            eventData.details?.brideContact || '',
-            eventData.details?.poruwaCeremonyFrom || null,
-            eventData.details?.groomContactNo || null,
-            eventData.details?.poruwaCeremonyTo || null,
-            eventData.details?.registrationTime || null,
-            eventData.details?.fountain || 'no',
-            eventData.details?.prosperityTable || 'no',
-            eventData.details?.groomAddress || '',
-            eventData.details?.brideAddress || '',
+            eventData.details?.groomName || eventData.Groom_Name || '',
+            eventData.details?.brideName || eventData.Bride_Name || '',
+            eventData.details?.groomContact || eventData.Groom_Contact_no || '',
+            eventData.details?.brideContact || eventData.Bride_Contact_no || '',
+            eventData.details?.poruwaCeremonyFrom || eventData.Poruwa_CeremonyFrom || null,
+            eventData.details?.poruwaCeremonyTo || eventData.Poruwa_CeremonyTo || null,
+            eventData.details?.registrationTime || eventData.Registration_Time || null,
+            eventData.details?.fountain || eventData.Fountain || 'no',
+            eventData.details?.prosperityTable || eventData.ProsperityTable || 'no',
+            eventData.details?.groomAddress || eventData.Groom_Address || '',
+            eventData.details?.brideAddress || eventData.Bride_Address || '',
             eventId
           ]
         );
-      } else { // Custom event
+      } else if (isCustom) {
         await connection.query(
-          `UPDATE CustomEvent SET
-          Event_Name = ?,
-          ContactPersonName = ?,
-          ContactPersonNumber = ?
-         WHERE Event_ID = ?`,
+          `UPDATE customevent SET
+        Event_Name = ?,
+        ContactPersonName = ?,
+        ContactPersonNumber = ?
+        WHERE Event_ID = ?`,
           [
-            eventData.Event_Name || '',
-            eventData.details?.contactPersonName || '',
-            eventData.details?.contactPersonNumber || '',
+            eventData.Event_Name || eventData.Custom_Event_Name || '',
+            eventData.details?.contactPersonName || eventData.ContactPersonName || '',
+            eventData.details?.contactPersonNumber || eventData.ContactPersonNumber || '',
             eventId
           ]
         );
@@ -150,10 +162,10 @@ class AllEvent {
 
       // Return updated event
       const [updated] = await connection.query(
-        `SELECT * FROM Event 
-       LEFT JOIN Wedding ON Event.Event_ID = Wedding.Event_ID
-       LEFT JOIN CustomEvent ON Event.Event_ID = CustomEvent.Event_ID
-       WHERE Event.Event_ID = ?`,
+        `SELECT * FROM event 
+       LEFT JOIN wedding ON event.Event_ID = wedding.Event_ID
+       LEFT JOIN customevent ON event.Event_ID = customevent.Event_ID
+       WHERE event.Event_ID = ?`,
         [eventId]
       );
       return updated[0];
@@ -200,7 +212,7 @@ class AllEvent {
         // Delete from the junction table first.
         await connection.query('DELETE FROM arrangement_reservation WHERE Arrangement_ID = ?', [Arrangement_Id]);
 
-        
+
         const [arrangementRows] = await connection.query(
           'SELECT Table_Reserve_ID FROM table_chair_arrangement WHERE Arrangement_ID = ?',
           [Arrangement_Id]

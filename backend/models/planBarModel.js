@@ -145,6 +145,7 @@ class PlanBar {
         }
     }
 
+    
     static async getPlanBar(booking_id) {
         const connection = await db.getConnection();
         try {
