@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { Logout } from '../../components/Logout'
 import AddCustomer from '../../pages/superAdmin/AddCustomer'
 import ManageCustomer from '../../pages/superAdmin/ManageCustomer';
+import Help from '../help/Help';
+import CusHelpData from '../help/customerHelpData.json'
 
 const CustomersManagementSAN = ({ setRenderContent }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,6 +23,10 @@ const CustomersManagementSAN = ({ setRenderContent }) => {
             case 'manage-customer':
                 setClickedItem('manage-customer');
                 setRenderContent(() => () => <ManageCustomer />);
+                break;
+            case 'help':
+                setClickedItem('help');
+                setRenderContent(() => () => <Help tz={CusHelpData} />);
                 break;
             default:
                 setClickedItem('manage-customer');
@@ -46,15 +52,15 @@ const CustomersManagementSAN = ({ setRenderContent }) => {
                     </li>
                     <li>
                         <a href="#" onClick={() => handleRenderContent('manage-customer')} class={`flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${clickedItem === 'manage-customer' ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
-                            <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M9 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4H7Zm8-1a1 1 0 0 1 1-1h1v-1a1 1 0 1 1 2 0v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1h-1a1 1 0 0 1-1-1Z" clip-rule="evenodd" />
+                            <svg class="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="square" stroke-linejoin="round" stroke-width="2" d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             </svg>
                             <span class="ml-3">Manage Customer</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <a href="#" onClick={() => handleRenderContent('help')} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm1 12H9v-2h2zm0-4H9V6h2z" clipRule="evenodd"></path>
                             </svg>

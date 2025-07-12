@@ -132,7 +132,16 @@ export default function BookingPrintView({ bookingId, onBack }) {
 
         {/* Invoice Content */}
         <div className="pt-5 pl-8 pr-8 pb-5" ref={printRef}>
-          <h1 className="text-2xl font-bold mb-5">Booking Invoice</h1>
+          <div className='flex  mb-5'>
+            <div className='mr-5'>
+              <img src='/15.svg' className='w-16 h-w-16 mb-5' />
+            </div>
+            <div className=''>
+              <h1 className="text-2xl font-bold ">INVOICE</h1>
+              <h3>Deandra Bolgoda</h3>
+            </div>
+            <hr />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Customer Details */}
             <div>

@@ -55,7 +55,6 @@ const CustomerRegistration = () => {
             setErrmsg({ msg: 'Passwords do not match.', color: 'text-red-600' });
             return;
         }
-        console.log("ss")
 
         setBtnText("Waiting..")
         try {

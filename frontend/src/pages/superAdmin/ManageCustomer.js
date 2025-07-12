@@ -1,20 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { getAllCustomers, getCustomerBookings, searchCustomer, updateCustomer } from '../../services/CustomerServise';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
+import { registerCustomer } from '../../services/AuthService';
 
 const ManageCustomer = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [customers, setCustomers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [originalCustomerStatus, setOriginalCustomerStatus] = useState(null); // Track original status
+
     const [bookings, setBookings] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showBookingsModal, setShowBookingsModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [password, setPassword] = useState('');
+
 
     useEffect(() => {
         loadCustomers();
     }, []);
+
+    const handleEditCustomer = (customer) => {
+        setSelectedCustomer(customer);
+        setOriginalCustomerStatus(customer.staus); // Store original status
+        setShowEditModal(true);
+        setPassword(''); // Reset password when opening modal
+    };
+
+    const handleUpdateCustomer = async (e) => {
+        e.preventDefault();
+        try {
+            // Prepare update data
+            const updateData = {
+                name: selectedCustomer.name,
+                email: selectedCustomer.email,
+                phone: selectedCustomer.phone,
+                address: selectedCustomer.address,
+                staus: selectedCustomer.staus
+            };
+
+            // Register customer if changing from inactive to active
+            if (originalCustomerStatus === 'inactive' && selectedCustomer.staus === 'active' && password) {
+                try {
+                    await registerCustomer({
+                        password: password,
+                        customer_id: selectedCustomer.customer_id
+                    });
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    alert('Registration failed. Please try again.');
+                    return;
+                }
+            }
+
+            await updateCustomer(selectedCustomer.customer_id, updateData);
+            await loadCustomers();
+            setShowEditModal(false);
+        } catch (error) {
+            console.error('Update failed:', error);
+        }
+    };
+
 
     const handleDateClick = (booking_id) => {
         console.log("xxx", booking_id)
@@ -45,30 +92,13 @@ const ManageCustomer = () => {
         }
     };
 
-    const handleEditCustomer = (customer) => {
-        setSelectedCustomer(customer);
-        setShowEditModal(true);
-    };
 
-    const handleUpdateCustomer = async (e) => {
-        e.preventDefault();
-        try {
-            // Create a new object with correctly formatted fields
-            const updateData = {
-                name: selectedCustomer.name,
-                email: selectedCustomer.email,
-                phone: selectedCustomer.phone,
-                address: selectedCustomer.address,
-                staus: selectedCustomer.staus // Match backend expectation
-            };
-
-            await updateCustomer(selectedCustomer.customer_id, updateData);
-            await loadCustomers();
-            setShowEditModal(false);
-        } catch (error) {
-            console.error('Update failed:', error);
-        }
-    };
+    // const handleRegisterCustomer = (pswd) => {
+    //     // Update customer with password (add other registration logic here)
+    //     setSelectedCustomer(prev => ({ ...prev, password: pswd }));
+    //     //setShowRegister(false);
+    //     setPassword(''); // Reset password after registration
+    // };
 
     const handleViewBookings = async (customerId) => {
         try {
@@ -139,7 +169,7 @@ const ManageCustomer = () => {
                                         ? 'bg-green-100 text-green-800'
                                         : 'bg-red-100 text-red-800'
                                         }`}>
-                                        {customer.staus}
+                                        {customer.staus == 'active' ? 'Active' : 'Not Registered'}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap space-x-2">
@@ -217,13 +247,37 @@ const ManageCustomer = () => {
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Status</label>
                                     <select
-                                        value={selectedCustomer.staus || 'active'}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, staus: e.target.value })}
+                                        value={selectedCustomer?.staus || 'active'}
+                                        onChange={(e) => {
+                                            const newStatus = e.target.value;
+                                            setSelectedCustomer(prev => ({ 
+                                                ...prev, 
+                                                staus: newStatus 
+                                            }));
+                                        }}
                                         className="w-full p-2 border rounded"
                                     >
                                         <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="inactive">Not Registered</option>
                                     </select>
+                                    
+                                    {/* Show password field only when changing from inactive to active */}
+                                    {originalCustomerStatus === 'inactive' && 
+                                     selectedCustomer.staus === 'active' && (
+                                        <div className="mt-2">
+                                            <input 
+                                                type="password"
+                                                placeholder="Enter password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="w-full p-2 border rounded mb-2"
+                                                required
+                                            />
+                                            <p className="text-sm text-gray-500 mb-2">
+                                                Password is required to activate this customer
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex justify-end space-x-3">
