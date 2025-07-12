@@ -6,6 +6,7 @@ import Pay from "../../pages/superAdmin/Pay";
 import Help from '../help/Help';
 //import PaymentHistory from "./pages/superAdmin/PaymentHistory";
 import PaymentHistory from "../../pages/superAdmin/PaymentHistory";
+import PayHelpData from '../help/payHelpData.json'
 
 const PayrollManagementSAN = ({ setRenderContent }) => {
   const [clickedItem, setClickedItem] = useState(null);
@@ -17,7 +18,7 @@ const PayrollManagementSAN = ({ setRenderContent }) => {
         setRenderContent(() => () => <ServicesChargeCalc />);
         break;
       case "help":
-        setRenderContent(() => () => <Help />);
+        setRenderContent(() => () => <Help tz={PayHelpData} />);
         break;
       default:
         setRenderContent(() => () => <ServicesChargeCalc />);
