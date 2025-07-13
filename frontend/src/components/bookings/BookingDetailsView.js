@@ -10,12 +10,13 @@ import jsPDF from "jspdf";
 import { parse, format } from 'date-fns';
 
 // Reusable detail row component
-function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn, color }) {
+function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh, setCancelBtn, color }) {
     const [edit, setEdit] = useState(false);
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
     const [saving, setSaving] = useState(false);
     const [contract, setContract] = useState('');
+    //const [statusDone, setStatusDone] = useState();
 
     useEffect(() => {
         if (label === "Venue ID") {
@@ -28,9 +29,15 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                 { 'venue_id': 3, 'venue_name': "cancelled" }
             ]);
         }
+        // if(label === "Status"){
+        //     setStatusDone(value);
+        // }
     }, [label]);
 
-    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours" || label === "Date") {
+    const statusDone = label === "Status" ? value : null;
+    console.log(statusDone)
+
+    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours" || (label === "Date" && bookingStatus !== "done")) {
         return (
             <div className="relative p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition-all duration-200 group">
                 {/* Display label and value when not editing */}
@@ -391,6 +398,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
+                                        bookingStatus={b.status}
                                     />
                                     <DetailRow label="Time Slot" value={b.venu_time_slot} />
                                     <DetailRow

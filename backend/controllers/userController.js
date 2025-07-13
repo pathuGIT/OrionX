@@ -245,7 +245,7 @@ export const addEmployee = async (req, res) => {
       "Deandra Registration",
       email,
       user.employee_id,
-      "http://localhost:3000/registration/register-employee"
+      `${process.env.REACT_APP_API_BASE_URL}/registration/register-employee`
     );
 
     res
@@ -271,7 +271,7 @@ export const addCustomer = async (req, res) => {
         const customer = await addCustomerModel(name, email, address, phone);
 
         const user = await getCustomerByEmailModel(email);
-        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
+        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, `${process.env.REACT_APP_API_BASE_URL}/registration/register-customer`);
         
         res.status(201).json({ message: `User registered successfully with this '${email}' email.`, cus_id: customer });
 
