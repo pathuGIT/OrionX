@@ -7,6 +7,7 @@ import autoTable from "jspdf-autotable";
 
 const PaymentHistory = () => {
   const [history, setHistory] = useState([]);
+  const [latestRecords, setLatestRecords] = useState([]);
   const [filteredHistory, setFilteredHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,7 +25,23 @@ const PaymentHistory = () => {
         const { success, data, message } = await getPaymentHistory();
         if (success) {
           setHistory(data);
-          setFilteredHistory(data);
+          
+          // Process to get latest records per employee per month
+          const latestMap = new Map();
+          data.forEach(item => {
+            const monthYear = moment(item.calculation_date).format('YYYY-MM');
+            const key = `${item.employee_id}-${monthYear}`;
+            
+            // If no record exists or current record is newer
+            if (!latestMap.has(key) || 
+                moment(item.calculation_date).isAfter(moment(latestMap.get(key).calculation_date))) {
+              latestMap.set(key, item);
+            }
+          });
+          
+          const latestRecordsArray = Array.from(latestMap.values());
+          setLatestRecords(latestRecordsArray);
+          setFilteredHistory(latestRecordsArray);
         } else {
           setError(message || 'Failed to load payment history');
         }
@@ -40,7 +57,7 @@ const PaymentHistory = () => {
   }, []);
 
   useEffect(() => {
-    let results = history;
+    let results = latestRecords;
     
     // Apply search filter
     if (searchTerm) {
@@ -70,7 +87,7 @@ const PaymentHistory = () => {
     }
     
     setFilteredHistory(results);
-  }, [searchTerm, filters, history]);
+  }, [searchTerm, filters, latestRecords]);
 
   const formatCurrency = (value) => {
     return `LKR ${parseFloat(value).toLocaleString('en-US', {
@@ -173,7 +190,7 @@ const PaymentHistory = () => {
       // Add title
       doc.setFontSize(20);
       doc.setFont(undefined, 'bold');
-      doc.text('Payment  Report', pageWidth / 2, 40, { align: 'center' });
+      doc.text('Payment Report', pageWidth / 2, 40, { align: 'center' });
       
       // Add report date
       doc.setFontSize(10);
@@ -185,7 +202,7 @@ const PaymentHistory = () => {
       let hasFilters = false;
       
       if (filters.employee) {
-        const employee = history.find(e => e.employee_id === filters.employee);
+        const employee = latestRecords.find(e => e.employee_id === filters.employee);
         filterInfo += `Employee: ${employee?.employee_name || filters.employee} `;
         hasFilters = true;
       }
@@ -291,14 +308,14 @@ const PaymentHistory = () => {
     }
   };
 
-  // Get unique years from history
-  const uniqueYears = [...new Set(history.map(item => 
+  // Get unique years from latestRecords
+  const uniqueYears = [...new Set(latestRecords.map(item => 
     moment(item.calculation_date).format('YYYY'))
   )].sort((a, b) => b - a);
 
   // Get unique employees
   const employeeMap = new Map();
-  history.forEach(item => {
+  latestRecords.forEach(item => {
     if (!employeeMap.has(item.employee_id)) {
       employeeMap.set(item.employee_id, item.employee_name);
     }
@@ -573,7 +590,7 @@ const PaymentHistory = () => {
 
         {filteredHistory.length > 0 && (
           <div className="mt-4 text-sm text-gray-500">
-            Showing {filteredHistory.length} of {history.length} records
+            Showing {filteredHistory.length} of {latestRecords.length} records
             {filters.employee || filters.month || filters.year || searchTerm ? (
               <button 
                 className="ml-4 text-blue-600 hover:text-blue-800"
