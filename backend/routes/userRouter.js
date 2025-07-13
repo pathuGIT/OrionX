@@ -25,14 +25,20 @@ import {
     notifyEmployeesPayroll,
     notifySingleEmployeePayroll,
     sendIdToEmp,
-    getPaymentHistory
+    getPaymentHistory,
+    addCustomerNew
 } from '../controllers/userController.js';
 
 const router = express.Router();
 
 //super admins
 router.post('/addEmployee',superAdmin,  addEmployee);
-router.post('/addCustomer', superAdmin, addCustomer);
+router.post('/addCustomer', addCustomer);
+
+//Add new customer with email - test
+router.post('/addCustomerNew', addCustomerNew);
+
+
 router.get('/searchCustomer', searchCustomer);
 router.post('/changeUserRole', superAdmin, changeUserRole);
 router.delete('/deleteEmployee',superAdmin,deleteEmployees);

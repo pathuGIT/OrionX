@@ -24,12 +24,12 @@ export const getEmployeeById = async (employeeId) => {
 };
 
 export const addEmployees = async (employeeData) => {
-    const response = await api.post(`user/addEmployee/`, employeeData);
+    const response = await api.post(`/user/addEmployee/`, employeeData);
     return response.data;
 };
 
 export const deleteEmployees = async (employeeId) => {
-    const response = await api.delete(`user/deleteEmployee/`, employeeId);
+    const response = await api.delete(`/user/deleteEmployee/`, employeeId);
     return response.data;
 };
 

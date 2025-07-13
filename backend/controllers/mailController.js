@@ -34,7 +34,7 @@ export const sendIdToEmp = async (req, res) => {
 
 }
 
-export const sendIdToUserMethod = async (name, subject, email, message, url, res) => {
+export const sendIdToUserMethod = async (name, subject, email, message, url) => {
     //const {name, subject, email, message} = req.body;
     try {
         // Create a transporter
@@ -135,9 +135,8 @@ export const sendIdToUserMethod = async (name, subject, email, message, url, res
         await transporter.sendMail(mailOptions);
 
     } catch (error) {
-        res.json({ msg: 'Mail Server error...', error });
+        console.log('Mail Server error...' );
     }
-
 }
 
 export const sendOtpEmail = async (email, otp) => {

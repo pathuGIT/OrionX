@@ -2,7 +2,7 @@ import api from './Api';
 
 export const addCustomer = async (cusData) => {
   try {
-    const response = await api.post(`user/addCustomer/`, cusData);
+    const response = await api.post(`/user/addCustomer/`, cusData);
     return response.data;
   } catch (error) {
     console.error('Error adding customer:', error);
