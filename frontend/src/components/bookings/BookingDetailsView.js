@@ -7,16 +7,16 @@ import { getAllVenues, getVenueById } from '../../services/VenueService';
 import { data, useNavigate } from 'react-router-dom';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { parse, format } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 
 // Reusable detail row component
-function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh, setCancelBtn, color }) {
+function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh, setCancelBtn, color, bDate }) {
     const [edit, setEdit] = useState(false);
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(value);
     const [saving, setSaving] = useState(false);
     const [contract, setContract] = useState('');
-    //const [statusDone, setStatusDone] = useState();
+    const [date, setDate] = useState();
 
     useEffect(() => {
         if (label === "Venue ID") {
@@ -29,13 +29,9 @@ function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh
                 { 'venue_id': 3, 'venue_name': "cancelled" }
             ]);
         }
-        // if(label === "Status"){
-        //     setStatusDone(value);
-        // }
     }, [label]);
 
-    const statusDone = label === "Status" ? value : null;
-    console.log(statusDone)
+    console.log(bDate)
 
     if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours" || (label === "Date" && bookingStatus !== "done")) {
         return (
@@ -54,8 +50,8 @@ function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh
                                 onClick={() => {
                                     setEdit(true);
                                     setCancelBtn(true);
-                                    
-                                    setSelectedVenue({ additionalHours: value, number_of_guests: value, damageFee: value, date: format(parse(value, 'MMM dd, yyyy', new Date()), 'yyyy-MM-dd') });
+
+                                    setSelectedVenue({ additionalHours: value, number_of_guests: value, damageFee: value, date: format(parseISO(bDate), "yyyy-MM-dd") });
                                 }}
                             >
                                 <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -79,7 +75,7 @@ function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh
                             >
                                 <option value="">Select {label}</option>
                                 {venues.map(v => (
-                                    <option key={v.venue_id} value={v.venue_id}>{v.venue_name + " || " + v.time_slot}</option>
+                                    <option key={v.venue_id} value={v.venue_id}>{v.venue_name + (v.time_slot ? " || " + v.time_slot : "")}</option>
                                 ))}
                             </select>
                         )}
@@ -399,6 +395,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
                                         bookingStatus={b.status}
+                                        bDate={b.booking_date}
                                     />
                                     <DetailRow label="Time Slot" value={b.venu_time_slot} />
                                     <DetailRow

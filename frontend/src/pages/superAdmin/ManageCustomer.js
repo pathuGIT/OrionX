@@ -94,13 +94,6 @@ const ManageCustomer = () => {
     };
 
 
-    // const handleRegisterCustomer = (pswd) => {
-    //     // Update customer with password (add other registration logic here)
-    //     setSelectedCustomer(prev => ({ ...prev, password: pswd }));
-    //     //setShowRegister(false);
-    //     setPassword(''); // Reset password after registration
-    // };
-
     const handleViewBookings = async (customerId) => {
         try {
             const data = await getCustomerBookings(customerId);
@@ -152,6 +145,7 @@ const ManageCustomer = () => {
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -163,6 +157,7 @@ const ManageCustomer = () => {
                             <tr key={customer.customer_id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.customer_id}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.name}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.address}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
