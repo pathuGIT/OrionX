@@ -13,7 +13,6 @@ const CustomerMenuSummaryPage = () => {
   const decryptedBookingId = decryptBookingId(encryptedBookingId);
 
   useEffect(() => {
-    console.log("hii")
     const fetchMenuSelections = async () => {
       try {
         setLoading(true);
@@ -42,18 +41,62 @@ const CustomerMenuSummaryPage = () => {
       const textColor = [55, 65, 81];
       const lightGray = [156, 163, 175];
 
+      // Add watermark to all pages
+      const addWatermark = () => {
+        try {
+          // Save current state to restore later
+          doc.saveGraphicsState();
+          
+          // Set watermark properties - increased opacity for better visibility
+          doc.setGState(new doc.GState({ opacity: 0.2 })); // Increased from 0.1 to 0.2
+          
+          const watermarkLogoPath = '/menus/deandra logo.jpg'; 
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          
+          // Watermark size - 50% of page width (increased from 30%)
+          const watermarkWidth = pageWidth * 0.5;
+          // Maintain aspect ratio
+          const watermarkHeight = watermarkWidth * (1); // Adjust ratio if needed
+          
+          // Center watermark
+          const x = (pageWidth - watermarkWidth) / 2;
+          const y = (pageHeight - watermarkHeight) / 2;
+          
+          doc.addImage(
+            watermarkLogoPath,
+            'JPEG',
+            x,
+            y,
+            watermarkWidth,
+            watermarkHeight
+          );
+          
+          // Restore graphics state
+          doc.restoreGraphicsState();
+        } catch (e) {
+          console.error('Error adding watermark:', e);
+        }
+      };
+
       let yPosition = 20;
       const pageWidth = doc.internal.pageSize.width;
       const margin = 20;
       const contentWidth = pageWidth - 2 * margin;
 
-      doc.setFillColor(...primaryColor);
+      // Add watermark to first page
+      addWatermark();
+
+      // doc.setFillColor(...primaryColor);
       doc.rect(0, 0, pageWidth, 40, 'F');
       
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Menu Selection Summary', margin, 25);
+      
+      doc.text('Menu Summary', doc.internal.pageSize.getWidth() / 2, 25, { align: 'center' , setFontSize: '40'});
+      doc.text('Deandra Bolgoda', doc.internal.pageSize.getWidth() / 2, 35, { align: 'center' });
+    
       
       yPosition = 50;
 
@@ -97,10 +140,13 @@ const CustomerMenuSummaryPage = () => {
           if (yPosition > 250) {
             doc.addPage();
             yPosition = 20;
+            addWatermark(); // Add watermark to new pages
           }
 
-          doc.setFillColor(245, 245, 245);
-          doc.rect(margin, yPosition - 5, contentWidth, 12, 'F');
+        // doc.setDrawColor(...primaryColor);
+        // doc.setLineWidth(0.5);
+        // doc.line(margin, yPosition + 2, margin + contentWidth, yPosition + 2);
+        // yPosition += 5;
           
           doc.setTextColor(...primaryColor);
           doc.setFontSize(12);
@@ -112,6 +158,7 @@ const CustomerMenuSummaryPage = () => {
             if (yPosition > 270) {
               doc.addPage();
               yPosition = 20;
+              addWatermark(); // Add watermark to new pages
             }
 
             doc.setTextColor(...textColor);
@@ -125,6 +172,7 @@ const CustomerMenuSummaryPage = () => {
                 if (yPosition > 275) {
                   doc.addPage();
                   yPosition = 20;
+                  addWatermark(); // Add watermark to new pages
                 }
 
                 doc.setFont('helvetica', 'normal');
@@ -195,7 +243,7 @@ const CustomerMenuSummaryPage = () => {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-white">Menu Selection Summary</h1>
+            <h1 className="text-2xl font-bold text-white">Menu Summary</h1>
             <div className="mt-2 text-blue-100">
               <p>Booking ID: {menuData.booking_id}</p>
               <p>Customer: {menuData.customer_name} ({menuData.customer_email})</p>
@@ -245,7 +293,7 @@ const CustomerMenuSummaryPage = () => {
                     Guests: {menuData.number_of_guests}
                   </p>
                   <p className="text-sm text-gray-600">
-                    {/* Status: <span className="capitalize">{menuData.status}</span> */}
+                    Status: <span className="capitalize">{menuData.status}</span>
                   </p>
                 </div>
                 
