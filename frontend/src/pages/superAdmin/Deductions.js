@@ -371,7 +371,6 @@ const DeductionsPage = () => {
                       <tr key={index}>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">
                           {entry.employee_id}
-                          {console.log('ado',entry.data)}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">
                           {new Date(entry.month_year).toLocaleDateString(

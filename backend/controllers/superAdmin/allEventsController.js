@@ -31,7 +31,6 @@ export const updateEvent = async (req, res) => {
       }
     });
 
-    console.log('Updating event:', req.params.id, eventData);
     const updatedEvent = await AllEvent.update(req.params.id, eventData);
     
     res.json({ 

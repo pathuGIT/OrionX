@@ -127,7 +127,7 @@ const EventServiceList = () => {
                         className="h-12 w-12 object-cover rounded"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.parentNode.innerHTML = '<span class="text-red-500 text-xs">Image error</span>';
+                          e.target.parentNode.innerHTML = '<span className="text-red-500 text-xs">Image error</span>';
                         }}
                       />
                     )}

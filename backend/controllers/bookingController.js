@@ -170,7 +170,6 @@ export async function createBooking(req, res) {
             payDeposit // boolean
         } = req.body;
 
-        console.log("Bookk:", req.body)
         // 1. Fetch venue details
         const venue = await getVenueBytId(venueId);
         if (!venue) return res.status(404).json({ error: 'Venue not found' });
@@ -317,7 +316,6 @@ export const updateBookingStatus = async (req, res) => {
                 return res.status(201).json({ success: true, message: "Contract created successfully." });
             }
 
-            console.log("currentContract", currentContract.data)
             // change contract
             await updateDamageFeeModel(bookingId, 0, 0, payDeposit, 'pending');
             
@@ -356,7 +354,6 @@ export const updateBookingStatus = async (req, res) => {
         }
 
         if (status === "1") {
-            console.log("here 1")
             await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
 
             const currentBookingPrice = await getBookingPricingById(bookingId);
@@ -374,7 +371,6 @@ export const updateBookingStatus = async (req, res) => {
 
         if (status === "3") {
             // change contract
-            console.log("Iam 1")
             await updateDamageFeeModel(bookingId, 0, 0, 0, 'canceled');
 
 
@@ -482,8 +478,6 @@ export const updateBookingVenue = async (req, res) => {
         //const overallTotal = hallCharge + extraHourFee;
         //const overallTotal = Number(hallCharge) + Number(extraHourFee);
 
-        console.log("hallcharge:", hallCharge)
-        console.log("extraHourFee:", extraHourFee)
 
         // Update booking with new pricing information
         await updateBookingPricingModel(bookingId, {
@@ -541,9 +535,9 @@ export const updateDamageFee = async (req, res) => {
         };
         await updatePricingModel(bookingId, newBookingPrice);
 
-        console.log("New booking price:", newBookingPrice);
-        console.log("booking status:", status);
-        console.log("contract data:", bookingId, newDamageFee, newRefundAmount, newDepositAmount, newStatus);
+        // console.log("New booking price:", newBookingPrice);
+        // console.log("booking status:", status);
+        // console.log("contract data:", bookingId, newDamageFee, newRefundAmount, newDepositAmount, newStatus);
 
         res.status(200).json({ success: true, message: "Damage fee updated successfully." });
     } catch (error) {
@@ -556,8 +550,6 @@ export const updateDamageFee = async (req, res) => {
 export const updateMenuFee = async (req, res) => {
     const bookingId = req.params.id;
     const { menueFee } = req.body;
-
-    console.log("menueFee:", menueFee, bookingId)
 
     try {
 
@@ -587,18 +579,15 @@ export const updateMenuFee = async (req, res) => {
 export const updateGuests = async (req, res) => {
     const bookingId = req.params.id;
     const { number_of_guests } = req.body;
-    console.log("updateGuests:", bookingId, number_of_guests);
     try {
         // get current booking
         const currBooking = await getBookingById(bookingId);
 
         // update current booking guest
         await updateGuestsModel(bookingId, number_of_guests);
-        console.log("1111")
 
         // get current venue 
         const venue = await getVenueBytId(currBooking.venue_id);
-        console.log("22222")
 
         // get selected venue price for booking_id
         const selectedMenuPrice = await getSelectedMenuPrice(bookingId);

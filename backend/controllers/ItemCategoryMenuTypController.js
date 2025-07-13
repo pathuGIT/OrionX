@@ -5,7 +5,6 @@ export const getItemCategoryMenuTypes = async (req, res) => {
     try {
         const icmt = await ItemCategoryMenuTypeModel.getItemCategoryMenuTypes();
         
-    console.log("Fetching all Item_Category_Menu_Type records",icmt);
         res.json(icmt);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -41,7 +40,6 @@ export const createItemCategoryMenuType = async (req, res) => {
 export const updateItemCategoryMenuType = async (req, res) => {
     try {
         const { category_menu_type_id, item_id } = req.body;
-        console.log("Updating ItemCategoryMenuType with ID:", req.params.id, "Category Menu Type ID:", category_menu_type_id, "Item ID:", item_id);
         const affectedRows = await ItemCategoryMenuTypeModel.updateItemCategoryMenuType(req.params.id, category_menu_type_id, item_id);
         
         if (affectedRows) {

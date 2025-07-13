@@ -6,10 +6,10 @@ export const BookingTable = ({ bookings, onRowClick }) => {
   const formatDate = (iso) => new Date(iso).toLocaleDateString();
 
   return (
-    <div class="relative overflow-x-auto overflow-y-scroll shadow-md sm:rounded-lg mt-5" style={{ maxHeight: '450px' }}>
+    <div className="relative overflow-x-auto overflow-y-scroll shadow-md sm:rounded-lg mt-5" style={{ maxHeight: '450px' }}>
       {/* display venue table */}
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th className='px-6 py-3'>Booking ID</th>
             <th className='px-6 py-3'>Date</th>

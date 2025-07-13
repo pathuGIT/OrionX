@@ -75,11 +75,9 @@ export const assignAdmin = async (req, res) => {
     if (!validPassword) return res.status(401).json({ error: 'Invalid password' })
 
     // Update role
-    console.log("xxxxxx:")
     const updatedUser = await updateUserRole(employeeId, role)
     res.status(200).json(updatedUser)
 
-    console.log("zzzzzz:")
 
   } catch (error) {
     console.error('Role assignment error:', error)

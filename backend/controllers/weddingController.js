@@ -4,7 +4,6 @@ import Wedding from '../models/weddingModel.js'; // Import the Wedding model
 export const createWedding = async (req, res) => {
     try {
         const weddingData = req.body;
-        console.log("Received wedding data:", weddingData); // Log received data
 
         if (!weddingData) {
             return res.status(400).json({ success: false, message: "Wedding data is required." });

@@ -14,7 +14,6 @@ export const getSelectionById = async (booking_id, ICMT_Id) => {
 };
 
 export const createSelection = async (booking_id, ICMT_Id) => {
-    console.log("Creating selection for booking_id:", booking_id, "ICMT_Id:", ICMT_Id);
     const [result] = await db.query(
         "INSERT INTO customer_menu_item_selection (booking_id, ICMT_Id) VALUES (?, ?)",
         [booking_id, ICMT_Id]
@@ -31,7 +30,6 @@ export const deleteSelection = async (booking_id, ICMT_Id) => {
 };
 
 export const existsBookingSelection = async (booking_id) => {
-    console.log("Checking booking selection for ID:", booking_id);
     const [rows] = await db.query(
         "SELECT 1 FROM customer_menu_item_selection WHERE booking_id = ? LIMIT 1",
         [booking_id]

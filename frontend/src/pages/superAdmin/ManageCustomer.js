@@ -64,7 +64,6 @@ const ManageCustomer = () => {
 
 
     const handleDateClick = (booking_id) => {
-        console.log("xxx", booking_id)
         if (booking_id) {
             setSelectedBooking(booking_id);
         }

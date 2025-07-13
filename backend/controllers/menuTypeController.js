@@ -12,7 +12,6 @@ export const getAllMenuTypes = async (req, res) => {
 export const getMenuTypeById = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log("menu_type_id", id);
         const menuType = await MenuTypeModel.getMenuTypeById(id);
 
         if (!menuType) {

@@ -23,7 +23,6 @@ const InvoiceView = () => {
       );
 
       if (params) {
-        console.log("Searching bookings with params:", params);
         const data = await searchBookingBy(params.customer_id || params.booking_id);
         setBookings(data.data);
       }
@@ -36,7 +35,6 @@ const InvoiceView = () => {
     setLoading(true);
     try {
       const data = await getBookings();
-      console.log("Searching bookings with status2222:", data);
       setBookings(data.data);
 
       setError(null);

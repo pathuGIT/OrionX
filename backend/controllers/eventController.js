@@ -5,7 +5,6 @@ import Event from '../models/eventModel.js'; // Import the Event model
 export const createEvents = async (req, res) => {
     try {
         const eventData = req.body;
-        console.log("Received event data:", eventData); // Log received data
 
         if (!eventData) {
             return res.status(400).json({ success: false, message: "Event data is required." });

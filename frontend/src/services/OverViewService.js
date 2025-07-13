@@ -27,7 +27,6 @@ export const OverViewService = {
 export const getRecentBookings = async () => {
   try {
     const response = await api.get(`${BASE}/recent-bookings`);
-    console.log("Recent bookings fetched:", response);
     return response.data;
   } catch (err) {
     console.error("Error in getRecentBookings:", err);

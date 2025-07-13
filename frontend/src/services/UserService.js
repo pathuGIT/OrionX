@@ -12,7 +12,6 @@ export const getEmployees = async () => {
 //updateEmployee_link
 export const updateEmployee = async (employeeId, data) => {
     const datat = { id:employeeId, name: data.name, phone:data.phone, email:data.email, bod:data.bod, salary:data.salary, service_charge_precentage:data.service_charge_precentage, hire_date:data.hire_date  };
-    console.log(datat)
     const response = await api.put("/user/updateEmployee/", datat);
      
     return response.data;
@@ -21,7 +20,6 @@ export const updateEmployee = async (employeeId, data) => {
 // Get employee by ID
 export const getEmployeeById = async (employeeId) => {
     const response = await api.get(`/user/getEmployeeById/${employeeId}`);
-   //console.log(response.data);
     return response.data;
 };
 
@@ -37,38 +35,14 @@ export const deleteEmployees = async (employeeId) => {
 
 export const updateEmployeesStatus = async (employee_Id, status) => {
     const data = { employee_Id, status };
-    console.log(data);
     const response = await api.put("/user/updateStatus/",data);
-    console.log(response.data);
     return response.data;
 };
 
-// export const getEmployeesByStatus = async (status) => {
-//     const data = { status };
-//     console.log(data);
-//     const response = await api.get("/user/getEmployeesByStatus/", data);
-//     //console.log(response);
-//     return response.data;
-
-// };
-// Get employee by ID
 export const getEmployeesByStatus = async (status) => {
     const response = await api.get(`/user/getEmployeesByStatus/${status}`);
     return response.data;
 };
-
-// Get all service charge data
-// export const getAllServiceChargeData = async () => {
-//     const response = await api.get("/user/getAllServiceChargeData");
-//     // console.log("adoooo");
-//     // console.log(response.data);
-//     return response.data;
-// };
-// Service Charge Calculation Logic
-// export const calculateServiceChargeDistribution = async () => {
-//     const response = await api.get("/user/getAllServiceChargeData");
-//     return response.data;
-// };
 
 export const serviceChargeService = {
     calculateCharges: async () => {
@@ -292,7 +266,6 @@ export const calculatePay = async (date) => {
 
 export const getPayEntries = async (date) => {
     try {
-        console.log("Fetching pay entries for date:", date);
         const response = await api.get(`/user/entries/${date}`);
         return response.data;
     } catch (error) {
