@@ -50,18 +50,18 @@ const MenuManagementSAN = ({ setRenderContent }) => {
         setRenderContent(() => () => <CreateCategory setRenderContent={setRenderContent} handleRenderContent={handleRenderContent} />);
         break;
       case 'createItem':
-        setClickedItem('CreateItem');
+        setClickedItem('createItem');
         setRenderContent(() => () => <CreateItem setRenderContent={setRenderContent} handleRenderContent={handleRenderContent} />);
         break;
       case 'createCategoryMenuType':
-        setClickedItem('CreateCategoryMenuType');
+        setClickedItem('createCategoryMenuType');
         setRenderContent(() => () => <CreateCategoryMenuType setRenderContent={setRenderContent} handleRenderContent={handleRenderContent} />);
         break;
       case 'MenuOverview':
         setRenderContent(() => () => <MenuOverview />);
         break;
       case 'createItemCategoryMenuType':
-        setClickedItem('CreateItemCategoryMenuType');
+        setClickedItem('createItemCategoryMenuType');
         setRenderContent(() => () => <CreateItemCategoryMenuType setRenderContent={setRenderContent} handleRenderContent={handleRenderContent} />);
         break;
       // case 'CustomerMenuSummary':
@@ -114,9 +114,9 @@ const MenuManagementSAN = ({ setRenderContent }) => {
               <li><a href="#" onClick={() => handleRenderContent('createMenuListTypes')}  class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuListTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Menu List Setup</a></li>
               <li><a href="#" onClick={() => handleRenderContent('createMenuTypes')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createMenuTypes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Define Menu Types</a></li>
               <li><a href="#" onClick={() => handleRenderContent('createCategory')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'createCategory' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Manage Food categories</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateItem')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItem' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Add Food Items</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Link Categories to Menu Types</a></li>
-              <li><a href="#" onClick={() => handleRenderContent('CreateItemCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItemCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Map Items with Categories & Menu Types</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createItem')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItem' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Add Food Items</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Link Categories to Menu Types</a></li>
+              <li><a href="#" onClick={() => handleRenderContent('createItemCategoryMenuType')} class={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CreateItemCategoryMenuType' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>Map Items with Categories & Menu Types</a></li>
             </ul>
           </li>
 
