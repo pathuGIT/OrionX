@@ -54,21 +54,23 @@ export async function fetchRevenueTrend() {
 export async function fetchRecentBookings() {
   // revenue grouped by YYYY-MM
   const [rows] = await db.query(
-        `SELECT 
-        b.booking_id, 
-        c.name, 
-        b.booking_date, 
-        b.total_price, 
-        b.status 
-    FROM 
-        booking b 
-    INNER JOIN 
-        customer c 
-        ON b.customer_id = c.customer_id 
-    WHERE 
-        b.status = 'confirmed'
-        AND b.updated_at BETWEEN NOW() - INTERVAL 5 DAY AND NOW()
-        AND b.booking_date >= CURDATE() Limit 3`
+    `SELECT
+    b.booking_id,
+    c.name,
+    b.booking_date,
+    b.total_price,
+    b.status
+FROM
+    booking b
+INNER JOIN
+    customer c ON b.customer_id = c.customer_id
+WHERE
+    b.status = 'confirmed'
+    AND b.updated_at BETWEEN NOW() - INTERVAL 5 DAY AND NOW()
+    AND b.booking_date >= CURDATE()
+ORDER BY
+    b.updated_at DESC
+LIMIT 3`
   );
   return rows;
 }
