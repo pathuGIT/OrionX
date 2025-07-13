@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getItems, addItem, getItemById, deleteItem, updateItem } from '../../services/MenuService';
 
-function CreateItem({setRenderContent}) {
+function CreateItem({ setRenderContent, handleRenderContent }) {
   const [item, setItem] = useState({ item_id: '', item_name: '' });
   const [items, setItems] = useState([]);
   const [btnName, setBtnName] = useState('Add Item');
@@ -55,6 +55,11 @@ function CreateItem({setRenderContent}) {
         alert('Item added successfully!');
         setItem({ item_name: '' });
         setIsAdding(false);
+
+         if (handleRenderContent) {
+          handleRenderContent('createCategoryMenuType');
+        }
+
       } else {
         await updateItem(item.item_id, item.item_name);
         alert('Item updated successfully!');
