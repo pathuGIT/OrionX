@@ -11,9 +11,16 @@ export const registerEmployee = async (employeeData) => {
 };
 
 export const registerCustomer = async (customerData) => {
-  const response = await api.post('/auth/register-customer', customerData);
+  console.log('Registering customer with data:', customerData);
+  const response = await api.put('/auth/register-customer', customerData);
   return response.data; // Returns success message
 };
+
+export const updateCustomerPassword = async (customerData) => {
+  console.log('Updating customer password with data:', customerData); 
+  const response = await api.put('/auth/update-customer-password', customerData);
+  return response.data; // Returns success message
+}
 
 export const validateEmail = async (email) => {
   try {

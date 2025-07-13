@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllCustomers, getCustomerBookings, searchCustomer, updateCustomer } from '../../services/CustomerServise';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
-import { registerCustomer } from '../../services/AuthService';
+import { registerCustomer, updateCustomerPassword } from '../../services/AuthService';
 
 const ManageCustomer = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +42,7 @@ const ManageCustomer = () => {
 
             // Register customer if changing from inactive to active
             if (originalCustomerStatus === 'inactive' && selectedCustomer.staus === 'active' && password) {
+                console.log('Registering customer with password:', password, selectedCustomer.customer_id);
                 try {
                     await registerCustomer({
                         password: password,
@@ -55,6 +56,7 @@ const ManageCustomer = () => {
             }
 
             await updateCustomer(selectedCustomer.customer_id, updateData);
+            //await updateCustomerPassword(selectedCustomer.customer_id, updateData);
             await loadCustomers();
             setShowEditModal(false);
         } catch (error) {

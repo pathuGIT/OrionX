@@ -51,6 +51,7 @@ export const addCustomerModel = async (name, email, address, phone) => {
 
 //register customer 
 export const registerCustomerModel = async (password, customer_id) => {
+    console.log("model",password, customer_id)
     const [result] = await pool.query(
         'UPDATE customer SET pasword = ?, staus = ? WHERE customer_id = ?',
         [password, 'active', customer_id]

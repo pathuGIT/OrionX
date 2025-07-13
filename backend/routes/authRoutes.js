@@ -3,7 +3,7 @@ import {registerCus, registerEmp, login, refresh, checkEmail, forgotPassword, va
 const router = express.Router();
 
 router.post('/register-employee', registerEmp);
-router.post('/register-customer', registerCus);
+router.put('/register-customer', registerCus);
 router.post('/login', login);
 router.post('/refresh', refresh);
 router.get('/check-email', checkEmail);
