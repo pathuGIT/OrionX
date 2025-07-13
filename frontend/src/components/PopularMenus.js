@@ -61,6 +61,7 @@ const PopularMenuSelections = ({ setActivePage, closeSidebar }) => {
         for (const category of menuType.categories) {
           if (category.items.some(item => item.id === itemId)) {
             return {
+              menuListId: menuList.id,
               menuListName: menuList.name,
               menuTypeName: menuType.name,
               categoryName: category.name
@@ -70,6 +71,16 @@ const PopularMenuSelections = ({ setActivePage, closeSidebar }) => {
       }
     }
     return null;
+  };
+
+  const handleViewMenu = (itemId) => {
+    const menuInfo = findItemMenuType(itemId);
+    if (menuInfo) {
+      // Store the highlighted menu in session storage
+      sessionStorage.setItem('highlightedMenuList', menuInfo.menuListId);
+      setActivePage('plan-menulist');
+      closeSidebar?.();
+    }
   };
 
   if (loading) {
@@ -131,10 +142,7 @@ const PopularMenuSelections = ({ setActivePage, closeSidebar }) => {
                     #{index + 1} Most Popular
                   </span>
                   <button 
-                    onClick={() => {
-                      setActivePage('plan-menulist');
-                      closeSidebar?.();
-                    }}
+                    onClick={() => handleViewMenu(item.item_id)}
                     className="flex items-center text-blue-600 hover:text-blue-800 transition"
                   >
                     View Menu
