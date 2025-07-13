@@ -5,6 +5,25 @@ import { FaSearch, FaFilePdf } from 'react-icons/fa';
 import { jsPDF } from 'jspdf';
 import autoTable from "jspdf-autotable";
 
+// Helper function for month dot colors
+const getMonthDotColor = (monthName) => {
+  const colorMap = {
+    'January': '#3b82f6',    // blue-500
+    'February': '#8b5cf6',   // purple-500
+    'March': '#ec4899',      // pink-500
+    'April': '#10b981',      // green-500
+    'May': '#eab308',        // yellow-500
+    'June': '#6366f1',       // indigo-500
+    'July': '#ef4444',       // red-500
+    'August': '#f97316',     // orange-500
+    'September': '#14b8a6',  // teal-500
+    'October': '#06b6d4',    // cyan-500
+    'November': '#f59e0b',   // amber-500
+    'December': '#84cc16'    // lime-500
+  };
+  return colorMap[monthName] || '#94a3b8';
+};
+
 const PaymentHistory = () => {
   const [history, setHistory] = useState([]);
   const [latestRecords, setLatestRecords] = useState([]);
@@ -227,7 +246,7 @@ const PaymentHistory = () => {
         doc.text(filterInfo, pageWidth / 2, 80, { align: 'center', maxWidth: pageWidth - 80 });
       }
 
-      // Prepare table data
+      // Prepare table data with Payment Status column
       const headers = [
         'Employee ID',
         'Name',
@@ -236,7 +255,8 @@ const PaymentHistory = () => {
         'Service Charge',
         'Deductions',
         'Net Salary',
-        'Payment Date'
+        'Payment Date',
+        'Payment Status'
       ];
       
       const data = filteredHistory.map(item => [
@@ -247,7 +267,8 @@ const PaymentHistory = () => {
         formatCurrency(item.total_service_charge),
         formatCurrency(item.total_deduction),
         formatCurrency(item.net_salary),
-        moment(item.calculation_date).format('DD MMM YYYY')
+        moment(item.calculation_date).format('DD MMM YYYY'),
+        item.status
       ]);
 
       // Add watermark and logo to first page
@@ -255,7 +276,7 @@ const PaymentHistory = () => {
       addLogo();
 
       // Calculate table width and center it
-      const tableWidth = 570; // Sum of column widths
+      const tableWidth = 640; // Increased to accommodate new column
       const margin = (pageWidth - tableWidth) / 2;
 
       // Generate table with centered alignment
@@ -276,7 +297,7 @@ const PaymentHistory = () => {
         styles: {
           cellPadding: 3,
           valign: 'middle',
-          halign: 'center' // Center-align all cells
+          halign: 'center'
         },
         columnStyles: {
           0: { cellWidth: 70, halign: 'left' },
@@ -286,7 +307,8 @@ const PaymentHistory = () => {
           4: { cellWidth: 70 },
           5: { cellWidth: 70 },
           6: { cellWidth: 70 },
-          7: { cellWidth: 70 }
+          7: { cellWidth: 70 },
+          8: { cellWidth: 70 } // Payment Status column
         },
         margin: { left: margin, right: margin },
         didDrawPage: function(data) {
@@ -505,12 +527,15 @@ const PaymentHistory = () => {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Payment Date
                 </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Payment status
+                </th>
               </tr>
             </thead>
             <tbody>
               {filteredHistory.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center">
                       <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -527,15 +552,13 @@ const PaymentHistory = () => {
                   
                   return (
                     <React.Fragment key={`group-${monthYear}`}>
-                      {/* Month header row with color coding */}
                       <tr className={`${monthColor} border-t-2 border-b border-gray-300`}>
-                        <td colSpan="7" className="px-6 py-3 font-bold text-gray-800">
+                        <td colSpan="8" className="px-6 py-3 font-bold text-gray-800">
                           <div className="flex items-center">
-                            <div className="w-3 h-3 rounded-full mr-3" style={{
-                              backgroundColor: monthColors.find((_, i) => 
-                                moment().month(i).format('MMMM') === monthName
-                              )?.replace('bg-', '').replace('-50', '') || '#94a3b8'
-                            }}></div>
+                            <div 
+                              className="w-3 h-3 rounded-full mr-3" 
+                              style={{ backgroundColor: getMonthDotColor(monthName) }}
+                            ></div>
                             {monthYear}
                             <span className="ml-2 text-sm font-normal text-gray-600">
                               ({items.length} payment{items.length > 1 ? 's' : ''})
@@ -544,7 +567,6 @@ const PaymentHistory = () => {
                         </td>
                       </tr>
                       
-                      {/* Payment records for the month */}
                       {items.map((item, index) => (
                         <tr 
                           key={`${item.employee_id}-${item.calculation_date}`}
@@ -577,6 +599,15 @@ const PaymentHistory = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {moment(item.calculation_date).format('DD MMM YYYY')}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <span className={`px-2 py-1 rounded-full ${
+                              item.status === 'Paid' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {item.status}
+                            </span>
                           </td>
                         </tr>
                       ))}

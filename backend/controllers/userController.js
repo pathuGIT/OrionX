@@ -15,7 +15,8 @@ import {
   DeductionModel,
   calculatePayModel,
   getPayEntriesModel,
-  getPaymentHistoryModel
+  getPaymentHistoryModel,
+  UpdatePayStatusEntriesModel,
   
   
 } from "../models/userModel.js";
@@ -837,7 +838,56 @@ export const getPayEntries = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+//huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+export const UpdatePayStatus = async (req, res) => {
+  try {
+    const { employee_id, date } = req.params;
+    const { status } = req.body;
 
+    // Validate status input
+    const validStatuses = ["Paid","Not Paid"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        error: "Invalid status. Valid values: Paid, Not Paid" 
+      });
+    }
+
+    // Update and get affected rows
+    const result = await UpdatePayStatusEntriesModel(
+      status, 
+      date, 
+      employee_id
+    );
+
+    // Handle no records updated
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        error: "No records found matching the criteria",
+        details: {
+          employee_id,
+          date,
+          current_status: "Check if record exists"
+        }
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Pay status updated successfully",
+      updatedRecord: {
+        employee_id,
+        date,
+        new_status: status
+      },
+      affectedRows: result.affectedRows
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: "Database operation failed",
+      details: error.message 
+    });
+  }
+};
 
 // Add new controller methods
 export const getAllCustomers = async (req, res) => {
