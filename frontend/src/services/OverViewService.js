@@ -3,12 +3,34 @@ import api from './Api';  // your preconfigured axios instance
 const BASE = '/overview';
 
 export const OverViewService = {
-  getKpis: () => api.get(`${BASE}/kpis`).then(res => res.data),
-  getRevenueTrend: () => api.get(`${BASE}/revenue-trend`).then(res => res.data)
+  getKpis: async () => {
+    try {
+      const res = await api.get(`${BASE}/kpis`);
+      return res.data;
+    } catch (err) {
+      console.error("Error in getKpis:", err);
+      throw err; // or return default value
+    }
+  },
+
+  getRevenueTrend: async () => {
+    try {
+      const res = await api.get(`${BASE}/revenue-trend`);
+      return res.data;
+    } catch (err) {
+      console.error("Error in getRevenueTrend:", err);
+      throw err;
+    }
+  }
 };
 
 export const getRecentBookings = async () => {
-  const response = await api.get(`${BASE}/recent-bookings`);
-  console.log("Recent bookings fetched:", response);
-  return response.data;
+  try {
+    const response = await api.get(`${BASE}/recent-bookings`);
+    console.log("Recent bookings fetched:", response);
+    return response.data;
+  } catch (err) {
+    console.error("Error in getRecentBookings:", err);
+    throw err;
+  }
 };
