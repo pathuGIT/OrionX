@@ -276,6 +276,11 @@ export const updateBookingVenueModel = (bookingId, venueId) => {
     [venueId, bookingId]
   );
 }
+
+export const updateDateModel = (bookingId, date) => {
+  const sql = `UPDATE booking SET booking_date = ?, updated_at = NOW() WHERE booking_id = ?`;
+  return pool.query(sql, [date, bookingId]);
+}
 //
 export const updateDamageFeeModel = async (bookingId, damageFee, refundAmount, depositAmount, status) => {
   const sql = `UPDATE contract SET damage_fee = ?, refund_amount = ?, deposit_amount = ?, status = ?,  updated_at = NOW() WHERE booking_id = ?`;

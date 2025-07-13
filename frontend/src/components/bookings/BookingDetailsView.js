@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import BookingService, { getBookingDetails, getPrintBookingDetails, updateAdditionalHours, updateBookingGuest, updateBookingStatus, updateBookingVenue, updateDamageFee } from '../../services/BookngService';
+import BookingService, { getBookingDetails, getPrintBookingDetails, updateAdditionalHours, updateBookingGuest, updateBookingStatus, updateBookingVenue, updateDamageFee, updateDate } from '../../services/BookngService';
 import VenueDropdown from './VenueDropdown';
 import BookingPrintView from './BookingPrintView';
 import { getAllVenues, getVenueById } from '../../services/VenueService';
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { parse, format } from 'date-fns';
 
 // Reusable detail row component
 function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refresh, setCancelBtn, color }) {
@@ -29,7 +30,7 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
         }
     }, [label]);
 
-    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours") {
+    if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours" || label === "Date") {
         return (
             <div className="relative p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition-all duration-200 group">
                 {/* Display label and value when not editing */}
@@ -46,7 +47,8 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                                 onClick={() => {
                                     setEdit(true);
                                     setCancelBtn(true);
-                                    setSelectedVenue({ additionalHours: value, number_of_guests: value, damageFee: value });
+                                    
+                                    setSelectedVenue({ additionalHours: value, number_of_guests: value, damageFee: value, date: format(parse(value, 'MMM dd, yyyy', new Date()), 'yyyy-MM-dd') });
                                 }}
                             >
                                 <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -119,6 +121,15 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                             />
                         )}
 
+                        {label === "Date" && (
+                            <input
+                                type="date"
+                                className="border rounded p-1"
+                                value={selectedVenue.date}
+                                onChange={e => setSelectedVenue({ "date": e.target.value })}
+                            />
+                        )}
+
                         <div className="flex gap-2 mt-2">
                             <button
                                 className={`flex-1 py-1.5 px-3 rounded-md font-medium transition-all duration-200 ${saving || !selectedVenue || selectedVenue === value
@@ -139,6 +150,8 @@ function DetailRow({ label, value, bookingId, onVenueUpdated, setRefresh, refres
                                             await updateBookingGuest(bookingId, selectedVenue);
                                         } else if (label === "Additional Hours") {
                                             await updateAdditionalHours(bookingId, selectedVenue);
+                                        } else if (label === "Date") {
+                                            await updateDate(bookingId, selectedVenue);
                                         }
                                         setRefresh(!refresh);
                                         setEdit(false);
@@ -372,7 +385,13 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <DetailRow label="Booking ID" value={b.booking_id} />
-                                    <DetailRow label="Date" value={formatDate(b.booking_date)} />
+                                    <DetailRow
+                                        label="Date"
+                                        value={formatDate(b.booking_date)}
+                                        bookingId={b.booking_id}
+                                        setRefresh={setRefresh}
+                                        setCancelBtn={setCancelBtn}
+                                    />
                                     <DetailRow label="Time Slot" value={b.venu_time_slot} />
                                     <DetailRow
                                         label="Status"

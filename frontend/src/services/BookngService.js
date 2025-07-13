@@ -73,6 +73,11 @@ export const updateAdditionalHours = async (id, {additionalHours}) => {
   return res.data;
 }
 
+export const updateDate = async (id, {date}) => {
+  const res = await api.put(`/booking/${id}/date`, { date });
+  return res.data;
+}
+
 // Add to services/BookngService.js
 export const searchBookings = async (params) => {
   try {

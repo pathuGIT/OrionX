@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings, printBookingDetails, getSelectedMenuPrice } from "../models/bookingModel.js";
+import { addNewVenue, deleteVenueByIdModel, getAllVenuesModel, checkVenuById, getVenueByIdModel, updateNewVenueModel, checkBookingByVenueId, insertContract, getDamageFeeForfeited, insertPricing, getBookingById, getVenueBytId, insertBooking, checkBookingExists, getAllBookings, getBookingByIdAdvance, updateBookingStatusModel, updateContractModel, updatePricingModel, updateBookingVenueModel, updateDamageFeeModel, getContractById, getBookingPricingById, updateGuestsModel, updateAdditionalHoursModel, UpdateBookingPrice_BiteSoftLiquorModel, getBiteSoftLiquorFromEventModel, updateBookingPricingModel, searchAllBookings, printBookingDetails, getSelectedMenuPrice, updateDateModel } from "../models/bookingModel.js";
 
 //add venues (venues add to system by admin)
 export const addVenue = async (req, res) => {
@@ -658,5 +658,19 @@ export const updateAdditionalHours = async (req, res) => {
         res.status(200).json({ success: true, message: "Additional hours updated successfully." });
     } catch (err) {
         res.status(500).json({ success: false, message: "Failed to update additional hours.", error: err.message });
+    }
+}
+
+export const updateDate = async (req, res) => {
+    const bookingId = req.params.id;
+    const { date } = req.body;
+
+    try {
+        // update curr booking pricing
+        await updateDateModel(bookingId, date);
+
+        res.status(200).json({ success: true, message: "Date updated successfully." });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to update date.", error: err.message });
     }
 }
