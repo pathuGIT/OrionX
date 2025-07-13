@@ -142,7 +142,6 @@ function AdminTableChairArrangement() {
         setSuccessMessage('');
         try {
             const arrangement = await getArrangementById(id);
-            console.log("Fetched Arrangement Data for Edit:", arrangement);
 
             let updatedReservedTables = arrangement.reservedTables.map(table => ({
                 tableNumber: table.tableNumber || '',

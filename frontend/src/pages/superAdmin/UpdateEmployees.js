@@ -11,7 +11,6 @@ import {
 function UpdateEmployees() {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  console.log("Selected Employee aa:", selectedEmployee);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -41,7 +40,6 @@ function UpdateEmployees() {
         return;
       }
       const response = await getEmployeesByStatus(filterStatus);
-      console.log("Fetched employees (object):", response.employees);
       setEmployees(response.employees); 
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -67,7 +65,6 @@ function UpdateEmployees() {
   const handleEdit = async (employeeId) => {
     try {
       const response = await getEmployeeById(employeeId);
-      console.log("Fetched employee:", response);
       setSelectedEmployee(response);
       setFormData({
         name: response.name,

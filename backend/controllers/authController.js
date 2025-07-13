@@ -32,17 +32,32 @@ export const registerEmp = async (req, res) => {
 export const registerCus = async (req, res) => {
     const { password, customer_id } = req.body;
     try {
-        const userAlreadyExist = await getCustomersByCusIdModel(customer_id);
-        if (userAlreadyExist) return res.status(400).json({ message: 'This User already exist...' });
-
+        //const userAlreadyExist = await getCustomersByCusIdModel(customer_id);
+        //if (userAlreadyExist) return res.status(400).json({ message: 'This User already exist...' });
+        //console.log('Registering customer with ID:', customer_id);
+        
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword, customer_id)
         await registerCustomerModel(hashedPassword, customer_id);
         res.status(201).json({ message: 'Customer registered successfully' });
     } catch (error) {
         res.status(500).json({ message: 'error register customer.', error });
     }
 }
+
+//Register customer 
+// export const updateCustomerPswd = async (req, res) => {
+//     const { password, customer_id } = req.body;
+//     try {
+//         const userAlreadyExist = await getCustomersByCusIdModel(customer_id);
+//         if (!userAlreadyExist) return res.status(400).json({ message: 'This User does not exist...' });
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         await registerCustomerModel(hashedPassword, customer_id);
+//         res.status(201).json({ message: 'Customer password updated successfully' });
+//         console.log('Updating customer password for ID:', customer_id, password);
+//     } catch (error) {
+//         res.status(500).json({ message: 'error updating customer password.', error });
+//     }
+// }
 
 // For login
 export const login = async (req, res) => {

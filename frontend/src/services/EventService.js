@@ -429,7 +429,6 @@ export const getAllEvents = async () => {
 export const updateEvent = async (eventId, data) => {
   try {
     const response = await api.put(`/AdminEvents/events/${eventId}`, data);
-    console.log('Update response:', response.data);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || 'Event update failed');

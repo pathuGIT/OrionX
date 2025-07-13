@@ -6,7 +6,6 @@ export const createReservation = async (req, res) => {
     try {
         const { bookingid } = req.params;
         const { tableNumber, reserveName } = req.body;
-        console.log("Booking IDs:", bookingid);
 
         
 
@@ -43,7 +42,6 @@ export const createArrangement = async (req, res) => {
         const { bookingid } = req.params;
         const arrangementData = req.body;
 
-        console.log("Booking IDs:", bookingid);
 
         // Validate required fields
         const requiredFields = ['headPax', 'topClothColor', 'tableClothColor', 

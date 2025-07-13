@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllCustomers, getCustomerBookings, searchCustomer, updateCustomer } from '../../services/CustomerServise';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
-import { registerCustomer } from '../../services/AuthService';
+import { registerCustomer, updateCustomerPassword } from '../../services/AuthService';
 
 const ManageCustomer = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +42,7 @@ const ManageCustomer = () => {
 
             // Register customer if changing from inactive to active
             if (originalCustomerStatus === 'inactive' && selectedCustomer.staus === 'active' && password) {
+                console.log('Registering customer with password:', password, selectedCustomer.customer_id);
                 try {
                     await registerCustomer({
                         password: password,
@@ -55,6 +56,7 @@ const ManageCustomer = () => {
             }
 
             await updateCustomer(selectedCustomer.customer_id, updateData);
+            //await updateCustomerPassword(selectedCustomer.customer_id, updateData);
             await loadCustomers();
             setShowEditModal(false);
         } catch (error) {
@@ -64,7 +66,6 @@ const ManageCustomer = () => {
 
 
     const handleDateClick = (booking_id) => {
-        console.log("xxx", booking_id)
         if (booking_id) {
             setSelectedBooking(booking_id);
         }
@@ -92,13 +93,6 @@ const ManageCustomer = () => {
         }
     };
 
-
-    // const handleRegisterCustomer = (pswd) => {
-    //     // Update customer with password (add other registration logic here)
-    //     setSelectedCustomer(prev => ({ ...prev, password: pswd }));
-    //     //setShowRegister(false);
-    //     setPassword(''); // Reset password after registration
-    // };
 
     const handleViewBookings = async (customerId) => {
         try {
@@ -151,6 +145,7 @@ const ManageCustomer = () => {
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -162,6 +157,7 @@ const ManageCustomer = () => {
                             <tr key={customer.customer_id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.customer_id}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.name}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.address}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">{customer.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">

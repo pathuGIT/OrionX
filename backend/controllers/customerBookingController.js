@@ -3,7 +3,6 @@ import customerBookingModel from '../models/customerBookingModel.js';
 export const getCustomerBookings = async (req, res) => {
     try {
         const { customerID } = req.params; // Extract parameter
-        console.log("Customer ID received:", customerID);
 
         if (!customerID) {
             return res.status(400).json({ success: false, message: "Customer ID is required." });
@@ -28,7 +27,6 @@ export const getCustomerBookings = async (req, res) => {
     export const getTotallBookingCustomerBookings = async (req, res) => {
     try {
         const { customerID } = req.params; // Extract parameter
-        console.log("Customer ID received:", customerID);
 
         if (!customerID) {
             return res.status(400).json({ success: false, message: "Customer ID is required." });

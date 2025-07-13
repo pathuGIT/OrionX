@@ -2,69 +2,6 @@
 import db from '../../config/db.js';
 
 class AllEvent {
-  // // Create event with type-specific details
-  // static async create(eventType, data) {
-  //   const connection = await db.getConnection();
-  //   try {
-  //     await connection.beginTransaction();
-
-  //     // Create base event
-  //     const [eventResult] = await connection.query(
-  //       'INSERT INTO Event SET ?',
-  //       [{
-  //         Event_Type: eventType,
-  //         Event_Date: data.eventDate,
-  //         Status: 'active',
-  //         // Add other common fields
-  //       }]
-  //     );
-  //     const eventId = eventResult.insertId;
-
-  //     // Create type-specific record
-  //     let typeTable, typeData;
-  //     switch(eventType) {
-  //       case 'wedding':
-  //         typeTable = 'Wedding';
-  //         typeData = {
-  //           Event_ID: eventId,
-  //           Groom_Name: data.groomName,
-  //           Bride_Name: data.brideName,
-  //           Groom_Contact: data.groomContact,
-  //           Bride_Contact: data.brideContact,
-  //           Poruwa_Time: data.poruwaTime
-  //         };
-  //         break;
-  //       case 'custom':
-  //         typeTable = 'CustomEvent';
-  //         typeData = {
-  //           Event_ID: eventId,
-  //           Event_Name: data.eventName,
-  //           Contact_Person: data.contactPerson,
-  //           Contact_Number: data.contactNumber,
-  //           Special_Requirements: data.specialRequirements
-  //         };
-  //         break;
-  //       default:
-  //         throw new Error('Invalid event type');
-  //     }
-
-  //     const [typeResult] = await connection.query(
-  //       `INSERT INTO ${typeTable} SET ?`,
-  //       [typeData]
-  //     );
-
-  //     await connection.commit();
-  //     return { eventId, typeId: typeResult.insertId };
-
-  //   } catch (error) {
-  //     await connection.rollback();
-  //     throw error;
-  //   } finally {
-  //     connection.release();
-  //   }
-  // }
-
-  // Update event and type-specific details
 
   static async update(eventId, eventData) {
     const connection = await db.getConnection();

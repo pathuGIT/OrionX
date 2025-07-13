@@ -38,8 +38,7 @@ const BookingView = () => {
   useEffect(() => {
     fetchVenues();
     if (viewAddRaw != false) {
-      //setEditVenueData({});
-      console.log("aaaaaaaaaaaaaaaazs")
+      console.log("view add veue error")
     }
   }, [viewAddRaw]);
 
@@ -115,7 +114,6 @@ const BookingView = () => {
           additionalHourFee: Number(editVenueData.additional_hour_fee),
           openedTimePeriod: Number(editVenueData.opened_time_period),
         };
-        console.log("Sending payload to backend:", payload);
 
         if (venue_id == 0) {
           setEditVenueData({
@@ -130,7 +128,6 @@ const BookingView = () => {
           });
           const res = await addVenue(payload);
         } else {
-          console.log("aaaaaaaaa",venue_id);
           const res = await updateVenueById(venue_id, payload);
           setEditRowId(null);
           setEditVenueData({
@@ -159,16 +156,16 @@ const BookingView = () => {
   }
 
   return (
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
-      <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900 p-5">
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
+      <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900 p-5">
         <div>
           {/* buuton for dropdown */}
           <button
             onClick={toggleAction}
-            class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+            className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
             Action
-            <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+            <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
             </svg>
           </button>
 
@@ -176,10 +173,10 @@ const BookingView = () => {
           <div
             ref={dropdownRef}
             id="dropdownAction"
-            class={`z-10 ${!viewAction ? 'block absolute mt-2' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600`}
+            className={`z-10 ${!viewAction ? 'block absolute mt-2' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600`}
             style={{ minWidth: '11rem' }}
           >
-            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownActionButton">
+            <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownActionButton">
               <li>
                 <a
                   href="#"
@@ -197,37 +194,37 @@ const BookingView = () => {
                     setViewAddRaw(true);
                     setViewAction(true);
                   }}
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
                   New Venue
                 </a>
               </li>
             </ul>
-            <div class="py-1">
-              <a href="#" onClick={() => { deleteAllTikBox(); setViewAction(true); }} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete Venues</a>
+            <div className="py-1">
+              <a href="#" onClick={() => { deleteAllTikBox(); setViewAction(true); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete Venues</a>
             </div>
           </div>
         </div>
 
-        <label for="table-search" class="sr-only">Search</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+        <label for="table-search" className="sr-only">Search</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
             </svg>
           </div>
-          <input type="text" id="table-search-users" class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Venues" />
+          <input type="text" id="table-search-users" className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Venues" />
         </div>
       </div>
 
       {/* display venue table */}
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" class="p-4">
-              <div class="flex items-center">
-                <input id="checkbox-all-search" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <label for="checkbox-all-search" class="sr-only">checkbox</label>
+            <th scope="col" className="p-4">
+              <div className="flex items-center">
+                <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                <label for="checkbox-all-search" className="sr-only">checkbox</label>
               </div>
             </th>
             <th className='px-6 py-3'>Name</th>
@@ -244,23 +241,23 @@ const BookingView = () => {
 
         <tbody>
           {/* Table raw for adding new venue */}
-          <tr class={`${viewAddRaw == false ? 'hidden' : 'visible'}  bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600`}>
-            <td class="w-4 p-4">
-              <div class="flex items-center">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+          <tr className={`${viewAddRaw == false ? 'hidden' : 'visible'}  bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600`}>
+            <td className="w-4 p-4">
+              <div className="flex items-center">
+                <input type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
               </div>
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <input type="text" value={editVenueData.venue_name} onChange={(e) => handleEditVenueChange('venue_name', e.target.value)} className="border rounded px-2 py-1" size="15" />
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <select value={editVenueData.time_slot} onChange={(e) => handleEditVenueChange('time_slot', e.target.value)} className="border rounded px-2 py-1">
                 <option value="">Default</option>
                 <option value="day">day</option>
                 <option value="night">night</option>
               </select>
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <select value={editVenueData.Location} onChange={(e) => handleEditVenueChange('Location', e.target.value)} className="border rounded px-2 py-1">
                 <option value="">Default</option>
                 <option value="indoor">indoor</option>
@@ -268,35 +265,35 @@ const BookingView = () => {
                 <option value="both">both</option>
               </select>
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <input type="text" value={editVenueData.min_capacity} onChange={(e) => handleEditVenueChange('min_capacity', e.target.value)} className="border rounded px-2 py-1" size="1" />
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <input type="text" value={editVenueData.max_capacity} onChange={(e) => handleEditVenueChange('max_capacity', e.target.value)} className="border rounded px-2 py-1" size="1" />
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <input type="text" value={editVenueData.price} onChange={(e) => handleEditVenueChange('price', e.target.value)} className="border rounded px-2 py-1" size="10" />
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <input type="text" value={editVenueData.additional_hour_fee} onChange={(e) => handleEditVenueChange('additional_hour_fee', e.target.value)} className="border rounded px-2 py-1" size="10" />
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <input type="text" value={editVenueData.opened_time_period} onChange={(e) => handleEditVenueChange('opened_time_period', e.target.value)} className="border rounded px-2 py-1" size="10" />
             </td>
-            <td class="px-6 py-4">
+            <td className="px-6 py-4">
               <button onClick={() => handleUpdate(0)} className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2'>Add</button>
               <button onClick={() => { setViewAddRaw(false) }} className='bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded' >Cancel</button>
             </td>
           </tr>
 
           {venues.map((venue) => (
-            <tr key={venue.venue_id} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <td class="w-4 p-4">
-                <div class="flex items-center">
+            <tr key={venue.venue_id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+              <td className="w-4 p-4">
+                <div className="flex items-center">
                   <input
                     id={`checkbox-table-search-${venue.venue_id}`}
                     type="checkbox"
-                    class={`${venue.status === 'booked' ? 'hidden' : 'visible'} w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"`}
+                    className={`${venue.status === 'booked' ? 'hidden' : 'visible'} w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"`}
                     checked={selectedIds.includes(venue.venue_id)}
                     onChange={() => handleCheckboxChange(venue.venue_id)}
                   />
@@ -304,7 +301,7 @@ const BookingView = () => {
               </td>
               {editRowId === venue.venue_id ? (
                 <>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <input
                       type="text"
                       value={editVenueData.venue_name}
@@ -313,7 +310,7 @@ const BookingView = () => {
                       size="15"
                     />
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <select
                       value={editVenueData.time_slot}
                       onChange={(e) => handleEditVenueChange('time_slot', e.target.value)}
@@ -323,7 +320,7 @@ const BookingView = () => {
                       <option value="night">night</option>
                     </select>
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <select
                       value={editVenueData.Location}
                       onChange={(e) => handleEditVenueChange('Location', e.target.value)}
@@ -334,7 +331,7 @@ const BookingView = () => {
                       <option value="both">both</option>
                     </select>
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <input
                       type="text"
                       value={editVenueData.min_capacity}
@@ -343,7 +340,7 @@ const BookingView = () => {
                       size="1"
                     />
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <input
                       type="text"
                       value={editVenueData.max_capacity}
@@ -352,7 +349,7 @@ const BookingView = () => {
                       size="1"
                     />
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <input
                       type="text"
                       value={editVenueData.price}
@@ -361,7 +358,7 @@ const BookingView = () => {
                       size="1"
                     />
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <input
                       type="text"
                       value={editVenueData.additional_hour_fee}
@@ -370,7 +367,7 @@ const BookingView = () => {
                       size="1"
                     />
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <input
                       type="text"
                       value={editVenueData.opened_time_period}
@@ -379,7 +376,7 @@ const BookingView = () => {
                       size="1"
                     />
                   </td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">
                     <button
                       onClick={() => handleUpdate(venue.venue_id)}
                       className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2'
@@ -396,15 +393,15 @@ const BookingView = () => {
                 </>
               ) : (
                 <>
-                  <td class="px-6 py-4">{venue.venue_name}</td>
-                  <td class="px-6 py-4">{venue.time_slot}</td>
-                  <td class="px-6 py-4">{venue.Location}</td>
-                  <td class="px-6 py-4">{venue.min_capacity}</td>
-                  <td class="px-6 py-4">{venue.max_capacity}</td>
-                  <td class="px-6 py-4">RS.{venue.price}</td>
-                  <td class="px-6 py-4">RS.{venue.additional_hour_fee}</td>
-                  <td class="px-6 py-4">{venue.opened_time_period}</td>
-                  <td class="px-6 py-4">
+                  <td className="px-6 py-4">{venue.venue_name}</td>
+                  <td className="px-6 py-4">{venue.time_slot}</td>
+                  <td className="px-6 py-4">{venue.Location}</td>
+                  <td className="px-6 py-4">{venue.min_capacity}</td>
+                  <td className="px-6 py-4">{venue.max_capacity}</td>
+                  <td className="px-6 py-4">RS.{venue.price}</td>
+                  <td className="px-6 py-4">RS.{venue.additional_hour_fee}</td>
+                  <td className="px-6 py-4">{venue.opened_time_period}</td>
+                  <td className="px-6 py-4">
                     <button
                       onClick={() => handleEdit(venue)}
                       className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded'

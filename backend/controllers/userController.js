@@ -245,7 +245,7 @@ export const addEmployee = async (req, res) => {
       "Deandra Registration",
       email,
       user.employee_id,
-      "http://localhost:3000/registration/register-employee"
+      `${process.env.REACT_APP_API_BASE_URL}/registration/register-employee`
     );
 
     res
@@ -271,9 +271,8 @@ export const addCustomer = async (req, res) => {
         const customer = await addCustomerModel(name, email, address, phone);
 
         const user = await getCustomerByEmailModel(email);
-        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
+        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, `${process.env.REACT_APP_API_BASE_URL}/registration/register-customer`);
         
-        console.log(`User ID sent to: ${customer}`);
         res.status(201).json({ message: `User registered successfully with this '${email}' email.`, cus_id: customer });
 
     } catch (error) {
@@ -401,18 +400,6 @@ export const updateEmployees = async (req, res) => {
     hire_date,
   } = req.body;
   try {
-    //const checkUserId = await getEmployeeByuserIdModel(id);
-    //if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
-    console.log(
-      id,
-      name,
-      phone,
-      email,
-      bod,
-      salary,
-      service_charge_precentage,
-      hire_date
-    )
     await updateEmployeesModel(
       id,
       name,
@@ -758,8 +745,6 @@ saveMonthlyDeduction: async (req, res) => {
 getMonthlyDeductionEntriesByEmployeeAndDate: async (req, res) => {
   try {
     const { employee_id, date } = req.params;
-
-    console.log("Request Parameters:", employee_id, date); // Log request parameters
     const entries = await DeductionModel.getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date);
 
     if (!entries || entries.length === 0) {

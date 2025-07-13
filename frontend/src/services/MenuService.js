@@ -4,7 +4,6 @@ import api from './Api';
 export const getMenus = async () => {
   try {
     const response = await api.get('/menuListType/getAll');
-    console.log("getMenus response:", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching menus:", error);
@@ -47,7 +46,6 @@ export const deleteMenuListType = async (id) => {
 
 // update menu list type by id
 export const updateMenuListTypeById = async (id, data) => {
-  console.log(id,data);
   const name = {menu_list_name:data}
   try {
     const response = await api.put(`/menuListType/update/${id}`, name);
@@ -107,7 +105,6 @@ export const deleteMenuType = async (id) => {
 
 // update menu type by id
 export const updateMenuTypeById = async (data) => {
-  console.log(data);
   try {
     const response = await api.put(`/menutypes/update/${data.menu_type_id}`, data);
     return response.data;
@@ -166,7 +163,6 @@ export const deleteCategory = async (id) => {
 
 //to update a category
 export const updateCategoryById = async (id, data) => {
-  console.log(id,data);
   const name = {category_name:data}
   try {
     const response = await api.put(`/categories/update/${id}`, name);
@@ -226,7 +222,6 @@ export const deleteItem = async (id) => {
 
 //to update an item
 export const updateItem = async (id, data) => {
-  console.log(id, data);
   const name = { item_name: data }; 
   try {
     const response = await api.put(`/items/update/${id}`, name);
@@ -257,7 +252,6 @@ export const getCategoryMenuTypes = async () => {
 export const addCategoryMenuType = async (categoryMenu) => {
   try {
     const response = await api.post('/categoryMenuTypes/add', categoryMenu);
-    console.log("Category Menu Type added successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error adding category menu type:", error);
@@ -289,7 +283,6 @@ export const deleteCategoryMenuType = async (id) => {
 
 //to update a catedory menu type by id
 export const updateCategoryMenuType = async (id, data) => {
-  console.log(id,data);
   const name = {categoryMenuType_name:data}
   try {
     const response = await api.put(`/categoryMenuTypes/update/${id}`, name);
@@ -349,7 +342,6 @@ export const deleteItemCategoryMenuType = async (id) => {
 
 //to update item category menu type by id
 export const updateItemCategoryMenuTypeById = async (id, data) => {
-  console.log("ID:", id, "Data:", data);
   try {
     const response = await api.put(`/ItemCategoryMenuType/${id}`, {category_menu_type_id: data.category_menu_type_id, item_id: data.item_id});
     return response.data;
@@ -384,7 +376,6 @@ export const getMenuOverview = async () => {
 export const CusgetMenuListType = async () => {
   try {
     const response = await api.get('/menuListType/getAll');
-    console.log("getMenus response:", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching menus:", error);
@@ -513,7 +504,6 @@ export const checkBookingMenuSelection = async (booking_id) => {
 export const getSummaryByBookingId = async (booking_id) => {
   try {
     const response = await api.get(`/summary/${booking_id}`);
-    console.log("getSummaryByBookingId response:", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching summary:", error);
@@ -637,7 +627,6 @@ export const checkBookingMenuSelections = async (booking_id) => {
  * @returns {Promise<Object>} The saved menu selection
  */
 export const saveCustomersMenuSelection = async (booking_id, ICMT_Id) => {
-  console.log("Saving customer menu selection:", booking_id, ICMT_Id);
   try {
     const response = await api.post('/AdminCorrectMenus/', {
       booking_id,

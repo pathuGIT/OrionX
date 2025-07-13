@@ -54,26 +54,7 @@ const Contact = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (validateForm()) {
-  //     // In a real app, you would send this data to your backend
-  //     console.log('Form submitted:', formData);
-  //     setIsSubmitted(true);
-  //     setFormData({
-  //       name: '',
-  //       email: '',
-  //       phone: '',
-  //       eventType: '',
-  //       date: '',
-  //       message: ''
-  //     });
-
-  //     // Reset success message after 5 seconds
-  //     setTimeout(() => setIsSubmitted(false), 5000);
-  //   }
-  // };  
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {

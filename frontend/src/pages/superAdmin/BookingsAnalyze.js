@@ -27,8 +27,6 @@ const BookingsAnalyze = () => {
 
     const searchBooking = async () => {
         const data = await searchBookingBy(serchBy);
-        
-        console.log(data)
         setBookings(data.data);
     }
 

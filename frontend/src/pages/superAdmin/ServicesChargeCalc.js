@@ -237,7 +237,6 @@ const ServiceChargeTable = () => {
 
                           </td>
                         )}
-                        {console.log(row.event_budget)}
                         <td className="px-4 py-3 text-sm font-semibold text-green-600">
                           + LKR {formatCurrency(row.amount)}
                         </td>

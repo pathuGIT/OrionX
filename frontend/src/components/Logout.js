@@ -12,5 +12,7 @@ export const Logout = () => {
       navigate('/');
     };
   
-    return <button onClick={handleLogout} className='' >Logout</button>;
+    return <span onClick={handleLogout} className="cursor-pointer">
+      Logout
+    </span>;
 }

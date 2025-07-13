@@ -146,7 +146,6 @@ const CustomerMenuTypeSelection = () => {
         throw new Error("Booking session expired. Please start a new booking.");
       }
 
-      console.log("psosos::", ICMT_Ids)
       // Save selections
       await Promise.all(
         ICMT_Ids.map(ICMT_Id => 

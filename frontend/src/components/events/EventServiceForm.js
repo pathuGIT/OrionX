@@ -175,7 +175,7 @@ const EventServiceForm = ({
                       className="h-16 w-16 object-cover rounded border"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.parentNode.innerHTML = '<span class="text-red-500">Image failed to load</span>';
+                        e.target.parentNode.innerHTML = '<span className="text-red-500">Image failed to load</span>';
                       }}
                     />
                     <div>

@@ -153,11 +153,6 @@ class LiquorItem {
                     itemData.price
                 ]
             );
-            console.log(itemData.itemName);
-            console.log(itemData.quantity);
-            console.log(itemData.usages);
-            console.log(itemData.price);
-            console.log(barRequirementID);
 
             const [liquorTotal] = await connection.query(
                 `SELECT SUM(quantity * LiquorPrice) AS total 
@@ -321,11 +316,6 @@ class SoftDrinkItem {
                 ]
             );
 
-            console.log(itemData.itemName);
-            console.log(itemData.quantity);
-            console.log(itemData.usages);
-            console.log(itemData.price);
-            console.log(barRequirementID);
 
             const [softDrinkTotal] = await connection.query(
                 `SELECT SUM(quantity * DrinkPrice) AS total 

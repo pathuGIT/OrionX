@@ -11,14 +11,20 @@ export const registerEmployee = async (employeeData) => {
 };
 
 export const registerCustomer = async (customerData) => {
-  const response = await api.post('/auth/register-customer', customerData);
+  console.log('Registering customer with data:', customerData);
+  const response = await api.put('/auth/register-customer', customerData);
   return response.data; // Returns success message
 };
+
+export const updateCustomerPassword = async (customerData) => {
+  console.log('Updating customer password with data:', customerData); 
+  const response = await api.put('/auth/update-customer-password', customerData);
+  return response.data; // Returns success message
+}
 
 export const validateEmail = async (email) => {
   try {
     const response = await api.get(`/auth/check-email?email=${email}`);
-    console.log(response.data)
     return response.data; // Returns success message
   } catch (error) {
     return error.response?.data || { message: "An error occurred" };
@@ -26,13 +32,11 @@ export const validateEmail = async (email) => {
 };
 
 export const sendOtp = async (email) => {
-  console.log(email)
   const response = await api.post('/auth/forgot-password', email);
   return response.data; // Returns success message
 };
 
 export const validateOtp = async (data) => {
-  console.log(data.otp)
   const response = await api.post('/auth/validate-otp', data);
   return response.data; // Returns success message
 };

@@ -4,7 +4,6 @@ export const getPlannedEvents = async (req, res) => {
     try {
         // Get customerID and bookingID from request parameters
         const { customerID, bookingID } = req.params;
-        console.log(`Fetching events for customer ID: ${customerID} and booking ID: ${bookingID}`);
 
         if (!customerID || !bookingID) {
             return res.status(400).json({ success: false, message: "Customer ID and Booking ID are required." });

@@ -5,32 +5,16 @@ export const getCustomerByEmailModel = async (email) => {
         'select * from customer where email = ?',
         [email]
     );
-    console.log(result[0])
     return result[0];
 }
 
 export const getCustomerByPhoneModel = async (phone) => {
-    console.log(phone)
     const [result] = await pool.query(
         'select * from customer where phone = ?',
         [phone]
     );
-    console.log(result[0])
     return result[0];
 }
-
-//get employees & system user by email or phone
-// export const getCustomerByEmailORPswdModel = async (credintial) => {
-//     const [result] = await pool.query(
-//         'SELECT customer_id, email, role, phone, staus FROM customer WHERE staus = ? AND (email = ? OR phone = ?)',
-//         ['active',credintial, credintial]
-//     );
-
-//     console.log(result[0].email)
-//     return result[0];
-// }
-
-//get customers by customer id
 
 // Get customers by email or phone
 export const getCustomerByEmailORPswdModel = async (credential) => {
@@ -40,8 +24,6 @@ export const getCustomerByEmailORPswdModel = async (credential) => {
     );
 
     if (result.length === 0) return null; // Prevent accessing undefined index
-
-    console.log("Customer Found:", result[0].email);
     return result[0];
 };
 
@@ -50,7 +32,6 @@ export const getCustomersByCusIdModel = async (empId) => {
         'select * from customer where pasword IS NOT NULL and customer_id = ?',
         [empId]
     );
-    console.log(result[0])
     return result[0];
 }
 
@@ -70,6 +51,7 @@ export const addCustomerModel = async (name, email, address, phone) => {
 
 //register customer 
 export const registerCustomerModel = async (password, customer_id) => {
+    console.log("model",password, customer_id)
     const [result] = await pool.query(
         'UPDATE customer SET pasword = ?, staus = ? WHERE customer_id = ?',
         [password, 'active', customer_id]
