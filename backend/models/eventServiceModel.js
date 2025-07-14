@@ -14,8 +14,8 @@ class EventServiceModel {
             `);
             return results;
         } catch (error) {
-            console.error("Database Error (getEventServices):", error.message || error);
-            throw new Error(error.message || "Failed to fetch event services.");
+            console.error("Database Error (getEventServices):", error);
+            throw new Error("Failed to fetch event services");
         }
     }
 }

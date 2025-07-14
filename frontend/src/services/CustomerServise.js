@@ -1,13 +1,18 @@
 import api from './Api';
 
 export const addCustomer = async (cusData) => {
-  const response = await api.post(`user/addCustomer/`, cusData);
-  return response.data;
+  try {
+    const response = await api.post(`/user/addCustomer/`, cusData);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding customer:', error);
+    throw error;
+  }
 };
 
 export const searchCustomer = async (searchTerm) => {
   const response = await api.get(`/user/searchCustomer`, {
-    params: { q: searchTerm }  // <- this sends ?q=value in the URL
+    params: { q: searchTerm }
   });
   return response.data;
 };
@@ -25,3 +30,33 @@ export const getCusName = async (id) => {
   }
 };
 
+// src/services/CustomerService.js
+export const getAllCustomers = async () => {
+  try {
+    const response = await api.get('/user/getAllCustomers');
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all customers:', error);
+    throw error;
+  }
+};
+
+export const updateCustomer = async (customerId, data) => {
+  try {
+    const response = await api.put(`/user/updateCustomer/${customerId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    throw error;
+  }
+};
+
+export const getCustomerBookings = async (customerId) => {
+  try {
+    const response = await api.get(`/user/getCustomerBookings/${customerId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting customer bookings:', error);
+    throw error;
+  }
+};

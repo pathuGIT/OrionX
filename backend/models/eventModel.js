@@ -30,8 +30,6 @@ class EventModel {
                 VALUES (?, ?, ?, ?)`,
                 [newEventID, eventData.eventName, eventData.contactPersonName, eventData.contactPersonNumber]
             );
-
-            console.log("CustomEvent inserted with Event_ID:", newEventID);
             return newEventID; 
 
         } catch (error) {

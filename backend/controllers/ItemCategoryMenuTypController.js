@@ -4,6 +4,7 @@ import ItemCategoryMenuTypeModel from "../models/ItemCategoryMenuTypeModel.js";
 export const getItemCategoryMenuTypes = async (req, res) => {
     try {
         const icmt = await ItemCategoryMenuTypeModel.getItemCategoryMenuTypes();
+        
         res.json(icmt);
     } catch (error) {
         res.status(500).json({ message: error.message });

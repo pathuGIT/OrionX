@@ -1,57 +1,59 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // <-- Make sure this matches your backend
+  baseURL: 'http://167.71.192.163:8000/api', // ✅ Use your actual server IP or domain
 });
 
-//Attach token to requests if available
+// Attach token to requests
 api.interceptors.request.use((config) => {
-    const token = sessionStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log("lsls");
-    return config;
+  const token = sessionStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
+// Handle 401 and refresh token
 api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        console.log('Interceptor triggered');
-        const originalRequest = error.config;
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            console.log('401 error detected');
-            originalRequest._retry = true;
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
 
-            try {
-                console.log('Attempting to refresh token');
-                // Request a new access token using the refresh token
-                const { data } = await axios.post('http://localhost:8000/api/auth/refresh', {
-                    useremail: sessionStorage.getItem('credential'),
-                    id: sessionStorage.getItem('id'),
-                    role: sessionStorage.getItem('role'),
-                    refreshKey: sessionStorage.getItem('refreshToken'),
-                });
-                //Save the new access token
-                sessionStorage.setItem('token', data.token);
+      const refreshToken = sessionStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        sessionStorage.clear();
+        window.location.href = '/login';
+        return;
+      }
 
-                //Retry the original request with the new token
-                originalRequest.headers.Authorization = `Bearer ${data.token}`;
-                console.log("gini:::::" + originalRequest);
-                return api(originalRequest);
-            } catch (refreshError) {
-                console.error('Refresh token expired or invalid');
-                // Redirect to login page or handle logout
-                // const { logout } = useContext(AuthContext);
-                // await logout();
-                sessionStorage.clear();
-                window.location.href = '/login';
-            }
-        }
+      try {
+        const { data } = await api.post('/auth/refresh', {
+          useremail: sessionStorage.getItem('credential'),
+          id: sessionStorage.getItem('id'),
+          role: sessionStorage.getItem('role'),
+          refreshKey: refreshToken,
+        });
 
-        return Promise.reject(error);
+        sessionStorage.setItem('token', data.token);
+
+        originalRequest.headers.Authorization = `Bearer ${data.token}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error('Token refresh failed', refreshError);
+        sessionStorage.clear();
+        window.location.href = '/login';
+      }
     }
+
+    return Promise.reject(error);
+  }
 );
 
 export default api;

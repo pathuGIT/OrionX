@@ -2,17 +2,17 @@ import pool from '../config/db.js';
 
 // Add a new venue to the venue table
 export const addNewVenue = async ({ name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod }) => {
-    const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
 
-    await pool.query(
-        `INSERT INTO venue (venue_name, time_slot, Location, min_capacity, max_capacity, price, created_at, updated_at, additional_hour_fee, opened_time_period)
+  await pool.query(
+    `INSERT INTO venue (venue_name, time_slot, Location, min_capacity, max_capacity, price, created_at, updated_at, additional_hour_fee, opened_time_period)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, time, location, minCapacity, maxCapacity, price, today, today, additionalHourFee, openedTimePeriod]
-    );
+    [name, time, location, minCapacity, maxCapacity, price, today, today, additionalHourFee, openedTimePeriod]
+  );
 };
 
 export const getAllVenuesModel = async () => {
-    const [rows] = await pool.query(`
+  const [rows] = await pool.query(`
         SELECT 
             v.venue_id,
             v.venue_name,
@@ -36,33 +36,33 @@ export const getAllVenuesModel = async () => {
         GROUP BY 
             v.venue_id
     `);
-    return rows;
+  return rows;
 };
 
 
 export const deleteVenueByIdModel = async (id) => {
-    const [result] = await pool.query(`DELETE FROM venue WHERE venue_id = ?`, [id]);
-    return result;
+  const [result] = await pool.query(`DELETE FROM venue WHERE venue_id = ?`, [id]);
+  return result;
 };
 
 export const checkVenuById = async (id) => {
-    const [rows] = await pool.query(`SELECT * FROM venue WHERE venue_id = ?`, [id]);
-    return rows.length > 0;
+  const [rows] = await pool.query(`SELECT * FROM venue WHERE venue_id = ?`, [id]);
+  return rows.length > 0;
 };
 
 export const getVenueByIdModel = async (id) => {
-    const [rows] = await pool.query(`SELECT * FROM venue WHERE venue_id = ?`, [id]);
-    if (rows.length === 0) {
-        return null; // Return null if no result found
-    } else {
-        return rows; // Return the first result
-    }
+  const [rows] = await pool.query(`SELECT * FROM venue WHERE venue_id = ?`, [id]);
+  if (rows.length === 0) {
+    return null; // Return null if no result found
+  } else {
+    return rows; // Return the first result
+  }
 };
 
-export const updateNewVenueModel = async ({ id, name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod}) => {
-    const today = new Date().toISOString().slice(0, 10);
-    await pool.query(
-        `UPDATE venue SET 
+export const updateNewVenueModel = async ({ id, name, time, location, minCapacity, maxCapacity, price, additionalHourFee, openedTimePeriod }) => {
+  const today = new Date().toISOString().slice(0, 10);
+  await pool.query(
+    `UPDATE venue SET 
             venue_name = ?, 
             time_slot = ?, 
             Location = ?, 
@@ -73,8 +73,8 @@ export const updateNewVenueModel = async ({ id, name, time, location, minCapacit
             additional_hour_fee = ?,
             opened_time_period = ?
          WHERE venue_id = ?`,
-        [name, time, location, minCapacity, maxCapacity, price, today, additionalHourFee, openedTimePeriod, id]
-    );
+    [name, time, location, minCapacity, maxCapacity, price, today, additionalHourFee, openedTimePeriod, id]
+  );
 };
 
 export const checkBookingByVenueId = async (venueId) => {
@@ -92,6 +92,11 @@ export const getVenueBytId = async (venueId) => {
   return rows[0];
 }
 
+export const getSelectedMenuPrice = async (bookingId) => {
+  const [rows] = await pool.query('select x.price from view_item_category_menu_type x inner join customer_menu_item_selection z on x.ICMT_Id = z.ICMT_Id where booking_id = ? limit 1', [bookingId]);
+  return rows[0];
+}
+
 export const insertBooking = async (booking) => {
   const sql = `
     INSERT INTO booking
@@ -101,17 +106,9 @@ export const insertBooking = async (booking) => {
   const params = [booking.slot, booking.status, booking.date, booking.venueId, booking.customerId, booking.guests, booking.extraHours || 0];
   await pool.query(sql, params);
 
-  // Fetch the latest booking_id for this customer, venue, and date
-//   const [rows] = await pool.query(
-//     `SELECT booking_id FROM booking
-//      WHERE customer_id = ? AND venue_id = ? AND booking_date = ?
-//      ORDER BY created_at DESC LIMIT 1`,
-//     [booking.customerId, booking.venueId, booking.date]
-//   );
   const [rows] = await pool.query(
     `SELECT booking_id FROM booking ORDER BY booking_id DESC LIMIT 1`
   );
-  console.log("assssssssss:",rows[0].booking_id);
   return rows.length ? rows[0].booking_id : null;
 }
 
@@ -119,9 +116,9 @@ export const insertContract = async (contract) => {
   const sql = `
     INSERT INTO contract
       ( booking_id, deposit_amount, damage_fee, refund_amount, status, created_at, updated_at)
-    VALUES (?, 50000.00, 0.00, 0.00, 'pending', NOW(), NOW())
+    VALUES (?, ?, 0.00, 0.00, 'pending', NOW(), NOW())
   `;
-  await pool.query(sql, [contract.bookingId]);
+  await pool.query(sql, [contract.bookingId, contract.payDeposit]);
 }
 
 export const insertPricing = async (pricing) => {
@@ -155,22 +152,22 @@ export const getBookingById = async (id) => {
 }
 
 export const checkBookingExists = (date, slot, venueId) => {
-    return pool.query(
-        'SELECT 1 FROM booking WHERE booking_date = ? AND time_slot = ? AND venue_id = ? AND status = ? LIMIT 1',
-        [date, slot, venueId, 'confirmed']
-    ).then(([rows]) => rows.length > 0);
+  return pool.query(
+    'SELECT 1 FROM booking WHERE booking_date = ? AND time_slot = ? AND venue_id = ? AND status = ? LIMIT 1',
+    [date, slot, venueId, 'confirmed']
+  ).then(([rows]) => rows.length > 0);
 }
 
 
 ///////////////////// advance booking view models
 
 export const getAllBookings = (status) => {
-  console.log("Status:", status);
   let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
     p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
     FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
     LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+
   const params = [];
   if (status && status !== 'all') {
     sql += ` WHERE b.status = ?`;
@@ -180,20 +177,79 @@ export const getAllBookings = (status) => {
   return pool.query(sql, params).then(([rows]) => rows);
 }
 
+export const searchAllBookings = (item) => {
+  let sql = `SELECT b.*, c.contract_id, c.deposit_amount, c.damage_fee, c.refund_amount, c.status as contract_status,
+    p.id as pricing_id, p.menu_price_total, p.hall_charge, p.extra_hour_fee, p.bites_payment, p.fountain_payment, p.other_payment, p.overall_total
+    FROM booking b
+    LEFT JOIN contract c ON b.booking_id = c.booking_id
+    LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id`;
+  const params = [];
+  if (item && item !== 'all') {
+    sql += ` WHERE b.booking_id = ? || b.customer_id = ? `;
+    params.push(item, item, item, item);
+  }
+  sql += ` ORDER BY b.booking_date DESC`;
+  return pool.query(sql, params).then(([rows]) => rows);
+}
+
 export const getBookingByIdAdvance = (bookingId) => {
-  const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.* FROM booking b
+  const sql = `SELECT b.*, c.contract_id, c.status as contract_status, c.deposit_amount, c.damage_fee, c.refund_amount, p.*, v.time_slot as venu_time_slot FROM booking b
     LEFT JOIN contract c ON b.booking_id = c.booking_id
     LEFT JOIN booking_pricing p ON b.booking_id = p.booking_id
+    LEFT JOIN venue v ON v.venue_id = b.venue_id
     WHERE b.booking_id = ?`;
   return pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
 }
 
+export const printBookingDetails = (bookingId) => {
+  const sql = `
+        SELECT 
+        b.booking_id, 
+        b.time_slot AS b_time_slot, 
+        b.status AS b_status, 
+        b.booking_date, 
+        b.total_price AS b_total_price, 
+        b.number_of_guests AS b_number_of_guests, 
+        b.additional_hours AS b_additional_hours, 
+        v.*, 
+        c.customer_id, 
+        c.name, 
+        c.email, 
+        c.address, 
+        c.phone, 
+        x.deposit_amount, 
+        x.damage_fee, 
+        x.refund_amount, 
+        x.status AS contract_status, 
+        z.menu_price_total, 
+        z.hall_charge, 
+        z.extra_hour_fee, 
+        z.bites_payment, 
+        z.fountain_payment, 
+        z.other_payment, 
+        z.overall_total, 
+        z.forfeited_deposit 
+    FROM 
+        booking b 
+    INNER JOIN 
+        venue v ON b.venue_id = v.venue_id 
+    INNER JOIN 
+        customer c ON c.customer_id = b.customer_id 
+    INNER JOIN 
+        contract x ON x.booking_id = b.booking_id 
+    INNER JOIN 
+        booking_pricing z ON z.booking_id = x.booking_id
+    WHERE 
+        b.booking_id = ?`;
+  
+  return pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
+
 export const updateBookingStatusModel = async (bookingId, status) => {
-  console.log(bookingId, status)
   return await pool.query(
-        `UPDATE booking SET status = ?, updated_at = NOW() WHERE booking_id = ?`,
-        [status, bookingId]
-    );
+    `UPDATE booking SET status = ?, updated_at = NOW() WHERE booking_id = ?`,
+    [status, bookingId]
+  );
 }
 
 export const updateContractModel = (bookingId, data) => {
@@ -221,6 +277,11 @@ export const updateBookingVenueModel = (bookingId, venueId) => {
   );
 }
 
+export const updateDateModel = (bookingId, date) => {
+  const sql = `UPDATE booking SET booking_date = ?, updated_at = NOW() WHERE booking_id = ?`;
+  return pool.query(sql, [date, bookingId]);
+}
+//
 export const updateDamageFeeModel = async (bookingId, damageFee, refundAmount, depositAmount, status) => {
   const sql = `UPDATE contract SET damage_fee = ?, refund_amount = ?, deposit_amount = ?, status = ?,  updated_at = NOW() WHERE booking_id = ?`;
   return await pool.query(sql, [damageFee, refundAmount, depositAmount, status, bookingId]);
@@ -248,4 +309,25 @@ export const updateAdditionalHoursModel = async (bookingId, additionalHours) => 
     `UPDATE booking SET additional_hours = ?, updated_at = NOW() WHERE booking_id = ?`,
     [additionalHours, bookingId]
   );
+}
+
+export const getBiteSoftLiquorFromEventModel = async (bookingId) => {
+  const sql = `
+    select bar.TotalBitePrice 
+      from bar inner join event 
+      on bar.BarRequirementID = event.BarRequirementID 
+      where event.booking_id = ?;
+  `;
+  return await pool.query(sql, [bookingId]).then(([rows]) => rows[0]);
+}
+
+export const UpdateBookingPrice_BiteSoftLiquorModel = async (bookingId, TotalBitePrice) => {
+  const sql = `
+    UPDATE booking_pricing
+    SET bites_payment = ?,  
+        updated_at = NOW()
+    WHERE booking_id = ?
+  `;
+  const [result] = await pool.query(sql, [TotalBitePrice, bookingId]);
+  return result; // <-- return the result object, not the array
 }

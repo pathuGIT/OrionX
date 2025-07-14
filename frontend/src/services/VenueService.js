@@ -1,7 +1,6 @@
 import api from './Api';
 
 export const addVenue = async (newVenue) => {
-    console.log("aaa", newVenue)
     const response = await api.post(`/booking/addVenue`, newVenue);
     return response.data; 
 }; 

@@ -13,7 +13,20 @@ import {
   checkUserIsActive,
   searchCustomerByTerm,
   DeductionModel,
+  calculatePayModel,
+  getPayEntriesModel,
+  getPaymentHistoryModel,
+  UpdatePayStatusEntriesModel,
+  
+  
 } from "../models/userModel.js";
+import pool from "../config/db.js";
+
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 import { sendIdToUserMethod } from "../controllers/mailController.js";
 import {
@@ -21,7 +34,196 @@ import {
   getCustomerByPhoneModel,
   addCustomerModel,
   getCusName,
+  getAllCustomersModel,
+  updateCustomerModel,
+  getBookingsByCustomerIdModel,
 } from "../models/customerModel.js";
+
+//...........................................................................
+
+// Create reusable transporter object
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.MAIL_ADDRESS,
+    pass: process.env.MAIL_PSWD,
+  },
+});
+
+// Send ID to employee
+export const sendIdToEmp = async (req, res) => {
+  const { name, subject, email, message } = req.body;
+
+  try {
+    const mailOptions = {
+      from: `"Deandra" <${process.env.MAIL_ADDRESS}>`,
+      to: email,
+      subject,
+      text: `Hello ${name},\n\n${message}`,
+      html: `<p>Hello ${name},</p><p>${message}</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Email error:', error);
+    res.status(500).json({ 
+      msg: 'Failed to send email',
+      error: error.message 
+    });
+  }
+};
+
+// Send salary notification to employee
+export const sendSalaryEmail = async (name, email, netSalary, month, deductions) => {
+  const subject = `Your Salary Statement - ${month}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2c3e50;">Dear ${name},</h2>
+      <p>Your salary for <strong>${month}</strong> has been processed:</p>
+      
+      <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #27ae60;">Salary Details</h3>
+        <p><strong>Net Salary:</strong> LKR ${netSalary.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Total Deductions:</strong> LKR ${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Payment Date:</strong> ${new Date().toLocaleDateString()}</p>
+      </div>
+      
+      <p>If you have any questions about your salary, please contact the HR department.</p>
+      
+      <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <small>This is an automated message. Please do not reply directly to this email.</small>
+      </p>
+      
+      <p>Best regards,<br>The Payroll Team<br>Deandra Management</p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"Deandra Payroll" <${process.env.MAIL_ADDRESS}>`,
+      to: email,
+      subject,
+      html
+    });
+    return true;
+  } catch (error) {
+    console.error(`Failed to send salary email to ${email}:`, error);
+    return false;
+  }
+};
+
+// Notify employees about payroll
+export const notifyEmployeesPayroll = async (req, res) => {
+  const { date } = req.body;
+  
+  try {
+    const payEntries = await getPayEntriesModel(date);
+    
+    if (!payEntries?.length) {
+      return res.status(404).json({ 
+        success: false,
+        message: "No payroll data found for the specified date" 
+      });
+    }
+
+    const results = [];
+    for (const entry of payEntries) {
+      try {
+        const employee = await getEmployeeByuserIdModel(entry.employee_id);
+        if (employee?.email) {
+          const emailSent = await sendSalaryEmail(
+            employee.name,
+            employee.email,
+            entry.net_salary,
+            date,
+            entry.total_deduction
+          );
+          
+          results.push({
+            employee_id: entry.employee_id,
+            status: emailSent ? 'success' : 'failed',
+            message: emailSent ? 'Email sent' : 'Failed to send email'
+          });
+        } else {
+          results.push({
+            employee_id: entry.employee_id,
+            status: 'failed',
+            message: 'Employee email not found'
+          });
+        }
+      } catch (error) {
+        results.push({
+          employee_id: entry.employee_id,
+          status: 'failed',
+          message: error.message
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.status === 'success').length;
+    
+    res.status(200).json({ 
+      success: true,
+      message: `Salary notifications sent to ${successCount}/${payEntries.length} employees`,
+      results
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to send notifications",
+      details: error.message 
+    });
+  }
+};
+export const notifySingleEmployeePayroll = async (req, res) => {
+  const { date, employeeId } = req.body;
+  
+  try {
+    const payEntry = await getPayEntryByEmployeeAndDateModel(employeeId, date);
+    
+    if (!payEntry) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Payroll data not found for the specified employee and date" 
+      });
+    }
+
+    const employee = await getEmployeeByuserIdModel(employeeId);
+    if (!employee?.email) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee email not found"
+      });
+    }
+
+    const emailSent = await sendSalaryEmail(
+      employee.name,
+      employee.email,
+      payEntry.net_salary,
+      date,
+      payEntry.total_deduction
+    );
+
+    res.status(200).json({
+      success: true,
+      message: emailSent ? 'Email sent successfully' : 'Failed to send email',
+      employee_id: employeeId,
+      status: emailSent ? 'success' : 'failed'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to send notification",
+      details: error.message 
+    });
+  }
+};
+
+  //....................................
 
 //add employees (employees add to system by admin)
 export const addEmployee = async (req, res) => {
@@ -44,7 +246,7 @@ export const addEmployee = async (req, res) => {
       "Deandra Registration",
       email,
       user.employee_id,
-      "http://localhost:3000/registration/register-employee"
+      `${process.env.REACT_APP_API_BASE_URL}/registration/register-employee`
     );
 
     res
@@ -80,9 +282,8 @@ export const addCustomer = async (req, res) => {
         const customer = await addCustomerModel(name, email, address, phone);
 
         const user = await getCustomerByEmailModel(email);
-        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, 'http://localhost:3000/registration/register-customer');
+        await sendIdToUserMethod(name, "Deandra Registration", email, user.customer_id, `${process.env.REACT_APP_API_BASE_URL}/registration/register-customer`);
         
-        console.log(`User ID sent toooooooo: ${customer}`);
         res.status(201).json({ message: `User registered successfully with this '${email}' email.`, cus_id: customer });
 
     } catch (error) {
@@ -141,26 +342,19 @@ export const getEmployee = async (req, res) => {
     } 
 }
 
+// Update the existing searchCustomer controller
 export const searchCustomer = async (req, res) => {
-    const search_term = req.query.q;
-    
-    try {
-        const customers = await searchCustomerByTerm(search_term);
-        if (!customers || customers.length === 0) return res.status(404).json({ message: 'Customer not found' });
-        console.log(customers)
-        res.status(200).json({ customers });
-        
-    } catch (error) {
-        res.status(500).json({ msg: 'Server error...', error });
-    }
-}
-=========
   try {
-    const result = await getEmployeeModel();
-    result.forEach((employee) => console.log(employee.bod));
-    res.status(201).json({ employees: result });
+    const searchTerm = req.query.q;
+    if (!searchTerm || searchTerm.trim() === '') {
+      return res.status(400).json({ error: 'Search term is required' });
+    }
+    
+    const results = await searchCustomerByTerm(searchTerm.trim());
+    res.json(results);
   } catch (error) {
-    res.status(500).json({ msg: "Server error...", error });
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Failed to perform search' });
   }
 };
 
@@ -240,18 +434,6 @@ export const updateEmployees = async (req, res) => {
     hire_date,
   } = req.body;
   try {
-    //const checkUserId = await getEmployeeByuserIdModel(id);
-    //if (!checkUserId) return res.status(400).json({ message: 'User ID does not exist' });
-    console.log(
-      id,
-      name,
-      phone,
-      email,
-      bod,
-      salary,
-      service_charge_precentage,
-      hire_date
-    )
     await updateEmployeesModel(
       id,
       name,
@@ -283,19 +465,49 @@ export const getEmployeesByStatus = async (req, res) => {
 
 export const serviceChargeController = {
   calculateCharges: async (req, res) => {
+    const connection = await pool.getConnection();
     try {
-      const result = await ServiceChargeModel.calculateServiceCharges();
+      await connection.beginTransaction();
+      
+      // Validate existing bookings
+      const [validation] = await connection.query(
+        `SELECT COUNT(*) AS valid_events 
+         FROM booking 
+         WHERE status = 'done' 
+         AND total_price > 0`
+      );
+
+      if (validation[0].valid_events === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No valid events available for calculation"
+        });
+      }
+
+      // Execute calculation
+      const [result] = await connection.query("CALL CalculateServiceCharges()");
+      
+      // Get affected rows
+      const [affected] = await connection.query(
+        "SELECT ROW_COUNT() AS affectedRows"
+      );
+
+      await connection.commit();
+
       res.json({
         success: true,
-        message: result.message,
-        affectedRows: result.affectedRows
+        message: "Service charges calculated successfully",
+        affectedRows: affected[0].affectedRows
       });
     } catch (error) {
+      await connection.rollback();
       res.status(500).json({
         success: false,
         message: "Service charge calculation failed",
         error: error.message
       });
+    } finally {
+      connection.release();
     }
   },
 
@@ -303,17 +515,24 @@ export const serviceChargeController = {
     try {
       const charges = await ServiceChargeModel.getAllCharges();
       
-      if (!charges || charges.length === 0) {
+      if (!charges?.length) {
         return res.status(404).json({
           success: false,
           message: "No service charge records found"
         });
       }
 
+      // Transform data for response
+      const transformed = charges.map(charge => ({
+        ...charge,
+        service_charge_id: charge.service_charge_id.replace('EVN', 'EVI'),
+        event_budget: `LKR ${charge.event_budget.toLocaleString('en-US')}`
+      }));
+
       res.json({
         success: true,
-        count: charges.length,
-        data: charges
+        count: transformed.length,
+        data: transformed
       });
     } catch (error) {
       res.status(500).json({
@@ -327,9 +546,17 @@ export const serviceChargeController = {
   getEmployeeCharges: async (req, res) => {
     try {
       const { employeeId } = req.params;
+      
+      if (!/^EMP\d{6}$/.test(employeeId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid employee ID format"
+        });
+      }
+
       const charges = await ServiceChargeModel.getEmployeeCharges(employeeId);
       
-      if (!charges || charges.length === 0) {
+      if (!charges?.length) {
         return res.status(404).json({
           success: false,
           message: "No charges found for this employee"
@@ -552,8 +779,6 @@ saveMonthlyDeduction: async (req, res) => {
 getMonthlyDeductionEntriesByEmployeeAndDate: async (req, res) => {
   try {
     const { employee_id, date } = req.params;
-
-    console.log("Request Parameters:", employee_id, date); // Log request parameters
     const entries = await DeductionModel.getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date);
 
     if (!entries || entries.length === 0) {
@@ -611,4 +836,137 @@ export const calculateAndSaveMonthlyDeduction = async (req, res) => {
   }
 };
 
+//........................pay
+export const calculatePay = async (req, res) => {
+  try {
+    const { calculation_date } = req.body;
+    const result = await calculatePayModel(calculation_date);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getPayEntries = async (req, res) => {
+  try {
+    const { date } = req.params;
+    const entries = await getPayEntriesModel(date);
+    res.status(200).json(entries);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+//huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+export const UpdatePayStatus = async (req, res) => {
+  try {
+    const { employee_id, date } = req.params;
+    const { status } = req.body;
+
+    // Validate status input
+    const validStatuses = ["Paid","Not Paid"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        error: "Invalid status. Valid values: Paid, Not Paid" 
+      });
+    }
+
+    // Update and get affected rows
+    const result = await UpdatePayStatusEntriesModel(
+      status, 
+      date, 
+      employee_id
+    );
+
+    // Handle no records updated
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        error: "No records found matching the criteria",
+        details: {
+          employee_id,
+          date,
+          current_status: "Check if record exists"
+        }
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Pay status updated successfully",
+      updatedRecord: {
+        employee_id,
+        date,
+        new_status: status
+      },
+      affectedRows: result.affectedRows
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: "Database operation failed",
+      details: error.message 
+    });
+  }
+};
+
+// Add new controller methods
+export const getAllCustomers = async (req, res) => {
+  try {
+    const customers = await getAllCustomersModel();
+    res.json(customers);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch customers' });
+  }
+};
+
+export const updateCustomer = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { name, email, phone, address, staus } = req.body;
+    
+    // Validate required fields
+    if (!name || !email || !phone) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const updateData = {
+      name,
+      email,
+      phone,
+      address: address || '',
+      staus: staus || 'active'
+    };
+
+    const updatedCustomer = await updateCustomerModel(customerId, updateData);
+    res.json(updatedCustomer);
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Failed to update customer' });
+  }
+};
+
+export const getCustomerBookings = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const bookings = await getBookingsByCustomerIdModel(customerId);
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+};
+
+// Add this to your controllers
+export const getPaymentHistory = async (req, res) => {
+  try {
+    const history = await getPaymentHistoryModel();
+    res.status(200).json({
+      success: true,
+      data: history
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve payment history",
+      error: error.message
+    });
+  }
+};
  

@@ -11,21 +11,29 @@ const BookingService = {
   }
 };
 
-
-/////////////
 export const getBookings = async (status = 'all') => {
   const res = await api.get(`/booking?status=${status}`);
   return res.data;
 }
 
-export const getBookingDetails = async (id) => {
-  const res = await api.get(`/booking/${id}`);
-  console.log("xxxxxxxxxxx", res.data);
+export const searchBookingBy = async (status) => {
+  const res = await api.get(`/booking/searchBooking?search=${status}`);
   return res.data;
 }
 
-export const updateBookingStatus = async (id, status) => {
-  const res = await api.put(`/booking/${id}/status`, { status });
+
+export const getBookingDetails = async (id) => {
+  const res = await api.get(`/booking/${id}`);
+  return res.data;
+}
+
+export const getPrintBookingDetails = async (id) => {
+  const res = await api.get(`/booking/printBookingDetails/${id}`);
+  return res.data;
+}
+
+export const updateBookingStatus = async (id, status, payDeposit) => {
+  const res = await api.put(`/booking/${id}/status`, { status, payDeposit });
   return res.data;
 }
 
@@ -45,8 +53,8 @@ export const updateContract = async (id, contractData) => {
   return res.data;
 }
 
-export const updatePricing = async (id, pricingData) => {
-  const res = await api.put(`/booking/${id}/pricing`, pricingData);
+export const updateBookingPrice_BiteSoftLiquor = async (id) => {
+  const res = await api.put(`/booking/BiteSoftLiquor/${id}`);
   return res.data;
 }
 
@@ -61,9 +69,22 @@ export const updateBookingGuest = async (id, {number_of_guests}) => {
 }
 
 export const updateAdditionalHours = async (id, {additionalHours}) => {
-  console.log("ssssssssssssssssss:",id,additionalHours)
   const res = await api.put(`/booking/${id}/additional-hours`, { additionalHours });
   return res.data;
 }
 
+export const updateDate = async (id, {date}) => {
+  const res = await api.put(`/booking/${id}/date`, { date });
+  return res.data;
+}
+
+// Add to services/BookngService.js
+export const searchBookings = async (params) => {
+  try {
+    const response = await api.get('/bookings/search', { params });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export default BookingService;

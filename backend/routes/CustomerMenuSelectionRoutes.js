@@ -12,7 +12,7 @@ const router = express.Router();
 router.get("/", getSelections);
 //router.get("/:customer_id/:ICMT_Id", getSelectionById);
 router.post("/", createSelection);
-router.delete("/:customer_id/:ICMT_Id", deleteSelection);
+router.delete("/:booking_id/:ICMT_Id", deleteSelection);
 
 // Add this route before the :customer_id/:ICMT_Id routes to avoid route conflicts
 router.get("/check-booking/:booking_id", checkBookingSelection);

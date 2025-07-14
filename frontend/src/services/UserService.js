@@ -1,5 +1,7 @@
 import api from './Api';
-
+import axios from 'axios';
+// ...existing code...
+ 
  
 
 export const getEmployees = async () => {
@@ -10,7 +12,6 @@ export const getEmployees = async () => {
 //updateEmployee_link
 export const updateEmployee = async (employeeId, data) => {
     const datat = { id:employeeId, name: data.name, phone:data.phone, email:data.email, bod:data.bod, salary:data.salary, service_charge_precentage:data.service_charge_precentage, hire_date:data.hire_date  };
-    console.log(datat)
     const response = await api.put("/user/updateEmployee/", datat);
      
     return response.data;
@@ -19,54 +20,29 @@ export const updateEmployee = async (employeeId, data) => {
 // Get employee by ID
 export const getEmployeeById = async (employeeId) => {
     const response = await api.get(`/user/getEmployeeById/${employeeId}`);
-   //console.log(response.data);
     return response.data;
 };
 
 export const addEmployees = async (employeeData) => {
-    const response = await api.post(`user/addEmployee/`, employeeData);
+    const response = await api.post(`/user/addEmployee/`, employeeData);
     return response.data;
 };
 
 export const deleteEmployees = async (employeeId) => {
-    const response = await api.delete(`user/deleteEmployee/`, employeeId);
+    const response = await api.delete(`/user/deleteEmployee/`, employeeId);
     return response.data;
 };
 
 export const updateEmployeesStatus = async (employee_Id, status) => {
     const data = { employee_Id, status };
-    console.log(data);
     const response = await api.put("/user/updateStatus/",data);
-    console.log(response.data);
     return response.data;
 };
 
-// export const getEmployeesByStatus = async (status) => {
-//     const data = { status };
-//     console.log(data);
-//     const response = await api.get("/user/getEmployeesByStatus/", data);
-//     //console.log(response);
-//     return response.data;
-
-// };
-// Get employee by ID
 export const getEmployeesByStatus = async (status) => {
     const response = await api.get(`/user/getEmployeesByStatus/${status}`);
     return response.data;
 };
-
-// Get all service charge data
-// export const getAllServiceChargeData = async () => {
-//     const response = await api.get("/user/getAllServiceChargeData");
-//     // console.log("adoooo");
-//     // console.log(response.data);
-//     return response.data;
-// };
-// Service Charge Calculation Logic
-// export const calculateServiceChargeDistribution = async () => {
-//     const response = await api.get("/user/getAllServiceChargeData");
-//     return response.data;
-// };
 
 export const serviceChargeService = {
     calculateCharges: async () => {
@@ -89,6 +65,22 @@ export const serviceChargeService = {
     getAllCharges: async () => {
       try {
         const response = await api.get('/user/service-charges');
+        return {
+          success: true,
+          data: response.data.data || [],
+          count: response.data.count || 0
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.response?.data?.message || 'Failed to fetch charges',
+          error: error.message
+        };
+      }
+    },
+        getEmployeeCharges: async (employeeId) => {
+      try {
+        const response = await api.get(`/user/service-charges/employee/${employeeId}`);
         return {
           success: true,
           data: response.data.data || [],
@@ -263,3 +255,120 @@ getMonthlyDeductionEntriesByEmployeeAndDate: async (employeeId, date) => {
 }
 };
 
+export const calculatePay = async (date) => {
+    try {
+        const response = await api.post('/user/calculate', { calculation_date: date });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to calculate payroll');
+    }
+};
+
+export const getPayEntries = async (date) => {
+    try {
+        const response = await api.get(`/user/entries/${date}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to load pay entries');
+    }
+};
+//huuuuuuuuuuuuuuuuuuuuuuuuuu
+export const updatePayStatus = async (employeeId, date, status) => {
+    const response = await api.put(`/user/entries/${employeeId}/${date}`, { status });
+    console.log(response.data);
+    return response.data;
+};
+
+
+
+// export const notifyEmployees = async (payData) => {
+//   // Replace with your actual API call
+//   const response = await fetch("/api/notify-employees", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ payData }),
+//   });
+//   if (!response.ok) throw new Error("Failed to notify employees");
+//   return response.json();
+// };
+
+
+// export const notifyPayroll = async (date) => {
+//   try {
+//     const response = await api.post('/user/payroll/notify', { date });
+//     return {
+//       success: true,
+//       data: response.data,
+//       message: response.data.message || 'Notifications sent successfully'
+//     };
+//   } catch (error) {
+//     return {
+//       success: false,
+//       message: error.response?.data?.error || 'Failed to send notifications',
+//       error: error.message
+//     };
+//   }
+// };
+
+// ... (other imports and functions remain the same) ...
+
+export const sendIdToEmp = async (data) => {
+  try {
+    const response = await api.post('/user/send-id-to-emp', data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to send ID',
+      error: error.message
+    };
+  }
+};
+
+// Notify employees about payroll
+export const notifyPayroll = async (date) => {
+  try {
+    const response = await api.post('/user/payroll/notify', { date });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to notify payroll',
+      error: error.message
+    };
+  }
+};
+
+// Notify single employee about payroll
+export const notifyEmployeePayroll = async (date, employeeId) => {
+  try {
+    const response = await api.post('/user/payroll/notify-employee', { date, employeeId });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to notify employee',
+      error: error.message
+    };
+  }
+};
+
+
+// Add this to your services
+export const getPaymentHistory = async () => {
+  try {
+    const response = await api.get('/user/payment-history');
+    return {
+      success: true,
+      data: response.data.data || [],
+      message: 'Payment history retrieved successfully'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to fetch payment history',
+      error: error.message,
+      data: []
+    };
+  }
+};

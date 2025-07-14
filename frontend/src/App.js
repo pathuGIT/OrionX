@@ -15,14 +15,20 @@ import CustomerRegistration from './pages/CustomerRegistration';
 import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
 import EventHome from './pages/customer/EventHome';
 import DisplayEvents from './pages/customer/DisplayEvents';
-//import CustomerEventPlanning from './pages/customer/CustomerEventPlanning';
-// import DisplayEvents from './components/DisplayEvents';
+import EventServiceForm from './components/events/EventServiceForm';
+
 
 import ResetPassword from './pages/VerifyOtp';
 import ForgotPswdSuccess from './pages/ForgotPswdSuccess';
 import UpdatePassword from './pages/UpdatePassword';
 import CustomerMenuListSelection from './components/CustomerMenuListSelection';
 import CustomerMenuTypeSelection from './components/CustomerMenuTypeSelection';
+import AdminMenuOrdersPage from './pages/superAdmin/AdminViewMenuOrders';
+import AdminCorrectMenuSelections from './pages/superAdmin/AdminCorrectMenuSelections';
+
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Service from './pages/Service';
 
 function App() {
   return (
@@ -33,11 +39,12 @@ function App() {
         <main> 
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/service" element={<Service />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/profile" element={<ProtectedRoute name="customer"><Profile /></ProtectedRoute>} />
             <Route path="/eventHome/:bookingId/:customerID" element={<ProtectedRoute name="customer"><EventHome /></ProtectedRoute>} />
-            {/* <Route path="/event-planning/:bookingId" element={<ProtectedRoute name="customer"><CustomerEventPlanning /></ProtectedRoute>} />
-            <Route path="/display-Events/:customerID" element={<ProtectedRoute name="customer"><DisplayEvents /></ProtectedRoute>} /> */}
             <Route path="/superAdmin" element={<ProtectedRoute name="super_admin"><SuperAdminDB /></ProtectedRoute>} />
             <Route path="/subAdmin" element={<ProtectedRoute name="sub_admin"><SubAdminDB /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute name="employee"><EmployeeDB /></ProtectedRoute>} />
@@ -48,10 +55,17 @@ function App() {
             <Route path="/forgot-password/success" element={<ForgotPswdSuccess />} />
             <Route path="/forgot-password/update" element={<UpdatePassword />} />
 
-            {/* sandli */}
+            <Route path="/event-services/create" element={<EventServiceForm />} />
+            <Route path="/event-services/edit/:id" element={<EventServiceForm />} />
 
             <Route path="/menu-listtype/:menuListTypeId" element={<CustomerMenuListSelection />} />
             <Route path="/menu-types/:menuListTypeId" element={<CustomerMenuTypeSelection />} />
+            
+            <Route path="/admin-menu-orders" element={<AdminMenuOrdersPage />} />
+            <Route path="/admin-correct-menu-selections" element={<AdminCorrectMenuSelections />} />
+
+            {/* Customer Event Planning */}
+        
 
           </Routes>
         </main>
