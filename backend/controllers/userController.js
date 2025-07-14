@@ -43,9 +43,9 @@ import {
 
 // Create reusable transporter object
 const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_PORT,
-  port: process.env.MAIL_PSWD,
-  secure: false,
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
+  secure: true,
   auth: {
     user: process.env.MAIL_ADDRESS,
     pass: process.env.MAIL_PSWD,

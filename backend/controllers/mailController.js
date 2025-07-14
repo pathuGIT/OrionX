@@ -9,8 +9,8 @@ export const sendIdToEmp = async (req, res) => {
         // Create a transporter
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST, // Replace with your SMTP server
-            port: process.env.MAIL_PSWD, // Replace with your SMTP port
-            secure: false, // true for 465, false for other ports
+            port: process.env.MAIL_PORT, // Replace with your SMTP port
+            secure: true, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
                 pass: process.env.MAIL_PSWD // Replace with your email password
@@ -44,8 +44,8 @@ export const sendIdToUserMethod = async (name, subject, email, message, url) => 
         // Create a transporter
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST, // Replace with your SMTP server
-            port: process.env.MAIL_PSWD, // Replace with your SMTP port
-            secure: false, // true for 465, false for other ports
+            port: process.env.MAIL_PORT, // Replace with your SMTP port
+            secure: true, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
                 pass: process.env.MAIL_PSWD // Replace with your email password
