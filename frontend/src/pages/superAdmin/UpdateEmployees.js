@@ -3,7 +3,6 @@ import {
   getEmployees,
   getEmployeeById,
   updateEmployee,
-  deleteEmployees,
   getEmployeesByStatus,
   updateEmployeesStatus,
 } from "../../services/UserService";
@@ -24,9 +23,8 @@ function UpdateEmployees() {
   const [showPopup, setShowPopup] = useState(false);
   const [showActionPopup, setShowActionPopup] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("active");
-  const [filterStatus, setFilterStatus] = useState();
-  const [previousFilterStatus, setPreviousFilterStatus] = useState(null); // Track the previous filter status
-  const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [filterStatus, setFilterStatus] = useState(null); // Start with no filter
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchEmployees();
@@ -34,7 +32,7 @@ function UpdateEmployees() {
 
   const fetchEmployees = async () => {
     try {
-      if (filterStatus == null) {
+      if (filterStatus === null) {
         const response = await getEmployees();
         setEmployees(response.employees);
         return;
@@ -60,7 +58,6 @@ function UpdateEmployees() {
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   const handleEdit = async (employeeId) => {
     try {
@@ -88,7 +85,6 @@ function UpdateEmployees() {
   };
 
   const handleUpdate = async () => {
-    //validation
     if (!formData.name.trim()) {
       setErrorMessage("Employee name is required.");
       return;
@@ -123,7 +119,7 @@ function UpdateEmployees() {
       await updateEmployee(selectedEmployee.employee_id, formData);
       alert("Employee updated successfully");
       setShowPopup(false);
-      fetchEmployees(filterStatus);
+      fetchEmployees();
     } catch (error) {
       console.error("Error updating employee:", error);
       setErrorMessage("An unexpected error occurred.");
@@ -143,7 +139,7 @@ function UpdateEmployees() {
       alert("Employee status updated successfully");
 
       setShowActionPopup(false);
-      fetchEmployees(filterStatus); // Refresh the employee list
+      fetchEmployees();
     } catch (error) {
       console.error("Error updating employee status:", error);
       alert("An unexpected error occurred.");
@@ -154,21 +150,11 @@ function UpdateEmployees() {
     setSelectedEmployee(employee);
     setShowActionPopup(true);
   };
-  const handleFilterChange = (status) => {
-    setPreviousFilterStatus(filterStatus); // Save the current filter status before changing it
-    setFilterStatus(status);
-  };
-
-  const handleBack = () => {
-    setFilterStatus(previousFilterStatus); // Restore the previous filter status
-    setPreviousFilterStatus(null);
-  };
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-lg border mt-5">
       <p className="text-xl font-semibold mb-4">Update Employees</p>
 
-      {/* Search Bar */}
       <div className="mb-4">
         <input
           type="text"
@@ -179,35 +165,50 @@ function UpdateEmployees() {
         />
       </div>
 
-      {/* Filter Buttons */}
-      <div className="mb-4 flex space-x-4">
+      <div className="mb-4 flex flex-wrap gap-2">
+        {/* Show All Button */}
+        <button
+          onClick={() => setFilterStatus(null)}
+          className={`px-4 py-2 rounded transition ${
+            filterStatus === null
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+        >
+          Show All
+        </button>
+        
+        {/* Active Button */}
         <button
           onClick={() => setFilterStatus("active")}
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded transition ${
             filterStatus === "active"
               ? "bg-green-500 text-white"
-              : "bg-gray-300 text-black"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
           Active
         </button>
 
+        {/* Inactive Button */}
         <button
           onClick={() => setFilterStatus("inactive")}
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded transition ${
             filterStatus === "inactive"
-              ? "bg-green-500 text-white"
-              : "bg-gray-300 text-black"
+              ? "bg-red-500 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
           Inactive
         </button>
-        {(
+        
+        {/* Back Button - Only shows when a filter is applied */}
+        {filterStatus !== null && (
           <button
-            onClick={handleBack}
-            className="px-4 py-2 rounded bg-blue-500 text-white"
+            onClick={() => setFilterStatus(null)}
+            className="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600 transition"
           >
-            Back
+            Back to All
           </button>
         )}
       </div>
@@ -215,7 +216,7 @@ function UpdateEmployees() {
       <table className="min-w-full bg-white border border-gray-300">
         <thead>
           <tr className="border border-gray-300">
-            <th className="py-1 px-2 border-r border-gray-300 text-left">
+            <th className="py-1 px-2 border-r border-gray-300 text-left w-32">
               Employee ID
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left">
@@ -224,21 +225,21 @@ function UpdateEmployees() {
             <th className="py-1 px-2 border-r border-gray-300 text-left">
               Phone
             </th>
-            <th className="py-1 px-2 border-r border-gray-300  text-left">
+            <th className="py-1 px-2 border-r border-gray-300 text-left">
               Email
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left">
+            <th className="py-1 px-2 border-r border-gray-300 text-left w-32" >
               Date of Birth
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left">
+            <th className="py-1 px-2 border-r border-gray-300 text-left w-32" >
               Basic Salary
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left">
+            <th className="py-1 px-2 border-r border-gray-300 text-left ">
               Service Charge
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left">
-              Hire Date
-            </th>
+            <th className="py-1 px-2 border-r border-gray-300 text-left w-32">
+  Hire Date
+</th>
             <th className="py-1 px-2">Actions</th>
           </tr>
         </thead>
@@ -264,7 +265,7 @@ function UpdateEmployees() {
                   : "N/A"}
               </td>
               <td className="py-1 px-2 border-r border-gray-300">
-                {"Rs " + employee.salary}
+                {"LKR " + employee.salary}
               </td>
               <td className="py-1 px-2 border-r border-gray-300">
                 {employee.service_charge_precentage + "%"}
@@ -276,12 +277,20 @@ function UpdateEmployees() {
                   : "N/A"}
               </td>
               <td className="py-1 px-2">
-                <button
-                  onClick={() => handleActionClick(employee)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded"
-                >
-                  Actions
-                </button>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => handleEdit(employee.employee_id)}
+                    className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleActionClick(employee)}
+                    className="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600 transition"
+                  >
+                    Actions
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -306,20 +315,14 @@ function UpdateEmployees() {
             </div>
             <div className="space-y-4">
               <button
-                onClick={() => handleEdit(selectedEmployee.employee_id)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Edit
-              </button>
-              <button
                 onClick={handleUpdateEmployeesStatus}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
               >
                 Update Status
               </button>
               <button
                 onClick={() => setShowActionPopup(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
               >
                 Cancel
               </button>
@@ -337,7 +340,6 @@ function UpdateEmployees() {
               <div className="text-red-500 mb-4">{errorMessage}</div>
             )}
             <div className="space-y-4 w-96">
-              {/* Form Fields */}
               <div>
                 <label className="block text-sm font-medium">
                   Employee name
@@ -379,7 +381,7 @@ function UpdateEmployees() {
               </div>
               <div>
                 <label className="block text-sm font-medium">
-                  Date of birthday
+                  Date  of  birthday
                 </label>
                 <input
                   type="date"
@@ -427,17 +429,16 @@ function UpdateEmployees() {
                   className="w-full p-2 border border-gray-300 rounded"
                 />
               </div>
-              {/* Other fields */}
               <div className="flex justify-between">
                 <button
                   onClick={handleUpdate}
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
                 >
                   Update
                 </button>
                 <button
                   onClick={() => setShowPopup(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
                 >
                   Cancel
                 </button>
