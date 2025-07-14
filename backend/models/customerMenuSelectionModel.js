@@ -29,6 +29,23 @@ export const deleteSelection = async (booking_id, ICMT_Id) => {
     return result.affectedRows;
 };
 
+export const getCustomerMenuSelections = async (booking_id, ICMT_Id) => {
+    const [result] = await db.query(
+        "select * from customer_menu_item_selection where booking_id = ?",
+        [booking_id]
+    );
+    return result.affectedRows;
+};
+
+export const deleteAllMenuSelectionsForBooking = async (booking_id) => {
+    console.log("Deleting all selections for booking ID:", booking_id);
+    const [result] = await db.query(
+        "DELETE FROM customer_menu_item_selection WHERE booking_id = ?",
+        [booking_id]
+    );
+    return result.affectedRows;
+};
+
 export const existsBookingSelection = async (booking_id) => {
     console.log("Checking booking selection for ID:", booking_id);
     const [rows] = await db.query(
@@ -43,5 +60,7 @@ export default {
     getSelectionById,
     createSelection,
     deleteSelection,
-    existsBookingSelection
+    existsBookingSelection,
+    getCustomerMenuSelections,
+    deleteAllMenuSelectionsForBooking
 };

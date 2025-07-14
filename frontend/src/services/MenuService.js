@@ -265,6 +265,16 @@ export const addCategoryMenuType = async (categoryMenu) => {
   }
 };
 
+export const getCustomerMenuSelections =  async (booking_id) => {
+  try {
+    const response = await api.get(`/customerMenuSelection/getCustomerMenuSelections/${booking_id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching customer menu selections:", error);
+    throw error;
+  }
+};
+
 //to display a category menu type by id
 export const getCategoryMenuTypeById = async (id) => {
   try {
@@ -536,6 +546,11 @@ export const getAllStructuredMenuSelections = async () => {
   }
 };
 
+export const deleteCustomerSelectMenu = async (booking_id) => {
+    const response = await api.delete(`/AdminCorrectMenus/${booking_id}`);
+    return response.data;
+}
+
 /**
  * Gets structured menu selections by booking ID
  * @param {string} booking_id - The booking ID
@@ -769,8 +784,8 @@ export const getMenuSelectionDetails = async (bookingId) => {
 export const bulkUpdateMenuSelections = async (bookingId, updates) => {
   try {
     // First delete all existing selections
-    await MenuSelectionService.deleteAllMenuSelections(bookingId);
-    
+    //await MenuSelectionService.deleteAllMenuSelections(bookingId);
+    await deleteCustomerSelectMenu(bookingId)
     // Then add all new selections
     const results = await Promise.all(
       updates.map(ICMT_Id => 
