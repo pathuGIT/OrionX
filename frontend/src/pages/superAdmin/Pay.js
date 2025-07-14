@@ -4,7 +4,8 @@ import {
   calculatePay,
   getPayEntries,
   deductionService,
-  notifyPayroll
+  notifyPayroll,
+  updatePayStatus
 } from "../../services/UserService";
 
 const Pay = () => {
@@ -14,6 +15,7 @@ const Pay = () => {
   const [notifying, setNotifying] = useState(false);
   const [notification, setNotification] = useState(null);
   const [emailStatus, setEmailStatus] = useState({});
+  const [statusUpdating, setStatusUpdating] = useState({});
 
   // Format currency values
   const formatCurrency = (value) => {
@@ -97,13 +99,13 @@ const Pay = () => {
       // Send notifications
       const result = await notifyPayroll(formattedDate);
       
-      if (result.data.success) {
+      if (result.success) {
         showNotification(result.message || "Salary notifications sent successfully!");
         
         // Update status based on API response
-        if (result.data?.results) {
+        if (result.results) {
           const newStatus = {};
-          result.data.results.forEach(item => {
+          result.results.forEach(item => {
             newStatus[item.employee_id] = item.status;
           });
           setEmailStatus(newStatus);
@@ -118,27 +120,51 @@ const Pay = () => {
     }
   };
 
- const handleSendIndividualEmail = async (employeeId) => {
-  try {
-    setEmailStatus(prev => ({ ...prev, [employeeId]: 'sending' }));
-    
-    const employee = payData.find(item => item.employee_id === employeeId);
-    const formattedDate = selectedDate.format("YYYY-MM-DD");
-    
-    const result = await notifyPayroll(formattedDate, employeeId);
+  // Handle individual email sending
+  const handleSendIndividualEmail = async (employeeId) => {
+    try {
+      setEmailStatus(prev => ({ ...prev, [employeeId]: 'sending' }));
+      
+      const employee = payData.find(item => item.employee_id === employeeId);
+      const formattedDate = selectedDate.format("YYYY-MM-DD");
+      
+      const result = await notifyPayroll(formattedDate, employeeId);
 
-    if (result.data && result.data.success) {
-      showNotification(`Email sent to ${employee.name}`);
-      setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
-    } else {
-      showNotification(`Failed to send email to ${employee.name}`, true);
+      if (result.success) {
+        showNotification(`Email sent to ${employee.name}`);
+        setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
+      } else {
+        showNotification(`Failed to send email to ${employee.name}`, true);
+        setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
+      }
+    } catch (error) {
+      showNotification(`Error: ${error.message}`, true);
       setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
     }
-  } catch (error) {
-    showNotification(`Error: ${error.message}`, true);
-    setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
-  }
-};
+  };
+
+  // Handle payment status change
+  const handleStatusChange = async (employeeId, newStatus) => {
+    try {
+      setStatusUpdating(prev => ({ ...prev, [employeeId]: true }));
+      
+      const formattedDate = selectedDate.format("YYYY-MM-DD");
+      await updatePayStatus(employeeId, formattedDate, newStatus);
+      
+      // Update local state
+      setPayData(prev => prev.map(item => 
+        item.employee_id === employeeId 
+          ? { ...item, status: newStatus } 
+          : item
+      ));
+      
+      showNotification(`Status updated to ${newStatus} for employee`);
+    } catch (error) {
+      showNotification(`Failed to update status: ${error.message}`, true);
+    } finally {
+      setStatusUpdating(prev => ({ ...prev, [employeeId]: false }));
+    }
+  };
 
   // Load data on mount and date change
   useEffect(() => {
@@ -192,6 +218,39 @@ const Pay = () => {
           </button>
         );
     }
+  };
+
+  // Payment status dropdown
+  const renderPaymentStatus = (employee) => {
+    if (statusUpdating[employee.employee_id]) {
+      return (
+        <span className="text-blue-600 flex items-center">
+          <svg className="animate-spin h-4 w-4 mr-1" 
+               xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" 
+                    stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" 
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Updating...
+        </span>
+      );
+    }
+    
+    return (
+      <select
+        value={employee.status || "Not Paid"}
+        onChange={(e) => handleStatusChange(employee.employee_id, e.target.value)}
+        className={`px-2 py-1 rounded-md border text-sm ${
+          employee.status === "Paid" 
+            ? "bg-green-100 text-green-800 border-green-300" 
+            : "bg-red-100 text-red-800 border-red-300"
+        } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+      >
+        <option value="Paid">Paid</option>
+        <option value="Not Paid">Not Paid</option>
+      </select>
+    );
   };
 
   // Fixed function to correctly calculate net salary
@@ -280,7 +339,7 @@ const Pay = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                       />
                     </svg>
                     <span>Calculate Payroll</span>
@@ -365,6 +424,9 @@ const Pay = () => {
                     Net Salary
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                    Payment Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                     Email Status
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
@@ -399,6 +461,9 @@ const Pay = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
                       {formatCurrency(calculateCorrectNetSalary(item))}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {renderPaymentStatus(item)}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       {renderEmailStatus(item.employee_id)}
                     </td>
@@ -411,7 +476,7 @@ const Pay = () => {
               <tfoot className="bg-gray-50">
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="9"
                     className="px-6 py-4 text-right text-sm font-semibold text-gray-900"
                   >
                     Total Net Payroll:{" "}

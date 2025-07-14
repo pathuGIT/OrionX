@@ -272,6 +272,13 @@ export const getPayEntries = async (date) => {
         throw new Error(error.response?.data?.message || 'Failed to load pay entries');
     }
 };
+//huuuuuuuuuuuuuuuuuuuuuuuuuu
+export const updatePayStatus = async (employeeId, date, status) => {
+    const response = await api.put(`/user/entries/${employeeId}/${date}`, { status });
+    console.log(response.data);
+    return response.data;
+};
+
 
 
 // export const notifyEmployees = async (payData) => {
@@ -305,25 +312,45 @@ export const getPayEntries = async (date) => {
 
 // ... (other imports and functions remain the same) ...
 
-const API_URL = 'http://localhost:8000/api/user'; // Update base URL as needed
-
-// Send ID to employee
-export const sendIdToEmp = (data) => {
-  return axios.post(`${API_URL}/send-id-to-emp`, data, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+export const sendIdToEmp = async (data) => {
+  try {
+    const response = await api.post('/user/send-id-to-emp', data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to send ID',
+      error: error.message
+    };
+  }
 };
 
-// Notify employees about payroll - FIXED URL
-export const notifyPayroll = (date) => {
-  return axios.post(`${API_URL}/payroll/notify`, { date });
+// Notify employees about payroll
+export const notifyPayroll = async (date) => {
+  try {
+    const response = await api.post('/user/payroll/notify', { date });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to notify payroll',
+      error: error.message
+    };
+  }
 };
 
-// Notify single employee - FIXED URL
-export const notifyEmployeePayroll = (date, employeeId) => {
-  return axios.post(`${API_URL}/payroll/notify-employee`, { date, employeeId });
+// Notify single employee about payroll
+export const notifyEmployeePayroll = async (date, employeeId) => {
+  try {
+    const response = await api.post('/user/payroll/notify-employee', { date, employeeId });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to notify employee',
+      error: error.message
+    };
+  }
 };
 
 
