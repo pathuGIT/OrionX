@@ -58,6 +58,38 @@ export const deleteSelection = async (req, res) => {
   }
 };
 
+export const getCustomerMenuSelections = async (req, res) => {
+  try {
+    const { booking_id } = req.params;
+
+    const selections = await CustomerMenuItemSelection.getCustomerMenuSelections(booking_id);
+
+    if (!selections) {
+      return res.status(404).json({ error: "No selections found" });
+    }
+
+    res.json(selections);
+  } catch (error) {
+    res.status(500).json({ error: "Database error" });
+  }
+};
+
+// Delete all selections for a booking
+export const deleteAllSelectionsForBooking = async (req, res) => {
+  const { booking_id } = req.params;
+  try {
+    // Fix: Use different variable name (affectedRows instead of res)
+    const affectedRows = await CustomerMenuItemSelection.deleteAllMenuSelectionsForBooking(booking_id);
+    
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: "No selections found" });
+    }
+    res.json({ message: "All selections deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Database error" });
+  }
+}
+
 // Check if booking_id exists in selections
 export const checkBookingSelection = async (req, res) => {
   try {

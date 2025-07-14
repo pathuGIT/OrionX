@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCategories, addCategory, getCategoryById, deleteCategory, updateCategoryById } from '../../services/MenuService';
 import CreateItem from './CreateItem';
 
-function CreateCategory({setRenderContent}) {
+function CreateCategory({ setRenderContent, handleRenderContent }) {
   const [category, setCategory] = useState({ category_id: '', category_name: '' });
   const [categories, setCategories] = useState([]);
   const [btnname, setBtnname] = useState('Add Category');
@@ -61,7 +61,12 @@ function CreateCategory({setRenderContent}) {
         alert('Category added successfully!');
         setCategory({ category_name: '' });
         setIsAdding(false);
-        setRenderContent(() => () => <CreateItem />);
+       
+        
+        if (handleRenderContent) {
+          handleRenderContent('createItem');
+        }
+
       } else if (btnname === 'Update') {
         await updateCategoryById(category.category_id, category.category_name);
         alert('Category updated successfully!');
