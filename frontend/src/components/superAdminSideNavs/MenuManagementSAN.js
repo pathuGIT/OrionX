@@ -136,7 +136,7 @@ const MenuManagementSAN = ({ setRenderContent }) => {
             <ul className={`${isSalesDropdownOpen ? '' : 'hidden'} py-2 space-y-2`}>
               <li><a href="#" onClick={() => handleRenderContent('AdminMenuOrdersPage')} className={`flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group hover:bg-gray-100 dark:hover:bg-gray-700 ${activeTab === 'CustomerMenuSummary' ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}>View Catering Orders</a></li>
               <li><a href="#" onClick={() => handleRenderContent('AdminCorrectMenuSelections')}  className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Fix Menu Selection Errors</a></li>
-              <li><a href="#" className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Notify Catering Staff</a></li>
+              
             </ul>
           </li>
 
