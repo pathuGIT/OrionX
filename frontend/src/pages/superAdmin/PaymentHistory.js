@@ -8,15 +8,15 @@ import autoTable from "jspdf-autotable";
 // Helper function for month dot colors
 const getMonthDotColor = (monthName) => {
   const colorMap = {
-    'January': '#3b82f6',    // blue-500
-    'February': '#8b5cf6',   // purple-500
-    'March': '#ec4899',      // pink-500
-    'April': '#10b981',      // green-500
-    'May': '#eab308',        // yellow-500
-    'June': '#6366f1',       // indigo-500
-    'July': '#ef4444',       // red-500
-    'August': '#f97316',     // orange-500
-    'September': '#14b8a6',  // teal-500
+    'January': '#3b82f6',   // blue-500
+    'February': '#8b5cf6',  // purple-500
+    'March': '#ec4899',     // pink-500
+    'April': '#10b981',     // green-500
+    'May': '#eab308',       // yellow-500
+    'June': '#6366f1',      // indigo-500
+    'July': '#ef4444',      // red-500
+    'August': '#f97316',    // orange-500
+    'September': '#14b8a6',   // teal-500
     'October': '#06b6d4',    // cyan-500
     'November': '#f59e0b',   // amber-500
     'December': '#84cc16'    // lime-500
@@ -117,104 +117,83 @@ const PaymentHistory = () => {
 
   const handleExport = async () => {
     try {
-      // Create new PDF document in landscape mode
       const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'pt',
         format: 'a4'
       });
 
-      // Get page dimensions
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       
-      // Add watermark to every page
+      // Add watermark function
       const addWatermark = () => {
-        // Save current state to restore later
         doc.saveGraphicsState();
-        
-        // Set watermark properties
-        doc.setFontSize(60);
         doc.setGState(new doc.GState({ opacity: 0.1 }));
-        doc.setTextColor(150);
-        doc.setFont(undefined, 'bold');
         
-        // Add watermark text at center of page
-        doc.text('Deandra Bolgoda', 
-          pageWidth / 2, 
-          pageHeight / 2, 
-          { 
-            align: 'center',
-            angle: 0, 
-          }
-        );
-        
-        // Restore graphics state
-        doc.restoreGraphicsState();
-      };
-      
-      const addLogo = () => {
         try {
-          // Use relative path from public folder
-          const logoPath = '/logo2.png'; 
+          const watermarkLogoPath = '/logo2.png'; 
+          const watermarkWidth = pageWidth * 0.7;
+          // Maintain aspect ratio
+          const watermarkHeight = watermarkWidth * (5 / 6);
+          
+          const x = (pageWidth - watermarkWidth) / 2;
+          const y = (pageHeight - watermarkHeight) / 2;
+          
           doc.addImage(
-            logoPath,
+            watermarkLogoPath,
             'PNG',
-            50,
-            30,
-            60,
-            50
+            x,
+            y,
+            watermarkWidth,
+            watermarkHeight
           );
         } catch (e) {
-          console.error('Error adding logo:', e);
+          console.error('Error adding watermark logo:', e);
         }
+        
+        doc.restoreGraphicsState();
       };
 
-      // Add footer with blue background and contact info
       const addFooter = (pageNumber, pageCount) => {
         const footerHeight = 40;
         const footerY = pageHeight - footerHeight;
-        
-        // Blue footer background
+
         doc.setFillColor(41, 128, 185);
         doc.rect(0, footerY, pageWidth, footerHeight, 'F');
-        
-        // Footer text (white)
+
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(10);
-        
-        // Prepared by text
+
         doc.text(
-          'Prepared by: Deandra Bolgoda', 
-          40, 
-          footerY + 15
+          'Prepared by: Deandra Bolgoda\nContact: Deandrabolgoda@gmail.com | +94 77 974 0722',
+          40,
+          footerY + 18,
+          { align: 'left' }
         );
-        
-        // Contact info
+
         doc.text(
-          'Contact: Deandrabolgoda@gmail.com | +94 77 974 0722', 
-          40, 
-          footerY + 30
-        );
-        
-        // Page numbers
-        doc.text(
-          `Page ${pageNumber} of ${pageCount}`, 
-          pageWidth - 40, 
+          `Page ${pageNumber} of ${pageCount}`,
+          pageWidth - 40,
           footerY + 25,
           { align: 'right' }
         );
+
+        // Draw border line around the page
+        doc.setDrawColor(41, 128, 185); // Border color
+        doc.setLineWidth(2); // Border thickness
+        doc.rect(10, 10, pageWidth - 20, pageHeight - 20, 'S'); // 'S' for stroke only
       };
 
       // Add title
       doc.setFontSize(20);
       doc.setFont(undefined, 'bold');
-      doc.text('Payment Report', pageWidth / 2, 40, { align: 'center' });
+      doc.text('Payment Report', pageWidth / 2, 50, { align: 'center' });
       
       // Add report date
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text(`Generated on: ${moment().format('DD MMM YYYY hh:mm A')}`, pageWidth / 2, 60, { align: 'center' });
+      doc.text(`Generated on: ${moment().format('DD MMM YYYY hh:mm A')}`, pageWidth / 2, 70, { align: 'center' });
       
       // Add filter information
       let filterInfo = 'Filters: ';
@@ -225,17 +204,14 @@ const PaymentHistory = () => {
         filterInfo += `Employee: ${employee?.employee_name || filters.employee} `;
         hasFilters = true;
       }
-      
       if (filters.month) {
         filterInfo += `| Month: ${moment().month(filters.month - 1).format('MMMM')} `;
         hasFilters = true;
       }
-      
       if (filters.year) {
         filterInfo += `| Year: ${filters.year} `;
         hasFilters = true;
       }
-      
       if (searchTerm) {
         filterInfo += `| Search: "${searchTerm}"`;
         hasFilters = true;
@@ -243,20 +219,14 @@ const PaymentHistory = () => {
       
       if (hasFilters) {
         doc.setFontSize(9);
-        doc.text(filterInfo, pageWidth / 2, 80, { align: 'center', maxWidth: pageWidth - 80 });
+        doc.text(filterInfo, pageWidth / 2, 90, { align: 'center', maxWidth: pageWidth - 80 });
       }
 
-      // Prepare table data with Payment Status column
+      const tableStartY = hasFilters ? 110 : 90;
+
       const headers = [
-        'Employee ID',
-        'Name',
-        'Period',
-        'Base Salary',
-        'Service Charge',
-        'Deductions',
-        'Net Salary',
-        'Payment Date',
-        'Payment Status'
+        'Employee ID', 'Name', 'Period', 'Base Salary', 'Service Charge',
+        'Deductions', 'Net Salary', 'Payment Date', 'Payment Status'
       ];
       
       const data = filteredHistory.map(item => [
@@ -268,36 +238,29 @@ const PaymentHistory = () => {
         formatCurrency(item.total_deduction),
         formatCurrency(item.net_salary),
         moment(item.calculation_date).format('DD MMM YYYY'),
-        item.status
+        item.status === 'Paid' ? 'Paid' : 'Not Paid' // Updated to show Not Paid by default
       ]);
 
-      // Add watermark and logo to first page
+      // Add watermark only (logo removed)
       addWatermark();
-      addLogo();
 
-      // Calculate table width and center it
-      const tableWidth = 640; // Increased to accommodate new column
-      const margin = (pageWidth - tableWidth) / 2;
+      // Calculate column widths for centering
+      const columnWidths = [70, 90, 60, 70, 70, 70, 70, 70, 70];
+      const totalTableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+      const startX = (pageWidth - totalTableWidth) / 2;
 
-      // Generate table with centered alignment
       autoTable(doc, {
         head: [headers],
         body: data,
-        startY: hasFilters ? 100 : 80,
+        startY: tableStartY,
+        margin: { left: startX }, // Center the table
         theme: 'grid',
         headStyles: {
-          fillColor: [41, 128, 185],
-          textColor: 255,
-          fontStyle: 'bold',
-          fontSize: 10
+          fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold', fontSize: 10
         },
-        bodyStyles: {
-          fontSize: 9
-        },
+        bodyStyles: { fontSize: 9 },
         styles: {
-          cellPadding: 3,
-          valign: 'middle',
-          halign: 'center'
+          cellPadding: 3, valign: 'middle', halign: 'center'
         },
         columnStyles: {
           0: { cellWidth: 70, halign: 'left' },
@@ -308,21 +271,17 @@ const PaymentHistory = () => {
           5: { cellWidth: 70 },
           6: { cellWidth: 70 },
           7: { cellWidth: 70 },
-          8: { cellWidth: 70 } // Payment Status column
+          8: { cellWidth: 70 }
         },
-        margin: { left: margin, right: margin },
         didDrawPage: function(data) {
           // Add watermark to subsequent pages
           if (data.pageNumber > 1) {
             addWatermark();
           }
-          
-          // Add footer to every page
-          addFooter(data.pageNumber, data.pageCount);
+          addFooter(data.pageNumber, doc.internal.getNumberOfPages());
         }
       });
 
-      // Save the PDF
       doc.save(`payment_history_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -330,12 +289,10 @@ const PaymentHistory = () => {
     }
   };
 
-  // Get unique years from latestRecords
   const uniqueYears = [...new Set(latestRecords.map(item => 
     moment(item.calculation_date).format('YYYY'))
   )].sort((a, b) => b - a);
 
-  // Get unique employees
   const employeeMap = new Map();
   latestRecords.forEach(item => {
     if (!employeeMap.has(item.employee_id)) {
@@ -348,7 +305,6 @@ const PaymentHistory = () => {
     name: `${id} - ${name}`
   })).sort((a, b) => a.name.localeCompare(b.name));
 
-  // Group by month-year
   const groupByMonthYear = (data) => {
     return data.reduce((groups, item) => {
       const key = moment(item.calculation_date).format('MMMM YYYY');
@@ -360,7 +316,6 @@ const PaymentHistory = () => {
     }, {});
   };
 
-  // Sort groups by date (newest first)
   const getSortedGroups = (groupedData) => {
     return Object.entries(groupedData)
       .sort(([aKey], [bKey]) => 
@@ -368,20 +323,10 @@ const PaymentHistory = () => {
       );
   };
 
-  // Array of light background colors for monthly sections
   const monthColors = [
-    'bg-blue-50',    // January
-    'bg-purple-50',  // February
-    'bg-pink-50',    // March
-    'bg-green-50',   // April
-    'bg-yellow-50',  // May
-    'bg-indigo-50',  // June
-    'bg-red-50',     // July
-    'bg-orange-50',  // August
-    'bg-teal-50',    // September
-    'bg-cyan-50',    // October
-    'bg-amber-50',   // November
-    'bg-lime-50'     // December
+    'bg-blue-50', 'bg-purple-50', 'bg-pink-50', 'bg-green-50', 'bg-yellow-50',
+    'bg-indigo-50', 'bg-red-50', 'bg-orange-50', 'bg-teal-50', 'bg-cyan-50',
+    'bg-amber-50', 'bg-lime-50'
   ];
 
   const getMonthColor = (monthName) => {
@@ -506,30 +451,14 @@ const PaymentHistory = () => {
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr className="border-b-2 border-gray-300">
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Period
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Base Salary
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Service Charge
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Deductions
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Net Salary
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Payment Date
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Payment status
-                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Salary</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service Charge</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deductions</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Salary</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Date</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment status</th>
               </tr>
             </thead>
             <tbody>
@@ -537,9 +466,7 @@ const PaymentHistory = () => {
                 <tr>
                   <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center">
-                      <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                      </svg>
+                      <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                       <p className="text-lg">No payment records found</p>
                       <p className="mt-1 text-sm">Try adjusting your search or filter criteria</p>
                     </div>
@@ -601,12 +528,12 @@ const PaymentHistory = () => {
                             {moment(item.calculation_date).format('DD MMM YYYY')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <span className={`px-2 py-1 rounded-full ${
+                            <span className={`px-2 py-1 rounded-full text-xs ${
                               item.status === 'Paid' 
                                 ? 'bg-green-100 text-green-800' 
                                 : 'bg-yellow-100 text-yellow-800'
                             }`}>
-                              {item.status}
+                              {item.status === 'Paid' ? 'Paid' : 'Not Paid'} {/* Updated to show Not Paid by default */}
                             </span>
                           </td>
                         </tr>
@@ -622,7 +549,7 @@ const PaymentHistory = () => {
         {filteredHistory.length > 0 && (
           <div className="mt-4 text-sm text-gray-500">
             Showing {filteredHistory.length} of {latestRecords.length} records
-            {filters.employee || filters.month || filters.year || searchTerm ? (
+            {(filters.employee || filters.month || filters.year || searchTerm) && (
               <button 
                 className="ml-4 text-blue-600 hover:text-blue-800"
                 onClick={() => {
@@ -632,7 +559,7 @@ const PaymentHistory = () => {
               >
                 Clear filters
               </button>
-            ) : null}
+            )}
           </div>
         )}
       </div>
