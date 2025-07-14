@@ -26,7 +26,6 @@ import {
     notifySingleEmployeePayroll,
     sendIdToEmp,
     getPaymentHistory,
-    addCustomer,
     UpdatePayStatus
 } from '../controllers/userController.js';
 
