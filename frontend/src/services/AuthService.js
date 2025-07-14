@@ -1,4 +1,5 @@
 import api from './Api';
+import api_local from './ApiLocal';
 
 export const loginUser = async (credentials) => {
   const response = await api.post('/auth/login', credentials);
