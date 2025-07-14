@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const api = axios.create({
+const api_local = axios.create({
   baseURL: 'http://localhost:8000/api', // ✅ Use your actual server IP or domain
 });
 
 // Attach token to requests
-api.interceptors.request.use((config) => {
+api_local.interceptors.request.use((config) => {
   const token = sessionStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -14,7 +14,7 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle 401 and refresh token
-api.interceptors.response.use(
+api_local.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -34,7 +34,7 @@ api.interceptors.response.use(
       }
 
       try {
-        const { data } = await api.post('/auth/refresh', {
+        const { data } = await api_local.post('/auth/refresh', {
           useremail: sessionStorage.getItem('credential'),
           id: sessionStorage.getItem('id'),
           role: sessionStorage.getItem('role'),
@@ -44,7 +44,7 @@ api.interceptors.response.use(
         sessionStorage.setItem('token', data.token);
 
         originalRequest.headers.Authorization = `Bearer ${data.token}`;
-        return api(originalRequest);
+        return api_local(originalRequest);
       } catch (refreshError) {
         console.error('Token refresh failed', refreshError);
         sessionStorage.clear();
@@ -56,4 +56,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default api_local;

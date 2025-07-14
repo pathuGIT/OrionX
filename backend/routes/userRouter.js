@@ -26,7 +26,6 @@ import {
     notifySingleEmployeePayroll,
     sendIdToEmp,
     getPaymentHistory,
-    addCustomerNew,
     UpdatePayStatus
 } from '../controllers/userController.js';
 
@@ -36,8 +35,6 @@ const router = express.Router();
 router.post('/addEmployee',superAdmin,  addEmployee);
 router.post('/addCustomer', addCustomer);
 
-//Add new customer with email - test
-router.post('/addCustomerNew', addCustomerNew);
 
 
 router.get('/searchCustomer', searchCustomer);
