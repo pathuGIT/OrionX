@@ -504,6 +504,18 @@ export const getPayEntriesModel = async (date) => {
   );
   return rows;
 };
+//huuuuuuuuuuuuuuuuuuuuuuuuuuuu
+export const UpdatePayStatusEntriesModel = async (status, date, employee_id) => {
+  const [result] = await pool.query(
+    `UPDATE employee_salary_calculation 
+     SET status = ?
+     WHERE 
+       calculation_date = STR_TO_DATE(?, '%Y-%m-%d') AND 
+       employee_id = ?`,
+    [status, date, employee_id]
+  );
+  return result;
+};
 
 
 // Email Services
@@ -574,7 +586,8 @@ export const getPaymentHistoryModel = async () => {
         esc.total_service_charge,
         esc.total_deduction,
         esc.net_salary,
-        esc.calculation_date
+        esc.calculation_date,
+        esc.status
       FROM employee_salary_calculation esc
       JOIN employee e ON esc.employee_id = e.employee_id
       ORDER BY esc.calculation_date DESC
