@@ -67,7 +67,7 @@ const EventHomeSideNav = ({ setActivePage, isOpen, setIsOpen }) => {
         { name: 'menu', icon: <FaUtensils className="text-orange-400" />, title: 'Menu Planning', subItems: [
             { page: 'plan-menulist', label: '🍽️ Select New Menu' },
             { page: 'menu-report', label: '📋 Saved Menus' },
-            { page: 'popular-menus', label: 'Favourite Menus'}
+            { page: 'popular-menus', label: '📋 Favourite Menus'}
         ]},
         { name: 'services', icon: <FaConciergeBell className="text-green-400" />, title: 'Event Services', subItems: [
             { page: 'Select-Services', label: '🛍️ Select Services' },
