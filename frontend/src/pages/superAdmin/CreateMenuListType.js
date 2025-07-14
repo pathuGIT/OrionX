@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { addMenuListType, deleteMenuListType, getMenuListTypeById, getMenus, updateMenuListTypeById } from '../../services/MenuService';
 import CreateMenuType from './CreateMenuType';
 
-function CreateMenuListType({setRenderContent}) {
+function CreateMenuListType({ setRenderContent, handleRenderContent }) {
   const [menu, setMenu] = useState({ menu_list_type_id: '', menu_list_name: '' });
   const [menus, setMenus] = useState([]);
   const [btnname, setBtnname] = useState('Add Menu');
@@ -53,7 +53,11 @@ function CreateMenuListType({setRenderContent}) {
         // Reverse the array to show newest first
         setMenus(updatedMenus.reverse());
         setIsAdding(false);
-        setRenderContent(() => () => <CreateMenuType />);
+        // Navigate to CreateMenuType after successful addition
+        if (handleRenderContent) {
+          handleRenderContent('createMenuTypes');
+        }
+
       } else if (btnname === 'Update') {
         await updateMenuListTypeById(menu.menu_list_type_id, menu.menu_list_name);
         setMenu({ menu_list_name: '' });
@@ -123,6 +127,7 @@ function CreateMenuListType({setRenderContent}) {
     }
   };
 
+  
   return (
     <div
   className="min-h-screen bg-gray-50 p-6 overflow-y-auto"

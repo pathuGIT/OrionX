@@ -10,7 +10,7 @@ import {
   getCategoryMenuTypeById,
 } from '../../services/MenuService';
 
-function CreateCategoryMenuType({setRenderContent}) {
+function CreateCategoryMenuType({ setRenderContent, handleRenderContent }) {
   const [categoryMenu, setCategoryMenu] = useState({
     menu_type_id: '',
     category_id: '',
@@ -65,6 +65,11 @@ function CreateCategoryMenuType({setRenderContent}) {
         alert('Category Menu Type added successfully!');
         setCategoryMenu({ menu_type_id: '', category_id: '', item_limit: '' });
         setIsAdding(false);
+        
+        if (handleRenderContent) {
+          handleRenderContent('createItemCategoryMenuType');
+        }
+
       } else {
         await updateCategoryMenuType(selectedId, categoryMenu);
         alert('Category Menu Type updated successfully!');

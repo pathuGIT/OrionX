@@ -27,6 +27,7 @@ import summaryRoutes from './routes/summaryRoutes.js';
 import overviewRout from './routes/overviewRoutes.js';
 import settingRoute from './routes/settingRoutes.js';
 import AdminCorrectMenusRoute from './routes/AdminCorrectMenusRoute.js';
+import MenuCorrectionRoute from './routes/MenuCorrectionRoute.js';
 
 
 
@@ -51,15 +52,19 @@ app.use('/api/categoryMenuTypes', categoryMenuTypeRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/ItemCategoryMenuType', ItemCategoryMenuTypeRoutes);
 app.use('/api/customerMenuSelection', customerSelectionRoutes);
+
 // Menu Overview routes
 app.use('/api/advanceMenu', advanceMenuViewRoute);
 app.use('/api/advanceMenuView', menuViewRoutes);
 app.use('/api/AdminCorrectMenus', AdminCorrectMenusRoute); // Admin Correct Menus Route
+app.use('/api/MenuCorrection', MenuCorrectionRoute); // Menu Correction Route
+
+app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
+
 
 
 //booking routes
 app.use('/api/booking', bookingRoutes);
-app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
 
 
 app.use('/api/overview', overviewRout);
