@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { serviceChargeService } from "../../services/UserService";
 
-
 const ServiceChargeTable = () => {
   const [charges, setCharges] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState(""); // New state for year selection
   const [totalDistributed, setTotalDistributed] = useState(0);
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
 
   const loadData = async () => {
     try {
@@ -44,48 +44,66 @@ const ServiceChargeTable = () => {
 
   useEffect(() => {
     const filterData = () => {
-      if (selectedMonth === "") {
-        setFilteredData(charges);
-        setTotalDistributed(
-          charges.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0)
-        );
-      } else {
-        const filtered = charges.filter((row) => {
+      let filtered = charges;
+      
+      // Apply month filter if selected
+      if (selectedMonth) {
+        filtered = filtered.filter((row) => {
           const date = new Date(row.calculation_date);
           return date.getMonth() + 1 === parseInt(selectedMonth);
         });
-        setFilteredData(filtered);
-        setTotalDistributed(
-          filtered.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0)
-        );
       }
+      
+      // Apply year filter if selected
+      if (selectedYear) {
+        filtered = filtered.filter((row) => {
+          const date = new Date(row.calculation_date);
+          return date.getFullYear() === parseInt(selectedYear);
+        });
+      }
+      
+      setFilteredData(filtered);
+      setTotalDistributed(
+        filtered.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0)
+      );
     };
+    
     filterData();
-  }, [selectedMonth, charges]);
+  }, [selectedMonth, selectedYear, charges]);
+
+  // Get unique years from calculation dates
+  const getAvailableYears = () => {
+    const years = new Set();
+    charges.forEach(item => {
+      const date = new Date(item.calculation_date);
+      years.add(date.getFullYear());
+    });
+    return Array.from(years).sort((a, b) => b - a); // Sort descending
+  };
 
   const groupByEvent = (data) => {
-  // First group the data
-  const grouped = data.reduce((acc, current) => {
-    const existing = acc.find(item => item.event_id === current.event_id);
-    if (!existing) {
-      acc.push({
-        event_id: current.event_id,
-        customer_name: current.customer_name,
-        calculation_date: current.calculation_date,
-        event_budget: current.event_budget,
-        entries: [current]
-      });
-    } else {
-      existing.entries.push(current);
-    }
-    return acc;
-  }, []);
+    // First group the data
+    const grouped = data.reduce((acc, current) => {
+      const existing = acc.find(item => item.event_id === current.event_id);
+      if (!existing) {
+        acc.push({
+          event_id: current.event_id,
+          customer_name: current.customer_name,
+          calculation_date: current.calculation_date,
+          event_budget: current.event_budget,
+          entries: [current]
+        });
+      } else {
+        existing.entries.push(current);
+      }
+      return acc;
+    }, []);
 
-  // Then sort the grouped array by event_id in DESCENDING order
-  return grouped.sort((b, a) => 
-    b.event_id.localeCompare(a.event_id)  // Reverse comparison for descending order
-  );
-};
+    // Then sort the grouped array by event_id in DESCENDING order
+    return grouped.sort((b, a) => 
+      b.event_id.localeCompare(a.event_id)  // Reverse comparison for descending order
+    );
+  };
 
   const formatCurrency = (value) => {
     return parseFloat(value || 0).toLocaleString("en-US", {
@@ -125,6 +143,7 @@ const ServiceChargeTable = () => {
             Service Charge Distribution
           </h1>
           <div className="flex items-center gap-4">
+            {/* Month Selector */}
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
@@ -134,6 +153,20 @@ const ServiceChargeTable = () => {
               {Array.from({ length: 12 }, (_, i) => (
                 <option key={i + 1} value={i + 1}>
                   {new Date(0, i).toLocaleString("default", { month: "long" })}
+                </option>
+              ))}
+            </select>
+            
+            {/* Year Selector */}
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Years</option>
+              {getAvailableYears().map(year => (
+                <option key={year} value={year}>
+                  {year}
                 </option>
               ))}
             </select>
@@ -237,7 +270,7 @@ const ServiceChargeTable = () => {
 
                           </td>
                         )}
-                        {console.log(row.event_budget)}
+
                         <td className="px-4 py-3 text-sm font-semibold text-green-600">
                           + LKR {formatCurrency(row.amount)}
                         </td>

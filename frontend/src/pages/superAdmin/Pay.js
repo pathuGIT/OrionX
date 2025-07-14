@@ -9,7 +9,7 @@ import {
 } from "../../services/UserService";
 
 const Pay = () => {
-  const [selectedDate, setSelectedDate] = useState(moment());
+  const [selectedDate, setSelectedDate] = useState(null); // Changed to null initially
   const [payData, setPayData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [notifying, setNotifying] = useState(false);
@@ -37,7 +37,15 @@ const Pay = () => {
     async (date) => {
       try {
         setLoading(true);
-        const formattedDate = date || selectedDate.format("YYYY-MM-DD");
+        
+        // If no date is provided, clear the data
+        if (!date) {
+          setPayData([]);
+          setEmailStatus({});
+          return;
+        }
+        
+        const formattedDate = date.format("YYYY-MM-DD");
         const response = await getPayEntries(formattedDate);
 
         setPayData(
@@ -55,12 +63,18 @@ const Pay = () => {
         setLoading(false);
       }
     },
-    [selectedDate, showNotification]
+    [showNotification]
   );
 
   // Calculate payroll handler
   const handleCalculate = async () => {
     try {
+      // Check if month is selected
+      if (!selectedDate) {
+        showNotification("Please select a month first", true);
+        return;
+      }
+      
       setLoading(true);
       const formattedDate = selectedDate.format("YYYY-MM-DD");
 
@@ -75,7 +89,7 @@ const Pay = () => {
 
       // Refresh data and show success
       showNotification("Payroll calculated successfully!");
-      await loadPayData(formattedDate);
+      await loadPayData(selectedDate);
     } catch (error) {
       showNotification(error.message || "Payroll calculation failed", true);
     } finally {
@@ -86,6 +100,12 @@ const Pay = () => {
   // Notification handler for salary emails
   const handleNotify = async () => {
     try {
+      // Check if month is selected
+      if (!selectedDate) {
+        showNotification("Please select a month first", true);
+        return;
+      }
+      
       setNotifying(true);
       const formattedDate = selectedDate.format("YYYY-MM-DD");
       
@@ -123,6 +143,12 @@ const Pay = () => {
   // Handle individual email sending
   const handleSendIndividualEmail = async (employeeId) => {
     try {
+      // Check if month is selected
+      if (!selectedDate) {
+        showNotification("Please select a month first", true);
+        return;
+      }
+      
       setEmailStatus(prev => ({ ...prev, [employeeId]: 'sending' }));
       
       const employee = payData.find(item => item.employee_id === employeeId);
@@ -146,6 +172,12 @@ const Pay = () => {
   // Handle payment status change
   const handleStatusChange = async (employeeId, newStatus) => {
     try {
+      // Check if month is selected
+      if (!selectedDate) {
+        showNotification("Please select a month first", true);
+        return;
+      }
+      
       setStatusUpdating(prev => ({ ...prev, [employeeId]: true }));
       
       const formattedDate = selectedDate.format("YYYY-MM-DD");
@@ -166,10 +198,10 @@ const Pay = () => {
     }
   };
 
-  // Load data on mount and date change
+  // Load data when date changes
   useEffect(() => {
-    loadPayData();
-  }, [loadPayData]);
+    loadPayData(selectedDate);
+  }, [selectedDate, loadPayData]);
 
   // Email status indicators
   const renderEmailStatus = (employeeId) => {
@@ -287,8 +319,10 @@ const Pay = () => {
               </label>
               <input
                 type="month"
-                value={selectedDate.format("YYYY-MM")}
-                onChange={(e) => setSelectedDate(moment(e.target.value))}
+                value={selectedDate ? selectedDate.format("YYYY-MM") : ""}
+                onChange={(e) => 
+                  setSelectedDate(e.target.value ? moment(e.target.value) : null)
+                }
                 className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -511,7 +545,9 @@ const Pay = () => {
                 </svg>
               </div>
               <p className="text-gray-500 text-sm">
-                No payroll data available for {selectedDate.format("MMMM YYYY")}
+                {selectedDate 
+                  ? `No payroll data available for ${selectedDate.format("MMMM YYYY")}`
+                  : "Please select a month to view payroll data"}
               </p>
             </div>
           )}
