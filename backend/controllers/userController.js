@@ -43,8 +43,8 @@ import {
 
 // Create reusable transporter object
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: process.env.MAIL_PORT,
+  port: process.env.MAIL_PSWD,
   secure: false,
   auth: {
     user: process.env.MAIL_ADDRESS,

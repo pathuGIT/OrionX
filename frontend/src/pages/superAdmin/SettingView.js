@@ -70,7 +70,7 @@ const SettingView = () => {
 
   // Move state inside modal
   const RoleChangeModal = () => {
-    const [selectedRole, setSelectedRole] = useState('sub_admin')
+    const [selectedRole, setSelectedRole] = useState('super_admin')
     const [adminPassword, setAdminPassword] = useState('')
 
     return (
@@ -85,8 +85,8 @@ const SettingView = () => {
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
               >
-                <option value="sub_admin">Sub Admin</option>
-                <option value="super_admin">Super Admin</option>
+                {/* <option value="sub_admin">Sub Admin</option> */}
+                <option value="super_admin">Admin</option>
                 <option value="employee">Employee</option>
               </select>
             </div>
@@ -277,7 +277,7 @@ const SettingView = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-4 sm:mb-0">Manage Admins</h2>
           <button
             onClick={() => setShowAdd(!showAdd)}
-            className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md transition-colors flex items-center"
+            className={` ${sessionStorage.getItem('id') !== 'SU000001' ? 'hidden' : ''} py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md transition-colors flex items-center`}
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -296,7 +296,7 @@ const SettingView = () => {
               >
                 <option value="">Select Employee</option>
                 {employees.map(emp => (
-                  <option key={emp.user_id} value={emp.employee_id}>{emp.name} | {emp.email}</option>
+                  <option key={emp.user_id} className={` ${emp.employee_id === 'EMP000001' ? 'hidden' : ''}`} value={emp.employee_id}>{emp.name} | {emp.email}</option>
                 ))}
               </select>
               <div className="flex gap-2">
@@ -332,7 +332,7 @@ const SettingView = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{admin.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      {admin.role}
+                      { admin.user_id === 'SU000001' ? admin.role : 'Sub Admin'}
                     </span>
                   </td>
                 </tr>

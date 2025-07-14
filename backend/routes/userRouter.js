@@ -35,8 +35,6 @@ const router = express.Router();
 router.post('/addEmployee',superAdmin,  addEmployee);
 router.post('/addCustomer', addCustomer);
 
-//Add new customer with email - test
-router.post('/addCustomerNew', addCustomer);
 
 
 router.get('/searchCustomer', searchCustomer);

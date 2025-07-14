@@ -1,12 +1,15 @@
 import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export const sendIdToEmp = async (req, res) => {
     const { name, subject, email, message } = req.body;
     try {
         // Create a transporter
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com', // Replace with your SMTP server
-            port: 587, // Replace with your SMTP port
+            host: process.env.MAIL_HOST, // Replace with your SMTP server
+            port: process.env.MAIL_PSWD, // Replace with your SMTP port
             secure: false, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
@@ -25,6 +28,7 @@ export const sendIdToEmp = async (req, res) => {
 
         // Send email
         await transporter.sendMail(mailOptions);
+        //await sgMail.send(mailOptions);
 
         res.status(200).json({ message: 'Email sent successfully' });
 
@@ -39,8 +43,8 @@ export const sendIdToUserMethod = async (name, subject, email, message, url) => 
     try {
         // Create a transporter
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com', // Replace with your SMTP server
-            port: 587, // Replace with your SMTP port
+            host: process.env.MAIL_HOST, // Replace with your SMTP server
+            port: process.env.MAIL_PSWD, // Replace with your SMTP port
             secure: false, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
@@ -143,9 +147,10 @@ export const sendOtpEmail = async (email, otp) => {
     try {
         // Create a transporter
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com', // Replace with your SMTP server
-            port: 587, // Replace with your SMTP port
-            secure: false, // true for 465, false for other ports
+            //host: process.env.MAIL_HOST, // Replace with your SMTP server
+            host: process.env.MAIL_HOST, // Use environment variable for host
+            port: process.env.MAIL_PORT, // Replace with your SMTP port
+            secure: true, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
                 pass: process.env.MAIL_PSWD // Replace with your email password
