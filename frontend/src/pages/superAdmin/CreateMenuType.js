@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getMenuTypes, addMenuType, getMenus, deleteMenuType, updateMenuTypeById, getMenuTypeById } from '../../services/MenuService';
 import CreateCategory from './CreateCategories';
 
-function CreateMenuType({setRenderContent}) {
+function CreateMenuType({ setRenderContent, handleRenderContent }) {
   const [menuType, setMenuType] = useState({ menu_type_id: '', menu_type_name: '', price: '', menu_list_type_id: '' });
   const [menuTypes, setMenuTypes] = useState([]);
   const [menuListTypes, setMenuListTypes] = useState([]);
@@ -72,7 +72,12 @@ function CreateMenuType({setRenderContent}) {
         // Reverse the array to show newest first
         setMenuTypes(updatedMenuTypes.reverse());
         setIsAdding(false);
-        setRenderContent(() => <CreateCategory/>);
+
+
+        if (handleRenderContent) {
+          handleRenderContent('createCategory');
+        }
+
       } else if (btnname === 'Update') {
         await updateMenuTypeById({ ...menuType, menu_type_name: trimmedName });
         alert('Menu Type updated successfully!');
@@ -147,6 +152,8 @@ function CreateMenuType({setRenderContent}) {
       alert('An error occurred while deleting the menu type.');
     }
   };
+
+  
 
   return (
    <div

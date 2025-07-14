@@ -14,6 +14,9 @@ import ArrangementDetailsPage from './ArrangementDetailsPage';
 import PlanBarForm from './PlanBarForm';
 import PlanBiteForm from './PlanBiteForm';
 import CustomerMenuListSelection from '../../components/CustomerMenuListSelection';
+import MenuSummaryReport from './MenuSummaryReport';
+import PopularMenuSelections from '../../components/PopularMenus';
+
 import BarManagement from './BarManagement';
 import EventNavbar from './EventNavbar'; // New component
 import CustomerEventDashboard from './CustomerEventDashboard';
@@ -36,24 +39,59 @@ const EventHome = () => {
     const [activePage, setActivePage] = useState('dashboard');
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const renderContent = () => {
-        switch (activePage) {
-            case 'plan-event': return <EventPlan bookingId={bookingId} />;
-            case 'view-events': return <DisplayEvents customerID={customerID} bookingId={bookingId} />;
-            case 'Select-Services': return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
-            case 'view-Vendors': return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
-            case 'Select-Tables': return <ChairArrangement bookingId={bookingId} />;
-            case 'Reserve-Tables': return <TableReservation bookingId={bookingId} />;
-            case 'see-arrangements': return <ArrangementDetailsPage bookingId={bookingId} />;
-            case 'Select-bar-Times': return <PlanBarForm bookingId={bookingId} />;
-            case 'setect-bites': return <PlanBiteForm bookingId={bookingId} />;
-            case 'select-bar-arrangements': return <BarManagement bookingId={bookingId} />;
-            case 'plan-menulist': return <CustomerMenuListSelection />;
-            case 'dashboard':
-            default:
-                return <CustomerEventDashboard setActivePage={setActivePage} />;
-        }
-    };
+  const renderContent = () => {
+    switch (activePage) {
+      case 'plan-event':
+        return <EventPlan bookingId={bookingId} />;
+      case 'view-events':
+        return <DisplayEvents customerID={customerID} />;
+      case 'Select-Services':
+        return <EventServicesSelector customerID={customerID} bookingId={bookingId} />;
+      case 'view-Vendors':
+        return <ServiceVendor customerID={customerID} bookingId={bookingId} />;
+      case 'Select-Tables':
+        return <ChairArrangement bookingId={bookingId} />;
+      case 'Reserve-Tables':
+        return <TableReservation bookingId={bookingId} />;
+      case 'see-arrangements':
+        return <ArrangementDetailsPage bookingId={bookingId} />;
+      case 'Select-bar-Times':
+        return <PlanBarForm bookingId={bookingId} />;
+      case 'setect-bites':
+        return <PlanBiteForm bookingId={bookingId} />;
+      case 'select-bar-arrangements':
+        return <BarManagement bookingId={bookingId} />;
+      case 'plan-menulist':
+        return <CustomerMenuListSelection/>;
+      case 'dashboard':
+      default:
+        return (
+          <div>
+            <h1 className="text-2xl font-bold mb-6">Event Dashboard</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="flex items-center">
+                  <i className="fas fa-calendar-check text-blue-500 text-2xl mr-4"></i>
+                  <div>
+                    <p className="text-gray-500">Active Bookings</p>
+                    <h3 className="text-xl font-bold ">2</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="flex items-center">
+                  <i className="fas fa-clock text-yellow-500 text-2xl mr-4"></i>
+                  <div>
+                    <p className="text-gray-500">Pending Events</p>
+                    <h3 className="text-xl font-bold">1</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+    }
+  };
 
     return (
         <div className="min-h-screen bg-gray-100">

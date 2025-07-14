@@ -3,7 +3,8 @@ import {
     getSelections,
     createSelection,
     deleteSelection,
-    checkBookingSelection // <-- add this import
+    checkBookingSelection, // <-- add this import
+    getCustomerMenuSelections
 } from "../controllers/customerMenuSelectionController.js";
 
 const router = express.Router();
@@ -13,6 +14,8 @@ router.get("/", getSelections);
 //router.get("/:customer_id/:ICMT_Id", getSelectionById);
 router.post("/", createSelection);
 router.delete("/:booking_id/:ICMT_Id", deleteSelection);
+
+router.get("/getCustomerMenuSelections/:booking_id", getCustomerMenuSelections);
 
 // Add this route before the :customer_id/:ICMT_Id routes to avoid route conflicts
 router.get("/check-booking/:booking_id", checkBookingSelection);
