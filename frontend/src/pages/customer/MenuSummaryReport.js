@@ -164,7 +164,7 @@ const CustomerMenuSummaryPage = () => {
             doc.setTextColor(...textColor);
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
-            doc.text(`${category.category_name} (${category.items.length}/${category.item_limit})`, margin + 10, yPosition);
+            doc.text(`${category.category_name} `, margin + 10, yPosition);
             yPosition += 8;
 
             if (category.items.length > 0) {
@@ -317,10 +317,12 @@ const CustomerMenuSummaryPage = () => {
                     <div key={menu.menu_type_id} className="bg-white rounded-lg shadow-sm border p-4">
                       <div className="flex justify-between items-center mb-4 pb-2 border-b">
                         <div>
-                          <h3 className="font-bold text-lg text-gray-800">
-                            {menu.menu_list_name}
-                          </h3>
-                          <p className="text-gray-600">{menu.menu_type_name}</p>
+                        <h3 className="font-bold text-lg text-gray-800 bg-gray-100 px-2 py-0.5">
+                      {menu.menu_list_name}
+                    </h3>
+                    <p className="text-blue-600 bg-blue-50 px-2 py-0.5 inline-block">
+                      {menu.menu_type_name}
+                    </p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm text-gray-500">Menu Package</p>
@@ -334,9 +336,9 @@ const CustomerMenuSummaryPage = () => {
                               <h4 className="font-medium text-gray-700">
                                 {category.category_name}
                               </h4>
-                              <span className="text-sm text-gray-500">
+                              {/* <span className="text-sm text-gray-500">
                                 Selected: {category.items.length}/{category.item_limit}
-                              </span>
+                              </span> */}
                             </div>
                             
                             {category.items.length > 0 ? (
