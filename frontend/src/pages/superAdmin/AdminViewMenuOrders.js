@@ -105,18 +105,20 @@ const AdminMenuOrdersPage = () => {
                       >
                         <div>
                           <h3 className="text-base font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
-                            Booking #{booking.booking_id}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              Booking on 
+                              {booking.booking_date ? format(new Date(booking.booking_date), ' MMMM do, yyyy') : 'No date'}
+                            
                           </h3>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               {booking.status}
                             </span>
-                            <span className="text-sm text-gray-500">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              {booking.booking_date ? format(new Date(booking.booking_date), 'MMMM do, yyyy') : 'No date'}
-                            </span>
+                            {/* <span className="text-sm text-gray-500">
+                              Booking #{booking.booking_id}
+                            </span> */}
                             <span className="text-sm text-gray-500">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

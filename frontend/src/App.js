@@ -29,6 +29,8 @@ import AdminMenuOrdersPage from './pages/superAdmin/AdminViewMenuOrders';
 import AdminCorrectMenuSelections from './pages/superAdmin/AdminCorrectMenuSelections';
 import CustomerMenuSummaryPage from './pages/customer/MenuSummaryReport';
 import PopularMenuSelections from './components/PopularMenus';
+import MenuCorrectionpage from './pages/superAdmin/MenuCorrection';
+
 
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -70,6 +72,7 @@ function App() {
             <Route path="/admin-correct-menu-selections" element={<AdminCorrectMenuSelections />} />
             <Route path="/menu-summary/:bookingId" element={<CustomerMenuSummaryPage />} />
             <Route path="/popular-menus" element={<PopularMenuSelections />} />
+            <Route path="menu-correction" element={<MenuCorrectionpage/>}/>
 
 
             {/* Customer Event Planning */}

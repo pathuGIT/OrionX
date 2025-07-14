@@ -660,3 +660,126 @@ export const updateMenuStructure = async (payload) => {
     throw error;
   }
 };
+
+
+
+////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+
+export const MenuSelectionService = {
+  // Get all menu selections for a booking (flat structure)
+  getMenuSelections: async (bookingId) => {
+    try {
+      const response = await api.get(`/orders/choices/${bookingId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || 
+        'Failed to fetch menu selections'
+      );
+    }
+  },
+
+  // Get structured menu selections (hierarchical format)
+  getStructuredMenuSelections: async (bookingId) => {
+    try {
+      const response = await api.get(`/orders/choices-details/${bookingId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || 
+        'Failed to fetch structured menu selections'
+      );
+    }
+  },
+
+  // Add a new menu selection
+  createMenuSelection: async (bookingId, ICMT_Id) => {
+    try {
+      const response = await api.post(`/orders/add-choice/${bookingId}`, { ICMT_Id });
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || 
+        'Failed to create menu selection'
+      );
+    }
+  },
+
+  // Swap/update a menu selection
+  updateMenuSelection: async (bookingId, oldICMT_Id, newICMT_Id) => {
+    try {
+      const response = await api.patch(
+        `/orders/${bookingId}/swap-choice/${oldICMT_Id}`,
+        { newICMT_Id }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || 
+        'Failed to update menu selection'
+      );
+    }
+  },
+
+  // Remove a specific menu selection
+  deleteMenuSelection: async (bookingId, ICMT_Id) => {
+    try {
+      const response = await api.delete(
+        `/orders/${bookingId}/remove-choice/${ICMT_Id}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || 
+        'Failed to delete menu selection'
+      );
+    }
+  },
+
+  // Remove all menu selections for a booking
+  deleteAllMenuSelections: async (bookingId) => {
+    try {
+      const response = await api.delete(
+        `/orders/reset-choices/${bookingId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || 
+        'Failed to delete all menu selections'
+      );
+    }
+  }
+};
+
+// Additional utility functions if needed
+export const getMenuSelectionDetails = async (bookingId) => {
+  try {
+    const [flatSelections, structuredSelections] = await Promise.all([
+      MenuSelectionService.getMenuSelections(bookingId),
+      MenuSelectionService.getStructuredMenuSelections(bookingId)
+    ]);
+    return { flatSelections, structuredSelections };
+  } catch (error) {
+    throw new Error('Failed to get comprehensive menu selection details');
+  }
+};
+
+export const bulkUpdateMenuSelections = async (bookingId, updates) => {
+  try {
+    // First delete all existing selections
+    await MenuSelectionService.deleteAllMenuSelections(bookingId);
+    
+    // Then add all new selections
+    const results = await Promise.all(
+      updates.map(ICMT_Id => 
+        MenuSelectionService.createMenuSelection(bookingId, ICMT_Id)
+      )
+    );
+    
+    return results;
+  } catch (error) {
+    throw new Error('Failed to perform bulk update of menu selections');
+  }
+};

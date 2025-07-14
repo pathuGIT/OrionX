@@ -27,6 +27,7 @@ import summaryRoutes from './routes/summaryRoutes.js';
 import overviewRout from './routes/overviewRoutes.js';
 import settingRoute from './routes/settingRoutes.js';
 import AdminCorrectMenusRoute from './routes/AdminCorrectMenusRoute.js';
+import MenuCorrectionRoute from './routes/MenuCorrectionRoute.js';
 
 
 const app = express();
@@ -54,6 +55,7 @@ app.use('/api/customerMenuSelection', customerSelectionRoutes);
 app.use('/api/advanceMenu', advanceMenuViewRoute);
 app.use('/api/advanceMenuView', menuViewRoutes);
 app.use('/api/AdminCorrectMenus', AdminCorrectMenusRoute); // Admin Correct Menus Route
+app.use('/api/MenuCorrection', MenuCorrectionRoute); // Menu Correction Route
 
 app.use('/api/summary', summaryRoutes); // to get the menu summary customer selected
 

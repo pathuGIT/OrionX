@@ -1,31 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import {
+import React, { useState, useEffect } from 'react';
+import { 
   getAllStructuredMenuSelections,
-  getMenuOverview,
-  getStructuredSelectionsByBookingId
-} from "../../services/MenuService";
-import { bulkUpdateMenuSelections } from "../../services/MenuService";
+  getStructuredSelectionsByBookingId,
+  MenuSelectionService
+} from '../../services/MenuService';
 import { format } from 'date-fns';
 
-const AdminMenuOrdersPage = () => {
+const MenuCorrectionpage = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [menuOverview, setMenuOverview] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [currentSelections, setCurrentSelections] = useState([]);
+  const [menuOverview, setMenuOverview] = useState([]);
   const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [selectionsResponse, overviewResponse] = await Promise.all([
-          getAllStructuredMenuSelections(),
-          getMenuOverview()
-        ]);
-        setCustomers(Array.isArray(selectionsResponse) ? selectionsResponse : []);
-        setMenuOverview(Array.isArray(overviewResponse) ? overviewResponse : []);
+        const data = await getAllStructuredMenuSelections();
+        setCustomers(data);
       } catch (err) {
         console.error("Failed to load data:", err);
         setError(err.message || "Failed to load data");
@@ -37,15 +32,31 @@ const AdminMenuOrdersPage = () => {
     fetchData();
   }, []);
 
-  const showSuccessMessage = (message) => {
-    setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(null), 3000);
-  };
-
   const handleOpenMenuEditor = async (booking) => {
     try {
       const selections = await getStructuredSelectionsByBookingId(booking.booking_id);
-      setCurrentSelections(Array.isArray(selections) ? selections : []);
+      // Flatten the selections structure for easier management
+      const flattenedSelections = selections.menus.flatMap(menu => 
+        menu.menu_types.flatMap(menuType => 
+          menuType.categories.flatMap(category => 
+            category.items.map(item => ({
+              booking_id: booking.booking_id,
+              menu_list_id: menu.menu_list_type_id,
+              menu_list_name: menu.menu_list_name,
+              menu_type_id: menuType.menu_type_id,
+              menu_type_name: menuType.menu_type_name,
+              category_id: category.category_id,
+              category_name: category.category_name,
+              item_id: item.item_id,
+              item_name: item.item_name,
+              ICMT_Id: item.ICMT_Id,
+              price: item.price
+            }))
+          )
+        )
+      );
+      
+      setCurrentSelections(flattenedSelections);
       setSelectedBooking(booking);
     } catch (err) {
       console.error("Error fetching menu selections:", err);
@@ -62,71 +73,90 @@ const AdminMenuOrdersPage = () => {
     if (!selectedBooking) return;
     
     try {
-      // Extract just the ICMT_Ids from current selections
-      const ICMT_Ids = currentSelections.map(selection => selection.ICMT_Id);
+      // First delete all existing selections
+      await MenuSelectionService.deleteAllMenuSelections(selectedBooking.booking_id);
       
-      // Use the bulk update function
-      await bulkUpdateMenuSelections(selectedBooking.booking_id, ICMT_Ids);
+      // Then add all new selections
+      await Promise.all(
+        currentSelections.map(selection => 
+          MenuSelectionService.createMenuSelection(selection.booking_id, selection.ICMT_Id)
+        )
+      );
       
-      showSuccessMessage("Menu updated successfully!");
+      setSuccessMessage("Menu selections updated successfully!");
+      setTimeout(() => setSuccessMessage(null), 3000);
       
       // Refresh the data
-      const response = await getAllStructuredMenuSelections();
-      setCustomers(Array.isArray(response) ? response : []);
+      const updatedData = await getAllStructuredMenuSelections();
+      setCustomers(updatedData);
       handleCloseMenuEditor();
     } catch (err) {
       console.error("Error updating menu selections:", err);
-      alert(err.message || "Failed to update menu selections. Please try again.");
+      alert("Failed to update menu selections. Please try again.");
     }
   };
 
-  const handleItemSelection = (menuListId, menuTypeId, categoryId, itemId, isSelected) => {
+  const handleItemSelection = (ICMT_Id, isSelected) => {
     setCurrentSelections(prev => {
-      const currentSelections = Array.isArray(prev) ? prev : [];
-      
       if (isSelected) {
-        // Add the item to selections
-        const menuList = menuOverview.find(ml => ml.id === menuListId);
-        const menuType = menuList?.types?.find(mt => mt.id === menuTypeId);
-        const category = menuType?.categories?.find(cat => cat.id === categoryId);
-        const item = category?.items?.find(i => i.id === itemId);
+        // Find the item in the original selections
+        const originalSelection = selectedBooking.menus
+          .flatMap(menu => menu.menu_types
+            .flatMap(menuType => menuType.categories
+              .flatMap(category => category.items
+                .find(item => item.ICMT_Id === ICMT_Id)
+              )
+            )
+          ).find(item => item);
         
-        if (!menuList || !menuType || !category || !item) return currentSelections;
+        if (!originalSelection) return prev;
+        
+        const menu = selectedBooking.menus.find(menu => 
+          menu.menu_types.some(menuType => 
+            menuType.categories.some(category => 
+              category.items.some(item => item.ICMT_Id === ICMT_Id)
+            )
+          )
+        );
+        
+        const menuType = selectedBooking.menus.flatMap(menu => menu.menu_types)
+          .find(menuType => 
+            menuType.categories.some(category => 
+              category.items.some(item => item.ICMT_Id === ICMT_Id)
+            )
+          );
+        
+        const category = selectedBooking.menus.flatMap(menu => 
+          menu.menu_types.flatMap(menuType => menuType.categories)
+        ).find(category => 
+          category.items.some(item => item.ICMT_Id === ICMT_Id)
+        );
         
         return [
-          ...currentSelections,
+          ...prev,
           {
-            booking_id: selectedBooking?.booking_id,
-            menu_list_id: menuListId,
-            menu_list_name: menuList.name,
-            menu_type_id: menuTypeId,
-            menu_type_name: menuType.name,
-            category_id: categoryId,
-            category_name: category.name,
-            item_id: itemId,
-            item_name: item.name,
-            ICMT_Id: `${itemId}_${categoryId}_${menuTypeId}_${menuListId}` // Generate a unique ID
+            booking_id: selectedBooking.booking_id,
+            menu_list_id: menu?.menu_list_type_id,
+            menu_list_name: menu?.menu_list_name,
+            menu_type_id: menuType?.menu_type_id,
+            menu_type_name: menuType?.menu_type_name,
+            category_id: category?.category_id,
+            category_name: category?.category_name,
+            item_id: originalSelection.item_id,
+            item_name: originalSelection.item_name,
+            ICMT_Id: originalSelection.ICMT_Id,
+            price: originalSelection.price
           }
         ];
       } else {
         // Remove the item from selections
-        return currentSelections.filter(sel => 
-          !(sel.menu_list_id === menuListId && 
-            sel.menu_type_id === menuTypeId && 
-            sel.category_id === categoryId && 
-            sel.item_id === itemId)
-        );
+        return prev.filter(sel => sel.ICMT_Id !== ICMT_Id);
       }
     });
   };
 
-  const isItemSelected = (menuListId, menuTypeId, categoryId, itemId) => {
-    return currentSelections.some(sel => 
-      sel.menu_list_id === menuListId && 
-      sel.menu_type_id === menuTypeId && 
-      sel.category_id === categoryId && 
-      sel.item_id === itemId
-    );
+  const isItemSelected = (ICMT_Id) => {
+    return currentSelections.some(sel => sel.ICMT_Id === ICMT_Id);
   };
 
   const getSelectedCountForCategory = (menuListId, menuTypeId, categoryId) => {
@@ -221,20 +251,17 @@ const AdminMenuOrdersPage = () => {
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="text-base font-medium text-gray-900">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              Booking on 
-                              {booking.booking_date ? format(new Date(booking.booking_date), ' MMMM do, yyyy') : 'No date'}
-                            {/* Booking #{booking.booking_id} */}
+                            Booking #{booking.booking_id}
                           </h3>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               {booking.status}
                             </span>
                             <span className="text-sm text-gray-500">
-                              
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              {booking.booking_date ? format(new Date(booking.booking_date), 'MMMM do, yyyy') : 'No date'}
                             </span>
                             <span className="text-sm text-gray-500">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -278,69 +305,49 @@ const AdminMenuOrdersPage = () => {
                   </button>
                 </div>
                 <div className="mt-2 text-sm text-gray-600">
-                  Customer: {customers.find(c => c.bookings?.some(b => b.booking_id === selectedBooking.booking_id))?.name}
+                  Customer: {selectedBooking.customer_name || customers.find(c => c.bookings?.some(b => b.booking_id === selectedBooking.booking_id))?.name}
                 </div>
               </div>
               
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="space-y-8">
-                  {menuOverview.map((menuList) => (
-                    <div key={menuList.id} className="bg-gray-50 rounded-lg p-5">
-                     <h3 className="text-lg font-semibold text-white mb-4 bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 rounded-lg shadow-md">
-                        <span className="inline-flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                          </svg>
-                          {menuList.name}
-                        </span>
-                        <span className="ml-3 text-indigo-100 font-medium">
-                          {menuList.description}
-                        </span>
+                  {selectedBooking.menus?.map((menu) => (
+                    <div key={menu.menu_type_id} className="bg-gray-50 rounded-lg p-5">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        {menu.menu_list_name}
                       </h3>
                       
                       <div className="space-y-6">
-                        {menuList.types?.map((menuType) => (
-                          <div key={menuType.id} className="pl-4 border-l-2 border-indigo-100">
-                            <h4 className="text-lg font-semibold text-indigo-700 border-b-2 border-indigo-100 pb-2">
-                                {menuType.name}
-                                <span className="ml-3 text-indigo-500 font-normal">
-                                  Rs. {menuType.price}
-                                </span>
-                              </h4>
+                        {menu.menu_types?.map((menuType) => (
+                          <div key={menuType.menu_type_id} className="pl-4 border-l-2 border-indigo-100">
+                            <h4 className="text-md font-medium text-gray-800 mb-3">
+                              {menuType.menu_type_name}
+                              <span className="ml-2 text-sm font-normal text-indigo-600">
+                                Rs. {menuType.price}
+                              </span>
+                            </h4>
                             
                             <div className="space-y-4">
                               {menuType.categories?.map((category) => (
-                                <div key={category.id} className="pl-4 border-l-2 border-gray-200">
+                                <div key={category.category_id} className="pl-4 border-l-2 border-gray-200">
                                   <h5 className="text-sm font-medium text-gray-700 mb-2">
-                                    {category.name}
+                                    {category.category_name}
                                     <span className="ml-2 text-xs font-normal text-gray-500">
-                                      (Select up to {category.limit} items)
+                                      (Select up to {category.item_limit} items)
                                     </span>
                                     <span className="ml-2 text-xs font-medium text-indigo-600">
-                                      {getSelectedCountForCategory(menuList.id, menuType.id, category.id)} selected
+                                      {getSelectedCountForCategory(menu.menu_list_type_id, menuType.menu_type_id, category.category_id)} selected
                                     </span>
                                   </h5>
                                   
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {category.items?.map((item) => {
-                                      const isSelected = isItemSelected(
-                                        menuList.id, 
-                                        menuType.id, 
-                                        category.id, 
-                                        item.id
-                                      );
+                                      const isSelected = isItemSelected(item.ICMT_Id);
                                       
                                       return (
                                         <div 
-                                          key={item.id}
-                                          onClick={() => handleItemSelection(
-                                            menuList.id, 
-                                            menuType.id, 
-                                            category.id, 
-                                            item.id, 
-                                            !isSelected
-                                          )}
+                                          key={item.ICMT_Id}
+                                          onClick={() => handleItemSelection(item.ICMT_Id, !isSelected)}
                                           className={`p-3 border rounded-lg cursor-pointer transition-all ${
                                             isSelected
                                               ? 'border-indigo-500 bg-indigo-50 transform scale-[1.02] shadow-md'
@@ -349,10 +356,10 @@ const AdminMenuOrdersPage = () => {
                                         >
                                           <div className="flex justify-between items-start">
                                             <div>
-                                              <div className="font-medium text-gray-800">{item.name}</div>
-                                              {item.description && (
-                                                <div className="text-xs text-gray-500 mt-1">{item.description}</div>
-                                              )}
+                                              <div className="font-medium text-gray-800">{item.item_name}</div>
+                                            </div>
+                                            <div className="text-sm text-indigo-600 font-medium">
+                                              Rs. {item.price}
                                             </div>
                                           </div>
                                           {isSelected && (
@@ -399,4 +406,4 @@ const AdminMenuOrdersPage = () => {
   );
 };
 
-export default AdminMenuOrdersPage;
+export default MenuCorrectionpage;
