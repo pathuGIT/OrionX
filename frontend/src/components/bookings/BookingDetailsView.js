@@ -404,6 +404,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
+                                        bDate={b.booking_date}
                                     />
                                     <DetailRow
                                         label="Venue ID"
@@ -411,6 +412,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
+                                        bDate={b.booking_date}
                                     />
                                     <DetailRow label="Customer ID" value={b.customer_id} />
                                     <DetailRow
@@ -419,6 +421,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
+                                        bDate={b.booking_date}
                                     />
                                     <DetailRow
                                         label="Additional Hours"
@@ -426,6 +429,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
+                                        bDate={b.booking_date}
                                     />
                                 </div>
                             </section>
@@ -447,6 +451,7 @@ export default function BookingDetailsView({ bookingId, onClose }) {
                                         bookingId={b.booking_id}
                                         setRefresh={setRefresh}
                                         setCancelBtn={setCancelBtn}
+                                        bDate={b.booking_date}
                                     />
                                     <DetailRow label="Refund Amount (Rs)" value={b.refund_amount} />
                                     <DetailRow label="Contract Status" value={b.contract_status} />
