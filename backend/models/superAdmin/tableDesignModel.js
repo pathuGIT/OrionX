@@ -5,7 +5,7 @@ class TableDesign {
         let connection;
         try {
             connection = await db.getConnection();
-            const [designs] = await connection.query('SELECT * FROM tables_and_chairs');
+            const [designs] = await connection.query('SELECT my_row_id, Top_Cloth_Color, Table_Cloth_Color, Bow_Color, Chair_Cover_Color FROM tables_and_chairs');
             return designs;
         } catch (error) {
             console.error('Error fetching table designs:', error);
@@ -92,6 +92,7 @@ class TableDesign {
         let connection;
         try {
             connection = await db.getConnection();
+            console.log('Deleting design with ID:', id);
             const [result] = await connection.query(
                 'DELETE FROM tables_and_chairs WHERE my_row_id = ?',
                 [id]

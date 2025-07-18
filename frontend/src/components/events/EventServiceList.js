@@ -9,7 +9,7 @@ const EventServiceList = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [selectedServiceId, setSelectedServiceId] = useState(null);
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL
+  const BASE_URL = "http://localhost:8000";
 
   const fetchServices = async () => {
     setLoading(true);

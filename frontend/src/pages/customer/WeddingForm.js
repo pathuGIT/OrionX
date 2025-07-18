@@ -65,6 +65,19 @@ const WeddingForm = ({ bookingId }) => {
                 if (!formData.ceremonyFrom) errors.ceremonyFrom = "Ceremony start time is required";
                 if (!formData.ceremonyTo) errors.ceremonyTo = "Ceremony end time is required";
                 if (!formData.registrationTime) errors.registrationTime = "Registration time is required";
+                if (formData.ceremonyFrom && formData.ceremonyTo) {
+                // Convert times to minutes since midnight for comparison
+                const [fromHours, fromMinutes] = formData.ceremonyFrom.split(':').map(Number);
+                const [toHours, toMinutes] = formData.ceremonyTo.split(':').map(Number);
+                
+                const totalFromMinutes = fromHours * 60 + fromMinutes;
+                const totalToMinutes = toHours * 60 + toMinutes;
+                
+                // Validate that end time is after start time
+                if (totalToMinutes <= totalFromMinutes) {
+                    errors.ceremonyTo = "Ceremony end time must be after start time";
+                }
+            }
                 break;
             case 4:
                 if (!formData.functionDurationFrom) errors.functionDurationFrom = "Start time is required";
