@@ -42,7 +42,7 @@ const BookingView = () => {
     let error = { msg: '', color: '' };
     switch (name) {
       case 'name':
-        if (/[^a-zA-Z\s]/.test(value)) {
+        if (/[^a-zA-Z\s.]/.test(value)) {
           error = { msg: 'Name must not contain numbers or symbols.', color: 'text-red-600' };
         }
         break;
@@ -59,14 +59,6 @@ const BookingView = () => {
       case 'address':
         if (value.trim() === '') {
           error = { msg: 'Address cannot be empty.', color: 'text-red-600' };
-        }
-        break;
-      case 'nic':
-        if (!/^\d{10}$/.test(value)) {
-          error = { msg: 'NIC number must be exactly 10 digits.', color: 'text-red-600' };
-        }
-        if (value.trim() === '') {
-          error = { msg: 'NIC number cannot be empty.', color: 'text-red-600' };
         }
         break;
       default:
@@ -299,7 +291,7 @@ const BookingView = () => {
                 </div>
 
                 {/* NIC */}
-                <div>
+                {/* <div>
                   <label htmlFor="nic" className={labelClass}>NIC Number</label>
                   <input
                     id="nic"
@@ -310,7 +302,7 @@ const BookingView = () => {
                     placeholder="e.g. 1234567891"
                     className={inputClass}
                   />
-                </div>
+                </div> */}
 
                 {/* Address */}
                 <div className="md:col-span-2">
@@ -494,7 +486,7 @@ const BookingView = () => {
             <div className="flex items-end pt-2">
               <div>
                 <label htmlFor="number_of_guests" className={labelClass}>
-                  Number of Guests
+                  Contract Money
                 </label>
                 <input
                   id="pay_deposit"

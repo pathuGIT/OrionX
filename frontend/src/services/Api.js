@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // ✅ Use your actual server IP or domain
+  baseURL: 'http://52.184.82.178:8000/api', // ✅ Use your actual server IP or domain
 });
 
 // Attach token to requests

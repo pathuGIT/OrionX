@@ -66,7 +66,7 @@ const Contact = () => {
         `Event Type: ${formData.eventType}\n` +
         `Date: ${formData.date}\n` +
         `Message: ${formData.message}`;
-      const phoneNumber = "+94713591396"; //change this number with client number
+      const phoneNumber = "+94743074463"; //change this number with client number
       const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
 
