@@ -29,29 +29,30 @@ class ReportModel {
                 
                 -- Bar Details
                 bar.LiquorTimeFrom, bar.LiquorTimeTo, bar.BarPax,
+                bar.TotalBitePrice, bar.TotalLiquorPrice, bar.TotalSoftDrinkPrice,
                 
                 -- Coordinators
                 (SELECT GROUP_CONCAT(co.Cordinator_Name SEPARATOR ', ')
-                 FROM event_cordinator ec
-                 JOIN cordinator co ON ec.Cordinator_Name = co.Cordinator_Name
-                 WHERE ec.Event_ID = e.Event_ID) AS coordinators,
+                FROM event_cordinator ec
+                JOIN cordinator co ON ec.Cordinator_Name = co.Cordinator_Name
+                WHERE ec.Event_ID = e.Event_ID) AS coordinators,
 
                 -- Selected Services
-                    (SELECT GROUP_CONCAT(es.Event_Service_Name SEPARATOR ', ') 
+                (SELECT GROUP_CONCAT(es.Event_Service_Name SEPARATOR ', ') 
                 FROM customer_event_service ces
                 JOIN event_service es ON ces.event_service_id = es.Event_Service_ID
                 WHERE ces.booking_id = b.booking_id) AS selected_services,
-                 
+                
                 -- Selected Bites
                 (SELECT JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'name', mt.menu_type_name, 
                         'quantity', bite.Quantity
                     )
-                 )
-                 FROM bite
-                 JOIN menu_type mt ON bite.menu_type_id = mt.menu_type_id
-                 WHERE bite.BarRequirementID = bar.BarRequirementID) AS selected_bites,
+                )
+                FROM bite
+                JOIN menu_type mt ON bite.menu_type_id = mt.menu_type_id
+                WHERE bite.BarRequirementID = bar.BarRequirementID) AS selected_bites,
 
                 -- Soft Drinks
                 (SELECT JSON_ARRAYAGG(
@@ -59,9 +60,20 @@ class ReportModel {
                         'name', sdi.Soft_Drink_name, 
                         'quantity', sdi.quantity
                     )
-                 )
-                 FROM soft_drink_items sdi 
-                 WHERE sdi.BarRequirementID = bar.BarRequirementID) AS soft_drink_items
+                )
+                FROM soft_drink_items sdi 
+                WHERE sdi.BarRequirementID = bar.BarRequirementID) AS soft_drink_items,
+
+                -- Liquor Items
+                (SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'name', li.item_name, 
+                        'quantity', li.quantity,
+                        'price', li.LiquorPrice
+                    )
+                )
+                FROM Liquor_items li 
+                WHERE li.BarRequirementID = bar.BarRequirementID) AS liquor_items
 
             FROM booking b
             JOIN customer c ON b.customer_id = c.customer_id
@@ -71,7 +83,7 @@ class ReportModel {
             LEFT JOIN event_table_chair etc ON e.Event_ID = etc.Event_ID
             LEFT JOIN table_chair_arrangement tca ON etc.Arrangement_Id = tca.Arrangement_ID
             LEFT JOIN bar ON e.BarRequirementID = bar.BarRequirementID
-            WHERE b.booking_id = ?;
+            WHERE b.booking_id = ?
         `;
         try {
             const [rows] = await db.query(query, [bookingId]);
