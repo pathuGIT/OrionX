@@ -371,7 +371,7 @@ const AdminMenuOrdersPage = () => {
                               </svg>
                               {booking.number_of_guests} guests
                             </span>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-500 border">
                               <b>Booking</b> #{booking.booking_id}  <b>Customer Name:</b> {customer.name}
                             </span>
                           </div>
