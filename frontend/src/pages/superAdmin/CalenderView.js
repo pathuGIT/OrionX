@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback  } from 'react';
-import { getBookings } from '../../services/BookngService';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { getBookings, updateBookingPrice_BiteSoftLiquor } from '../../services/BookngService';
 import BookingDetailsView from '../../components/bookings/BookingDetailsView';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addMonths, subMonths, isSameDay, isSameMonth, isToday } from 'date-fns';
 
@@ -111,6 +111,7 @@ export default function CalenderView() {
   };
 
   const handleBookingClick = (booking) => {
+    updateBookingPrice_BiteSoftLiquor(booking.booking_id);
     setSelectedBooking(booking.booking_id);
     setSelectedDate(null);
   };
@@ -143,8 +144,8 @@ export default function CalenderView() {
             onClick={handleRefresh}
             disabled={loading || refreshing}
             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${loading || refreshing
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-gray-100 hover:bg-gray-200'
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              : 'bg-gray-100 hover:bg-gray-200'
               }`}
           >
             {refreshing || loading ? (
@@ -167,135 +168,135 @@ export default function CalenderView() {
           <div className="relative">
             {/* ... existing filter button code ... */}
           </div>
-      </div>
+        </div>
 
-      {/* Filter Button */}
-      <div className="relative">
-        <button
-          onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full"
-        >
-          <FilterIcon />
-          <span className="capitalize">{statusFilter === 'all' ? 'All Bookings' : statusFilter}</span>
-        </button>
+        {/* Filter Button */}
+        <div className="relative">
+          <button
+            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full"
+          >
+            <FilterIcon />
+            <span className="capitalize">{statusFilter === 'all' ? 'All Bookings' : statusFilter}</span>
+          </button>
 
-        {/* Filter Dropdown */}
-        {showFilterDropdown && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-            <button
-              className={`block w-full text-left px-4 py-2 text-sm ${statusFilter === 'all' ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}
-              onClick={() => {
-                setStatusFilter('all');
-                setShowFilterDropdown(false);
-              }}
-            >
-              All Bookings
-            </button>
-            {Object.keys(STATUS_COLORS).map(status => (
+          {/* Filter Dropdown */}
+          {showFilterDropdown && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
               <button
-                key={status}
-                className={`block w-full text-left px-4 py-2 text-sm capitalize ${statusFilter === status ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}
+                className={`block w-full text-left px-4 py-2 text-sm ${statusFilter === 'all' ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}
                 onClick={() => {
-                  setStatusFilter(status);
+                  setStatusFilter('all');
                   setShowFilterDropdown(false);
                 }}
               >
-                {status}
+                All Bookings
               </button>
-            ))}
+              {Object.keys(STATUS_COLORS).map(status => (
+                <button
+                  key={status}
+                  className={`block w-full text-left px-4 py-2 text-sm capitalize ${statusFilter === status ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'}`}
+                  onClick={() => {
+                    setStatusFilter(status);
+                    setShowFilterDropdown(false);
+                  }}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <div key={day} className="text-center text-sm font-medium text-gray-600 p-1">
+            {day}
           </div>
-        )}
+        ))}
       </div>
-    </div>
 
-      {/* Calendar Grid */ }
-  <div className="grid grid-cols-7 gap-1 mb-2">
-    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-      <div key={day} className="text-center text-sm font-medium text-gray-600 p-1">
-        {day}
-      </div>
-    ))}
-  </div>
+      {
+        loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-7 gap-1">
+            {calendarDays.map((day, idx) => {
+              const dayBookings = getDateBookings(day);
+              const statusSummary = getStatusSummary(day);
+              const isCurrentMonth = isSameMonth(day, currentMonth);
 
-  {
-    loading ? (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    ) : (
-      <div className="grid grid-cols-7 gap-1">
-        {calendarDays.map((day, idx) => {
-          const dayBookings = getDateBookings(day);
-          const statusSummary = getStatusSummary(day);
-          const isCurrentMonth = isSameMonth(day, currentMonth);
-
-          return (
-            <div
-              key={idx}
-              onClick={() => handleDateClick(day)}
-              className={`min-h-24 p-1 rounded-lg border flex flex-col transition-all hover:shadow-md
+              return (
+                <div
+                  key={idx}
+                  onClick={() => handleDateClick(day)}
+                  className={`min-h-24 p-1 rounded-lg border flex flex-col transition-all hover:shadow-md
                   ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
                   ${isToday(day) ? 'border-2 border-blue-500' : 'border-gray-200'}
                   ${dayBookings.length > 0 ? 'hover:bg-blue-50' : ''}`}
-            >
-              <div className="flex justify-between items-start">
-                <span className={`text-sm ${isToday(day) ? 'text-blue-600 font-bold' : ''}`}>
-                  {format(day, 'd')}
-                </span>
-                {dayBookings.length > 0 && (
-                  <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                    {dayBookings.length}
-                  </span>
-                )}
-              </div>
-
-              {/* Status Indicators */}
-              <div className="mt-1 flex flex-wrap gap-0.5">
-                {Object.entries(statusSummary).map(([status, count]) => (
-                  <span
-                    key={status}
-                    className={`text-[8px] px-1 py-0.5 rounded ${STATUS_COLORS[status] || 'bg-gray-200'}`}
-                  >
-                    {count} {status}
-                  </span>
-                ))}
-              </div>
-
-              {/* Booking Preview */}
-              <div className="mt-auto space-y-0.5 max-h-16 overflow-y-auto">
-                {dayBookings.slice(0, 2).map(booking => (
-                  <div
-                    key={booking.booking_id}
-                    className={`text-[10px] p-0.5 rounded truncate cursor-pointer ${STATUS_COLORS[booking.status] || 'bg-gray-200'}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBookingClick(booking);
-                    }}
-                  >
-                    <div className="font-semibold truncate p-2">{booking.customer_id?.split(' ')[0] || 'Customer'}</div>
-                    {/* <div className="text-gray-600 truncate">{booking.venue_id?.split(' ')[0] || 'Venue'}</div> */}
+                >
+                  <div className="flex justify-between items-start">
+                    <span className={`text-sm ${isToday(day) ? 'text-blue-600 font-bold' : ''}`}>
+                      {format(day, 'd')}
+                    </span>
+                    {dayBookings.length > 0 && (
+                      <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                        {dayBookings.length}
+                      </span>
+                    )}
                   </div>
-                ))}
-                {dayBookings.length > 2 && (
-                  <div className="text-[10px] text-gray-500">+{dayBookings.length - 2} more</div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    )
-  }
 
-  {/* Booking Details Modal */ }
-  {
-    selectedBooking && (
-      <BookingDetailsView
-        bookingId={selectedBooking}
-        onClose={() => setSelectedBooking(null)}
-      />
-    )
-  }
+                  {/* Status Indicators */}
+                  <div className="mt-1 flex flex-wrap gap-0.5">
+                    {Object.entries(statusSummary).map(([status, count]) => (
+                      <span
+                        key={status}
+                        className={`text-[8px] px-1 py-0.5 rounded ${STATUS_COLORS[status] || 'bg-gray-200'}`}
+                      >
+                        {count} {status}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Booking Preview */}
+                  <div className="mt-auto space-y-0.5 max-h-16 overflow-y-auto">
+                    {dayBookings.slice(0, 2).map(booking => (
+                      <div
+                        key={booking.booking_id}
+                        className={`text-[10px] p-0.5 rounded truncate cursor-pointer ${STATUS_COLORS[booking.status] || 'bg-gray-200'}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookingClick(booking);
+                        }}
+                      >
+                        <div className="font-semibold truncate p-2">{booking.customer_id?.split(' ')[0] || 'Customer'}</div>
+                        {/* <div className="text-gray-600 truncate">{booking.venue_id?.split(' ')[0] || 'Venue'}</div> */}
+                      </div>
+                    ))}
+                    {dayBookings.length > 2 && (
+                      <div className="text-[10px] text-gray-500">+{dayBookings.length - 2} more</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+      }
+
+      {/* Booking Details Modal */}
+      {
+        selectedBooking && (
+          <BookingDetailsView
+            bookingId={selectedBooking}
+            onClose={() => setSelectedBooking(null)}
+          />
+        )
+      }
 
     </div >
   );
