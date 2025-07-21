@@ -82,19 +82,7 @@ const AdminMenuOrdersPage = () => {
           <div className="space-y-6">
             {customers.map((customer) => (
               <div key={customer.customer_id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                      <span className="text-indigo-600 font-medium">
-                        {customer.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="ml-4">
-                      <h2 className="text-lg font-semibold text-gray-900">{customer.name}</h2>
-                      <p className="text-sm text-gray-500">{customer.email}</p>
-                    </div>
-                  </div>
-                </div>
+                
                 
                 <div className="divide-y divide-gray-100">
                   {customer.bookings.map((booking) => (
@@ -112,18 +100,18 @@ const AdminMenuOrdersPage = () => {
                               {booking.booking_date ? format(new Date(booking.booking_date), ' MMMM do, yyyy') : 'No date'}
                             
                           </h3>
-                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 ">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               {booking.status}
                             </span>
-                            {/* <span className="text-sm text-gray-500">
-                              Booking #{booking.booking_id}
-                            </span> */}
                             <span className="text-sm text-gray-500">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                               </svg>
                               {booking.number_of_guests} guests
+                            </span>
+                            <span className="text-sm text-gray-500 border">
+                              <b>Booking</b> #{booking.booking_id}  <b>Customer Name:</b> {customer.name}
                             </span>
                           </div>
                         </div>

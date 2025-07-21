@@ -7,7 +7,7 @@ import {
     updateMenuSelection,
     deleteMenuSelection
 } from "../controllers/AdminCorrectMenusController.js";
-import { deleteAllSelectionsForBooking } from "../controllers/customerMenuSelectionController.js";
+import { AdminDeleteMenuPriceFromBookingDetail, deleteAllSelectionsForBooking } from "../controllers/customerMenuSelectionController.js";
 
 const router = express.Router();
 
@@ -16,6 +16,8 @@ router.get("/structured", getAllStructuredMenuSelections);
 
 //delete customer selected menu by admin
 router.delete('/:booking_id', deleteAllSelectionsForBooking);
+
+router.put('/bookingPrice/:booking_id', AdminDeleteMenuPriceFromBookingDetail);
 
 // Get structured menu selections by booking ID
 router.get("/structured/booking/:booking_id", getStructuredSelectionsByBookingId);

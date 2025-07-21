@@ -90,6 +90,17 @@ export const deleteAllSelectionsForBooking = async (req, res) => {
   }
 }
 
+export const AdminDeleteMenuPriceFromBookingDetail = async (req, res) => {
+  const { booking_id } = req.params;
+  try {
+    // Fix: Use different variable name (affectedRows instead of res)
+    CustomerMenuItemSelection.AdminDeleteMenuPriceFromBookingDetail(booking_id);
+    res.json({ message: "Menu price deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Database error" });
+  }
+}
+
 // Check if booking_id exists in selections
 export const checkBookingSelection = async (req, res) => {
   try {

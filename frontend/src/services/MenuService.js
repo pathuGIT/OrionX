@@ -539,6 +539,12 @@ export const deleteCustomerSelectMenu = async (booking_id) => {
     const response = await api.delete(`/AdminCorrectMenus/${booking_id}`);
     return response.data;
 }
+export const deleteMenuPriceFromBookingDetails = async (booking_id) => {
+    const response = await api.put(`/AdminCorrectMenus/bookingPrice/${booking_id}`);
+    return response.data;
+}
+
+
 
 /**
  * Gets structured menu selections by booking ID

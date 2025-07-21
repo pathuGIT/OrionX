@@ -46,6 +46,14 @@ export const deleteAllMenuSelectionsForBooking = async (booking_id) => {
     return result.affectedRows;
 };
 
+export const AdminDeleteMenuPriceFromBookingDetail = async (booking_id) => {
+    const [result] = await db.query(
+        "UPDATE booking_pricing SET menu_price_total = 0.0 WHERE booking_id = ?",
+        [booking_id]
+    );
+    return result.affectedRows;
+};
+
 export const existsBookingSelection = async (booking_id) => {
     const [rows] = await db.query(
         "SELECT 1 FROM customer_menu_item_selection WHERE booking_id = ? LIMIT 1",
@@ -61,5 +69,6 @@ export default {
     deleteSelection,
     existsBookingSelection,
     getCustomerMenuSelections,
-    deleteAllMenuSelectionsForBooking
+    deleteAllMenuSelectionsForBooking,
+    AdminDeleteMenuPriceFromBookingDetail
 };
