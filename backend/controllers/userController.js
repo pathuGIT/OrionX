@@ -17,6 +17,8 @@ import {
   getPayEntriesModel,
   getPaymentHistoryModel,
   UpdatePayStatusEntriesModel,
+  getActiveEmployeeModel,
+  getPayEntryByEmployeeAndDateModel
   
   
 } from "../models/userModel.js";
@@ -428,6 +430,23 @@ export const getEmployeesByStatus = async (req, res) => {
     res.status(500).json({ msg: "Server error...", error });
   }
 };
+
+//get active employee
+
+export const getActiveEmployee = async(req,res) =>{
+  const { status } = req.params;
+  try {
+    const employees = await getActiveEmployeeModel(status);
+    res.status(200).json({ employees });
+  } catch (error) {
+    res.status(500).json({ msg: "Server error...", error });
+  }
+}
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 export const serviceChargeController = {

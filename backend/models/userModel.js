@@ -166,6 +166,25 @@ export const getEmployeesByStatusModel = async (status) => {
     //console.log(result[0]);
     return result;
 };
+//get active employee
+export const getActiveEmployeeModel = async () => {
+  const [result] = await pool.query(
+    `SELECT e.employee_id, e.name FROM employee e JOIN systemuser s ON e.employee_id = s.employee_id WHERE s.status = ?`,
+    ['active']
+  );
+  return result;
+}
+ 
+
+export const getActiveEmployeesService = async () => {
+  try {
+    const employees = await getActiveEmployeeModel();
+    return employees;
+  } catch (error) {
+    // You can add more sophisticated error handling/logging here
+    throw new Error('Failed to fetch active employees: ' + error.message);
+  }
+};
 
 export const updatePasswordByEmail = async (newPassword, email, table) => {
   console.log(newPassword, email, table);
@@ -227,7 +246,7 @@ export class ServiceChargeModel {
         ae.User_Role AS employee_role,
         esc.event_id,
         esc.amount,
-        esc.calculation_date,
+        esc.booking_date,
         b.total_price AS event_budget,
         c.name AS customer_name
       FROM employee_service_charges esc
@@ -244,7 +263,7 @@ export class ServiceChargeModel {
         ON ev.booking_id = b.booking_id
       JOIN customer c 
         ON b.customer_id = c.customer_id
-      ORDER BY esc.calculation_date DESC
+      ORDER BY esc.booking_date DESC
       `);
       return results;
     } catch (error) {
@@ -262,7 +281,7 @@ export class ServiceChargeModel {
           esc.service_charge_id,
           esc.event_id,
           esc.amount,
-          esc.calculation_date,
+          esc.booking_date,
           b.total_price AS event_budget,
           c.name AS customer_name
          FROM employee_service_charges esc
@@ -276,7 +295,7 @@ export class ServiceChargeModel {
              WHERE Employee_ID = esc.employee_id
            )
          WHERE esc.employee_id = ?
-         ORDER BY esc.calculation_date DESC`,
+         ORDER BY esc.booking_date DESC`,
         [employeeId]
       );
       return results;
