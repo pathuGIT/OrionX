@@ -26,7 +26,9 @@ import {
     notifySingleEmployeePayroll,
     sendIdToEmp,
     getPaymentHistory,
-    UpdatePayStatus
+    UpdatePayStatus,
+    sendSalaryEmail,
+    getActiveEmployee
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -41,6 +43,9 @@ router.get('/searchCustomer', searchCustomer);
 router.post('/changeUserRole', superAdmin, changeUserRole);
 router.delete('/deleteEmployee',superAdmin,deleteEmployees);
 router.put('/updateStatus', updateEmployeesStatus);
+
+router.get('/getActiveEmployees',getActiveEmployee)
+
 router.get('/getEmployeeById/:id', superAdmin,getEmployeeById); // New route to get employee by ID
 //router.put("/updateEmployee/:id", updateEmployees); // same
 router.get('/getEmployees', superAdmin,getEmployee);//chage get employees
@@ -76,7 +81,7 @@ router.get('/entries/:date',getPayEntries);
 router.put('/entries/:employee_id/:date',UpdatePayStatus);
 
 router.post('/payroll/notify',  notifyEmployeesPayroll);
-router.post('/send-id-to-emp', sendIdToEmp);
+router.post('/send-id-to-emp', sendSalaryEmail);
 router.post('/payroll/notify-employee', notifySingleEmployeePayroll);
 
 router.get('/payment-history',   getPaymentHistory);
