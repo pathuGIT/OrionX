@@ -1,9 +1,8 @@
 import PDFDocument from 'pdfkit';
-import fs from 'fs'; // Import the file system module
-import path from 'path'; // 1. Import the path module
+import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
-// 2. Define __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,51 +20,30 @@ export function generateEventReport(reportData) {
             const isCustomEvent = reportData.custom_event_name;
             const eventType = isWedding ? 'Wedding' : isCustomEvent ? 'Custom Event' : 'Event';
 
-
-            // --- WATERMARK LOGIC ---
-            // 💧 Define the watermark function
+            // --- WATERMARK ---
             const addWatermark = () => {
                 const logoPath = path.resolve(__dirname, '../public/images/logo.png');
-                if (!fs.existsSync(logoPath)) {
-                    console.error("Watermark logo not found at path:", logoPath);
-                    return;
-                }
+                if (!fs.existsSync(logoPath)) return;
 
-                // Get page dimensions
                 const pageWidth = doc.page.width;
                 const pageHeight = doc.page.height;
-                const imageWidth = 800; // Adjust the size of your watermark
-
-                // Calculate center position
+                const imageWidth = 800;
                 const x = (pageWidth - imageWidth) / 2;
-                const y = (pageHeight - imageWidth) / 2; // Assuming a square-ish logo
+                const y = (pageHeight - imageWidth) / 2;
 
-                // Set opacity, draw image, then restore opacity
-                doc.opacity(0.1) // Set transparency (0.0 to 1.0)
-                    .image(logoPath, x, y, { width: imageWidth })
-                    .opacity(1); // Restore full opacity for subsequent text
+                doc.opacity(0.1).image(logoPath, x, y, { width: imageWidth }).opacity(1);
             };
-
-            // ✨ Add the watermark to every new page automatically
             doc.on('pageAdded', addWatermark);
-
-            // --- Call watermark for the FIRST page ---
             addWatermark();
 
-
-
-            // Header
+            // --- HELPERS ---
             const drawHeader = (title) => {
-                // Add the logo
                 try {
-
                     const logoPath = path.resolve(__dirname, '../public/images/logo.png');
-                    // Place the logo at the top left of the page
                     doc.image(logoPath, 40, 30, { width: 70 });
                 } catch (error) {
                     console.error("Error embedding image: ", error);
                 }
-
 
                 doc.font('Helvetica-Bold').fontSize(20).fillColor('#000')
                     .text('Deandra', { align: 'center' });
@@ -84,18 +62,14 @@ export function generateEventReport(reportData) {
 
             const writeSectionHeader = (text) => {
                 doc.moveDown(1);
-                const x = 45;
-                doc.font('Helvetica-Bold')
-                    .fontSize(12)
-                    .fillColor('#000')
-                    .text(text.toUpperCase(), x, doc.y, { underline: true });
+                doc.font('Helvetica-Bold').fontSize(12).fillColor('#000')
+                    .text(text.toUpperCase(), 45, doc.y, { underline: true });
                 drawLine();
             };
 
-            // Updated layout with increased spacing
             const writeTwoColumnField = (label1, value1, label2, value2) => {
                 const y = doc.y;
-                const valueOffset = 180; // Increased spacing
+                const valueOffset = 180;
                 const valueOffset2 = 450;
 
                 doc.font('Helvetica-Bold').fontSize(10).fillColor('#000').text(label1, 45, y);
@@ -116,13 +90,17 @@ export function generateEventReport(reportData) {
                 doc.moveDown();
             };
 
-            const writeItems = (title, items) => {
+            const writeItems = (title, items, showPrice = false) => {
                 if (items?.length > 0) {
                     writeSectionHeader(title);
                     const x = 55;
                     items.forEach(item => {
-                        doc.font('Helvetica').fontSize(10)
-                            .text(`• ${item.name} x ${item.quantity}`, x, doc.y);
+                        let text = `• ${item.name} x ${item.quantity}`;
+                        if (showPrice && item.price !== undefined && item.price !== null) {
+                            text += ` - Rs. ${parseFloat(item.price).toFixed(2)}`;
+                        }
+                        doc.font('Helvetica').fontSize(10).text(text, x, doc.y);
+                        doc.moveDown(0.5);
                     });
                     doc.moveDown();
                 }
@@ -132,17 +110,12 @@ export function generateEventReport(reportData) {
             drawHeader('Final Function Sheet');
 
             writeTwoColumnField(
-                'Date:',
-                new Date(reportData.booking_date).toLocaleDateString(),
-                'Pax:',
-                reportData.number_of_guests?.toString()
+                'Date:', new Date(reportData.booking_date).toLocaleDateString(),
+                'Pax:', reportData.number_of_guests?.toString()
             );
-
             writeTwoColumnField(
-                'Time Slot:',
-                reportData.time_slot === 'day' ? 'Day' : 'Night',
-                'Event Type:',
-                eventType
+                'Time Slot:', reportData.time_slot === 'day' ? 'Day' : 'Night',
+                'Event Type:', eventType
             );
 
             if (isWedding) {
@@ -156,13 +129,10 @@ export function generateEventReport(reportData) {
             writeTwoColumnField('Customer:', reportData.customer_name);
             doc.moveDown();
 
-            // Coordinators
             writeSectionHeader('COORDINATORS');
-            doc.font('Helvetica').fontSize(10)
-                .text(reportData.coordinators || 'No coordinators assigned', 45, doc.y);
+            doc.font('Helvetica').fontSize(10).text(reportData.coordinators || 'No coordinators assigned', 45, doc.y);
             doc.moveDown();
 
-            // Timings
             writeSectionHeader('TIMINGS');
             writeTwoColumnField('Function Duration:', `${reportData.Function_durationFrom} - ${reportData.Function_durationTo}`);
             writeTwoColumnField('Buffet Time:', `${reportData.Buffet_TimeFrom} - ${reportData.Buffet_TimeTo}`);
@@ -203,6 +173,19 @@ export function generateEventReport(reportData) {
             writeItems('BITES', reportData.selected_bites);
             writeItems('SOFT DRINKS', reportData.soft_drink_items);
 
+            // 🍾 Ensure space before liquor items
+            if (doc.y > doc.page.height - 180) {
+                doc.addPage();
+            }
+
+            if (Array.isArray(reportData.liquor_items) && reportData.liquor_items.length > 0) {
+                writeItems('LIQUOR ITEMS', reportData.liquor_items, true);
+            } else {
+                writeSectionHeader('LIQUOR ITEMS');
+                doc.font('Helvetica').fontSize(10).text('No liquor items selected.', 55, doc.y);
+                doc.moveDown();
+            }
+
             // --- SIGNATURE SECTION ---
             if (doc.y > doc.page.height - 180) {
                 doc.addPage();
@@ -224,7 +207,6 @@ export function generateEventReport(reportData) {
 
             doc.font('Helvetica').text('_____________________', 435, sigLineY);
             doc.font('Helvetica-Bold').text('Date', 467, sigTextY);
-
 
             doc.end();
         } catch (error) {
