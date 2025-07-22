@@ -23,8 +23,17 @@ function UpdateEmployees() {
   const [showPopup, setShowPopup] = useState(false);
   const [showActionPopup, setShowActionPopup] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("active");
-  const [filterStatus, setFilterStatus] = useState(null); // Start with no filter
+  const [filterStatus, setFilterStatus] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Function to get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
     fetchEmployees();
@@ -100,6 +109,18 @@ function UpdateEmployees() {
       return;
     }
 
+    // Validate birth date is not today or in the future
+    if (formData.bod) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time part
+      const birthDate = new Date(formData.bod);
+      
+      if (birthDate >= today) {
+        setErrorMessage("Birth date cannot be today or in the future.");
+        return;
+      }
+    }
+
     if (!formData.salary || isNaN(formData.salary) || formData.salary <= 0) {
       setErrorMessage("Basic salary must be a positive number.");
       return;
@@ -166,7 +187,6 @@ function UpdateEmployees() {
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        {/* Show All Button */}
         <button
           onClick={() => setFilterStatus(null)}
           className={`px-4 py-2 rounded transition ${
@@ -178,7 +198,6 @@ function UpdateEmployees() {
           Show All
         </button>
         
-        {/* Active Button */}
         <button
           onClick={() => setFilterStatus("active")}
           className={`px-4 py-2 rounded transition ${
@@ -190,7 +209,6 @@ function UpdateEmployees() {
           Active
         </button>
 
-        {/* Inactive Button */}
         <button
           onClick={() => setFilterStatus("inactive")}
           className={`px-4 py-2 rounded transition ${
@@ -202,7 +220,6 @@ function UpdateEmployees() {
           Inactive
         </button>
         
-        {/* Back Button - Only shows when a filter is applied */}
         {filterStatus !== null && (
           <button
             onClick={() => setFilterStatus(null)}
@@ -228,18 +245,18 @@ function UpdateEmployees() {
             <th className="py-1 px-2 border-r border-gray-300 text-left">
               Email
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left w-32" >
+            <th className="py-1 px-2 border-r border-gray-300 text-left w-32">
               Date of Birth
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left w-32" >
+            <th className="py-1 px-2 border-r border-gray-300 text-left w-32">
               Basic Salary
             </th>
-            <th className="py-1 px-2 border-r border-gray-300 text-left ">
+            <th className="py-1 px-2 border-r border-gray-300 text-left">
               Service Charge
             </th>
             <th className="py-1 px-2 border-r border-gray-300 text-left w-32">
-  Hire Date
-</th>
+              Hire Date
+            </th>
             <th className="py-1 px-2">Actions</th>
           </tr>
         </thead>
@@ -381,7 +398,7 @@ function UpdateEmployees() {
               </div>
               <div>
                 <label className="block text-sm font-medium">
-                  Date  of  birthday
+                  Date of birthday
                 </label>
                 <input
                   type="date"
@@ -389,6 +406,7 @@ function UpdateEmployees() {
                   placeholder="Date of Birth"
                   value={formData.bod}
                   onChange={handleInputChange}
+                  max={getTodayDate()} // Prevent future dates
                   className="w-full p-2 border border-gray-400 rounded"
                 />
               </div>

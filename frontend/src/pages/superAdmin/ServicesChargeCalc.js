@@ -6,9 +6,21 @@ const ServiceChargeTable = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState(""); // New state for year selection
+  const [selectedYear, setSelectedYear] = useState("");
   const [totalDistributed, setTotalDistributed] = useState(0);
   const [error, setError] = useState("");
+
+  // Helper to safely format booking_date
+  const formatBookingDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "-";
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   const loadData = async () => {
     try {
@@ -24,10 +36,7 @@ const ServiceChargeTable = () => {
       if (result.success) {
         const data = result.data;
         const sortedData = data.sort((a, b) => a.employee_id.localeCompare(b.employee_id));
-        const total = sortedData.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
         setCharges(sortedData);
-        setFilteredData(sortedData);
-        setTotalDistributed(total);
       } else {
         setError(result.message);
       }
@@ -43,46 +52,48 @@ const ServiceChargeTable = () => {
   }, []);
 
   useEffect(() => {
-    const filterData = () => {
-      let filtered = charges;
-      
-      // Apply month filter if selected
-      if (selectedMonth) {
-        filtered = filtered.filter((row) => {
-          const date = new Date(row.calculation_date);
-          return date.getMonth() + 1 === parseInt(selectedMonth);
-        });
-      }
-      
-      // Apply year filter if selected
-      if (selectedYear) {
-        filtered = filtered.filter((row) => {
-          const date = new Date(row.calculation_date);
-          return date.getFullYear() === parseInt(selectedYear);
-        });
-      }
-      
-      setFilteredData(filtered);
-      setTotalDistributed(
-        filtered.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0)
-      );
-    };
-    
-    filterData();
+    let filtered = charges;
+
+    // Only filter if both month and year are selected
+    if (selectedMonth && selectedYear) {
+      filtered = filtered.filter((row) => {
+        const date = new Date(row.booking_date);
+        return (
+          date.getMonth() + 1 === parseInt(selectedMonth) &&
+          date.getFullYear() === parseInt(selectedYear)
+        );
+      });
+    } else if (selectedMonth) {
+      filtered = filtered.filter((row) => {
+        const date = new Date(row.booking_date);
+        return date.getMonth() + 1 === parseInt(selectedMonth);
+      });
+    } else if (selectedYear) {
+      filtered = filtered.filter((row) => {
+        const date = new Date(row.booking_date);
+        return date.getFullYear() === parseInt(selectedYear);
+      });
+    }
+
+    setFilteredData(filtered);
+    setTotalDistributed(
+      filtered.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0)
+    );
   }, [selectedMonth, selectedYear, charges]);
 
-  // Get unique years from calculation dates
+  // Get unique years from booking dates
   const getAvailableYears = () => {
     const years = new Set();
     charges.forEach(item => {
-      const date = new Date(item.calculation_date);
-      years.add(date.getFullYear());
+      const date = new Date(item.booking_date);
+      if (!isNaN(date.getTime())) {
+        years.add(date.getFullYear());
+      }
     });
-    return Array.from(years).sort((a, b) => b - a); // Sort descending
+    return Array.from(years).sort((a, b) => b - a);
   };
 
   const groupByEvent = (data) => {
-    // First group the data
     const grouped = data.reduce((acc, current) => {
       const existing = acc.find(item => item.event_id === current.event_id);
       if (!existing) {
@@ -99,9 +110,8 @@ const ServiceChargeTable = () => {
       return acc;
     }, []);
 
-    // Then sort the grouped array by event_id in DESCENDING order
-    return grouped.sort((b, a) => 
-      b.event_id.localeCompare(a.event_id)  // Reverse comparison for descending order
+    return grouped.sort((b, a) =>
+      b.event_id.localeCompare(a.event_id)
     );
   };
 
@@ -156,7 +166,7 @@ const ServiceChargeTable = () => {
                 </option>
               ))}
             </select>
-            
+
             {/* Year Selector */}
             <select
               value={selectedYear}
@@ -266,8 +276,7 @@ const ServiceChargeTable = () => {
                             rowSpan={eventGroup.entries.length}
                             className="px-4 py-3 text-sm text-gray-900 align-middle border-r"
                           >
-                          {eventGroup.event_budget}
-
+                            {eventGroup.event_budget}
                           </td>
                         )}
 
@@ -280,11 +289,7 @@ const ServiceChargeTable = () => {
                             rowSpan={eventGroup.entries.length}
                             className="px-4 py-3 text-sm text-gray-500 align-middle border-r"
                           >
-                            {new Date(eventGroup.calculation_date).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            {formatBookingDate(eventGroup.entries[0].booking_date)}
                           </td>
                         )}
 

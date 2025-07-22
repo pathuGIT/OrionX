@@ -5,7 +5,8 @@ import {
   getPayEntries,
   deductionService,
   notifyPayroll,
-  updatePayStatus
+  updatePayStatus,
+  notifyEmployeePayroll
 } from "../../services/UserService";
 
 const Pay = () => {
@@ -154,17 +155,19 @@ const Pay = () => {
       const employee = payData.find(item => item.employee_id === employeeId);
       const formattedDate = selectedDate.format("YYYY-MM-DD");
       
-      const result = await notifyPayroll(formattedDate, employeeId);
+      // Use notifyEmployeePayroll instead of notifyPayroll for individual emails
+      const result = await notifyEmployeePayroll( formattedDate,employeeId,);
+      console.log("oiiiiii:",employeeId, formattedDate );
 
       if (result.success) {
         showNotification(`Email sent to ${employee.name}`);
         setEmailStatus(prev => ({ ...prev, [employeeId]: 'sent' }));
       } else {
-        showNotification(`Failed to send email to ${employee.name}`, true);
+        showNotification(`Failed to send email to ${employee.name}: ${result.message}`, true);
         setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
       }
     } catch (error) {
-      showNotification(`Error: ${error.message}`, true);
+      showNotification(`Error sending email: ${error.message}`, true);
       setEmailStatus(prev => ({ ...prev, [employeeId]: 'failed' }));
     }
   };

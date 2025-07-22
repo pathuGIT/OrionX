@@ -1,5 +1,5 @@
 import api from './Api';
-import axios from 'axios';
+//import axios from 'axios';
 // ...existing code...
  
  
@@ -43,6 +43,9 @@ export const getEmployeesByStatus = async (status) => {
     const response = await api.get(`/user/getEmployeesByStatus/${status}`);
     return response.data;
 };
+
+
+
 
 export const serviceChargeService = {
     calculateCharges: async () => {
@@ -341,6 +344,7 @@ export const notifyPayroll = async (date) => {
 
 // Notify single employee about payroll
 export const notifyEmployeePayroll = async (date, employeeId) => {
+  
   try {
     const response = await api.post('/user/payroll/notify-employee', { date, employeeId });
     return { success: true, data: response.data };
@@ -367,6 +371,21 @@ export const getPaymentHistory = async () => {
     return {
       success: false,
       message: error.response?.data?.message || 'Failed to fetch payment history',
+      error: error.message,
+      data: []
+    };
+  }
+};
+
+
+export const getActiveEmployees = async () => {
+  try {
+    const response = await api.get('/user/getActiveEmployees');
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Failed to fetch active employees',
       error: error.message,
       data: []
     };
