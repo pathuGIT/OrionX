@@ -108,6 +108,15 @@ export const getBookingsByCustomerIdModel = async (customerId) => {
   return rows;
 };
 
+export const deleteCustomerIdModel = async (customerId) => {
+  console.log('Deleting customer with ID:', customerId);
+  const [rows] = await pool.query(
+    `delete from customer where customer_id = ?`,
+    [customerId]
+  );
+  return rows;
+};
+
 export const searchCustomerByTerm = async (searchTerm) => {
   const query = `
     SELECT customer_id, name, email, phone, address, create_date, staus 

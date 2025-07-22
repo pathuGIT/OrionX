@@ -39,6 +39,7 @@ import {
   getAllCustomersModel,
   updateCustomerModel,
   getBookingsByCustomerIdModel,
+  deleteCustomerIdModel,
 } from "../models/customerModel.js";
 
 //...........................................................................
@@ -933,6 +934,16 @@ export const getCustomerBookings = async (req, res) => {
   try {
     const { customerId } = req.params;
     const bookings = await getBookingsByCustomerIdModel(customerId);
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+};
+
+export const deleteCustomer = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const bookings = await deleteCustomerIdModel(customerId);
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch bookings' });

@@ -28,7 +28,8 @@ import {
     getPaymentHistory,
     UpdatePayStatus,
     sendSalaryEmail,
-    getActiveEmployee
+    getActiveEmployee,
+    deleteCustomer
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -58,6 +59,7 @@ router.get('/getEmployeesByStatus/:status',superAdmin, getEmployeesByStatus);
 router.get('/getAllCustomers', superAdmin, getAllCustomers);
 router.put('/updateCustomer/:customerId', superAdmin, updateCustomer);
 router.get('/getCustomerBookings/:customerId', superAdmin, getCustomerBookings);
+router.delete('/deleteCustomer/:customerId', superAdmin, deleteCustomer);
 
 
 router.post('/service-charges/calculate', serviceChargeController.calculateCharges);
