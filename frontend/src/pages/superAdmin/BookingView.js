@@ -23,6 +23,34 @@ const BookingView = () => {
   const [activeTab, setActiveTab] = useState('new'); // 'new' or 'existing'
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
+  const [booking, setBooking] = useState({
+    date: '',
+    slot: 'day',
+    customerId: '',
+    guests: 150,
+    venueId: '',
+    extraHours: 0,
+    payDeposit: false,
+  });
+
+  const [search, setSearch] = useState({
+    property: ''
+  });
+
+  // New state for booking validation errors
+  const [bookingErrors, setBookingErrors] = useState({
+    date: '',
+    venue: '',
+    guests: '',
+  });
+
+  // Update booking validation on change
+  useEffect(() => {
+    if (booking.date || booking.venueId || booking.guests) {
+      validateBooking();
+    }
+  }, [booking.date, booking.venueId, booking.guests, venues]);
+
   // Fetch venues on mount
   useEffect(() => {
     fetchVenues();
@@ -107,19 +135,7 @@ const BookingView = () => {
     }
   };
 
-  const [booking, setBooking] = useState({
-    date: '',
-    slot: 'day',
-    customerId: '',
-    guests: 150,
-    venueId: '',
-    extraHours: 0,
-    payDeposit: false,
-  });
 
-  const [search, setSearch] = useState({
-    property: ''
-  });
 
   // Sync booking.customerId when selectedCustomer changes
   useEffect(() => {
@@ -162,9 +178,16 @@ const BookingView = () => {
 
   const submitBooking = async (e) => {
     e.preventDefault();
+    setBErrmsg({ msg: '', color: '' });
 
     if (!booking.customerId) {
       setBErrmsg({ msg: 'Please select a customer first', color: 'text-red-600' });
+      return;
+    }
+
+    // Validate booking before submission
+    if (!validateBooking()) {
+      setBErrmsg({ msg: 'Please fix booking errors', color: 'text-red-600' });
       return;
     }
 
@@ -198,6 +221,55 @@ const BookingView = () => {
     }
   };
 
+
+  const validateBooking = () => {
+    const errors = {};
+    let isValid = true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Date validation
+    if (!booking.date) {
+      errors.date = 'Booking date is required';
+      isValid = false;
+    } else {
+      const selectedDate = new Date(booking.date);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        errors.date = 'Cannot select past dates';
+        isValid = false;
+      }
+    }
+
+    // Venue validation
+    if (!booking.venueId) {
+      errors.venue = 'Please select a venue';
+      isValid = false;
+    }
+
+    // Guests validation
+    if (!booking.guests) {
+      errors.guests = 'Guest count is required';
+      isValid = false;
+    } else if (booking.venueId) {
+      const selectedVenue = venues.find(v => v.venue_id === booking.venueId);
+      if (selectedVenue) {
+        const guests = parseInt(booking.guests);
+        if (guests < selectedVenue.min_capacity) {
+          errors.guests = `Minimum guests: ${selectedVenue.min_capacity}`;
+          isValid = false;
+        } else if (guests > selectedVenue.max_capacity) {
+          errors.guests = `Maximum guests: ${selectedVenue.max_capacity}`;
+          isValid = false;
+        }
+      }
+    }
+
+    setBookingErrors(errors);
+    return isValid;
+  };
+
   // CSS Classes
   const inputClass = 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5';
   const labelClass = 'block mb-2 text-sm font-medium text-gray-900';
@@ -212,6 +284,15 @@ const BookingView = () => {
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );
+
+  // Helper function to get venue capacity
+  const getVenueCapacity = () => {
+    if (!booking.venueId) return { min: 0, max: 0 };
+    const venue = venues.find(v => v.venue_id === booking.venueId);
+    return venue
+      ? { min: venue.min_capacity, max: venue.max_capacity }
+      : { min: 0, max: 0 };
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6">
@@ -410,10 +491,10 @@ const BookingView = () => {
 
           <form onSubmit={submitBooking} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Date */}
+              {/* Date Field with Validation */}
               <div>
                 <label htmlFor="booking_date" className={labelClass}>
-                  Booking Date
+                  Booking Date *
                 </label>
                 <div className="relative">
                   <input
@@ -423,15 +504,18 @@ const BookingView = () => {
                     required
                     value={booking.date}
                     onChange={handleBookingChange}
-                    className={inputClass}
+                    className={`${inputClass} ${bookingErrors.date ? 'border-red-500' : ''}`}
                   />
                 </div>
+                {bookingErrors.date && (
+                  <p className="mt-1 text-sm text-red-600">{bookingErrors.date}</p>
+                )}
               </div>
 
-              {/* Slot */}
+              {/* Slot Field */}
               <div>
                 <label htmlFor="slot" className={labelClass}>
-                  Time Slot
+                  Time Slot *
                 </label>
                 <select
                   id="slot"
@@ -447,22 +531,42 @@ const BookingView = () => {
               </div>
 
               {/* Venue Dropdown */}
-              <VenueDropdown venues={venues} booking={booking} setBooking={setBooking} />
+              <div>
+                <label className={labelClass}>
+                  Venue *
+                </label>
+                <VenueDropdown venues={venues} booking={booking} setBooking={setBooking} />
+                {bookingErrors.venue && (
+                  <p className="mt-1 text-sm text-red-600">{bookingErrors.venue}</p>
+                )}
+              </div>
 
-              {/* Guests */}
+
+              {/* Guests Field with Validation and Capacity Info */}
               <div>
                 <label htmlFor="number_of_guests" className={labelClass}>
-                  Number of Guests
+                  Number of Guests *
                 </label>
                 <input
                   id="number_of_guests"
                   name="guests"
                   type="number"
                   required
+                  min={getVenueCapacity().min}
+                  max={getVenueCapacity().max}
                   value={booking.guests}
                   onChange={handleBookingChange}
-                  className={inputClass}
+                  className={`${inputClass} ${bookingErrors.guests ? 'border-red-500' : ''}`}
                 />
+                {bookingErrors.guests ? (
+                  <p className="mt-1 text-sm text-red-600">{bookingErrors.guests}</p>
+                ) : (
+                  booking.venueId && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      Capacity: {getVenueCapacity().min} - {getVenueCapacity().max} guests
+                    </p>
+                  )
+                )}
               </div>
 
               {/* Extra Hours */}
