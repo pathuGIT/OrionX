@@ -9,8 +9,8 @@ export const sendIdToEmp = async (req, res) => {
         // Create a transporter
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST, // Replace with your SMTP server
-            port: process.env.MAIL_PORT, // Replace with your SMTP port
-            secure: true, // true for 465, false for other ports
+            port: parseInt(process.env.MAIL_PORT), // Replace with your SMTP port
+            secure: false, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
                 pass: process.env.MAIL_PSWD // Replace with your email password
@@ -44,8 +44,8 @@ export const sendIdToUserMethod = async (name, subject, email, message, url) => 
         // Create a transporter
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST, // Replace with your SMTP server
-            port: process.env.MAIL_PORT, // Replace with your SMTP port
-            secure: true, // true for 465, false for other ports
+            port: parseInt(process.env.MAIL_PORT), // Replace with your SMTP port
+            secure: false, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
                 pass: process.env.MAIL_PSWD // Replace with your email password
@@ -53,7 +53,7 @@ export const sendIdToUserMethod = async (name, subject, email, message, url) => 
         });
 
         const mailOptions = {
-            from: `"Deandra" <no-reply@yourdomain.com>`, // Use a domain-based email
+            from: `"Deandra" <noreply@deandrabolgoda.lk>`, // Use a domain-based email
             to: email,
             subject: subject,
             text: `Hello ${name},\n\nID: ${message}\n\nBest regards,\nDeandra`,
@@ -149,8 +149,8 @@ export const sendOtpEmail = async (email, otp) => {
         const transporter = nodemailer.createTransport({
             //host: process.env.MAIL_HOST, // Replace with your SMTP server
             host: process.env.MAIL_HOST, // Use environment variable for host
-            port: process.env.MAIL_PORT, // Replace with your SMTP port
-            secure: true, // true for 465, false for other ports
+            port: parseInt(process.env.MAIL_PORT), // Replace with your SMTP port
+            secure: false, // true for 465, false for other ports
             auth: {
                 user: process.env.MAIL_ADDRESS, // Replace with your email
                 pass: process.env.MAIL_PSWD // Replace with your email password
@@ -158,7 +158,7 @@ export const sendOtpEmail = async (email, otp) => {
         });
 
         const mailOptions = {
-            from: `"Deandra" <no-reply@yourdomain.com>`, // Use a domain-based email
+            from: `"Deandra" <noreply@deandrabolgoda.lk>`, // Use a domain-based email
             to: email,
             subject: 'Your OTP Code',
             text: `Hello, Your OTP is: ${otp} Best regards,Deandra`,

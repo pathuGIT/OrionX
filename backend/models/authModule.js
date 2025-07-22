@@ -1,12 +1,31 @@
 import pool from '../config/db.js';
 
+// export const saveSystemuserRefreshTokenModel = async (token, userId) => {
+//     await pool.query('UPDATE systemuser SET refresh_token = ? WHERE user_id = ?', [token, userId]);
+// }
+
+// export const saveCustomerRefreshTokenModel = async (token, customer_id) => {
+//     await pool.query('UPDATE customer SET refresh_token = ? WHERE customer_id = ?', [token, customer_id]);
+// }
+
 export const saveSystemuserRefreshTokenModel = async (token, userId) => {
-    await pool.query('UPDATE systemuser SET refresh_token = ? WHERE user_id = ?', [token, userId]);
-}
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('UPDATE systemuser SET refresh_token = ? WHERE user_id = ?', [token, userId]);
+    } finally {
+        conn.release(); // ✅ Always release the connection
+    }
+};
 
 export const saveCustomerRefreshTokenModel = async (token, customer_id) => {
-    await pool.query('UPDATE customer SET refresh_token = ? WHERE customer_id = ?', [token, customer_id]);
-}
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('UPDATE customer SET refresh_token = ? WHERE customer_id = ?', [token, customer_id]);
+    } finally {
+        conn.release(); // ✅ Always release the connection
+    }
+};
+
 
 export const isRefreshTokenValidModel = async (userId, token) => {
     const [rows] = await pool.query('SELECT refresh_token FROM systemuser WHERE user_id = ?', [userId]);
