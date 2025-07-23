@@ -2,20 +2,30 @@ import pool from "../config/db.js";
 
 //register super admin only once
 export const registerSuperAdminSystemUserModel = async (pswd, employee_id) => {
-  const [result] = await pool.query(
-    "INSERT INTO systemuser (password, role, status, employee_id) VALUES (?, ?, ?, ?)",
-    [pswd, "super_admin", "active", employee_id]
-  );
-  return result[0];
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      "INSERT INTO systemuser (password, role, status, employee_id) VALUES (?, ?, ?, ?)",
+      [pswd, "super_admin", "active", employee_id]
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //register emplyoee
 export const registerEmployeeModel = async (pswd, employee_id) => {
-  const [result] = await pool.query(
-    "INSERT INTO systemuser (password, role, status, employee_id) VALUES (?, ?, ?, ?)",
-    [pswd, "employee", "active", employee_id]
-  );
-  return result[0];
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      "INSERT INTO systemuser (password, role, status, employee_id) VALUES (?, ?, ?, ?)",
+      [pswd, "employee", "active", employee_id]
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //get employees & system user by email or phone
@@ -33,46 +43,64 @@ export const registerEmployeeModel = async (pswd, employee_id) => {
 
 // Get employees & system users by email or phone
 export const getUserByUserEmailORPswdModel = async (credential) => {
-    console.log(typeof (credential))
-    const [result] = await pool.query(
-        'SELECT s.user_id, s.password, s.role, s.status, e.email, e.employee_id, s.refresh_token FROM systemuser s INNER JOIN employee e ON s.employee_id = e.employee_id WHERE e.email = ? OR e.phone = ?',
-        [credential, parseInt(credential, 10) || 0]
-        //[credential, credential]
+  console.log(typeof (credential))
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'SELECT s.user_id, s.password, s.role, s.status, e.email, e.employee_id, s.refresh_token FROM systemuser s INNER JOIN employee e ON s.employee_id = e.employee_id WHERE e.email = ? OR e.phone = ?',
+      [credential, parseInt(credential, 10) || 0]
+      //[credential, credential]
     );
 
-  console.log("User Found:", result[0]);
-  if (result.length === 0) return null; // Prevent accessing undefined index
-
+    console.log("User Found:", result[0]);
+    if (result.length === 0) return null; // Prevent accessing undefined index
 
     return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 export const getEmployeeByEmailModel = async (email) => {
-  const [result] = await pool.query("select * from employee where email = ?", [
-    email,
-  ]);
-  console.log(result[0]);
-  return result[0];
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query("select * from employee where email = ?", [
+      email,
+    ]);
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //get employees by phone
 export const getEmployeeByPhoneModel = async (phone) => {
-    const [result] = await pool.query(
-        'select * from employee where phone = ?',
-        [phone]
+  const conn = await pool.getConnection();
+
+  try {
+    const [result] = await conn.query(
+      'select * from employee where phone = ?',
+      [phone]
     );
 
     return result[0];
+  } finally {
+    conn.release();
+  }
 }
 
 //get system user by employeeId
 export const getSystemUserByEmpIdModel = async (empId) => {
-  const [result] = await pool.query(
-    "select * from systemuser where employee_id = ?",
-    [empId]
-  );
-  console.log(result[0]);
-  return result[0];
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      "select * from systemuser where employee_id = ?",
+      [empId]
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //register employees
@@ -84,97 +112,144 @@ export const addEmployeeModel = async (
   serviceCharge,
   salary
 ) => {
+  const conn = await pool.getConnection();
   const hireDate = new Date().toISOString().split("T")[0];
-  const [result] = await pool.query(
-    "INSERT INTO employee (name,phone,email,bod,salary,service_charge_precentage,hire_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [name, phone, email, bod, salary, serviceCharge, hireDate]
-  );
-  return result[0];
+  try {
+    const [result] = await conn.query(
+      "INSERT INTO employee (name,phone,email,bod,salary,service_charge_precentage,hire_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [name, phone, email, bod, salary, serviceCharge, hireDate]
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //update user role
 export const updateUserRoleModel = async (userId, role) => {
-    const [result] = await pool.query(
-        'UPDATE systemuser SET role = ? WHERE user_id = ? AND status = ? ',
-        [role, userId, 'active']
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'UPDATE systemuser SET role = ? WHERE user_id = ? AND status = ? ',
+      [role, userId, 'active']
     );
     return result[0];
+  } finally {
+    conn.release();
+  }
 }
 
 //check user is active ?
 export const checkUserIsActive = async (userId) => {
-  const [result] = await pool.query(
-    "SELECT status FROM systemuser WHERE user_id = ?",
-    [userId]
-  );
-  return result[0];
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      "SELECT status FROM systemuser WHERE user_id = ?",
+      [userId]
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 //get employees
 export const getEmployeeModel = async () => {
-
-    const [result] = await pool.query(
-        'SELECT employee_id, name, phone, email, DATE_FORMAT(bod, "%Y-%m-%d") AS bod, salary, service_charge_precentage, DATE_FORMAT(hire_date, "%Y-%m-%d") AS hire_date FROM employee'
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'SELECT employee_id, name, phone, email, DATE_FORMAT(bod, "%Y-%m-%d") AS bod, salary, service_charge_precentage, DATE_FORMAT(hire_date, "%Y-%m-%d") AS hire_date FROM employee'
     );
     return result;
+  } finally {
+    conn.release();
+  }
 }
 
 //get employee by id
 export const getEmployeeByuserIdModel = async (employee_id) => {
-    const [result] = await pool.query(
-        'SELECT employee_id, name, phone, email, DATE_FORMAT(bod, "%Y-%m-%d") AS bod, salary, service_charge_precentage, DATE_FORMAT(hire_date, "%Y-%m-%d") AS hire_date FROM employee WHERE employee_id = ?',
-        [employee_id]
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'SELECT employee_id, name, phone, email, DATE_FORMAT(bod, "%Y-%m-%d") AS bod, salary, service_charge_precentage, DATE_FORMAT(hire_date, "%Y-%m-%d") AS hire_date FROM employee WHERE employee_id = ?',
+      [employee_id]
     );
     return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //update employees
 export const updateEmployeesModel = async (employee_id, name, phone, email, bod, salary, service_charge_precentage, hire_date) => {
-    const [result] = await pool.query(
-        'UPDATE employee SET name = ?, phone = ?, email = ?, bod = ?, salary = ?, service_charge_precentage = ?, hire_date =?  WHERE employee_id = ?',
-        [name, phone, email, bod, salary, service_charge_precentage, hire_date, employee_id]
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'UPDATE employee SET name = ?, phone = ?, email = ?, bod = ?, salary = ?, service_charge_precentage = ?, hire_date =?  WHERE employee_id = ?',
+      [name, phone, email, bod, salary, service_charge_precentage, hire_date, employee_id]
     );
     return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //delete employees
 export const deleteEmployeesModel = async (employee_id) => {
-  const [result] = await pool.query(
-    "DELETE FROM employee WHERE employee_id = ?",
-    [employee_id]
-  );
-  return result[0];
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      "DELETE FROM employee WHERE employee_id = ?",
+      [employee_id]
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //update employee(systemuser) status
 export const updateEmployeesStatusModel = async (employee_id, status) => {
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'UPDATE systemuser SET status = ? WHERE employee_id = ?',
+      [status, employee_id]
 
-    const [result] = await pool.query(
-        'UPDATE systemuser SET status = ? WHERE employee_id = ?',
-        [status, employee_id]
-
-    ); return result[0];
+    );
+    return result[0];
+  } finally {
+    conn.release();
+  }
 };
 
 //get employees by status
 export const getEmployeesByStatusModel = async (status) => {
-    console.log(status);
-    const [result] = await pool.query(
-
-        'SELECT e.* FROM employee e JOIN systemuser su ON e.employee_id = su.employee_id WHERE su.status = ?',
-        [status]
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'SELECT e.* FROM employee e JOIN systemuser su ON e.employee_id = su.employee_id WHERE su.status = ?',
+      [status]
     );
-    //console.log(result[0]);
     return result;
+  } finally {
+    conn.release();
+  }
 };
+
 //get active employee
 export const getActiveEmployeeModel = async () => {
-  const [result] = await pool.query(
-    `SELECT e.employee_id, e.name FROM employee e JOIN systemuser s ON e.employee_id = s.employee_id WHERE s.status = ?`,
-    ['active']
-  );
-  return result;
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      `SELECT e.employee_id, e.name FROM employee e JOIN systemuser s ON e.employee_id = s.employee_id WHERE s.status = ?`,
+      ['active']
+    );
+    return result;
+  } finally {
+    conn.release();
+  }
 }
- 
+
 
 export const getActiveEmployeesService = async () => {
   try {
@@ -187,25 +262,29 @@ export const getActiveEmployeesService = async () => {
 };
 
 export const updatePasswordByEmail = async (newPassword, email, table) => {
-  console.log(newPassword, email, table);
-  let result;
-  if (table === "employee") {
-    [result] = await pool.query(
-      `UPDATE systemuser s 
-             JOIN employee e ON e.employee_id = s.employee_id 
-             SET s.password = ? 
-             WHERE e.email = ?`,
-      [newPassword, email]
-    );
-  } else if (table === "customer") {
-    [result] = await pool.query(
-      `UPDATE customer 
-             SET pasword = ? 
-             WHERE email = ?`,
-      [newPassword, email]
-    );
-  }
-  return result.affectedRows; // Returns the number of rows affected
+  const conn = await pool.getConnection();
+  try {
+    let result;
+    if (table === "employee") {
+      [result] = await conn.query(
+        `UPDATE systemuser s 
+               JOIN employee e ON e.employee_id = s.employee_id 
+               SET s.password = ? 
+               WHERE e.email = ?`,
+        [newPassword, email]
+      );
+    } else if (table === "customer") {
+      [result] = await conn.query(
+        `UPDATE customer 
+               SET pasword = ? 
+               WHERE email = ?`,
+        [newPassword, email]
+      );
+    }
+    return result.affectedRows;
+  } finally {
+    conn.release();
+  } // Returns the number of rows affected
 };
 
 export class ServiceChargeModel {
@@ -214,14 +293,14 @@ export class ServiceChargeModel {
     try {
       await connection.beginTransaction();
       const [result] = await connection.query("CALL CalculateServiceCharges()");
-      
+
       // Get actual affected rows from temporary table
       const [affected] = await connection.query(
         "SELECT ROW_COUNT() AS affectedRows"
       );
 
       await connection.commit();
-      
+
       return {
         success: true,
         message: "Service charges updated successfully",
@@ -308,11 +387,16 @@ export class ServiceChargeModel {
 }
 
 export const searchCustomerByTerm = async (search_term) => {
-    const [result] = await pool.query(
-        `SELECT * FROM customer WHERE customer_id LIKE ? OR name LIKE ? OR email LIKE ? OR role LIKE ? OR address LIKE ? OR phone LIKE ?`,
-    [`%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`]
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      `SELECT * FROM customer WHERE customer_id LIKE ? OR name LIKE ? OR email LIKE ? OR role LIKE ? OR address LIKE ? OR phone LIKE ?`,
+      [`%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`, `%${search_term}%`]
     );
-return result;
+    return result;
+  } finally {
+    conn.release();
+  }
 };
 
 
@@ -414,25 +498,7 @@ ORDER BY
       connection.release();
     }
   }
-  //....................................................problem
-  // static async calculateMonthlyDeduction(employeeId, monthYear) {
-  //   const connection = await pool.getConnection();
-  //   try {
-  //     const [results] = await connection.query(
-  //       `CALL CalculateAndSaveMonthlyDeduction(?, ?)`, {
-  //         replacements: [employeeId, `${monthYear}-01`]
-  //       }
-  //     );
-  //     return {
-  //         success: true,
-  //         data: results[0][0]
-  //     };
-  //   } catch (error) {
-  //     throw new Error('Monthly calculation failed: ' + error.message);
-  //   } finally {
-  //     connection.release();
-  //   }
-  // }
+
 
   static async saveMonthlyDeduction(employeeId, monthYear, totalDeductions) {
     const connection = await pool.getConnection();
@@ -483,64 +549,79 @@ ORDER BY
   //...........................
 
   static async getMonthlyDeductionSummaryByEmployeeAndDate(employee_id, date) {
-  const connection = await pool.getConnection();
-  try {
-    console.log("Query Parameters:", employee_id, date); // Log parameters
-    const [results] = await connection.query(
-      `SELECT employee_id,
+    const connection = await pool.getConnection();
+    try {
+      console.log("Query Parameters:", employee_id, date); // Log parameters
+      const [results] = await connection.query(
+        `SELECT employee_id,
       total_deduction,
       DATE_FORMAT(month_year, "%Y-%m") AS month_year 
        FROM deduction_month
        WHERE employee_id = ? AND DATE_FORMAT(month_year, "%Y-%m") = ?`,
-      [employee_id, date]
-    );
-    console.log("Query Results:", results); // Log results
-    return results;
-  } catch (error) {
-    throw new Error(
-      "Failed to fetch monthly deduction summary: " + error.message
-    );
-  } finally {
-    connection.release();
+        [employee_id, date]
+      );
+      console.log("Query Results:", results); // Log results
+      return results;
+    } catch (error) {
+      throw new Error(
+        "Failed to fetch monthly deduction summary: " + error.message
+      );
+    } finally {
+      connection.release();
+    }
   }
-}
 }
 
 
 export const calculatePayModel = async (calculation_date) => {
-  const [result] = await pool.query(
-    'CALL CalculateEmployeeSalary(?)',
-    [calculation_date]
-  );
-  return result;
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      'CALL CalculateEmployeeSalary(?)',
+      [calculation_date]
+    );
+    return result;
+  } finally {
+    conn.release();
+  }
 };
 
 export const getPayEntriesModel = async (date) => {
-  const [rows] = await pool.query(
-    `SELECT * FROM employee_salary_calculation 
-     WHERE calculation_date = ?`,
-    [date]
-  );
-  return rows;
+  const conn = await pool.getConnection();
+  try {
+    const [rows] = await conn.query(
+      `SELECT * FROM employee_salary_calculation 
+       WHERE calculation_date = ?`,
+      [date]
+    );
+    return rows;
+  } finally {
+    conn.release();
+  }
 };
-//huuuuuuuuuuuuuuuuuuuuuuuuuuuu
+
 export const UpdatePayStatusEntriesModel = async (status, date, employee_id) => {
-  const [result] = await pool.query(
-    `UPDATE employee_salary_calculation 
-     SET status = ?
-     WHERE 
-       calculation_date = STR_TO_DATE(?, '%Y-%m-%d') AND 
-       employee_id = ?`,
-    [status, date, employee_id]
-  );
-  return result;
+  const conn = await pool.getConnection();
+  try {
+    const [result] = await conn.query(
+      `UPDATE employee_salary_calculation 
+       SET status = ?
+       WHERE 
+         calculation_date = STR_TO_DATE(?, '%Y-%m-%d') AND 
+         employee_id = ?`,
+      [status, date, employee_id]
+    );
+    return result;
+  } finally {
+    conn.release();
+  }
 };
 
 
 // Email Services
 export const sendSalaryEmail = async (name, email, netSalary, month, deductions) => {
   const subject = `Your Salary Statement - ${month}`;
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2c3e50;">Dear ${name},</h2>
@@ -548,8 +629,8 @@ export const sendSalaryEmail = async (name, email, netSalary, month, deductions)
       
       <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
         <h3 style="color: #27ae60;">Salary Details</h3>
-        <p><strong>Net Salary:</strong> LKR ${netSalary.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-        <p><strong>Total Deductions:</strong> LKR ${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+        <p><strong>Net Salary:</strong> LKR ${netSalary.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+        <p><strong>Total Deductions:</strong> LKR ${deductions.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
         <p><strong>Payment Date:</strong> ${new Date().toLocaleDateString()}</p>
       </div>
       
@@ -572,23 +653,33 @@ export const sendSalaryEmail = async (name, email, netSalary, month, deductions)
   }
 };
 export const getPayEntryByEmployeeAndDateModel = async (employeeId, date) => {
-  const [rows] = await pool.query(
-    `SELECT * 
-     FROM employee_salary_calculation 
-     WHERE employee_id = ? AND calculation_date = ?`,
-    [employeeId, date]
-  );
-  return rows[0];
+  const conn = await pool.getConnection();
+  try {
+    const [rows] = await conn.query(
+      `SELECT * 
+       FROM employee_salary_calculation 
+       WHERE employee_id = ? AND calculation_date = ?`,
+      [employeeId, date]
+    );
+    return rows[0];
+  } finally {
+    conn.release();
+  }
 };
 
 export const getPayEntriesByEmployeeModel = async (employeeId) => {
-  const [rows] = await pool.query(
-    `SELECT * 
-     FROM employee_salary_calculation 
-     WHERE employee_id = ?`,
-    [employeeId]
-  );
-  return rows;
+  const conn = await pool.getConnection();
+  try {
+    const [rows] = await conn.query(
+      `SELECT * 
+       FROM employee_salary_calculation 
+       WHERE employee_id = ?`,
+      [employeeId]
+    );
+    return rows;
+  } finally {
+    conn.release();
+  }
 };
 
 // Add this to your models

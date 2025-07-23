@@ -2,9 +2,10 @@ import db from '../config/db.js';
 
 class EventModel {
     static async createEvents(eventData) {
+        const conn = await db.getConnection();
         try {
             // Insert into Event table
-            const [result] = await db.query(
+            const [result] = await conn.query(
                 `INSERT INTO Event (Buffet_TimeFrom, Buffet_TimeTo, 
                 Function_durationFrom, Function_durationTo, Tea_table_Time, Dress_Time, booking_id) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -19,13 +20,13 @@ class EventModel {
                 ]
             );
 
-            const [NewEventID] = await db.query(
+            const [NewEventID] = await conn.query(
                 `SELECT Event_ID FROM Event WHERE booking_id = ?`,
                 [eventData.bookingID]
             );
             let newEventID = NewEventID[0].Event_ID;
 
-            await db.query(
+            await conn.query(
                 `INSERT INTO CustomEvent (Event_ID, Event_Name, ContactPersonName, ContactPersonNumber) 
                 VALUES (?, ?, ?, ?)`,
                 [newEventID, eventData.eventName, eventData.contactPersonName, eventData.contactPersonNumber]
@@ -35,6 +36,8 @@ class EventModel {
         } catch (error) {
             console.error("Database Error (createEvents):", error.message || error);
             throw new Error(error.message || "Failed to create event.");
+        } finally {
+            conn.release();
         }
     }
 }
