@@ -2,9 +2,10 @@ import db from "../config/db.js";
 
 class plannedEvent {
     static async getPlannedEvent(customerID, bookingID) {
+        const conn = await db.getConnection();
         try {
             // Add b.booking_id = ? to the WHERE clause
-            const [results] = await db.query(
+            const [results] = await conn.query(
                 `SELECT 
                     e.Event_ID, 
                     e.Buffet_TimeFrom, 
@@ -40,6 +41,9 @@ class plannedEvent {
         } catch (error) {
             console.error("Database Error:", error);
             throw new Error("Failed to fetch event details.");
+        }
+        finally {
+            conn.release();
         }
     }
 static async update(eventId, eventData) {

@@ -1,7 +1,8 @@
 import db from "../config/db.js";
 
 export const getMenuSelectionsByBooking = async (bookingId) => {
-    const [rows] = await db.query(`
+    const conn = await db.getConnection();
+    const [rows] = await conn.query(`
         SELECT 
             c.customer_id,
             c.name AS customer_name,
@@ -37,7 +38,7 @@ export const getMenuSelectionsByBooking = async (bookingId) => {
         WHERE cmis.booking_id = ?
         ORDER BY mlt.menu_list_name, mt.menu_type_name, cat.category_name, i.item_name
     `, [bookingId]);
-
+    conn.release(); // Always release the connection
     return rows;
 };
 
@@ -117,42 +118,52 @@ export const getStructuredMenuSelectionsByBooking = async (bookingId) => {
 };
 
 export const createMenuSelection = async (bookingId, ICMT_Id) => {
-    const [result] = await db.query(
+    const conn = await db.getConnection();
+    const [result] = await conn.query(
         "INSERT INTO customer_menu_item_selection (booking_id, ICMT_Id) VALUES (?, ?)",
         [bookingId, ICMT_Id]
     );
+    conn.release(); // Always release the connection
     return result.insertId;
 };
 
 export const updateMenuSelection = async (bookingId, oldICMT_Id, newICMT_Id) => {
-    const [result] = await db.query(
+    const conn = await db.getConnection();
+    const [result] = await conn.query(
         "UPDATE customer_menu_item_selection SET ICMT_Id = ? WHERE booking_id = ? AND ICMT_Id = ?",
         [newICMT_Id, bookingId, oldICMT_Id]
     );
+    conn.release(); // Always release the connection
     return result.affectedRows;
 };
 
 export const deleteMenuSelection = async (bookingId, ICMT_Id) => {
-    const [result] = await db.query(
+    const conn = await db.getConnection();
+    const [result] = await conn.query(
         "DELETE FROM customer_menu_item_selection WHERE booking_id = ? AND ICMT_Id = ?",
         [bookingId, ICMT_Id]
     );
+    conn.release(); // Always release the connection
     return result.affectedRows;
 };
 
 export const deleteAllMenuSelectionsForBooking = async (bookingId) => {
-    const [result] = await db.query(
+    const conn = await db.getConnection();
+    const [result] = await conn.query(
         "DELETE FROM customer_menu_item_selection WHERE booking_id = ?",
         [bookingId]
     );
+    conn.release(); // Always release the connection
     return result.affectedRows;
 };
 
 export const menuSelectionExists = async (bookingId, ICMT_Id) => {
-    const [rows] = await db.query(
+    const conn = await db.getConnection();
+    const [rows] = await conn.query(
         "SELECT 1 FROM customer_menu_item_selection WHERE booking_id = ? AND ICMT_Id = ? LIMIT 1",
         [bookingId, ICMT_Id]
     );
+    conn.release(); // Always release the connection
     return rows.length > 0;
 };
 

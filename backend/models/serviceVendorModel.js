@@ -2,8 +2,9 @@ import db from '../config/db.js';
 
 class serviceVendorModel {
     static async getVendorsByCustomerBooking(customerId, bookingId) {
+        const conn = await db.getConnection();
         try {
-            const [results] = await db.query(`
+            const [results] = await conn.query(`
                     SELECT
                     v.Vendor_ID,
                     es.Event_Service_Name,
@@ -23,6 +24,9 @@ class serviceVendorModel {
         } catch (error) {
             console.error("Database Error (getVendorsByCustomerBooking):", error);
             throw new Error("Failed to fetch vendors");
+        }
+        finally {
+            conn.release();
         }
     }
 }
