@@ -60,3 +60,9 @@ export const getCustomerBookings = async (customerId) => {
     throw error;
   }
 };
+
+// services/CustomerService.js
+export const deleteCustomer = async (customerId) => {
+  const response = await api.delete(`/user/deleteCustomer/${customerId}`);
+  return response.data;
+};
