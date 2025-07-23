@@ -2,11 +2,12 @@ import db from '../config/db.js';
 
 class saveSelectedServiceModel {
     static async saveSelectedServices(customerId, bookingId, serviceIds) {
+        const conn = await db.getConnection();
         try {
-            await db.query('START TRANSACTION');
+            await conn.query('START TRANSACTION');
             
             // Delete existing selections for this booking
-            await db.query(
+            await conn.query(
                 'DELETE FROM Customer_Event_Service WHERE booking_id = ?',
                 [bookingId]
             );
@@ -19,7 +20,7 @@ class saveSelectedServiceModel {
                     serviceId
                 ]);
                 
-                await db.query(
+                await conn.query(
                     `INSERT INTO Customer_Event_Service 
                     (customer_id, booking_id, event_service_id) 
                     VALUES ?`,
@@ -27,12 +28,15 @@ class saveSelectedServiceModel {
                 );
             }
             
-            await db.query('COMMIT');
+            await conn.query('COMMIT');
             return true;
         } catch (error) {
-            await db.query('ROLLBACK');
+            await conn.query('ROLLBACK');
             console.error('Database Error:', error);
             throw new Error('Failed to save services');
+        }
+        finally {
+            conn.release();
         }
     }
 }

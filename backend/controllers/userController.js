@@ -27,7 +27,12 @@ import pool from "../config/db.js";
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
+import sgMail from '@sendgrid/mail';
+
 dotenv.config();
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 
 
 import { sendIdToUserMethod } from "../controllers/mailController.js";
@@ -45,39 +50,46 @@ import {
 //...........................................................................
 
 // Create reusable transporter object
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: parseInt(process.env.MAIL_PORT),
-  secure: false,
-  auth: {
-    user: process.env.MAIL_ADDRESS,
-    pass: process.env.MAIL_PSWD,
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   host: process.env.MAIL_HOST,
+//   port: parseInt(process.env.MAIL_PORT),
+//   secure: false,
+//   auth: {
+//     user: process.env.MAIL_ADDRESS,
+//     pass: process.env.MAIL_PSWD,
+//   },
+// });
+
 
 // Send ID to employee
 export const sendIdToEmp = async (req, res) => {
   const { name, subject, email, message } = req.body;
 
-  try {
-    const mailOptions = {
-      from: `"Deandra" <${process.env.MAIL_ADDRESS}>`,
-      to: email,
-      subject,
-      text: `Hello ${name},\n\n${message}`,
-      html: `<p>Hello ${name},</p><p>${message}</p>`,
-    };
+  const html = `<p>Hello ${name},</p><p>${message}</p>`;
 
-    await transporter.sendMail(mailOptions);
+  const msg = {
+    to: email,
+    from: {
+      name: 'Deandra',
+      email: 'noreply@deandrabolgoda.lk' // this must be verified in SendGrid
+    },
+    subject,
+    text: `Hello ${name},\n\n${message}`,
+    html,
+  };
+
+  try {
+    await sgMail.send(msg);
     res.status(200).json({ message: 'Email sent successfully' });
   } catch (error) {
-    console.error('Email error:', error);
+    console.error('Email error:', error.response?.body || error.message);
     res.status(500).json({ 
       msg: 'Failed to send email',
       error: error.message 
     });
   }
 };
+
 
 // Send salary notification to employee
 export const sendSalaryEmail = async (name, email, netSalary, month, deductions) => {
@@ -87,37 +99,39 @@ export const sendSalaryEmail = async (name, email, netSalary, month, deductions)
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2c3e50;">Dear ${name},</h2>
       <p>Your salary for <strong>${month}</strong> has been processed:</p>
-      
       <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
         <h3 style="color: #27ae60;">Salary Details</h3>
         <p><strong>Net Salary:</strong> LKR ${netSalary.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
         <p><strong>Total Deductions:</strong> LKR ${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
         <p><strong>Payment Date:</strong> ${new Date().toLocaleDateString()}</p>
       </div>
-      
       <p>If you have any questions about your salary, please contact the HR department.</p>
-      
       <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
         <small>This is an automated message. Please do not reply directly to this email.</small>
       </p>
-      
       <p>Best regards,<br>The Payroll Team<br>Deandra Management</p>
     </div>
   `;
 
+  const msg = {
+    to: email,
+    from: {
+      name: 'Deandra Payroll',
+      email: 'noreply@deandrabolgoda.lk' // must be verified in SendGrid
+    },
+    subject,
+    html,
+  };
+
   try {
-    await transporter.sendMail({
-      from: `"Deandra Payroll" <${process.env.MAIL_ADDRESS}>`,
-      to: email,
-      subject,
-      html
-    });
+    await sgMail.send(msg);
     return true;
   } catch (error) {
-    console.error(`Failed to send salary email to ${email}:`, error);
+    console.error(`Failed to send salary email to ${email}:`, error.response?.body || error.message);
     return false;
   }
 };
+
 
 // Notify employees about payroll
 export const notifyEmployeesPayroll = async (req, res) => {
