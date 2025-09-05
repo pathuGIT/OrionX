@@ -20,7 +20,7 @@ const EventServiceForm = ({
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState('');
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = "http://167.71.192.163:8000";
 
   // Load service data when in edit mode
   useEffect(() => {
