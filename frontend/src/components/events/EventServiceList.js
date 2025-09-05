@@ -9,7 +9,7 @@ const EventServiceList = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [selectedServiceId, setSelectedServiceId] = useState(null);
-  const BASE_URL = "http://167.71.192.163:8000";
+  const BASE_URL = "http://157.245.206.14:8000";
 
   const fetchServices = async () => {
     setLoading(true);
