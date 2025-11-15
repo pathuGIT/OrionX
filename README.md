@@ -1,5 +1,5 @@
 
-# OrionX: Baquet and Catering System for Deandra
+# OrionX: Banquet and Catering System for Deandra
 
 This is the Baquet and Catering System for Deandra, developed using **React.js** for the frontend and **Express.js** for the backend.
 
