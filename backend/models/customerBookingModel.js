@@ -2,8 +2,9 @@ import db from '../config/db.js';
 
 class customerBookingModel {
     static async getCustomerBooking(customerID) {
+        const conn = await db.getConnection();
         try {
-            const [result] = await db.query(
+            const [result] = await conn.query(
                 `SELECT 
                     b.booking_id, 
                     b.booking_date, 
@@ -19,12 +20,15 @@ class customerBookingModel {
         } catch (error) {
             console.error("Database Error (getCustomerBooking):", error);
             throw new Error("Failed to get customer bookings.");
+        } finally {
+            conn.release();
         }
     }
 
     static async getTotalBookingEvents(customerID) {
+        const conn = await db.getConnection();
         try {
-            const [result] = await db.query(
+            const [result] = await conn.query(
                 `
                     SELECT
                          (
@@ -54,6 +58,8 @@ class customerBookingModel {
         } catch (error) {
             console.error("Database Error (getBookingEvents):", error);
             throw new Error("Failed to get booking events.");
+        } finally {
+            conn.release();
         }
     }
 

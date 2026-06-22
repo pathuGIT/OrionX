@@ -60,3 +60,14 @@ export const getCustomerBookings = async (customerId) => {
     throw error;
   }
 };
+
+// services/CustomerService.js
+export const deleteCustomer = async (customerId) => {
+ try {
+   const response = await api.delete(`/user/deleteCustomer/${customerId}`);
+   return response.data;
+ } catch (error) {
+   console.error('Error deleting customer:', error);
+   throw error;
+ }
+};

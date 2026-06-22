@@ -31,7 +31,6 @@ function DetailRow({ label, value, bookingId, bookingStatus, setRefresh, refresh
         }
     }, [label]);
 
-    console.log(bDate)
 
     if (label === "Venue ID" || label === "Status" || label === "Damage Fee (Rs)" || label === "Guests" || label === "Additional Hours" || (label === "Date" && bookingStatus !== "done")) {
         return (

@@ -3,8 +3,9 @@ import db from '../config/db.js';
 
 class EventServiceModel {
     static async getEventServices() {
+        const conn = await db.getConnection();
         try {
-            const [results] = await db.query(`
+            const [results] = await conn.query(`
                 SELECT 
                     Event_Service_ID AS id,
                     Event_Service_Name AS name,
@@ -16,6 +17,8 @@ class EventServiceModel {
         } catch (error) {
             console.error("Database Error (getEventServices):", error);
             throw new Error("Failed to fetch event services");
+        } finally {
+            conn.release();
         }
     }
 }

@@ -3,6 +3,7 @@ import db from '../config/db.js';
 
 class ReportModel {
     static async getReportData(bookingId) {
+        const conn = await db.getConnection();
         const query = `
             SELECT
                 -- Booking & Customer
@@ -86,16 +87,19 @@ class ReportModel {
             WHERE b.booking_id = ?
         `;
         try {
-            const [rows] = await db.query(query, [bookingId]);
+            const [rows] = await conn.query(query, [bookingId]);
             return rows[0] || null;
         } catch (error) {
             console.error("Error fetching report data:", error);
             throw new Error("Database query for report failed.");
+        } finally {
+            conn.release();
         }
     }
 
-// Controller for admin bookings report
-static async getAllBookingReports() {
+    // Controller for admin bookings report
+    static async getAllBookingReports() {
+        const conn = await db.getConnection();
         const query = `
             SELECT 
                 b.booking_id,
@@ -122,26 +126,22 @@ static async getAllBookingReports() {
         `;
 
         try {
-            const [results] = await db.query(query);
+            const [results] = await conn.query(query);
             return results;
         } catch (error) {
             console.error('Database query error:', error);
-            
+
             // Enhance error information
             error.details = {
                 query,
                 timestamp: new Date().toISOString()
             };
-            
+
             throw error;
+        } finally {
+            conn.release();
         }
     }
-
-
-
-
-
-
 
 }
 

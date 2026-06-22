@@ -1,33 +1,6 @@
 import db from '../config/db.js';
 
 export class EventLinkModel {
-    // static async linkArrangement(eventId, arrangementId) {
-    //     const connection = await db.getConnection();
-    //     try {
-    //         await connection.query('START TRANSACTION');
-    //         console.log("Linking arrangement:", eventId, arrangementId);
-    //         // Remove any existing links
-    //         await connection.query(
-    //             `DELETE FROM event_table_chair WHERE Event_ID = ?`,
-    //             [eventId]
-    //         );
-
-    //         // Create new link
-    //         await connection.query(
-    //             `INSERT INTO event_table_chair (Event_ID, Arrangement_Id)
-    //             VALUES (?, ?)`,
-    //             [eventId, arrangementId]
-    //         );
-
-    //         await connection.query('COMMIT');
-    //     } catch (error) {
-    //         await connection.query('ROLLBACK');
-    //         throw error;
-    //     } finally {
-    //         connection.release();
-    //     }
-    // }
-
     static async getAllDesigns() {
         let connection;
         try {
@@ -93,4 +66,4 @@ export class EventLinkModel {
     }
 }
 
-export default EventLinkModel;
+export default EventLinkModel;//

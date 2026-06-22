@@ -2,7 +2,8 @@ import pool from "../config/db.js";
 
 // Get all menu views with detailed JOINs
 export const getAllMenuViewsModel = async () => {
-    const [rows] = await pool.query(`
+    const conn = await pool.getConnection();
+    const [rows] = await conn.query(`
         SELECT 
             b.ICMT_Id, 
             a.menu_type_id, 
@@ -22,13 +23,15 @@ export const getAllMenuViewsModel = async () => {
         INNER JOIN menu_type e ON a.menu_type_id = e.menu_type_id
         INNER JOIN menu_list_type f ON e.menu_list_type_id = f.menu_list_type_id
     `);
+    conn.release(); // Always release the connection
     return rows;
     
 };
 
 // Get a single menu view by ICMT_Id
 export const getMenuViewByIdModel = async (ICMT_Id) => {
-    const [rows] = await pool.query(`
+    const conn = await pool.getConnection();
+    const [rows] = await conn.query(`
         SELECT 
             b.ICMT_Id, 
             a.menu_type_id, 
@@ -49,5 +52,6 @@ export const getMenuViewByIdModel = async (ICMT_Id) => {
         INNER JOIN menu_list_type f ON e.menu_list_type_id = f.menu_list_type_id
         WHERE b.ICMT_Id = ?
     `, [ICMT_Id]);
+    conn.release(); // Always release the connection
     return rows[0];
 };

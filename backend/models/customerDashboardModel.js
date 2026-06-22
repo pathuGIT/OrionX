@@ -1,17 +1,21 @@
 import db from '../config/db.js';
 
 const checkCompletion = async (query, params) => {
+    const conn = await db.getConnection();
     try {
-        const [rows] = await db.query(query, params);
+        const [rows] = await conn.query(query, params);
         return rows.length > 0;
     } catch (error) {
         console.error(`Query failed: ${query}`, error.message);
         return false;
+    } finally {
+        conn.release();
     }
 };
 
 class CustomerDashboardModel {
     static async getPlanningStatus(bookingId) {
+        const conn = await db.getConnection();
         // First determine event type
         const eventType = await this.getEventType(bookingId);
 
@@ -77,8 +81,9 @@ class CustomerDashboardModel {
     }
 
     static async getEventType(bookingId) {
+        const conn = await db.getConnection();
         try {
-            const [eventRows] = await db.query(
+            const [eventRows] = await conn.query(
                 `SELECT Event_Type FROM event WHERE booking_id = ?`,
                 [bookingId]
             );
@@ -86,7 +91,7 @@ class CustomerDashboardModel {
             if (eventRows.length === 0) return 'unknown';
 
             // Check if it's a wedding
-            const [weddingRows] = await db.query(
+            const [weddingRows] = await conn.query(
                 `SELECT 1 FROM wedding WHERE Event_ID = ?`,
                 [eventRows[0].Event_ID]
             );
@@ -95,6 +100,8 @@ class CustomerDashboardModel {
         } catch (error) {
             console.error('Error determining event type:', error);
             return 'unknown';
+        } finally {
+            conn.release();
         }
     }
 }

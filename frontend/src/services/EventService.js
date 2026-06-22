@@ -371,43 +371,6 @@ export const deleteAssignment = async (assignmentId) => {
 };
 
 
-//wedding admin
-
-//  export const getAllEvents = async () => {
-//     try {
-//       const response = await api.get('/AdminEvents/events');
-//       return response.data;
-//     } catch (error) {
-//       throw new Error(error.response?.data?.error || 'Failed to fetch events');
-//     }
-//   };
-
-//    export const createEvent = async (eventType, data) => {
-//     try {
-//       const response = await api.post('/AdminEvents/events', { eventType, data });
-//       return response.data;
-//     } catch (error) {
-//       throw new Error(error.response?.data?.error || 'Event creation failed');
-//     }
-//   };
-
-//    export const  updateEvent = async (eventId, eventType, data) => {
-//     try {
-//       const response = await api.put(`/AdminEvents/events/${eventId}`, { eventType, data });
-//       return response.data;
-//     } catch (error) {
-//       throw new Error(error.response?.data?.error || 'Event update failed');
-//     }
-//   };
-
-//    export const deleteEvent = async (eventId, eventType) => {
-//     try {
-//       await api.delete(`/AdminEvents/events/${eventId}`, { data: { eventType } });
-//     } catch (error) {
-//       throw new Error(error.response?.data?.error || 'Event deletion failed');
-//     }
-//   };
-
 export const getEventById = async (eventId) => {
   try {
     const response = await api.get(`/AdminEvents/events/${eventId}`);
